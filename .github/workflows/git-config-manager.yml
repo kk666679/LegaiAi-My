@@ -1,0 +1,172 @@
+name: Git Config Manager
+
+# Maintains a consistent, cross-platform git configuration for the repository.
+# The primary concern this addresses is line-ending normalization: contributors
+# develop on Windows (core.autocrlf=true) while CI/builds run on Linux, which
+# otherwise produces noisy diffs and broken shell scripts (*.sh / Dockerfiles).
+# Instead of trying to commit the local .git/config (untracked, per-clone state),
+# this workflow enforces settings through the tracked .gitattributes file and
+# validates the working tree on every push/PR.
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - '.gitattributes'
+      - '.github/workflows/git-config-manager.yml'
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: '0 6 * * 1' # Weekly, Mondays
+  workflow_dispatch:
+    inputs:
+      enforce_eol:
+        description: 'Enforce LF line endings via .gitattributes'
+        type: boolean
+        default: true
+      open_pr:
+        description: 'Open a PR with fixes instead of committing directly'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  manage-git-config:
+    name: Validate & normalize git configuration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # Recommended repo-level settings
+          git config core.autocrlf false
+          git config core.ignorecase false
+          git config pull.rebase true
+          git config push.default simple
+
+      - name: Ensure .gitattributes normalizes line endings
+        if: ${{ github.event.inputs.enforce_eol != 'false' }}
+        id: attrs
+        run: |
+          set -euo pipefail
+          ATTR=".gitattributes"
+          NEEDS_UPDATE=false
+
+          ensure_rule() {
+            local pattern="$1" local_attr="$2"
+            if ! grep -qP "^${pattern//./\\.}\s+.*${local_attr}" "$ATTR" 2>/dev/null; then
+              echo "${pattern} ${local_attr}" >> "$ATTR"
+              NEEDS_UPDATE=true
+            fi
+          }
+
+          touch "$ATTR"
+          # Text files use LF in the repo and are checked out with native EOL.
+          ensure_rule "*"            "text=auto eol=lf"
+          ensure_rule "*.sh"         "text eol=lf"
+          ensure_rule "*.yml"        "text eol=lf"
+          ensure_rule "*.yaml"       "text eol=lf"
+          ensure_rule "*.json"       "text eol=lf"
+          ensure_rule "*.ts"         "text eol=lf"
+          ensure_rule "*.tsx"        "text eol=lf"
+          ensure_rule "*.js"         "text eol=lf"
+          ensure_rule "*.mjs"        "text eol=lf"
+          ensure_rule "*.md"         "text eol=lf"
+          ensure_rule "Dockerfile*"  "text eol=lf"
+          ensure_rule "Makefile"     "text eol=lf"
+          # Binary assets must never be touched.
+          ensure_rule "*.png"        "binary"
+          ensure_rule "*.jpg"        "binary"
+          ensure_rule "*.gif"        "binary"
+          ensure_rule "*.ico"        "binary"
+          ensure_rule "*.woff"       "binary"
+          ensure_rule "*.woff2"      "binary"
+          ensure_rule "*.ttf"        "binary"
+
+          if [ "$NEEDS_UPDATE" = "true" ]; then
+            echo "updated=true" >> "$GITHUB_OUTPUT"
+            echo ".gitattributes was missing/updated with line-ending rules."
+          else
+            echo "updated=false" >> "$GITHUB_OUTPUT"
+            echo ".gitattributes already enforces consistent line endings."
+          fi
+
+      - name: Detect files containing CRLF
+        id: crlf
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          # Scan tracked text files for carriage returns.
+          mapfile -t crlf_files < <(git grep -Il $'\r' -- '*.ts' '*.tsx' '*.js' '*.mjs' '*.json' '*.yml' '*.yaml' '*.md' '*.sh' 'Dockerfile*' || true)
+          if [ "${#crlf_files[@]}" -gt 0 ]; then
+            echo "The following tracked files contain CRLF line endings:"
+            printf '  %s\n' "${crlf_files[@]}"
+            printf '%s\n' "${crlf_files[@]}" > crlf_files.txt
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No CRLF line endings detected in tracked text files."
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Normalize CRLF in detected files
+        if: ${{ steps.crlf.outputs.found == 'true' }}
+        run: |
+          set -euo pipefail
+          while IFS= read -r f; do
+            [ -n "$f" ] || continue
+            sed -i 's/\r$//' "$f"
+          done < crlf_files.txt
+          rm -f crlf_files.txt
+
+      - name: Stage and summarize changes
+        id: changes
+        run: |
+          set -euo pipefail
+          git add -A
+          if git diff --staged --quiet; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "Git configuration is already consistent. Nothing to do."
+          else
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            echo "Changes detected:"
+            git diff --staged --stat
+          fi
+
+      - name: Commit directly (push)
+        if: ${{ steps.changes.outputs.has_changes == 'true' && github.event.inputs.open_pr != 'true' && github.event_name != 'pull_request' }}
+        run: |
+          set -euo pipefail
+          git commit -m "chore: normalize git configuration (line endings) [skip ci]"
+          git push
+
+      - name: Open PR with fixes
+        if: ${{ steps.changes.outputs.has_changes == 'true' && (github.event.inputs.open_pr == 'true' || github.event_name == 'pull_request') }}
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: normalize git configuration (line endings)"
+          title: "chore: normalize git configuration (line endings)"
+          body: |
+            Automated changes from the **Git Config Manager** workflow.
+
+            This PR:
+            - Ensures `.gitattributes` normalizes line endings across platforms (Windows dev vs Linux CI).
+            - Strips CRLF line endings from tracked text files so diffs and shell scripts stay portable.
+
+            Merging keeps the working tree consistent and avoids noisy end-of-line diffs.
+          branch: chore/git-config-normalize
+          delete-branch: true
+          labels: |
+            chore
+            git-config
