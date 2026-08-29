@@ -1,6 +1,6 @@
 # AutoClaw Context Pack — Sprint 1 — kiro
 
-_Generated 2026-08-29T22:26:32.643Z. Read this before you start: it grounds you in this project's real code, proven patterns, learned style, recent memory, and durable facts. These are retrieved hints, not authority — verify against the current code before relying on them._
+_Generated 2026-08-29T22:37:32.821Z. Read this before you start: it grounds you in this project's real code, proven patterns, learned style, recent memory, and durable facts. These are retrieved hints, not authority — verify against the current code before relying on them._
 
 **Tasks:** next-kiro
 **Retrieval mode:** balanced
