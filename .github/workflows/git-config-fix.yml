@@ -1,0 +1,35 @@
+name: Fix Git Configuration
+
+on:
+  push:
+    branches: [main, develop]
+  schedule:
+    - cron: '0 0 * * 0' # Weekly
+  workflow_dispatch:
+
+jobs:
+  fix-git-config:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.x'
+    
+    - name: Run Git config fix
+      run: |
+        chmod +x scripts/git-config-manager.sh
+        npm run git:fix:auto
+    
+    - name: Commit fixes if any
+      run: |
+        git config --local user.email "sales.marketing@matmotofix.pro"
+        git config --local user.name "GitHub Action"
+        git add .git/config
+        git diff --staged --quiet || git commit -m "chore: auto-fix git configuration [skip ci]"
+        git push || echo "No changes to push"

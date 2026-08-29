@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["court","appellant","respondent","issues","authorities"],
+  "properties": {
+    "court": {"type":"string","minLength":1},
+    "appellant": {"type":"string","minLength":1},
+    "respondent": {"type":"string","minLength":1},
+    "issues": {"type":"array","minItems":1,"items":{"type":"string","minLength":1}},
+    "authorities": {"type":"array","items":{"type":"string","minLength":1}},
+    "reliefSought": {"type":"array","items":{"type":"string","minLength":1}},
+    "solicitorName": {"type":"string"},
+    "solicitorRef": {"type":"string"}
+  }
+}
+

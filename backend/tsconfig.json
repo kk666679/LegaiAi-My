@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+    "allowJs": true,
+    "ignoreDeprecations": "6.0",
+    "strict": false,
+    "baseUrl": ".",
+    "paths": {
+      "@/backend/src/db": ["./src/db/index.ts"],
+      "@/backend/*": ["./*"]
+    },
+    "outDir": "./dist",
+    "sourceMap": true
+  },
+  "include": ["src/**/*", "schemas/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

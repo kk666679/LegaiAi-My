@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["court","suitNo","plaintiff","defendant","replyToDenials"],
+  "properties": {
+    "court": {"type":"string","minLength":1},
+    "suitNo": {"type":"string","minLength":1},
+    "plaintiff": {
+      "type":"object",
+      "additionalProperties": false,
+      "required":["name","description","address"],
+      "properties":{
+        "name":{"type":"string"},
+        "description":{"type":"string"},
+        "address":{"type":"string"}
+      }
+    },
+    "defendant": {
+      "type":"object",
+      "additionalProperties": false,
+      "required":["name","description","address"],
+      "properties":{
+        "name":{"type":"string"},
+        "description":{"type":"string"},
+        "address":{"type":"string"}
+      }
+    },
+    "replyToDenials": {
+      "type":"array",
+      "minItems":0,
+      "items":{
+        "type":"object",
+        "additionalProperties":false,
+        "required":["paragraph","response"],
+        "properties":{
+          "paragraph":{"type":"number"},
+          "response":{"type":"string","minLength":1}
+        }
+      }
+    },
+    "additionalMatters": {"type":"array","items":{"type":"string","minLength":1}},
+    "solicitorName": {"type":"string"},
+    "solicitorRef": {"type":"string"}
+  }
+}
+

@@ -1,0 +1,54 @@
+{
+  "mcpServers": {
+    "web_search_and_fetch": {
+      "type": "stdio",
+      "command": "uv",
+      "args": ["path/to/web-search-mcp.py"],
+      "env": { "OLLAMA_API_KEY": "your_api_key_here" }
+    },
+    "allpepper-memory-bank": {
+      "command": "docker",
+      "args": [
+        "run", "-i", "--rm",
+        "-e", "MEMORY_BANK_ROOT",
+        "-v", "/path/to/memory-bank:/mnt/memory_bank",
+        "memory-bank-mcp:local"
+      ],
+      "env": {
+        "MEMORY_BANK_ROOT": "/mnt/memory_bank"
+      },
+      "disabled": false,
+      "alwaysAllow": [
+        "list_projects",
+        "list_project_files",
+        "memory_bank_read",
+        "memory_bank_update",
+        "memory_bank_write"
+      ]
+    },
+    "openclaw-legalai": {
+      "type": "stdio",
+      "command": "npm",
+      "args": ["run", "openclaw:gateway"],
+      "env": {
+        "OLLAMA_API_KEY": "ollama-local"
+      },
+      "disabled": false,
+      "alwaysAllow": [
+        "legal_retrieve",
+        "legal_analyse",
+        "legal_draft",
+        "legal_validate",
+        "legal_debate",
+        "legal_privacy",
+        "legal_audit",
+        "legal_orchestrate",
+        "legal_monitor",
+        "legal_index",
+        "legal_test",
+        "read",
+        "write"
+      ]
+    }
+  }
+}

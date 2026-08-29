@@ -1,0 +1,28 @@
+# Caddy reverse proxy — single origin for web + API.
+# Frontend and backend are served from the same host, so the browser
+# calls the tRPC API at /trpc (same-origin, no CORS, no public backend DNS).
+#
+# For production TLS, replace `:80` with your domain and Caddy will
+# auto-provision Let's Encrypt certificates.
+
+:80 {
+	# tRPC + Express API routes → backend (path preserved; backend mounts /trpc)
+	handle /trpc* {
+		reverse_proxy backend:3001
+	}
+	handle /api* {
+		reverse_proxy backend:3001
+	}
+	handle /health* {
+		reverse_proxy backend:3001
+	}
+	handle /metrics {
+		reverse_proxy backend:3001
+	}
+	handle /audit {
+		reverse_proxy backend:3001
+	}
+
+	# Everything else → Next.js frontend
+	reverse_proxy frontend:3000
+}

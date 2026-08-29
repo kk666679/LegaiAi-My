@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["court","judgmentCreditor","judgmentDebtor","orderOrJudgmentDate","complianceDeadline","demandedAction"],
+  "properties": {
+    "court": {"type":"string","minLength":1},
+    "judgmentCreditor": {"type":"string","minLength":1},
+    "judgmentDebtor": {"type":"string","minLength":1},
+    "orderOrJudgmentDate": {"type":"string","minLength":1},
+    "complianceDeadline": {"type":"string","minLength":1},
+    "demandedAction": {"type":"string","minLength":1},
+    "iracIssueHint": {"type":"string"},
+    "solicitorName": {"type":"string"},
+    "solicitorRef": {"type":"string"}
+  }
+}
+

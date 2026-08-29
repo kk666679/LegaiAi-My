@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["fromCourt","toCourt","decisionDate","decisionType","appealingParty","respondent","groundsOfAppeal","dateOfNotice"],
+  "properties": {
+    "fromCourt": {"type":"string","minLength":1},
+    "toCourt": {"type":"string","minLength":1},
+    "decisionDate": {"type":"string","minLength":1},
+    "decisionType": {"type":"string","minLength":1},
+    "appealingParty": {"type":"string","minLength":1},
+    "respondent": {"type":"string","minLength":1},
+    "groundsOfAppeal": {"type":"array","minItems":1,"items":{"type":"string","minLength":1}},
+    "dateOfNotice": {"type":"string","minLength":1},
+    "solicitorName": {"type":"string"},
+    "solicitorRef": {"type":"string"}
+  }
+}
+

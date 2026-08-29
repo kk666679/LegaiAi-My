@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["court","applicant","respondent","ordersSought","summonsDate"],
+  "properties": {
+    "court": {"type":"string","minLength":1},
+    "applicant": {"type":"string","minLength":1},
+    "respondent": {"type":"string","minLength":1},
+    "ordersSought": {"type":"array","minItems":1,"items":{"type":"string","minLength":1}},
+    "summonsDate": {"type":"string","minLength":1},
+    "affidavitSummary": {"type":"string"},
+    "iracIssueHint": {"type":"string"},
+    "solicitorName": {"type":"string"},
+    "solicitorRef": {"type":"string"}
+  }
+}
+

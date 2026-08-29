@@ -1,0 +1,26 @@
+# Fly.io — Law Mate web (Next.js, standalone)
+# Deploy:  fly deploy
+# Then point NEXT_PUBLIC_TRPC_URL at the API app (set as a build arg secret or
+# redeploy with: fly deploy --build-arg NEXT_PUBLIC_TRPC_URL=https://lawmate-api.fly.dev/trpc)
+app = "lawmate-web"
+primary_region = "sin"
+
+build = { dockerfile = "Dockerfile" }
+[build.args]
+  NEXT_PUBLIC_TRPC_URL = "/trpc"
+
+[env]
+  NEXT_PUBLIC_TRPC_URL = "/trpc"
+  PORT = "3000"
+
+[[services]]
+  internal_port = 3000
+  protocol = "tcp"
+  processes = ["app"]
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]

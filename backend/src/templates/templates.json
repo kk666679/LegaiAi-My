@@ -1,0 +1,85 @@
+{
+  "templates": [
+    {
+      "templateId": "statement_of_claim",
+      "name": "Statement of Claim",
+      "docType": "PLEADING",
+      "targetCourt": "HIGH",
+      "practiceArea": "civil",
+      "outputFormat": "markdown",
+      "schemaPath": "./statement-of-claim/schema.json",
+      "promptPath": "./statement-of-claim/prompt.md"
+    },
+    {
+      "templateId": "defence",
+      "name": "Defence",
+      "docType": "PLEADING",
+      "targetCourt": "HIGH",
+      "practiceArea": "civil",
+      "outputFormat": "markdown",
+      "schemaPath": "./defence/schema.json",
+      "promptPath": "./defence/prompt.md"
+    },
+    {
+      "templateId": "reply_to_defence",
+      "name": "Reply (to Defence)",
+      "docType": "PLEADING",
+      "targetCourt": "HIGH",
+      "practiceArea": "civil",
+      "outputFormat": "markdown",
+      "schemaPath": "./reply-to-defence/schema.json",
+      "promptPath": "./reply-to-defence/prompt.md"
+    },
+    {
+      "templateId": "notice_of_appeal",
+      "name": "Notice of Appeal",
+      "docType": "PLEADING",
+      "targetCourt": "APPEAL",
+      "practiceArea": "civil",
+      "outputFormat": "markdown",
+      "schemaPath": "./notice-of-appeal/schema.json",
+      "promptPath": "./notice-of-appeal/prompt.md"
+    },
+    {
+      "templateId": "skeletal_arguments",
+      "name": "Skeletal Arguments",
+      "docType": "BRIEF",
+      "targetCourt": "APPEAL",
+      "practiceArea": "civil",
+      "outputFormat": "markdown",
+      "schemaPath": "./skeletal-arguments/schema.json",
+      "promptPath": "./skeletal-arguments/prompt.md"
+    },
+    {
+      "templateId": "summons_with_affidavit",
+      "name": "Summons (with supporting affidavit)",
+      "docType": "MOTION",
+      "targetCourt": "HIGH",
+      "practiceArea": "civil",
+      "outputFormat": "markdown",
+      "schemaPath": "./summons/schema.json",
+      "promptPath": "./summons/prompt.md"
+    },
+    {
+      "templateId": "enforcement_notice",
+      "name": "Enforcement Notice",
+      "docType": "MOTION",
+      "targetCourt": "HIGH",
+      "practiceArea": "civil",
+      "outputFormat": "markdown",
+      "schemaPath": "./enforcement-notice/schema.json",
+      "promptPath": "./enforcement-notice/prompt.md"
+    },
+    {
+      "templateId": "consent_order",
+      "name": "Consent Order",
+      "docType": "AGREEMENT",
+      "targetCourt": "HIGH",
+      "practiceArea": "civil",
+      "outputFormat": "markdown",
+      "schemaPath": "./consent-order/schema.json",
+      "promptPath": "./consent-order/prompt.md"
+    }
+  ]
+}
+

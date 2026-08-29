@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "epoch": 0,
+  "term": 0,
+  "active_manager": {
+    "instance_id": "orchestrator-loop-191fac",
+    "acquired_at": "2026-08-29T21:59:02.377Z",
+    "lease_heartbeat": "2026-08-29T22:30:03.209Z",
+    "lease_expires": "2026-08-29T22:31:33.209Z"
+  },
+  "standbys": [],
+  "monitors": [],
+  "quorum_size": 1,
+  "fenced": []
+}

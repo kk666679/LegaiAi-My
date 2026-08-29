@@ -1,0 +1,98 @@
+# Law Mate — production orchestration
+#
+# Services: Caddy (edge) · Next.js frontend · Express/tRPC backend
+#           · PostgreSQL+pgVector · Redis (BullMQ)
+#
+# Bring it up:
+#   docker compose -f docker-compose.prod.yml --env-file .env up -d --build
+#
+# The frontend is built with NEXT_PUBLIC_TRPC_URL=/trpc so the browser
+# talks to the API on the same origin via Caddy.
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-lawmate}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lawmate123}
+      POSTGRES_DB: ${POSTGRES_DB:-lawmate}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-lawmate} -d ${POSTGRES_DB:-lawmate}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-lawmate}:${POSTGRES_PASSWORD:-lawmate123}@postgres:5432/${POSTGRES_DB:-lawmate}?schema=public
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_URL: redis://redis:6379
+      PORT: 3001
+      LOG_LEVEL: warn
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://localhost:3001/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_TRPC_URL: /trpc
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NEXT_PUBLIC_TRPC_URL: /trpc
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://localhost:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      # Uncomment for TLS termination with a real domain in Caddyfile:
+      # - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  pgdata:
+  redisdata:

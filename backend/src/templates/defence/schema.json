@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["court","suitNo","plaintiff","defendant","admissions","denials"],
+  "properties": {
+    "court": {"type":"string","minLength":1},
+    "suitNo": {"type":"string","minLength":1},
+    "plaintiff": {
+      "type":"object",
+      "additionalProperties": false,
+      "required":["name","description","address"],
+      "properties":{
+        "name":{"type":"string"},
+        "description":{"type":"string"},
+        "address":{"type":"string"}
+      }
+    },
+    "defendant": {
+      "type":"object",
+      "additionalProperties": false,
+      "required":["name","description","address"],
+      "properties":{
+        "name":{"type":"string"},
+        "description":{"type":"string"},
+        "address":{"type":"string"}
+      }
+    },
+    "admissions": {"type":"array","minItems":0,"items":{"type":"string","minLength":1}},
+    "denials": {
+      "type":"array",
+      "minItems":0,
+      "items":{
+        "type":"object",
+        "additionalProperties":false,
+        "required":["paragraph","reason"],
+        "properties":{
+          "paragraph":{"type":"number"},
+          "reason":{"type":"string","minLength":1}
+        }
+      }
+    },
+    "affirmativeDefences": {"type":"array","items":{"type":"string","minLength":1}},
+    "counterclaim": {"type":"object","additionalProperties":true},
+    "solicitorName": {"type":"string"},
+    "solicitorRef": {"type":"string"}
+  }
+}
+
