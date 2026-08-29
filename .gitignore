@@ -54,3 +54,7 @@ next-env.d.ts
 
 # AutoClaw KDream data
 .autoclaw/
+
+# AutoClaw orchestrator runtime state (live SQLite WAL / lock / dispatch queues)
+backend/.claude/autoclaw/
+
