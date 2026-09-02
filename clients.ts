@@ -1,8 +1,14 @@
 import { createTRPCReact } from '@trpc/react-query';
-import type { AnyRouter } from '@trpc/server';
+import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server';
+import type { AppRouter } from '@/backend/src/trpc/routers/_app';
+
+type ReactRouter = ReturnType<typeof createTRPCReact<AppRouter>>;
 
 // Create a properly typed tRPC React client
-export const trpcReact = createTRPCReact<AnyRouter>();
+export const trpcReact: ReactRouter = createTRPCReact<AppRouter>();
+
+export type RouterInputs = inferRouterInputs<AppRouter>;
+export type RouterOutputs = inferRouterOutputs<AppRouter>;
 
 // Export the Provider component
 export function TRPCProvider({ children }: { children: React.ReactNode }) {
@@ -11,6 +17,3 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
 
 // Export a properly typed TRPCReactProvider for compatibility
 export const TRPCReactProvider = TRPCProvider;
-
-// Note: You'll need to configure this with your actual router
-// For now, this provides a type-safe stub

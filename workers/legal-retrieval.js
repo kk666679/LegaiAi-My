@@ -12,6 +12,7 @@ import { randomUUID } from 'crypto'
 import { agentLogger } from '@/backend/src/lib/logger.js'
 import { writeAuditLog } from '@/backend/src/lib/audit.js'
 import { signOutput } from '@/backend/src/lib/crypto.js'
+import { runHybridRetrieval } from '../.autoclaw/agents/retrieval/hybrid-retriever.js'
 
 const log = agentLogger('legal-retrieval')
 const connection = { host: process.env.REDIS_HOST || 'localhost', port: parseInt(process.env.REDIS_PORT || '6379') }
@@ -54,16 +55,36 @@ const worker = new Worker('legal-retrieval', async (job) => {
     LIMIT $2
   `, `[${queryVec.join(',')}]`, topK * 2)
 
-  // Step 4: BM25-style keyword reranking (simple TF scoring over content)
-  const terms = query.toLowerCase().split(/\s+/).filter(t => t.length > 2)
-  const reranked = results
-    .map(r => {
-      const text = (r.content || '').toLowerCase()
-      const tf = terms.reduce((acc, t) => acc + (text.split(t).length - 1), 0)
-      const combined = (parseFloat(r.similarity) * 0.7) + (Math.min(tf / 10, 1) * 0.3)
-      return { ...r, similarity: parseFloat(r.similarity), bm25Score: tf, combinedScore: combined }
+  // Step 4: Legal hybrid reranking (semantic vector + bilingual keyword + citation-aware scoring)
+  const hybridDocuments = results.map(r => ({
+    id: r.id,
+    title: r.caseName || r.citation || 'Untitled case',
+    caseName: r.caseName || '',
+    citation: r.citation || '',
+    content: r.content || '',
+    sourceType: 'case',
+    jurisdiction: 'MY',
+    language: r.language || 'en',
+    version: 'current',
+    date: r.caseDate || null,
+    authorityScore: parseFloat(r.similarity || 0),
+    metadata: { id: r.id, collection: r.collection || 'vector_docs' },
+  }))
+
+  const hybrid = runHybridRetrieval(hybridDocuments, query, { filters, topK })
+  const reranked = hybrid.results
+    .map(hit => {
+      const exact = results.find(r => String(r.id) === String(hit.id))
+      return {
+        ...(exact || {}),
+        id: hit.id,
+        citation: hit.citation || exact?.citation || 'Citation unavailable',
+        title: hit.title || exact?.caseName || 'Untitled case',
+        similarity: Number(hit.relevanceScore ?? hit.authorityScore ?? exact?.similarity ?? 0),
+        bm25Score: Number(hit.relevanceScore ?? 0),
+        combinedScore: Number(hit.relevanceScore ?? hit.authorityScore ?? 0),
+      }
     })
-    .sort((a, b) => b.combinedScore - a.combinedScore)
     .slice(0, topK)
 
   // Step 5: Hallucination guard

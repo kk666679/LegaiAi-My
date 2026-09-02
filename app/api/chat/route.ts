@@ -1,7 +1,7 @@
-import { chat, toServerSentEventsResponse } from '@tanstack/ai'
-import { openaiText } from '@tanstack/ai-openai'
+import { streamText } from 'ai'
 import { NextRequest } from 'next/server'
 import { rateLimit } from '@/lib/security'
+import { getModel, MODEL } from '@/lib/ai'
 import { z } from 'zod'
 
 const messageSchema = z.object({
@@ -18,12 +18,9 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) return new Response(JSON.stringify({ error: 'Invalid chat request' }), { status: 400, headers: { 'Content-Type': 'application/json' } })
     const { messages } = parsed.data
 
-    const result = chat({
-      adapter: openaiText('gpt-4o-mini'), 
-      messages: [
-        {
-          role: 'system',
-          content: `You are LAW MATE — Malaysian legal AI assistant. 
+    const result = streamText({
+      model: getModel(),
+      system: `You are LAW MATE — Malaysian legal AI assistant. 
 
 Legal guidelines:
 • Cite Malaysian cases as [YYYY] N MLJ NNN format  
@@ -35,13 +32,10 @@ Legal guidelines:
 • Prioritize PDPA compliance
 
 Respond concisely with provenance.`,
-        } as any,
-        ...messages.map((message) => ({ role: message.role, content: message.content }) as any)
-      ],
-      stream: true
+      messages: messages.map((message) => ({ role: message.role, content: message.content })),
     })
 
-    return toServerSentEventsResponse(result)
+    return result.toTextStreamResponse()
   } catch (error) {
     return new Response(JSON.stringify({ error: 'Failed to generate response' }), {
       status: 500,
