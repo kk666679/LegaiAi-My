@@ -112,7 +112,6 @@
     ".next",
     "out",
     "coverage",
-    "**/*.d.ts",
     "**/*.d.tsx",
     "**/*.bak",
     "**/*.old",
