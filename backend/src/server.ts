@@ -90,7 +90,12 @@ app.post('/api/ai-chat', async (req: Request, res: Response) => {
     })
     return response
   } catch (error) {
-    // ── Drafting workspace SSE (per-job, tenant-scoped) ────────────────────────
+    metrics.errors++
+    return res.status(500).json({ error: 'Chat failed', details: String(error) })
+  }
+})
+
+// ── Drafting workspace SSE (per-job, tenant-scoped) ────────────────────────
 app.get('/api/drafting/jobs/:id/events', async (req: Request, res: Response) => {
   const auth = (req.headers.authorization as string | undefined)?.replace(/^Bearer\s+/i, '')
   const user = auth ? await validateSession(auth) : null
@@ -156,11 +161,6 @@ app.get('/api/lom/search', async (req: Request, res: Response) => {
   const q = String((req.query.q as string) ?? '').slice(0, 120)
   const limit = Math.min(50, Math.max(1, parseInt(String(req.query.limit ?? '10'), 10)))
   res.json(searchLomCatalog(q, { limit }))
-})
-
-metrics.errors++
-    return res.status(500).json({ error: 'Chat failed', details: String(error) })
-  }
 })
 
 // ── BYOK provider playground (SSE streaming, server-side credential decrypt) ─

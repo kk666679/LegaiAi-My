@@ -15,9 +15,9 @@ export interface RateLimitOptions {
 }
 
 /**
- * Minimal in-memory fixed-window rate limiter.
- * Sufficient for a single-instance deployment; swap for Redis (BullMQ) backed
- * limiter when running multiple backend replicas.
+ * In-memory fixed-window rate limiter. Sufficient for a single-instance
+ * deployment; the Next.js side uses the Redis-aware variant in
+ * lib/rate-limit.ts so the two processes never share a bucket.
  */
 export function rateLimit(options: RateLimitOptions = {}) {
   const windowMs = options.windowMs ?? 60_000

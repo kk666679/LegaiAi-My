@@ -1,22 +1,17 @@
 import { NextRequest, NextResponse } from "next/server"
-
-const buckets = new Map<string, { count: number; resetAt: number }>()
+import { checkRateLimit, clientKeyFromHeaders } from "@/lib/rate-limit"
 
 export function clientKey(request: NextRequest) {
-  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown"
+  return clientKeyFromHeaders(request.headers)
 }
 
-export function rateLimit(request: NextRequest, limit = 30, windowMs = 60_000) {
-  const key = clientKey(request)
-  const now = Date.now()
-  const current = buckets.get(key)
-  if (!current || current.resetAt <= now) {
-    buckets.set(key, { count: 1, resetAt: now + windowMs })
-    return null
-  }
-  current.count += 1
-  if (current.count > limit) {
-    return NextResponse.json({ error: "Too many requests" }, { status: 429, headers: { "Retry-After": String(Math.ceil((current.resetAt - now) / 1000)) } })
+export async function rateLimit(request: NextRequest, limit = 30, windowMs = 60_000) {
+  const decision = await checkRateLimit({ key: clientKey(request), limit, windowMs })
+  if (decision.limited) {
+    return NextResponse.json({ error: "Too many requests" }, {
+      status: 429,
+      headers: { "Retry-After": String(decision.retryAfterSeconds) },
+    })
   }
   return null
 }
