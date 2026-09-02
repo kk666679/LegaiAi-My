@@ -18,11 +18,11 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Lint
-        # eslint is not yet wired into the repo (no eslint config / dependency at
-        # the root). Lint failures must not block CI while the toolchain is being
-        # rolled out, so the step is best-effort and surfaced via the PR checks UI.
+        # `npm run lint` is a no-op until the eslint toolchain is rolled out at
+        # the root. The step is still marked best-effort so wiring it up later
+        # does not require a workflow change.
         continue-on-error: true
-        run: npm run lint || true
+        run: npm run lint
       - name: Type-check
         run: npm run type-check
       - name: Build
