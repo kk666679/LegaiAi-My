@@ -6,7 +6,7 @@ ENV NODE_ENV=production
 
 # Install dependencies first for better layer caching
 COPY backend/package.json backend/package-lock.json ./
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # Copy backend source
 COPY backend/ ./
