@@ -6,7 +6,8 @@ const nextConfig = {
   // its own project (verified 0 errors via `backend/` tsconfig) and runs via
   // tsx, so we skip build-time type errors here. A follow-up is to decouple
   // the frontend client types from the backend source (e.g. generated types).
-  output: 'standalone',
+  // NOTE: Vercel recommends against using `output: 'standalone'` for Next.js 16
+  // deployments as it may cause build issues.
   typescript: {
     ignoreBuildErrors: true,
   },
