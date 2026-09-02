@@ -4,332 +4,86 @@ id: tools
 order: 1
 ---
 
-Tools (also called "function calling") allow AI models to interact with external systems, APIs, or perform computations. TanStack AI provides an isomorphic tool system that enables type-safe, framework-agnostic tool definitions that work on both server and client.
+# LAW MATE — Tools
 
-Tools enable your AI application to:
+LAW MATE uses the [TanStack AI](https://tanstack.com/ai) isomorphic tool system to expose its agent capabilities as type-safe, framework-agnostic tools that can be called from both server (Ollama adapter) and client (React) contexts.
 
-- **Fetch data** from APIs or databases
-- **Perform calculations** or data transformations
-- **Interact with services** like email, calendars, or payment systems
-- **Execute client-side operations** like updating UI or local storage
-- **Create hybrid tools** that execute in both server and client contexts
+For the per-procedure request/response shapes, see **[agent-api.md](agent-api.md)**. This page covers how tools are *defined and registered* inside the codebase.
 
-## Framework Support
+---
 
-TanStack AI works with **any** JavaScript framework:
-- Next.js, Express, Remix, Fastify, etc.
-- React, Vue, Solid, Svelte, vanilla JS, etc.
+## Tool registration
 
-TanStack AI works with any JavaScript framework.
+All legal tools live in:
 
-## Isomorphic Tool Architecture
+- **Schemas + client/server implementations:** `backend/src/tools/index.ts`
+- **OpenClaw tool registry:** `.openclaw/tools/` (mirrors the backend tools for the gateway)
+- **Skill-level wrappers:** `.openclaw/skills/*.SKILL.md`
 
-TanStack AI uses a two-step tool definition process:
-
-1. **Define once** with `toolDefinition()` - Creates a shared tool schema
-2. **Implement** with `.server()` or `.client()` - Add execution logic for each environment
-
-This approach provides:
-
-- **Type Safety**: Full TypeScript inference from Zod schemas
-- **Code Reuse**: Define schemas once, use everywhere
-- **Flexibility**: Tools can execute on server, client, or both
-- **Schema Options**: Use Zod schemas or raw JSON Schema objects
-
-## Schema Options
-
-TanStack AI supports two ways to define tool schemas:
-
-### Option 1: Zod Schemas (Recommended)
-
-Zod schemas provide full TypeScript type inference and runtime validation:
+A typical definition combines a Zod input/output schema with a `.server()` implementation that delegates to the matching BullMQ worker (see [workers-queues.md](workers-queues.md)):
 
 ```typescript
-import { z } from "zod";
+import { toolDefinition } from "@tanstack/ai"
+import { z } from "zod"
 
-const inputSchema = z.object({
-  location: z.string().meta({ description: "City name" }),
-  unit: z.enum(["celsius", "fahrenheit"]).optional(),
-});
-```
-
-### Option 2: JSON Schema Objects
-
-For cases where you already have JSON Schema definitions or prefer not to use Zod, you can pass raw JSON Schema objects directly:
-
-```typescript
-import type { JSONSchema } from "@tanstack/ai";
-
-const inputSchema: JSONSchema = {
-  type: "object",
-  properties: {
-    location: {
-      type: "string",
-      description: "City name",
-    },
-    unit: {
-      type: "string",
-      enum: ["celsius", "fahrenheit"],
-    },
-  },
-  required: ["location"],
-};
-```
-
-> **Note:** When using JSON Schema, TypeScript will infer `any` for input/output types since JSON Schema cannot provide compile-time type information. Zod schemas are recommended for full type safety.
-
-## Tool Definition
-
-Tools are defined using `toolDefinition()` from `@tanstack/ai`:
-
-```typescript
-import { toolDefinition } from "@tanstack/ai";
-import { z } from "zod";
-
-// Step 1: Define the tool schema
-const getWeatherDef = toolDefinition({
-  name: "get_weather",
-  description: "Get the current weather for a location",
+export const legalRetrieveTool = toolDefinition({
+  name: "legal_retrieve",
+  description: "Search Malaysian case law by legal issue",
   inputSchema: z.object({
-    location: z.string().meta({ description: "The city and state, e.g. San Francisco, CA" }),
-    unit: z.enum(["celsius", "fahrenheit"]).optional(),
+    query: z.string().min(10),
+    court: z.enum(["FC", "CA", "HC", "SC", "MC"]).optional(),
+    topK: z.number().default(5),
   }),
   outputSchema: z.object({
-    temperature: z.number(),
-    conditions: z.string(),
-    location: z.string(),
+    cases: z.array(z.object({
+      citation: z.string(),
+      caseName: z.string(),
+      relevanceScore: z.number(),
+      status: z.string(),
+    })),
   }),
-});
-
-// Step 2: Create a server implementation
-const getWeatherServer = getWeatherDef.server(async ({ location, unit }) => {
-  const response = await fetch(
-    `https://api.weather.com/v1/current?location=${location}&unit=${
-      unit || "fahrenheit"
-    }`
-  );
-  const data = await response.json();
-  return {
-    temperature: data.temperature,
-    conditions: data.conditions,
-    location: data.location,
-  };
-});
+}).server(async ({ query, court, topK }) => {
+  const result = await trpcServer.agents.retrieve({ query, court, topK })
+  return result
+})
 ```
 
-### Using JSON Schema
+---
 
-If you prefer JSON Schema or have existing schema definitions:
+## Tool catalogue
 
-```typescript
-import { toolDefinition } from "@tanstack/ai";
-import type { JSONSchema } from "@tanstack/ai";
+Each row below maps a tool to its tRPC procedure, BullMQ worker, and doc page.
 
-// Define schemas using JSON Schema
-const inputSchema: JSONSchema = {
-  type: "object",
-  properties: {
-    location: {
-      type: "string",
-      description: "The city and state, e.g. San Francisco, CA",
-    },
-    unit: {
-      type: "string",
-      enum: ["celsius", "fahrenheit"],
-    },
-  },
-  required: ["location"],
-};
+| Tool | tRPC procedure | Worker | Reference |
+|------|----------------|--------|-----------|
+| `legal_retrieve` | `agents.retrieve` | `legal-retrieval` | [agent-api.md](agent-api.md#agentsretrieve) |
+| `legal_analyse` | `agents.analyse` | `legal-analysis` | [agent-api.md](agent-api.md#agentsanalyse) |
+| `legal_draft` | `agents.draft` | `legal-drafting` | [agent-api.md](agent-api.md#agentsdraft) |
+| `legal_validate` | `agents.validate` | `legal-validation` | [agent-api.md](agent-api.md#agentsvalidate) |
+| `legal_debate` | `agents.debate` | `legal-debate` | [agent-api.md](agent-api.md#agentsdebate) |
+| `legal_privacy` | `agents.privacy` | `legal-privacy` | [pdpa-compliance.md](pdpa-compliance.md) |
+| `legal_audit` | `agents.audit` | `legal-audit` | [pdpa-compliance.md](pdpa-compliance.md) |
+| `legal_monitor` | `agents.monitor` | `legal-monitoring` | [openclaw.md](openclaw.md) |
+| `legal_index` | `agents.index` | `legal-indexing` | [openclaw.md](openclaw.md) |
+| `legal_test` | `agents.test` | `legal-testing` | [openclaw.md](openclaw.md) |
+| `legal_orchestrate` | `agents.orchestrate` | `legal-orchestrator` | [agent-api.md](agent-api.md#agentsorchestrate) |
+| `legal_sandbox` | `agents.sandbox` | `legal-sandbox` | [deployment.md](deployment.md) |
 
-const outputSchema: JSONSchema = {
-  type: "object",
-  properties: {
-    temperature: { type: "number" },
-    conditions: { type: "string" },
-    location: { type: "string" },
-  },
-  required: ["temperature", "conditions", "location"],
-};
+---
 
-// Create the tool definition
-const getWeatherDef = toolDefinition({
-  name: "get_weather",
-  description: "Get the current weather for a location",
-  inputSchema,
-  outputSchema,
-});
+## Adding a new tool
 
-// Create server implementation (args is typed as `any` with JSON Schema)
-const getWeatherServer = getWeatherDef.server(async (args) => {
-  const { location, unit } = args;
-  const response = await fetch(
-    `https://api.weather.com/v1/current?location=${location}&unit=${unit || "fahrenheit"}`
-  );
-  return await response.json();
-});
-```
+1. Define schema + server impl in `backend/src/tools/index.ts`.
+2. Register the matching tRPC procedure in `backend/src/trpc/routers/`.
+3. Add the queue + worker under `backend/queues/` and `workers/`.
+4. Mirror the tool in `.openclaw/tools/` so the gateway can dispatch to it.
+5. Add a slash command (optional) in `.openclaw/commands.yml`.
+6. Update [agent-api.md](agent-api.md) and this catalogue.
 
-## Using Tools in Chat
+See [openclaw.md](openclaw.md#adding-a-new-skill) for the full skill/tool wiring checklist.
 
-### Server-Side
+---
 
-```typescript
-import { chat, toServerSentEventsResponse } from "@tanstack/ai";
-import { openaiText } from "@tanstack/ai-openai";
-import { getWeatherDef } from "./tools";
+## Framework support
 
-export async function POST(request: Request) {
-  const { messages } = await request.json();
-
-  // Create server implementation
-  const getWeather = getWeatherDef.server(async ({ location, unit }) => {
-    const response = await fetch(`https://api.weather.com/v1/current?...`);
-    return await response.json();
-  });
-
-  const stream = chat({
-    adapter: openaiText("gpt-5.2"),
-    messages,
-    tools: [getWeather], // Pass server tools
-  });
-
-  return toServerSentEventsResponse(stream);
-}
-```
-
-### Client-Side with Type Safety
-
-```typescript
-import { useChat, fetchServerSentEvents } from "@tanstack/ai-react";
-import { 
-  clientTools, 
-  createChatClientOptions, 
-  type InferChatMessages 
-} from "@tanstack/ai-client";
-import { updateUIDef, saveToStorageDef } from "./tools";
-
-// Create client implementations
-const updateUI = updateUIDef.client((input) => {
-  // Update UI state
-  setNotification(input.message);
-  return { success: true };
-});
-
-const saveToStorage = saveToStorageDef.client((input) => {
-  localStorage.setItem("data", JSON.stringify(input));
-  return { saved: true };
-});
-
-// Create typed tools array (no 'as const' needed!)
-const tools = clientTools(updateUI, saveToStorage);
-
-const textOptions = createChatClientOptions({
-  connection: fetchServerSentEvents("/api/chat"),
-  tools,
-});
-
-// Infer message types for full type safety
-type ChatMessages = InferChatMessages<typeof textOptions>;
-
-function ChatComponent() {
-  const { messages, sendMessage } = useChat(textOptions);
-  
-  // messages is now fully typed with tool names and outputs!
-  return <Messages messages={messages} />;
-}
-```
-
-## Hybrid Tools
-
-Tools can be implemented for both server and client, enabling flexible execution patterns:
-
-```typescript
-// Define once
-const addToCartDef = toolDefinition({
-  name: "add_to_cart",
-  description: "Add item to shopping cart",
-  inputSchema: z.object({
-    itemId: z.string(),
-    quantity: z.number(),
-  }),
-  outputSchema: z.object({
-    success: z.boolean(),
-    cartId: z.string(),
-  }),
-  needsApproval: true,
-});
-
-// Server implementation - Store in database
-const addToCartServer = addToCartDef.server(async (input) => {
-  const cart = await db.carts.create({
-    data: { itemId: input.itemId, quantity: input.quantity },
-  });
-  return { success: true, cartId: cart.id };
-});
-
-// Client implementation - Update local wishlist
-const addToCartClient = addToCartDef.client((input) => {
-  const wishlist = JSON.parse(localStorage.getItem("wishlist") || "[]");
-  wishlist.push(input.itemId);
-  localStorage.setItem("wishlist", JSON.stringify(wishlist));
-  return { success: true, cartId: "local" };
-});
-```
-
-On the server, pass the definition (for client execution) or server implementation:
-
-```typescript
-chat({
-  adapter: openaiText("gpt-5.2"),
-  messages,
-  tools: [addToCartDef], // Client will execute, or
-  tools: [addToCartServer], // Server will execute
-});
-```
-
-## Type Safety Benefits
-
-The isomorphic architecture provides complete type safety:
-
-```typescript
-// In your React component
-messages.forEach((message) => {
-  message.parts.forEach((part) => {
-    if (part.type === 'tool-call' && part.name === 'add_to_cart') {
-      // ✅ TypeScript knows part.name is literally 'add_to_cart'
-      // ✅ part.input is typed as { itemId: string, quantity: number }
-      // ✅ part.output is typed as { success: boolean, cartId: string } | undefined
-      
-      if (part.output) {
-        console.log(part.output.cartId); // ✅ Fully typed!
-      }
-    }
-  });
-});
-```
-
-## Tool Execution Flow
-
-1. **Model decides to call a tool** - Based on user input and tool descriptions
-2. **Tool is identified** - Server or client implementation
-3. **Tool executes** - Automatically on server or client
-4. **Result is returned** - To the model as a tool result message
-5. **Model continues** - Uses the result to generate a response
-
-## Tool States
-
-Tools go through different states during execution:
-
-- `awaiting-input` - Tool call received, waiting for arguments
-- `input-streaming` - Partial arguments being streamed
-- `input-complete` - All arguments received
-- `approval-requested` - Tool requires user approval (if `needsApproval: true`)
-- `approval-responded` - User has approved/denied
-
-## Next Steps
-
-- [Server Tools](./server-tools) - Learn about server-side tool execution
-- [Client Tools](./client-tools) - Learn about client-side tool execution
-- [Tool Approval Flow](./tool-approval) - Implement approval workflows
-- [How Tools Work](./tool-architecture) - Deep dive into the tool architecture
-
+TanStack AI tools are isomorphic — the same `toolDefinition()` schema can be re-implemented with `.client()` for browser-side execution (e.g. optimistic UI updates). LAW MATE currently only uses server implementations; client-side tools are a planned extension.

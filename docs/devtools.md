@@ -4,54 +4,64 @@ id: devtools
 order: 3
 ---
 
-TanStack Devtools is a unified devtools panel for inspecting and debugging TanStack libraries, including TanStack AI. It provides real-time insights into AI interactions, tool calls, and state changes, making it easier to develop and troubleshoot AI-powered applications.
+# LAW MATE — Devtools
 
-## Features
-- **Real-time Monitoring** - View live chat messages, tool invocations, and AI responses.
-- **Tool Call Inspection** - Inspect input and output of tool calls.
-- **State Visualization** - Visualize chat state and message history.
-- **Error Tracking** - Monitor errors and exceptions in AI interactions.
+The repo uses [TanStack Devtools](https://tanstack.com/devtools) for in-browser inspection of AI traffic during development. The devtools panel is **not** shipped in production builds.
 
-## Installation
-To use TanStack Devtools with TanStack AI, install the `@tanstack/react-ai-devtools` package:
+For the upstream install/usage boilerplate see the [TanStack AI Devtools docs](https://tanstack.com/ai/latest/docs/devtools). This page covers the LAW MATE-specific wiring only.
+
+---
+
+## Install (once)
 
 ```bash
 npm install -D @tanstack/react-ai-devtools @tanstack/react-devtools
 ```
 
-Or the `@tanstack/solid-ai-devtools` package for SolidJS:
-```bash
-npm install -D @tanstack/solid-ai-devtools @tanstack/solid-devtools
-```
+---
 
-Or the `@tanstack/preact-ai-devtools` package for Preact:
-```bash
-npm install -D @tanstack/preact-ai-devtools @tanstack/preact-devtools
-```
+## Mount in the root layout
 
-## Usage
-
-Import and include the Devtools component in your application:
+The devtools panel must be mounted in `app/layout.tsx` (or equivalent) and gated on `NODE_ENV`:
 
 ```tsx
-import { TanStackDevtools } from '@tanstack/react-devtools'
-import { aiDevtoolsPlugin } from '@tanstack/react-ai-devtools'
+import { TanStackDevtools } from "@tanstack/react-devtools"
+import { aiDevtoolsPlugin } from "@tanstack/react-ai-devtools"
 
-const App = () => {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
-       <TanStackDevtools 
-          plugins={[
-            // ... other plugins
-            aiDevtoolsPlugin(),
-          ]}
-          // this config is important to connect to the server event bus
-          eventBusConfig={{
-            connectToServerBus: true,
-          }}
-        />
-    </>
+    <html lang="en">
+      <body>
+        {children}
+        {process.env.NODE_ENV === "development" && (
+          <TanStackDevtools
+            plugins={[aiDevtoolsPlugin()]}
+            eventBusConfig={{ connectToServerBus: true }}
+          />
+        )}
+      </body>
+    </html>
   )
 }
 ```
 
+> `connectToServerBus: true` forwards `/api/events/stream` (SSE) events from the backend into the panel — required to see worker/job lifecycle and tool-call traces originating on the server side. Without it, only client-originated chat events appear.
+
+---
+
+## What you can inspect
+
+- Live chat messages and tool calls (per [ai-chat.md](ai-chat.md))
+- Tool input/output for each `legal_*` tool (see [tools.md](tools.md))
+- Queue/job lifecycle from the backend SSE stream
+- Citation validation results (per [agent-api.md](agent-api.md#agentsvalidate))
+
+---
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Panel shows "no events" | `eventBusConfig` missing | Add `connectToServerBus: true` |
+| Panel not visible in production | NODE_ENV guard | Confirm build used `next build` without `NODE_ENV=development` |
+| Tool calls absent | Tool not registered | Confirm tool exists in `backend/src/tools/index.ts` and [tools.md](tools.md) catalogue |

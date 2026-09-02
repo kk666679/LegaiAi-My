@@ -8,12 +8,12 @@ order: 1
 
 The frontend chat interface at `/legalai` connects to the backend via two paths:
 
-1. **Streaming SSE** — `POST /api/ai-chat` for real-time token streaming
+1. **Streaming SSE** — `POST /api/chat` for real-time token streaming (route: `app/api/chat/route.ts`)
 2. **tRPC** — `agents.*` procedures for structured agent calls
 
 ---
 
-## Streaming chat (`/api/ai-chat`)
+## Streaming chat (`/api/chat`)
 
 The backend uses `@tanstack/ai` with an Ollama adapter for streaming responses.
 
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
   const { messages } = await request.json()
 
   const stream = chat({
-    adapter: ollamaText(process.env.LLM_MODEL ?? "minimax-m2.7:cloud", {
+    adapter: ollamaText(process.env.LLM_MODEL ?? "llama3.1", {
       baseUrl: process.env.OLLAMA_URL ?? "http://localhost:11434",
     }),
     messages,

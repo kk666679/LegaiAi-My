@@ -15,16 +15,19 @@ All agent work is processed asynchronously via **BullMQ** backed by Redis.
 | Queue name | Worker file | Concurrency | Description |
 |------------|-------------|-------------|-------------|
 | `legal-retrieval` | `workers/legal-retrieval.js` | 3 | Hybrid pgVector + BM25 search |
-| `legal-analysis` | `workers/legal-analysis.js` | 2 | IRAC reasoning via Ollama |
+| `legal-analysis` | `workers/legal-analysis.js` | 5 (or `LLM_MAX_CONCURRENCY`) | IRAC reasoning via Ollama |
 | `legal-drafting` | `workers/legal-drafting.js` | 2 | Document generation |
 | `legal-validation` | `workers/legal-validation.js` | 3 | Citation status check + Redis cache |
 | `legal-debate` | `workers/legal-debate.js` | 1 | Three-agent moot court (resource-intensive) |
-| `legal-privacy` | `workers/legal-privacy.js` | 4 | PII redaction (CPU-only, fast) |
-| `legal-audit` | `workers/legal-audit.js` | 2 | Hash-chained audit log writes |
-| `legal-orchestrator` | `workers/legal-orchestrator.js` | 1 | Pipeline fan-out coordinator |
-| `legal-monitoring` | `workers/legal-monitoring.js` | 2 | Topic subscriptions + trend detection |
+| `legal-privacy` | `workers/legal-privacy.js` | 5 | PII redaction (CPU-only, fast) |
+| `legal-audit` | `workers/legal-audit.js` | 10 | Hash-chained audit log writes |
+| `legal-orchestrator` | `workers/legal-orchestrator.js` | 5 | Pipeline fan-out coordinator |
+| `legal-monitoring` | `workers/legal-monitoring.js` | 5 | Topic subscriptions + trend detection |
 | `legal-indexing` | `workers/legal-indexing.js` | 2 | Embedding + pgVector upsert |
 | `legal-testing` | `workers/legal-testing.js` | 1 | Gold eval + adversarial tests |
+| `legal-sandbox` | `workers/legal-sandbox.js` | 2 | Isolated execution sandbox for tool calls |
+
+> Concurrency values reflect the actual `new Worker(name, …, { concurrency })` settings. `legal-analysis` additionally honours the `LLM_MAX_CONCURRENCY` env var.
 
 ---
 

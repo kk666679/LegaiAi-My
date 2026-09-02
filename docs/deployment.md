@@ -85,27 +85,13 @@ Production differences:
 
 ## Workers
 
-Start all 12 BullMQ workers:
+Start all 12 BullMQ workers (full list in `workers-queues.md`):
 
 ```bash
 npm run workers:all
 ```
 
-Or start individually:
-
-```bash
-node workers/legal-retrieval.js
-node workers/legal-analysis.js
-node workers/legal-drafting.js
-node workers/legal-validation.js
-node workers/legal-debate.js
-node workers/legal-privacy.js
-node workers/legal-audit.js
-node workers/legal-orchestrator.js
-node workers/legal-monitoring.js
-node workers/legal-indexing.js
-node workers/legal-testing.js
-```
+Or start any single worker via the matching `npm run worker:<name>` script in `package.json`.
 
 ---
 

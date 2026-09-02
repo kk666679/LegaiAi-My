@@ -209,7 +209,7 @@ Run a three-agent adversarial moot court debate.
 
 ### `agents.queueHealth`
 
-Get real-time queue depth and job status across all 11 agent queues.
+Get real-time queue depth and job status across all 12 agent queues.
 
 **Input**: none
 
@@ -233,7 +233,7 @@ Get real-time queue depth and job status across all 11 agent queues.
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `POST` | `/api/ai-chat` | Streaming SSE chat via Ollama |
+| `POST` | `/api/chat` | Streaming SSE chat via Ollama (see `ai-chat.md`) |
 | `POST` | `/api/agent/query` | Orchestrated query with provenance graph |
 | `POST` | `/api/feedback` | Submit feedback on an agent response |
 | `GET` | `/api/events/stream` | SSE stream of live agent events |

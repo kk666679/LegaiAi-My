@@ -108,10 +108,12 @@ OpenClaw persists these keys across sessions:
 
 ```yaml
 model:
-  default: ollama/minimax-m2.7:cloud
-  fallback: ollama/llama3.1
+  default: ollama/llama3.1
+  fallback: ollama/llama3.2:1b
   temperature: 0.2      # Low — legal precision
   maxTokens: 4096
 ```
 
-The fallback model (`llama3.1`) is used automatically if the primary model is unavailable. It is restricted to `legal_retrieve` and `legal_validate` only (read-only tools).
+The fallback model (`llama3.2:1b`) is used automatically if the primary model is unavailable. Override either via the `LLM_MODEL` and `LLM_MODEL_FALLBACK` environment variables; see `environment-variables.md`.
+
+> **Note:** Tool restrictions for the fallback model (e.g. read-only `legal_retrieve` / `legal_validate`) are currently aspirational — the runtime does not yet enforce them. Do not rely on them for safety guarantees.

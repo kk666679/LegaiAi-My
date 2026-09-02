@@ -29,7 +29,8 @@ cp .env.example .env
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `OLLAMA_URL` | `http://localhost:11434` | Ollama inference server URL |
-| `LLM_MODEL` | `minimax-m2.7:cloud` | Primary LLM model name |
+| `LLM_MODEL` | `llama3.1` | Primary LLM model name |
+| `LLM_MODEL_FALLBACK` | `llama3.2:1b` | Fallback LLM used when primary is unavailable |
 | `EMBED_MODEL` | `mxbai-embed-large` | Embedding model for pgVector indexing |
 | `SESSION_SECRET` | *(must set)* | Min 32-char secret for session signing |
 | `NEXTAUTH_SECRET` | *(must set)* | NextAuth.js secret |
@@ -42,10 +43,11 @@ cp .env.example .env
 |----------|---------|-------------|
 | `PORT` | `3001` | Backend HTTP port |
 | `LOG_LEVEL` | `info` | Pino log level: `trace` / `debug` / `info` / `warn` / `error` |
-| `TRPC_URL` | `http://localhost:3001/trpc` | tRPC base URL used by the frontend |
+| `NEXT_PUBLIC_TRPC_URL` | `http://localhost:3001/trpc` | tRPC base URL used by the frontend (must be `NEXT_PUBLIC_` prefixed to reach the browser bundle) |
+| `TRPC_BACKEND_URL` | `http://localhost:3001/trpc` | Server-side tRPC URL used by Next.js route handlers; falls back to `NEXT_PUBLIC_TRPC_URL` |
 | `CONFIDENCE_THRESHOLD` | `0.6` | Minimum retrieval confidence score to include a case |
 | `ALERT_DELAY_HOURS` | `4` | Deduplication window for `legal_monitor` alerts |
-| `REDIS_URL` | `redis://localhost:6379` | Full Redis URL (alternative to HOST+PORT) |
+| `REDIS_URL` | `redis://localhost:6379` | Full Redis URL (alternative to `REDIS_HOST` + `REDIS_PORT`) |
 
 ---
 
