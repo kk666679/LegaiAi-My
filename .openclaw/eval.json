@@ -1,0 +1,86 @@
+{
+  "version": "1.0.0",
+  "description": "Evaluation dataset for LAW MATE – covers all 31 skills and adversarial test vectors.",
+  "tests": [
+    {
+      "id": "RET-001",
+      "skill": "legal-retrieve",
+      "description": "Retrieve cases on duty of care in tort",
+      "input": {
+        "query": "Duty of care owed by doctor to patient Malaysia",
+        "court": "FEDERAL",
+        "limit": 5
+      },
+      "expected": {
+        "min_results": 3,
+        "must_contain_citations": ["MLJ", "FC", "duty of care"],
+        "max_similarity_threshold": 0.75
+      },
+      "validation": "Check that at least 3 Federal Court cases are returned and citation format is valid."
+    },
+    {
+      "id": "RET-002",
+      "skill": "legal-retrieve",
+      "description": "Retrieve legislation on limitation of actions",
+      "input": {
+        "query": "Limitation of actions contract 1953",
+        "collection": "malaysia_legislation",
+        "limit": 3
+      },
+      "expected": {
+        "must_contain_act": ["Limitation Act 1953"],
+        "min_results": 1
+      },
+      "validation": "Verify that the Limitation Act 1953 is among results."
+    },
+    {
+      "id": "ANA-001",
+      "skill": "legal-analyse",
+      "description": "IRAC analysis of director's liability for company debts",
+      "input": {
+        "query": "Can a director be personally liable for company debts under Companies Act 2016?",
+        "evidence": [
+          { "citation": "Act 777, s. 221", "content": "A director may be liable if he continues to trade while insolvent." },
+          { "citation": "Re: XYZ Sdn Bhd [2020] 4 MLJ 123", "content": "Director held liable for debts incurred after insolvency." }
+        ]
+      },
+      "expected": {
+        "must_have_sections": ["Issue", "Rule", "Application", "Conclusion"],
+        "must_cite": ["Act 777", "s. 221", "MLJ"],
+        "confidence": { "min": 0.8 }
+      },
+      "validation": "Output must have IRAC structure and reference provided evidence."
+    },
+    {
+      "id": "VALID-001",
+      "skill": "legal-validate",
+      "description": "Validate a citation that exists in LOM",
+      "input": {
+        "text": "Under s. 221 of the Companies Act 2016, directors may be liable.",
+        "evidence": []
+      },
+      "expected": {
+        "valid_citations": ["Companies Act 2016"],
+        "invalid_citations": [],
+        "hallucinated_statements": []
+      },
+      "validation": "Citation must be verified against LOM database."
+    },
+    {
+      "id": "DEBATE-001",
+      "skill": "legal-debate",
+      "description": "Debate on objective vs subjective 'reasonable force'",
+      "input": {
+        "issue": "Is the test for 'reasonable force' in self‑defence objective or subjective?",
+        "rounds": 3,
+        "agents": ["Prosecution", "Defence", "Neutral"]
+      },
+      "expected": {
+        "transcript_length": { "min": 6 },
+        "winner": { "in": ["Prosecution", "Defence", "Neutral"] },
+        "rationale": { "type": "string", "min_length": 50 }
+      },
+      "validation": "Each round must have arguments from all agents and a final adjudication."
+    }
+  ]
+}

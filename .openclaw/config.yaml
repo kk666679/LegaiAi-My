@@ -1,0 +1,25 @@
+version: 1.0.0
+name: LAW MATE - OpenClaw Agent Swarm
+description: AI legal operating platform for Malaysian law
+default_model: llama3.1
+embed_model: mxbai-embed-large
+vector_dimension: 1536
+memory:
+  ltm:
+    type: pgvector
+    collection: malaysia_legislation
+  stm:
+    type: redis
+    ttl: 3600
+governance:
+  hitl_default: 0
+  data_classification:
+    public: ["llama3.1", "gpt-4o"]
+    internal: ["llama3.1"]
+    confidential: ["llama3.1"]
+    privileged: ["embed-only"]
+tools:
+  - pgvector
+  - ollama
+  - lom_client
+  - westlaw_api
