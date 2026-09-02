@@ -23,7 +23,6 @@ import {
   X,
 } from "lucide-react";
 import { DashboardShell } from "@/components/lawmate/DashboardShell";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -31,7 +30,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { LegalDisclaimer } from "@/components/lawmate/LegalDisclaimer";
 import { AIComposer } from "@/components/lawmate/AIComposer";
 import { DRAFT_TEMPLATES, MALAYSIAN_SOURCES } from "@/lib/lawmate/data";
-import { cn } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -48,6 +46,19 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Artifact,
+  ArtifactHeader,
+  ArtifactTitle,
+  ArtifactDescription,
+  ArtifactActions,
+  ArtifactAction,
+  ArtifactContent,
+} from "@/components/ai-elements/artifact";
+import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
+import { Sources, SourcesTrigger, SourcesContent, Source } from "@/components/ai-elements/sources";
+import { InlineCitation, InlineCitationCard, InlineCitationCardTrigger, InlineCitationCardBody, InlineCitationSource, InlineCitationQuote } from "@/components/ai-elements/inline-citation";
+import { Reasoning, ReasoningTrigger, ReasoningContent } from "@/components/ai-elements/reasoning";
 
 const DRAFT_BODY = `Date: 21 August 2026
 
@@ -105,24 +116,30 @@ const VERSIONS = [
   { id: "v-4", label: "Template: warning_letter", date: "2h ago", author: "system", ai: false },
 ];
 
+type ChatMsg = { role: "user" | "ai"; content: string; thinking?: string };
+
 export default function DraftStudioPage() {
   const [template, setTemplate] = useState<string>("warning_letter");
   const [body, setBody] = useState(DRAFT_BODY);
-  const [chat, setChat] = useState<{ role: "user" | "ai"; content: string }[]>([
+  const [chat, setChat] = useState<ChatMsg[]>([
     {
       role: "ai",
       content:
         "I've prepared a draft warning letter. Review it and let me know if you'd like me to make it more legally cautious, identify risks, or improve wording.",
+      thinking:
+        "Drafted from the warning_letter template. Cross-referenced Section 14 of the Employment Act 1955 on disciplinary procedures and the company's internal grievance policy.",
     },
   ]);
   const [chatInput, setChatInput] = useState("");
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "unsaved">("saved");
   const [selectedTab, setSelectedTab] = useState("editor");
   const [citationInput, setCitationInput] = useState("");
+  const [activeAction, setActiveAction] = useState<string | null>(null);
 
   const wordCount = body.split(/\s+/).filter(Boolean).length;
 
-  const runAction = (label: string) => {
+  const runAction = (id: string, label: string) => {
+    setActiveAction(id);
     setSaveStatus("saving");
     setChat((c) => [
       ...c,
@@ -130,9 +147,13 @@ export default function DraftStudioPage() {
       {
         role: "ai",
         content: `Applied: ${label}. Changes are streaming into the editor with citation-backed justifications.`,
+        thinking: `Streaming response for "${label}". Verifying changes against the active authorities before applying.`,
       },
     ]);
-    setTimeout(() => setSaveStatus("saved"), 800);
+    setTimeout(() => {
+      setSaveStatus("saved");
+      setActiveAction(null);
+    }, 800);
     toast.success(`AI action queued: ${label}`);
   };
 
@@ -143,8 +164,8 @@ export default function DraftStudioPage() {
       { role: "user", content: chatInput },
       {
         role: "ai",
-        content:
-          "Noted. I'll apply the suggested change after verifying it against the active authorities.",
+        content: "Noted. I'll apply the suggested change after verifying it against the active authorities.",
+        thinking: "Reviewing user request against active authorities before applying changes.",
       },
     ]);
     setChatInput("");
@@ -155,20 +176,16 @@ export default function DraftStudioPage() {
     setTimeout(() => setSaveStatus("saved"), 400);
     toast.success("Draft saved");
   };
+
   const exportDraft = (format: "PDF" | "DOCX" | "TXT") => {
-    const ext = format.toLowerCase();
     const blob = new Blob([body], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `warning-letter.${ext}`;
+    a.download = `warning-letter.${format.toLowerCase()}`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success(`Exported as ${format}`);
-  };
-  const showHistory = () => {
-    setSelectedTab("history");
-    toast.info("Showing version history");
   };
 
   const handleBodyChange = (val: string) => {
@@ -208,13 +225,11 @@ export default function DraftStudioPage() {
               </SelectTrigger>
               <SelectContent>
                 {DRAFT_TEMPLATES.map((t) => (
-                  <SelectItem key={t.id} value={t.id}>
-                    {t.label}
-                  </SelectItem>
+                  <SelectItem key={t.id} value={t.id}>{t.label}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <Button variant="outline" size="sm" className="gap-1.5" onClick={showHistory}>
+            <Button variant="outline" size="sm" className="gap-1.5" onClick={() => { setSelectedTab("history"); toast.info("Showing version history"); }}>
               <History className="size-3.5" /> History
             </Button>
             <Button variant="outline" size="sm" className="gap-1.5" onClick={saveDraft}>
@@ -239,29 +254,26 @@ export default function DraftStudioPage() {
 
         <LegalDisclaimer compact />
 
-        <Card>
-          <CardContent className="p-3">
+        <Artifact>
+          <ArtifactContent className="p-3">
             <div className="flex items-center gap-2 overflow-x-auto">
-              <span className="text-xs text-muted-foreground whitespace-nowrap">
-                Apply AI to draft:
-              </span>
+              <span className="text-xs text-muted-foreground whitespace-nowrap">Apply AI to draft:</span>
               {AI_ACTIONS.map((a) => {
                 const Icon = a.icon;
                 return (
-                  <Button
-                    key={a.id}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => runAction(a.label)}
-                    className="gap-1.5 whitespace-nowrap shrink-0"
-                  >
-                    <Icon className="size-3.5" /> {a.label}
+                  <Button key={a.id} variant="outline" size="sm" onClick={() => runAction(a.id, a.label)} className="gap-1.5 whitespace-nowrap shrink-0">
+                    {activeAction === a.id ? (
+                      <Loader2 className="size-3.5 animate-spin" />
+                    ) : (
+                      <Icon className="size-3.5" />
+                    )}
+                    {a.label}
                   </Button>
                 );
               })}
             </div>
-          </CardContent>
-        </Card>
+          </ArtifactContent>
+        </Artifact>
 
         <Tabs value={selectedTab} onValueChange={setSelectedTab}>
           <TabsList>
@@ -274,36 +286,53 @@ export default function DraftStudioPage() {
 
           <TabsContent value="editor" className="mt-3">
             <div className="grid gap-4 lg:grid-cols-[1fr_minmax(320px,360px)]">
-              <Card>
-                <div className="flex items-center justify-between border-b px-4 py-2">
+              <Artifact>
+                <ArtifactHeader>
                   <div className="flex items-center gap-2 text-sm">
                     <FileSignature className="size-4 text-primary" />
-                    <span className="font-medium">Document editor</span>
+                    <ArtifactTitle>Document editor</ArtifactTitle>
+                    <InlineCitation>
+                      <InlineCitationCard>
+                        <InlineCitationCardTrigger sources={["https://lom.gov.my/act/employment-1955"]} />
+                        <InlineCitationCardBody>
+                          <div className="p-3 space-y-2">
+                            <InlineCitationSource
+                              title="Employment Act 1955 — Section 14"
+                              url="https://lom.gov.my/act/employment-1955"
+                              description="Governs disciplinary procedures for misconduct in Malaysian employment relationships."
+                            />
+                            <InlineCitationQuote>
+                              The contract of service may be terminated by either party on grounds of misconduct.
+                            </InlineCitationQuote>
+                          </div>
+                        </InlineCitationCardBody>
+                      </InlineCitationCard>
+                    </InlineCitation>
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="gap-1.5">
-                        <Wand2 className="size-3.5" /> AI actions
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56">
-                      <DropdownMenuLabel>Apply to selection</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      {AI_ACTIONS.map((a) => {
-                        const Icon = a.icon;
-                        return (
-                          <DropdownMenuItem
-                            key={a.id}
-                            onClick={() => runAction(a.label)}
-                            className="gap-2"
-                          >
-                            <Icon className="size-3.5" /> {a.label}
-                          </DropdownMenuItem>
-                        );
-                      })}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
+                  <ArtifactActions>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <ArtifactAction tooltip="AI actions" asChild>
+                          <Button variant="outline" size="sm" className="size-auto gap-1.5 px-2">
+                            <Wand2 className="size-3.5" /> AI actions
+                          </Button>
+                        </ArtifactAction>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-56">
+                        <DropdownMenuLabel>Apply to selection</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        {AI_ACTIONS.map((a) => {
+                          const Icon = a.icon;
+                          return (
+                            <DropdownMenuItem key={a.id} onClick={() => runAction(a.id, a.label)} className="gap-2">
+                              <Icon className="size-3.5" /> {a.label}
+                            </DropdownMenuItem>
+                          );
+                        })}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </ArtifactActions>
+                </ArtifactHeader>
                 <textarea
                   value={body}
                   onChange={(e) => handleBodyChange(e.target.value)}
@@ -323,34 +352,40 @@ export default function DraftStudioPage() {
                     )}
                   </span>
                 </div>
-              </Card>
+              </Artifact>
 
-              <Card className="flex flex-col overflow-hidden">
-                <div className="flex items-center justify-between border-b px-4 py-2">
+              <Artifact className="flex flex-col overflow-hidden">
+                <ArtifactHeader>
                   <div className="flex items-center gap-2 text-sm">
                     <Sparkles className="size-4 text-primary" />
-                    <span className="font-medium">AI Assistant</span>
+                    <ArtifactTitle>AI Assistant</ArtifactTitle>
                   </div>
-                </div>
-
+                </ArtifactHeader>
                 <ScrollArea className="flex-1 min-h-[260px] max-h-[320px] lg:max-h-[420px]">
-                  <div className="p-3 space-y-3">
-                    {chat.map((m, i) => (
-                      <div
-                        key={i}
-                        className={cn(
-                          "rounded-md p-3 text-sm leading-relaxed",
-                          m.role === "user"
-                            ? "ml-auto max-w-[90%] bg-primary/10"
-                            : "bg-muted/40",
+                  <div className="p-3 space-y-4">
+                    {chat.map((msg, i) => (
+                      <Message key={i} from={msg.role}>
+                        {msg.thinking && (
+                          <Reasoning defaultOpen={false}>
+                            <ReasoningTrigger />
+                            <ReasoningContent>{msg.thinking}</ReasoningContent>
+                          </Reasoning>
                         )}
-                      >
-                        {m.content}
-                      </div>
+                        <MessageContent>
+                          <MessageResponse>{msg.content}</MessageResponse>
+                          <Sources>
+                            <SourcesTrigger count={3} />
+                            <SourcesContent>
+                              <Source href="https://lom.gov.my/act/employment-1955" title="Employment Act 1955" />
+                              <Source href="https://lom.gov.my/case/wong-yuen-foo" title="Wong Yuen Foo v Soon Hing" />
+                              <Source href="https://lom.gov.my/internal/disciplinary-policy" title="Internal Disciplinary Policy" />
+                            </SourcesContent>
+                          </Sources>
+                        </MessageContent>
+                      </Message>
                     ))}
                   </div>
                 </ScrollArea>
-
                 <div className="border-t p-3 space-y-2">
                   <AIComposer
                     value={chatInput}
@@ -361,17 +396,19 @@ export default function DraftStudioPage() {
                     compact
                   />
                 </div>
-              </Card>
+              </Artifact>
             </div>
           </TabsContent>
 
           <TabsContent value="evidence" className="mt-3">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Supporting evidence</CardTitle>
-                <CardDescription>Authoritative sources relevant to this draft.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2">
+            <Artifact>
+              <ArtifactHeader>
+                <div>
+                  <ArtifactTitle>Supporting evidence</ArtifactTitle>
+                  <ArtifactDescription>Authoritative sources relevant to this draft.</ArtifactDescription>
+                </div>
+              </ArtifactHeader>
+              <ArtifactContent className="space-y-2">
                 {EVIDENCE.map((e, i) => (
                   <div key={i} className="flex items-start gap-3 rounded-md border bg-card/30 p-3">
                     <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted">
@@ -395,33 +432,37 @@ export default function DraftStudioPage() {
                       </div>
                     </div>
                     <Button
-                          variant="ghost"
-                          size="sm"
-                          className="shrink-0"
-                          onClick={() => {
-                            setBody((b) => `${b}\n\n${e.title}${e.section ? ` — ${e.section}` : ''}: ${e.snippet ?? ""}`);
-                            toast.success(`Inserted reference: ${e.title}`);
-                          }}
-                        >
-                          Insert
-                        </Button>
+                      variant="ghost"
+                      size="sm"
+                      className="shrink-0"
+                      onClick={() => {
+                        setBody((b) => `${b}\n\n${e.title}${e.section ? ` — ${e.section}` : ""}: ${e.snippet ?? ""}`);
+                        toast.success(`Inserted reference: ${e.title}`);
+                      }}
+                    >
+                      Insert
+                    </Button>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+              </ArtifactContent>
+            </Artifact>
           </TabsContent>
 
           <TabsContent value="quality" className="mt-3">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Draft quality</CardTitle>
-                <CardDescription>Multi-dimensional quality assessment.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            <Artifact>
+              <ArtifactHeader>
+                <div>
+                  <ArtifactTitle>Draft quality</ArtifactTitle>
+                  <ArtifactDescription>Multi-dimensional quality assessment.</ArtifactDescription>
+                </div>
+              </ArtifactHeader>
+              <ArtifactContent className="space-y-4">
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium">Overall</span>
-                    <span className="text-2xl font-semibold tracking-tight">{QUALITY_SCORES.overall}<span className="text-sm text-muted-foreground">/100</span></span>
+                    <span className="text-2xl font-semibold tracking-tight">
+                      {QUALITY_SCORES.overall}<span className="text-sm text-muted-foreground">/100</span>
+                    </span>
                   </div>
                   <Progress value={QUALITY_SCORES.overall} className="h-2" />
                 </div>
@@ -436,25 +477,25 @@ export default function DraftStudioPage() {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </ArtifactContent>
+            </Artifact>
           </TabsContent>
 
           <TabsContent value="citations" className="mt-3">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Citations</CardTitle>
-                <CardDescription>Insert and validate citations from LOM.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="relative">
-                  <input
-                    value={citationInput}
-                    onChange={(e) => setCitationInput(e.target.value)}
-                    placeholder="Search LOM: Act, case, section…"
-                    className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
+            <Artifact>
+              <ArtifactHeader>
+                <div>
+                  <ArtifactTitle>Citations</ArtifactTitle>
+                  <ArtifactDescription>Insert and validate citations from LOM.</ArtifactDescription>
                 </div>
+              </ArtifactHeader>
+              <ArtifactContent className="space-y-3">
+                <input
+                  value={citationInput}
+                  onChange={(e) => setCitationInput(e.target.value)}
+                  placeholder="Search LOM: Act, case, section…"
+                  className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                />
                 {citationInput && (
                   <div className="space-y-1 rounded-md border bg-card/30 p-2">
                     {MALAYSIAN_SOURCES.filter((s) =>
@@ -463,9 +504,7 @@ export default function DraftStudioPage() {
                     ).slice(0, 4).map((s) => (
                       <button
                         key={s.id}
-                        onClick={() => {
-                          setCitationInput("");
-                        }}
+                        onClick={() => setCitationInput("")}
                         className="flex w-full items-center gap-2 rounded-md p-2 text-left text-sm hover:bg-accent/40 transition-colors"
                       >
                         <Gavel className="size-3.5 text-muted-foreground" />
@@ -486,28 +525,25 @@ export default function DraftStudioPage() {
                         <p className="text-sm font-medium">{s.title} {s.section && `— ${s.section}`}</p>
                         <p className="text-xs text-muted-foreground mt-0.5">{s.excerpt}</p>
                       </div>
-<Button
-                            variant="ghost"
-                            size="icon-sm"
-                            aria-label="Remove"
-                            onClick={() => toast.message("Citation removed")}
-                          >
-                            <X className="size-3" />
-                          </Button>
+                      <Button variant="ghost" size="icon-sm" aria-label="Remove" onClick={() => toast.message("Citation removed")}>
+                        <X className="size-3" />
+                      </Button>
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </ArtifactContent>
+            </Artifact>
           </TabsContent>
 
           <TabsContent value="history" className="mt-3">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Version history</CardTitle>
-                <CardDescription>Restore previous versions or compare.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2">
+            <Artifact>
+              <ArtifactHeader>
+                <div>
+                  <ArtifactTitle>Version history</ArtifactTitle>
+                  <ArtifactDescription>Restore previous versions or compare.</ArtifactDescription>
+                </div>
+              </ArtifactHeader>
+              <ArtifactContent className="space-y-2">
                 {VERSIONS.map((v) => (
                   <div key={v.id} className="flex items-center gap-3 rounded-md border bg-card/30 p-3">
                     <div className="flex size-9 items-center justify-center rounded-md bg-muted">
@@ -520,24 +556,12 @@ export default function DraftStudioPage() {
                       </div>
                       <p className="text-xs text-muted-foreground">{v.author} · {v.date}</p>
                     </div>
-<Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => toast.info(`Comparing with "${v.label}"`)}
-                      >
-                        Compare
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => toast.success(`Restored "${v.label}"`)}
-                      >
-                        Restore
-                      </Button>
+                    <Button variant="ghost" size="sm" onClick={() => toast.info(`Comparing with "${v.label}"`)}>Compare</Button>
+                    <Button variant="outline" size="sm" onClick={() => toast.success(`Restored "${v.label}"`)}>Restore</Button>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+              </ArtifactContent>
+            </Artifact>
           </TabsContent>
         </Tabs>
       </div>

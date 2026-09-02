@@ -106,6 +106,22 @@ export const ArtifactAction = ({
   variant = "ghost",
   ...props
 }: ArtifactActionProps) => {
+  if (props.asChild) {
+    const child = (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>{children}</TooltipTrigger>
+          {tooltip ? (
+            <TooltipContent>
+              <p>{tooltip}</p>
+            </TooltipContent>
+          ) : null}
+        </Tooltip>
+      </TooltipProvider>
+    );
+    return child;
+  }
+
   const button = (
     <Button
       className={cn(

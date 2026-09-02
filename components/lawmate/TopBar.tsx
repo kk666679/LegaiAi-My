@@ -19,6 +19,8 @@ import {
   HelpCircle,
   Sparkles,
   Command as CommandIcon,
+  Languages,
+  Check,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
@@ -35,10 +37,18 @@ import {
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import { CommandPalette } from "@/components/lawmate/CommandPalette";
 import { MOCK_USER, MOCK_NOTIFICATIONS } from "@/lib/lawmate/data";
 import { useTranslation } from "@/lib/i18n/I18nProvider";
+import {
+  LOCALE_FLAGS,
+  LOCALE_LABELS,
+  LOCALE_COUNTRY,
+  type Locale,
+} from "@/lib/i18n/resources";
 
 interface TopBarProps {
   onMenu?: () => void;
@@ -49,7 +59,7 @@ export function TopBar({ onMenu }: TopBarProps) {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [shortcutKey, setShortcutKey] = useState("Ctrl");
   const { setTheme, theme } = useTheme();
-  const { t } = useTranslation("sidebar");
+  const { t, locale, setLocale, available } = useTranslation("sidebar");
   const unread = MOCK_NOTIFICATIONS.filter((n) => !n.read).length;
   const router = useRouter();
 
@@ -212,6 +222,43 @@ export function TopBar({ onMenu }: TopBarProps) {
               <Sparkles className="size-4" /> AI Settings
             </Link>
           </DropdownMenuItem>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <Languages className="size-4" />
+              <span className="ml-2">Language</span>
+              <span className="ml-auto text-xs text-muted-foreground">
+                {LOCALE_FLAGS[locale]} {LOCALE_LABELS[locale]}
+              </span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuSubContent className="min-w-[16rem]">
+              <DropdownMenuLabel className="text-xs text-muted-foreground">
+                Choose your language
+              </DropdownMenuLabel>
+              <DropdownMenuRadioGroup
+                value={locale}
+                onValueChange={(v) => setLocale(v as Locale)}
+              >
+                {available.map((code) => (
+                  <DropdownMenuRadioItem
+                    key={code}
+                    value={code}
+                    className="gap-2"
+                  >
+                    <span className="text-base leading-none">
+                      {LOCALE_FLAGS[code]}
+                    </span>
+                    <span className="flex-1">{LOCALE_LABELS[code]}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {LOCALE_COUNTRY[code]}
+                    </span>
+                    {code === locale && (
+                      <Check className="size-4 text-primary" />
+                    )}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
               {theme === "dark" ? (

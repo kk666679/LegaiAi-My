@@ -8,11 +8,9 @@ import {
   FileText,
   CheckCircle2,
   Loader2,
-  ArrowRight,
   Search,
 } from "lucide-react";
 import { DashboardShell } from "@/components/lawmate/DashboardShell";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -20,6 +18,15 @@ import { MOCK_ANALYSIS, MOCK_DOCUMENTS } from "@/lib/lawmate/data";
 import { cn } from "@/lib/utils";
 import { AIInsightCard } from "@/components/ai/aiinsight-card";
 import { AIMetricCard } from "@/components/ai/aimetric-card";
+import {
+  Artifact,
+  ArtifactHeader,
+  ArtifactTitle,
+  ArtifactDescription,
+  ArtifactActions,
+  ArtifactAction,
+  ArtifactContent,
+} from "@/components/ai-elements/artifact";
 
 const KIND_LABEL: Record<string, string> = {
   risk: "Risk",
@@ -55,43 +62,21 @@ export default function AnalysisPage() {
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <AIMetricCard
-            title="Findings"
-            value={MOCK_ANALYSIS.findings.length}
-            description="Total identified"
-            icon={Sparkles}
-          />
-          <AIMetricCard
-            title="High severity"
-            value={MOCK_ANALYSIS.findings.filter((f) => f.severity === "high").length}
-            description="Need immediate attention"
-            icon={Sparkles}
-          />
-          <AIMetricCard
-            title="Parties"
-            value={MOCK_ANALYSIS.parties.length}
-            description="Detected in document"
-            icon={FileText}
-          />
-          <AIMetricCard
-            title="Status"
-            value={MOCK_ANALYSIS.status}
-            description={MOCK_ANALYSIS.dates[0] ?? "Pending"}
-            icon={CheckCircle2}
-          />
+          <AIMetricCard title="Findings" value={MOCK_ANALYSIS.findings.length} description="Total identified" icon={Sparkles} />
+          <AIMetricCard title="High severity" value={MOCK_ANALYSIS.findings.filter((f) => f.severity === "high").length} description="Need immediate attention" icon={Sparkles} />
+          <AIMetricCard title="Parties" value={MOCK_ANALYSIS.parties.length} description="Detected in document" icon={FileText} />
+          <AIMetricCard title="Status" value={MOCK_ANALYSIS.status} description={MOCK_ANALYSIS.dates[0] ?? "Pending"} icon={CheckCircle2} />
         </div>
 
         <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
+          {/* Document picker */}
           <div className="space-y-2">
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 size-3.5 text-muted-foreground" />
-              <Input
-                placeholder="Search documents…"
-                className="pl-8 h-9 text-sm"
-              />
+              <Input placeholder="Search documents…" className="pl-8 h-9 text-sm" />
             </div>
-            <Card>
-              <CardContent className="p-2 space-y-1">
+            <Artifact>
+              <ArtifactContent className="p-2 space-y-1">
                 {MOCK_DOCUMENTS.map((d) => (
                   <button
                     key={d.id}
@@ -108,14 +93,15 @@ export default function AnalysisPage() {
                     )}
                   </button>
                 ))}
-              </CardContent>
-            </Card>
+              </ArtifactContent>
+            </Artifact>
           </div>
 
+          {/* Analysis panel */}
           <div className="space-y-4">
             {!analysis ? (
-              <Card>
-                <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+              <Artifact>
+                <ArtifactContent className="flex flex-col items-center justify-center py-12 text-center">
                   <Loader2 className="size-6 animate-spin text-primary mb-3" />
                   <p className="font-medium">No analysis available</p>
                   <p className="text-sm text-muted-foreground mt-1 max-w-sm">
@@ -126,47 +112,48 @@ export default function AnalysisPage() {
                       <Upload className="size-4" /> Upload document
                     </Link>
                   </Button>
-                </CardContent>
-              </Card>
+                </ArtifactContent>
+              </Artifact>
             ) : (
               <>
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <CardTitle className="text-base">
-                          {MOCK_DOCUMENTS.find((d) => d.id === analysis.documentId)?.name ?? "Document"}
-                        </CardTitle>
-                        <CardDescription className="mt-1">{analysis.summary}</CardDescription>
-                      </div>
+                <Artifact>
+                  <ArtifactHeader>
+                    <div className="min-w-0 flex-1">
+                      <ArtifactTitle>
+                        {MOCK_DOCUMENTS.find((d) => d.id === analysis.documentId)?.name ?? "Document"}
+                      </ArtifactTitle>
+                      <ArtifactDescription className="mt-1">{analysis.summary}</ArtifactDescription>
+                    </div>
+                    <ArtifactActions>
                       <Badge variant="secondary" className="gap-1 shrink-0">
                         <CheckCircle2 className="size-3" /> {analysis.status}
                       </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
+                    </ArtifactActions>
+                  </ArtifactHeader>
+                  <ArtifactContent>
                     <div className="grid grid-cols-2 gap-3">
                       <InfoRow label="Parties" value={analysis.parties.join(", ")} />
                       <InfoRow label="Key dates" value={analysis.dates.join(" · ")} />
                     </div>
-                  </CardContent>
-                </Card>
+                  </ArtifactContent>
+                </Artifact>
 
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle className="text-base">Findings</CardTitle>
-                        <CardDescription>{analysis.findings.length} items identified</CardDescription>
-                      </div>
-                      <Button size="sm" variant="outline" className="gap-1.5" asChild>
+                <Artifact>
+                  <ArtifactHeader>
+                    <div>
+                      <ArtifactTitle>Findings</ArtifactTitle>
+                      <ArtifactDescription>{analysis.findings.length} items identified</ArtifactDescription>
+                    </div>
+                    <ArtifactActions>
+                      <Button variant="outline" size="sm" asChild>
                         <Link href="/legalai/drafting">
-                          <Sparkles className="size-3.5" /> Apply fixes
+                          <Sparkles className="size-4" />
+                          <span>Apply fixes</span>
                         </Link>
                       </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
+                    </ArtifactActions>
+                  </ArtifactHeader>
+                  <ArtifactContent className="space-y-2">
                     {analysis.findings.map((f) => (
                       <AIInsightCard
                         key={f.id}
@@ -181,8 +168,8 @@ export default function AnalysisPage() {
                         ]}
                       />
                     ))}
-                  </CardContent>
-                </Card>
+                  </ArtifactContent>
+                </Artifact>
               </>
             )}
           </div>
