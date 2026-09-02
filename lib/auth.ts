@@ -1,5 +1,10 @@
 "use client";
 
+// Client-side session token holder. The token value itself is created and
+// validated server-side by backend/src/lib/auth.ts (createSession /
+// validateSession). The localStorage key is purely a client concern and does
+// not need to match any backend field name.
+
 const TOKEN_KEY = "lm_session_token";
 
 export function getToken(): string | null {
