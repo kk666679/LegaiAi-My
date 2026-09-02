@@ -1,0 +1,53 @@
+{
+  "sidebar": {
+    "brandName": "LawMate",
+    "brandTagline": "ဥပဒေ AI အကူအညီ",
+    "primaryNav": "ပင်မလမ်းညွှန်",
+    "aiWorkspaceTitle": "AI အကူအညီပါသော အလုပ်ခွင်",
+    "aiWorkspaceDescription": "နိဂုံးချုပ်များကို စစ်ဆေးပြီး လိုအပ်ပါက အရည်အချင်းပြည့်မီသော ဥပဒေအကြံဉာဏ်ကို ရယူပါ။",
+    "expand": "ဘေးဘားကို ချဲ့ရန်",
+    "collapse": "ဘေးဘားကို ခေါက်ရန်",
+    "openMenu": "လမ်းညွှန်ကို ဖွင့်ရန်",
+    "closeMenu": "လမ်းညွှန်ကို ပိတ်ရန်",
+    "groups": {
+      "Workspace": "အလုပ်ခွင်",
+      "Matters & Cases": "အမှုများနှင့် ကိစ္စရပ်များ",
+      "Documents": "စာရွက်စာတမ်းများ",
+      "Legal Research": "ဥပဒေသုတေသန",
+      "Risk & Intelligence": "အန္တရာယ်နှင့် ထောက်လှမ်းရေး",
+      "AI & Agents": "AI နှင့် ကိုယ်စားလှယ်များ",
+      "Governance": "စီမံခန့်ခွဲမှု",
+      "System": "စနစ်"
+    },
+    "items": {
+      "Dashboard": "ဒက်ရှ်ဘုတ်",
+      "Saved Items": "သိမ်းထားသည်များ",
+      "Activity History": "လှုပ်ရှားမှု မှတ်တမ်း",
+      "Matters": "အမှုများ",
+      "Clients": "ဖောက်သည်များ",
+      "Tasks": "လုပ်ငန်းများ",
+      "Documents": "စာရွက်စာတမ်းများ",
+      "Document Drafting": "စာရွက်စာတမ်း ရေးသားခြင်း",
+      "Drafting Studio": "ရေးသားရေး စတူဒီယို",
+      "Contracts": "စာချုပ်များ",
+      "Document Analysis": "စာရွက်စာတမ်း ခွဲခြမ်းစိတ်ဖြာခြင်း",
+      "Documentation": "စာရွက်စာတမ်းပြုစုခြင်း",
+      "Research": "သုတေသန",
+      "Universal Search": "ကျယ်ပြန့်သော ရှာဖွေမှု",
+      "Insights & Timeline": "ထိုးထွင်းသိမြင်မှုနှင့် အချိန်ကြောင်းဇစ်မြစ်",
+      "Risk Engine": "အန္တရာယ် အင်ဂျင်",
+      "Change Monitor": "ပြောင်းလဲမှု စောင့်ကြည့်ရေး",
+      "Executive Analytics": "အရာရှိချုပ် ခွဲခြမ်းစိတ်ဖြာမှု",
+      "AI Assistant": "AI အကူ",
+      "AI Copilot": "AI ကိုပိုလော့",
+      "Debate Simulation": "အငြင်းပွဲ တုပခြင်း",
+      "Agent Control (HITL)": "ကိုယ်စားလှယ် ထိန်းချုပ်မှု (HITL)",
+      "AI Governance": "AI စီမံခန့်ခွဲမှု",
+      "Compliance": "လိုက်နာမှု",
+      "Audit Trail": "စစ်ဆေးရေး မှတ်တမ်း",
+      "Billing Intelligence": "ငွေတောင်းခံမှု ထောက်လှမ်းရေး",
+      "Notifications": "အသိပေးချက်များ",
+      "Settings": "ဆက်တင်များ"
+    }
+  }
+}

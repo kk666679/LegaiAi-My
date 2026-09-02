@@ -1,0 +1,53 @@
+{
+  "sidebar": {
+    "brandName": "LawMate",
+    "brandTagline": "Asisten Legal AI",
+    "primaryNav": "Navigasi utama",
+    "aiWorkspaceTitle": "Ruang kerja berbantu AI",
+    "aiWorkspaceDescription": "Verifikasi kesimpulan dan cari nasihat hukum yang berkualifikasi jika diperlukan.",
+    "expand": "Buka bilah sisi",
+    "collapse": "Tutup bilah sisi",
+    "openMenu": "Buka navigasi",
+    "closeMenu": "Tutup navigasi",
+    "groups": {
+      "Workspace": "Ruang Kerja",
+      "Matters & Cases": "Perkara & Kasus",
+      "Documents": "Dokumen",
+      "Legal Research": "Penelitian Hukum",
+      "Risk & Intelligence": "Risiko & Intelijen",
+      "AI & Agents": "AI & Agen",
+      "Governance": "Tata Kelola",
+      "System": "Sistem"
+    },
+    "items": {
+      "Dashboard": "Dasbor",
+      "Saved Items": "Item Tersimpan",
+      "Activity History": "Riwayat Aktivitas",
+      "Matters": "Perkara",
+      "Clients": "Klien",
+      "Tasks": "Tugas",
+      "Documents": "Dokumen",
+      "Document Drafting": "Penyusunan Dokumen",
+      "Drafting Studio": "Studio Penyusunan",
+      "Contracts": "Kontrak",
+      "Document Analysis": "Analisis Dokumen",
+      "Documentation": "Dokumentasi",
+      "Research": "Penelitian",
+      "Universal Search": "Pencarian Universal",
+      "Insights & Timeline": "Wawasan & Linimasa",
+      "Risk Engine": "Mesin Risiko",
+      "Change Monitor": "Pemantau Perubahan",
+      "Executive Analytics": "Analitik Eksekutif",
+      "AI Assistant": "Asisten AI",
+      "AI Copilot": "Kopilot AI",
+      "Debate Simulation": "Simulasi Debat",
+      "Agent Control (HITL)": "Kontrol Agen (HITL)",
+      "AI Governance": "Tata Kelola AI",
+      "Compliance": "Kepatuhan",
+      "Audit Trail": "Jejak Audit",
+      "Billing Intelligence": "Intelijen Penagihan",
+      "Notifications": "Notifikasi",
+      "Settings": "Pengaturan"
+    }
+  }
+}

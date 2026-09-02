@@ -1,0 +1,53 @@
+{
+  "sidebar": {
+    "brandName": "LawMate",
+    "brandTagline": "AI Legal na Tumatulong",
+    "primaryNav": "Pangunahing nabigasyon",
+    "aiWorkspaceTitle": "Workspace na may tulong ng AI",
+    "aiWorkspaceDescription": "Patunayan ang mga konklusyon at humingi ng payo mula sa kwalipikadong abugado kung kinakailangan.",
+    "expand": "Palawakin ang sidebar",
+    "collapse": "I-collapse ang sidebar",
+    "openMenu": "Buksan ang nabigasyon",
+    "closeMenu": "Isara ang nabigasyon",
+    "groups": {
+      "Workspace": "Workspace",
+      "Matters & Cases": "Mga Kaso at Usapin",
+      "Documents": "Mga Dokumento",
+      "Legal Research": "Pananaliksik sa Batas",
+      "Risk & Intelligence": "Panganib at Intelligence",
+      "AI & Agents": "AI at mga Ahente",
+      "Governance": "Pamamahala",
+      "System": "Sistema"
+    },
+    "items": {
+      "Dashboard": "Dashboard",
+      "Saved Items": "Mga Na-save",
+      "Activity History": "Kasaysayan ng Aktibidad",
+      "Matters": "Mga Usapin",
+      "Clients": "Mga Kliyente",
+      "Tasks": "Mga Gawain",
+      "Documents": "Mga Dokumento",
+      "Document Drafting": "Pagbuo ng Dokumento",
+      "Drafting Studio": "Drafting Studio",
+      "Contracts": "Mga Kontrata",
+      "Document Analysis": "Pagsusuri ng Dokumento",
+      "Documentation": "Dokumentasyon",
+      "Research": "Pananaliksik",
+      "Universal Search": "Universal na Paghahanap",
+      "Insights & Timeline": "Mga Insight at Timeline",
+      "Risk Engine": "Risk Engine",
+      "Change Monitor": "Change Monitor",
+      "Executive Analytics": "Executive Analytics",
+      "AI Assistant": "AI Assistant",
+      "AI Copilot": "AI Copilot",
+      "Debate Simulation": "Debate Simulation",
+      "Agent Control (HITL)": "Agent Control (HITL)",
+      "AI Governance": "AI Governance",
+      "Compliance": "Compliance",
+      "Audit Trail": "Audit Trail",
+      "Billing Intelligence": "Billing Intelligence",
+      "Notifications": "Mga Notipikasyon",
+      "Settings": "Mga Setting"
+    }
+  }
+}

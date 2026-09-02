@@ -1,0 +1,53 @@
+{
+  "sidebar": {
+    "brandName": "LawMate",
+    "brandTagline": "AI ຊ່ວຍວຽກກົດໝາຍ",
+    "primaryNav": "ການນຳທາງຫຼັກ",
+    "aiWorkspaceTitle": "ພື້ນທີ່ເຮັດວຽກທີ່ມີ AI ຊ່ວຍ",
+    "aiWorkspaceDescription": "ກວດສອບຂໍ້ສະຫຼຸບ ແລະ ຊອກຫາຄຳປຶກສາກົດໝາຍຈາກຜູ້ຊ່ຽວຊານເມື່ອຈຳເປັນ.",
+    "expand": "ຂະຫຍາຍແຖບຂ້າງ",
+    "collapse": "ຫຍິບແຖບຂ້າງ",
+    "openMenu": "ເປີດການນຳທາງ",
+    "closeMenu": "ປິດການນຳທາງ",
+    "groups": {
+      "Workspace": "ພື້ນທີ່ເຮັດວຽກ",
+      "Matters & Cases": "ຄະດີ ແລະ ເລື່ອງ",
+      "Documents": "ເອກະສານ",
+      "Legal Research": "ການຄົ້ນຄວ້າກົດໝາຍ",
+      "Risk & Intelligence": "ຄວາມສ່ຽງ ແລະ ຂ່າວກອງ",
+      "AI & Agents": "AI ແລະ ຕົວແທນ",
+      "Governance": "ການຄຸ້ມຄອງ",
+      "System": "ລະບົບ"
+    },
+    "items": {
+      "Dashboard": "ແຜງຄວບຄຸມ",
+      "Saved Items": "ລາຍການທີ່ບັນທຶກ",
+      "Activity History": "ປະຫວັດກິດຈະກຳ",
+      "Matters": "ຄະດີ",
+      "Clients": "ລູກຄ້າ",
+      "Tasks": "ວຽກງານ",
+      "Documents": "ເອກະສານ",
+      "Document Drafting": "ການ��ຂຽນເອກະສານ",
+      "Drafting Studio": "ສະຕູດິໂອຂຽນເອກະສານ",
+      "Contracts": "ສັນຍາ",
+      "Document Analysis": "ການວິເຄາະເອກະສານ",
+      "Documentation": "ເອກະສານປະກອບ",
+      "Research": "ການຄົ້ນຄວ້າ",
+      "Universal Search": "ການຊອກຫາແບບຄົບວົງຈອນ",
+      "Insights & Timeline": "ຂໍ້ມູນເຈາະເລິກ ແລະ ທາມລາຍ",
+      "Risk Engine": "ເຄື່ອງຈັກຄວາມສ່ຽງ",
+      "Change Monitor": "ຕົວຕິດຕາມການປ່ຽນແປງ",
+      "Executive Analytics": "ການວິເຄາະບໍລິຫານ",
+      "AI Assistant": "ຜູ້ຊ່ວຍ AI",
+      "AI Copilot": "AI ໂຄໄພລອດ",
+      "Debate Simulation": "ການຈຳລອງການໂຕ້ວາທີ",
+      "Agent Control (HITL)": "ການຄວບຄຸມຕົວແທນ (HITL)",
+      "AI Governance": "ການຄຸ້ມຄອງ AI",
+      "Compliance": "ການປະຕິບັດຕາມ",
+      "Audit Trail": "ຮອຍກວດສອບ",
+      "Billing Intelligence": "ຂ່າວກອງການເກັບເງິນ",
+      "Notifications": "ການແຈ້ງເຕືອນ",
+      "Settings": "ການຕັ້ງຄ່າ"
+    }
+  }
+}

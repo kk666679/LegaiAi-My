@@ -1,0 +1,53 @@
+{
+  "sidebar": {
+    "brandName": "LawMate",
+    "brandTagline": "Trợ lý Pháp lý AI",
+    "primaryNav": "Điều hướng chính",
+    "aiWorkspaceTitle": "Không gian làm việc có hỗ trợ AI",
+    "aiWorkspaceDescription": "Xác minh kết luận và tìm kiếm lời khuyên pháp lý có trình độ khi cần thiết.",
+    "expand": "Mở rộng thanh bên",
+    "collapse": "Thu gọn thanh bên",
+    "openMenu": "Mở điều hướng",
+    "closeMenu": "Đóng điều hướng",
+    "groups": {
+      "Workspace": "Không gian làm việc",
+      "Matters & Cases": "Vụ việc & Hồ sơ",
+      "Documents": "Tài liệu",
+      "Legal Research": "Nghiên cứu pháp lý",
+      "Risk & Intelligence": "Rủi ro & Tình báo",
+      "AI & Agents": "AI & Tác nhân",
+      "Governance": "Quản trị",
+      "System": "Hệ thống"
+    },
+    "items": {
+      "Dashboard": "Bảng điều khiển",
+      "Saved Items": "Mục đã lưu",
+      "Activity History": "Lịch sử hoạt động",
+      "Matters": "Vụ việc",
+      "Clients": "Khách hàng",
+      "Tasks": "Tác vụ",
+      "Documents": "Tài liệu",
+      "Document Drafting": "Soạn thảo tài liệu",
+      "Drafting Studio": "Studio soạn thảo",
+      "Contracts": "Hợp đồng",
+      "Document Analysis": "Phân tích tài liệu",
+      "Documentation": "Tài liệu hướng dẫn",
+      "Research": "Nghiên cứu",
+      "Universal Search": "Tìm kiếm toàn cầu",
+      "Insights & Timeline": "Thông tin chi tiết & Dòng thời gian",
+      "Risk Engine": "Động cơ rủi ro",
+      "Change Monitor": "Giám sát thay đổi",
+      "Executive Analytics": "Phân tích điều hành",
+      "AI Assistant": "Trợ lý AI",
+      "AI Copilot": "Đồng lái AI",
+      "Debate Simulation": "Mô phỏng tranh luận",
+      "Agent Control (HITL)": "Điều khiển tác nhân (HITL)",
+      "AI Governance": "Quản trị AI",
+      "Compliance": "Tuân thủ",
+      "Audit Trail": "Nhật ký kiểm toán",
+      "Billing Intelligence": "Tình báo thanh toán",
+      "Notifications": "Thông báo",
+      "Settings": "Cài đặt"
+    }
+  }
+}
