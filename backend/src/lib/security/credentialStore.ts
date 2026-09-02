@@ -81,7 +81,7 @@ export class CredentialStore {
 
     if (!config) return null;
 
-    const [keyRef, encryptedKey] = config.apiKeyRef.split(':');
+    const [keyRef = '', encryptedKey = ''] = config.apiKeyRef.split(':');
     const apiKey = decrypt(encryptedKey);
 
     return {
@@ -127,7 +127,7 @@ export class CredentialStore {
       userId: c.userId || undefined,
       provider: c.provider as ProviderType,
       name: c.name,
-      keyRef: hashKeyRef(c.apiKeyRef.split(':')[0]),
+      keyRef: hashKeyRef(c.apiKeyRef.split(':')[0] ?? ''),
       apiBaseUrl: c.apiBaseUrl || undefined,
       defaultModel: c.defaultModel,
       isActive: c.isActive,

@@ -197,6 +197,31 @@ export const agentsRouter: AnyRouter = router({
       return { jobId: job.id, traceId: ctx.traceId }
     }),
 
+  // ── Agent 13: Vercel Sandbox — safe code execution ───────────────────────
+  sandboxExec: permissionProcedure('manage_users')
+    .input(z.object({
+      language: z.enum(['node', 'python', 'bash', 'shell']).default('node'),
+      code: z.string().max(200_000).optional(),
+      cmd: z.string().max(1024).optional(),
+      args: z.array(z.string().max(1024)).max(64).optional(),
+      cwd: z.string().optional(),
+      env: z.record(z.string(), z.string()).optional(),
+      sandboxName: z.string().regex(/^[a-z0-9][a-z0-9-_]*$/).optional(),
+      files: z.array(z.object({
+        path: z.string(),
+        contentBase64: z.string(),
+        mode: z.number().int().min(0).max(0o7777).optional(),
+      })).max(100).optional(),
+      networkPolicy: z.enum(['allow-all', 'deny-all']).default('deny-all'),
+      vcpus: z.number().int().min(1).max(32).default(2),
+      snapshotAfter: z.boolean().default(false),
+      stopAfter: z.boolean().default(false),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const job = await queues.sandbox.add('exec', { ...input, traceId: ctx.traceId, userId: ctx.userId, orgId: ctx.orgId })
+      return { jobId: job.id, traceId: ctx.traceId }
+    }),
+
   // ── Data queries ─────────────────────────────────────────────────────────
   getAuditLogs: permissionProcedure('view_audit_log')
     .input(z.object({

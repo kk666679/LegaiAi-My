@@ -66,7 +66,7 @@ export class PaymentOrchestrator {
       .sort((a, b) => a.priority - b.priority);
 
     if (matchingRules.length > 0) {
-      const selectedRule = matchingRules[0];
+      const selectedRule = matchingRules[0]!;
       if (selectedRule.provider && this.isProviderHealthy(selectedRule.provider)) {
         return selectedRule.provider;
       }
@@ -85,7 +85,7 @@ export class PaymentOrchestrator {
 
     const available = this.getAvailableProviders();
     if (available.length > 0) {
-      return available[0];
+      return available[0]!;
     }
 
     return 'xendit';

@@ -27,6 +27,7 @@ export const queues = {
   debate:       makeQueue('legal-debate'),
   monitoring:   makeQueue('legal-monitoring'),
   indexing:     makeQueue('legal-indexing'),
-  testing:      makeQueue('legal-testing'),
+testing:     makeQueue('legal-testing'),
   aiDeveloper:  makeQueue('ai-developer'),
+  sandbox:      makeQueue('legal-sandbox'),
 }

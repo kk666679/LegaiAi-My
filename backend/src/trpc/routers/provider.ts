@@ -29,7 +29,7 @@ export const providerRouter = router({
       if (!isValid) {
         await credentialStore.logKeyAction({
           orgId: ctx.orgId ?? undefined,
-          userId: ctx.userId,
+          userId: ctx.userId ?? undefined,
           action: 'FAILED',
           provider: input.provider,
           model: input.defaultModel,
@@ -43,7 +43,7 @@ export const providerRouter = router({
 
       const credential = await credentialStore.store({
         orgId: ctx.orgId ?? undefined,
-        userId: ctx.userId,
+        userId: ctx.userId ?? undefined,
         provider: input.provider as ProviderType,
         name: input.name,
         apiKey: input.apiKey,
@@ -55,7 +55,7 @@ export const providerRouter = router({
 
       await credentialStore.logKeyAction({
         orgId: ctx.orgId ?? undefined,
-        userId: ctx.userId,
+        userId: ctx.userId ?? undefined,
         providerConfigId: credential.id,
         action: 'VERIFIED',
         provider: input.provider,
@@ -70,7 +70,7 @@ export const providerRouter = router({
 
   listKeys: permissionProcedure('view_audit_log')
     .query(async ({ ctx }) => {
-      const keys = await credentialStore.list(ctx.orgId ?? undefined, ctx.userId);
+      const keys = await credentialStore.list(ctx.orgId ?? undefined, ctx.userId ?? undefined);
       return keys.map((k) => ({
         id: k.id,
         name: k.name,
@@ -87,7 +87,7 @@ export const providerRouter = router({
   verifyKey: permissionProcedure('manage_users')
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      const isValid = await credentialStore.verify(input.id, ctx.userId, ctx.orgId ?? undefined);
+      const isValid = await credentialStore.verify(input.id, ctx.userId ?? undefined, ctx.orgId ?? undefined);
       return { id: input.id, verified: isValid };
     }),
 
@@ -108,7 +108,7 @@ export const providerRouter = router({
   rotateKey: permissionProcedure('manage_users')
     .input(z.object({ id: z.string(), newApiKey: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      const credential = await credentialStore.retrieve(input.id, ctx.userId, ctx.orgId ?? undefined);
+      const credential = await credentialStore.retrieve(input.id, ctx.userId ?? undefined, ctx.orgId ?? undefined);
       if (!credential) {
         throw new Error('Credential not found');
       }
@@ -124,7 +124,7 @@ export const providerRouter = router({
 
       await credentialStore.logKeyAction({
         orgId: ctx.orgId ?? undefined,
-        userId: ctx.userId,
+        userId: ctx.userId ?? undefined,
         providerConfigId: input.id,
         action: 'ROTATED',
         provider: credential.provider,
@@ -142,6 +142,92 @@ export const providerRouter = router({
     .mutation(async ({ input, ctx }) => {
       await credentialStore.delete(input.id, ctx.orgId ?? undefined);
       return { id: input.id, deleted: true };
+    }),
+
+  // Non-streaming provider playground — verifies credentials still work and
+  // returns a small sanitized response. The streaming variant lives at
+  // /api/providers/playground (SSE) in server.ts.
+  playground: permissionProcedure('manage_users')
+    .input(z.object({
+      id: z.string(),
+      prompt: z.string().min(1).max(2000),
+      model: z.string().optional(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const credential = await credentialStore.retrieve(input.id, ctx.userId ?? undefined, ctx.orgId ?? undefined);
+      if (!credential) throw new Error('Credential not found');
+
+      const client = createProviderClient(credential.provider);
+      const isValid = await client.verifyCredential(credential.apiKey, credential.apiBaseUrl);
+      if (!isValid) {
+        await credentialStore.logKeyAction({
+          orgId: ctx.orgId ?? undefined,
+          userId: ctx.userId ?? undefined,
+          providerConfigId: input.id,
+          action: 'PLAYGROUND_FAILED',
+          provider: credential.provider,
+          model: input.model ?? credential.defaultModel,
+          keyRef: credential.keyRef,
+          success: false,
+          errorMessage: 'verifyCredential returned false',
+          ipAddress: ctx.ipAddress,
+        });
+        throw new Error('Credential verification failed');
+      }
+
+      const start = Date.now();
+      let response;
+      try {
+        response = await client.generate({
+          prompt: input.prompt,
+          model: input.model ?? credential.defaultModel,
+          apiKey: credential.apiKey,
+          apiBaseUrl: credential.apiBaseUrl,
+        } as any);
+      } catch (err: any) {
+        await credentialStore.logKeyAction({
+          orgId: ctx.orgId ?? undefined,
+          userId: ctx.userId ?? undefined,
+          providerConfigId: input.id,
+          action: 'PLAYGROUND_FAILED',
+          provider: credential.provider,
+          model: input.model ?? credential.defaultModel,
+          keyRef: credential.keyRef,
+          success: false,
+          errorMessage: err?.message?.slice(0, 200) ?? 'generate failed',
+          ipAddress: ctx.ipAddress,
+        });
+        throw new Error('Provider playground failed');
+      }
+
+      await credentialStore.logKeyAction({
+        orgId: ctx.orgId ?? undefined,
+        userId: ctx.userId ?? undefined,
+        providerConfigId: input.id,
+        action: 'PLAYGROUND_OK',
+        provider: credential.provider,
+        model: response.model,
+        keyRef: credential.keyRef,
+        success: true,
+        ipAddress: ctx.ipAddress,
+      });
+
+      return {
+        text: response.text,
+        model: response.model,
+        provider: credential.provider,
+        latencyMs: response.latencyMs ?? Date.now() - start,
+        promptTokens: response.promptTokens,
+        completionTokens: response.completionTokens,
+      };
+    }),
+
+  // List the registered models for a configured provider type (UI hints).
+  listModels: permissionProcedure('view_audit_log')
+    .input(z.object({ provider: ProviderTypeSchema }))
+    .query(({ input }) => {
+      const client = createProviderClient(input.provider);
+      return { provider: input.provider, models: client.models };
     }),
 
   getKeyAuditLog: permissionProcedure('view_audit_log')

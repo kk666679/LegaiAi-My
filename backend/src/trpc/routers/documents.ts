@@ -104,7 +104,7 @@ export const documentsRouter = router({
         court: input.court,
         jurisdiction: input.jurisdiction,
         tags: input.tags,
-        parties: input.parties ?? null,
+        parties: input.parties ?? undefined,
         fileUrl: input.fileUrl,
         fileSize: input.fileSize,
         mimeType: input.mimeType ?? 'text/markdown',
@@ -422,7 +422,7 @@ export const documentsRouter = router({
           court: original.court,
           jurisdiction: original.jurisdiction,
           tags: original.tags,
-          parties: original.parties,
+          parties: original.parties ? (JSON.parse(JSON.stringify(original.parties)) as any) : undefined,
           mimeType: original.mimeType,
           // Don't copy file references, createdBy, reviewedBy, etc.
         },

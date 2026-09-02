@@ -47,7 +47,7 @@ export const billingRouter = router({
     .mutation(async ({ input, ctx }) => {
       const result = await billingService.createCheckout({
         organisationId: ctx.orgId!,
-        userId: ctx.userId,
+        userId: ctx.userId ?? undefined,
         email: ctx.user?.email || '',
         planId: input.planId as PlanId,
         countryCode: input.countryCode,
@@ -69,7 +69,7 @@ export const billingRouter = router({
 
       const result = await paymentOrchestrator.createCheckout({
         organisationId: ctx.orgId!,
-        userId: ctx.userId,
+        userId: ctx.userId ?? undefined,
         planId: input.planId as PlanId,
         email: ctx.user?.email || '',
         countryCode: input.countryCode,

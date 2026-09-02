@@ -13,6 +13,8 @@ import { governanceRouter } from './governance';
 import { providerRouter } from './provider';
 import { subscriptionRouter } from './subscription';
 import { billingRouter } from './billing';
+import { draftingRouter } from './drafting';
+import { sandboxRouter } from './sandbox';
 import type { AnyRouter } from '@trpc/server';
 
 export const appRouter: AnyRouter = router({
@@ -30,6 +32,8 @@ export const appRouter: AnyRouter = router({
   provider: providerRouter,
   subscription: subscriptionRouter,
   billing: billingRouter,
+  drafting: draftingRouter,
+  sandbox: sandboxRouter,
 });
 
 export type AppRouter = typeof appRouter;

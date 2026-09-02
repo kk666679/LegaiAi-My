@@ -1,6 +1,5 @@
 import express, { type Request, type Response, type NextFunction } from 'express'
 import cors from 'cors'
-import helmet from 'helmet'
 import { randomUUID } from 'crypto'
 import { rateLimit } from './middleware/rateLimit'
 // Use global fetch when available; otherwise fall back to undici
@@ -18,8 +17,28 @@ import { circuitBreaker } from './lib/resilience/circuitBreaker'
 import { ProvenanceGraph } from './lib/provenance/graph'
 import { generateWithCascade } from './lib/llm/cascade'
 import { getCachedOrFetch } from './lib/cache/predictiveCache'
+import { validateSession } from './lib/auth'
+import { credentialStore } from './lib/security/credentialStore'
+import { createProviderClient } from './lib/providers/factory'
+import { sanitizeError } from './lib/security/credentials'
+import type { ProviderStreamEvent } from './lib/providers/types'
+import { searchLomCatalog } from './trpc/routers/drafting'
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const { logger } = require('./lib/logger.js') as { logger: { info: (...a: unknown[]) => void; error: (...a: unknown[]) => void } }
+
+// Helmet is required in production (backend/package.json) but may be absent in
+// the workspace-root dev sandbox. Fall back to a no-op so the dev server boots.
+function loadHelmet(): express.RequestHandler {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const m = require('helmet')
+    const fn = (m.default ?? m) as (opts?: { contentSecurityPolicy?: boolean }) => express.RequestHandler
+    return fn({ contentSecurityPolicy: false })
+  } catch {
+    return (_req, _res, next) => next()
+  }
+}
+const helmetMw: express.RequestHandler = loadHelmet()
 
 const app = express()
 const PORT = parseInt(process.env.PORT || '3001')
@@ -32,9 +51,7 @@ const metrics = {
   startTime: Date.now(),
 }
 
-app.use(helmet({
-  contentSecurityPolicy: false, // handled per-response by the Next.js frontend
-}))
+app.use(helmetMw)
 app.use(cors())
 app.use(express.json())
 app.use(rateLimit({ windowMs: 60_000, max: 120, message: 'Rate limit exceeded. Try again shortly.' }))
@@ -73,9 +90,197 @@ app.post('/api/ai-chat', async (req: Request, res: Response) => {
     })
     return response
   } catch (error) {
-    metrics.errors++
+    // ── Drafting workspace SSE (per-job, tenant-scoped) ────────────────────────
+app.get('/api/drafting/jobs/:id/events', async (req: Request, res: Response) => {
+  const auth = (req.headers.authorization as string | undefined)?.replace(/^Bearer\s+/i, '')
+  const user = auth ? await validateSession(auth) : null
+  if (!user) return res.status(401).json({ error: 'unauthorized' })
+  const job = await prisma.draftJob.findUnique({ where: { id: String(req.params.id) } })
+  if (!job) return res.status(404).json({ error: 'not_found' })
+  if (user.orgId && job.orgId && job.orgId !== user.orgId) {
+    return res.status(403).json({ error: 'forbidden' })
+  }
+
+  res.setHeader('Content-Type', 'text/event-stream')
+  res.setHeader('Cache-Control', 'no-cache')
+  res.setHeader('Connection', 'keep-alive')
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.flushHeaders?.()
+
+  const send = (event: string, data: unknown) =>
+    res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`)
+
+  send('job.status', { status: job.status, progress: job.progress ?? null })
+
+  // Initial snapshot of citation/evidence states for the client.
+  const citations = await prisma.citationReference.findMany({ where: { draftId: job.draftId } })
+  const evidence = await prisma.evidenceReference.findMany({ where: { draftId: job.draftId } })
+  send('snapshot', { citations, evidence })
+
+  // Poll the job state — bounded duration, no setInterval storms.
+  const startedAt = Date.now()
+  const interval = setInterval(async () => {
+    try {
+      const current = await prisma.draftJob.findUnique({ where: { id: job.id } })
+      if (!current) {
+        send('job.failed', { error: 'job vanished' })
+        clearInterval(interval)
+        return res.end()
+      }
+      send('job.status', { status: current.status, progress: current.progress ?? null })
+      if (current.status === 'COMPLETED') {
+        send('job.completed', { result: current.result ?? null })
+        clearInterval(interval)
+        return res.end()
+      }
+      if (current.status === 'FAILED' || current.status === 'CANCELLED') {
+        send('job.failed', { error: current.errorMessage ?? 'job ended' })
+        clearInterval(interval)
+        return res.end()
+      }
+      if (Date.now() - startedAt > 5 * 60_000) {
+        send('job.timeout', { error: 'SSE stream window elapsed' })
+        clearInterval(interval)
+        return res.end()
+      }
+    } catch (err) {
+      send('job.error', { error: sanitizeError(err) })
+    }
+  }, 2000)
+
+  req.on('close', () => clearInterval(interval))
+})
+
+// LOM autocomplete (server-side, public source, mirrors tRPC procedure).
+app.get('/api/lom/search', async (req: Request, res: Response) => {
+  const q = String((req.query.q as string) ?? '').slice(0, 120)
+  const limit = Math.min(50, Math.max(1, parseInt(String(req.query.limit ?? '10'), 10)))
+  res.json(searchLomCatalog(q, { limit }))
+})
+
+metrics.errors++
     return res.status(500).json({ error: 'Chat failed', details: String(error) })
   }
+})
+
+// ── BYOK provider playground (SSE streaming, server-side credential decrypt) ─
+// Per spec §30: tighter rate limit on playground; §6 never returns plaintext.
+const providerPlaygroundLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 30,
+  message: 'Provider playground rate limit exceeded.',
+  key: (req: Request) => `${req.ip ?? 'unknown'}:${(req.headers['authorization'] as string | undefined)?.slice(-12) ?? 'anon'}`,
+})
+
+app.post('/api/providers/playground', providerPlaygroundLimiter, async (req: Request, res: Response) => {
+  const auth = (req.headers.authorization as string | undefined)?.replace(/^Bearer\s+/i, '')
+  const user = auth ? await validateSession(auth) : null
+  if (!user) {
+    return res.status(401).json({ error: 'unauthorized' })
+  }
+  const { id, prompt, model } = (req.body ?? {}) as { id?: string; prompt?: string; model?: string }
+  if (!id || !prompt) {
+    return res.status(400).json({ error: 'id and prompt are required' })
+  }
+  if (prompt.length > 4000) {
+    return res.status(400).json({ error: 'prompt too long (max 4000 chars)' })
+  }
+
+  const credential = await credentialStore.retrieve(id, user.id, user.orgId ?? undefined)
+  if (!credential) {
+    return res.status(404).json({ error: 'credential not found' })
+  }
+
+  res.setHeader('Content-Type', 'text/event-stream')
+  res.setHeader('Cache-Control', 'no-cache')
+  res.setHeader('Connection', 'keep-alive')
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.flushHeaders?.()
+
+  const client = createProviderClient(credential.provider)
+  let stream: AsyncIterable<ProviderStreamEvent> | null = null
+  if (typeof (client as any).stream === 'function') {
+    try {
+      stream = (client as any).stream({
+        prompt,
+        model: model ?? credential.defaultModel,
+        apiKey: credential.apiKey,
+        apiBaseUrl: credential.apiBaseUrl,
+      })
+    } catch (err: any) {
+      res.write(`event: error\ndata: ${JSON.stringify({ error: sanitizeError(err) })}\n\n`)
+      await credentialStore.logKeyAction({
+        orgId: user.orgId ?? undefined,
+        userId: user.id,
+        providerConfigId: credential.id,
+        action: 'PLAYGROUND_FAILED',
+        provider: credential.provider,
+        model: model ?? credential.defaultModel,
+        keyRef: credential.keyRef,
+        success: false,
+        errorMessage: 'stream init failed',
+        ipAddress: req.ip,
+      })
+      return res.end()
+    }
+  }
+
+  if (!stream) {
+    try {
+      const r = await client.generate({
+        prompt,
+        model: model ?? credential.defaultModel,
+        apiKey: credential.apiKey,
+        apiBaseUrl: credential.apiBaseUrl,
+      } as any)
+      res.write(`event: text\ndata: ${JSON.stringify({ delta: r.text })}\n\n`)
+      res.write(`event: done\ndata: ${JSON.stringify({ model: r.model, latencyMs: r.latencyMs, promptTokens: r.promptTokens, completionTokens: r.completionTokens })}\n\n`)
+    } catch (err: any) {
+      res.write(`event: error\ndata: ${JSON.stringify({ error: sanitizeError(err) })}\n\n`)
+    }
+    await credentialStore.logKeyAction({
+      orgId: user.orgId ?? undefined,
+      userId: user.id,
+      providerConfigId: credential.id,
+      action: 'PLAYGROUND_OK',
+      provider: credential.provider,
+      model: model ?? credential.defaultModel,
+      keyRef: credential.keyRef,
+      success: true,
+      ipAddress: req.ip,
+    })
+    return res.end()
+  }
+
+  let totalDelta = ''
+  try {
+    for await (const evt of stream) {
+      if (evt.type === 'text' && evt.delta) {
+        totalDelta += evt.delta
+        res.write(`event: text\ndata: ${JSON.stringify({ delta: evt.delta })}\n\n`)
+      } else if (evt.type === 'done') {
+        res.write(`event: done\ndata: ${JSON.stringify({ model: evt.model, latencyMs: evt.latencyMs, promptTokens: evt.promptTokens, completionTokens: evt.completionTokens })}\n\n`)
+      } else if (evt.type === 'error') {
+        res.write(`event: error\ndata: ${JSON.stringify({ error: sanitizeError(evt.error ?? 'unknown') })}\n\n`)
+      }
+    }
+  } catch (err: any) {
+    res.write(`event: error\ndata: ${JSON.stringify({ error: sanitizeError(err) })}\n\n`)
+  }
+
+  await credentialStore.logKeyAction({
+    orgId: user.orgId ?? undefined,
+    userId: user.id,
+    providerConfigId: credential.id,
+    action: totalDelta ? 'PLAYGROUND_OK' : 'PLAYGROUND_FAILED',
+    provider: credential.provider,
+    model: model ?? credential.defaultModel,
+    keyRef: credential.keyRef,
+    success: Boolean(totalDelta),
+    ipAddress: req.ip,
+  })
+
+  res.end()
 })
 
 

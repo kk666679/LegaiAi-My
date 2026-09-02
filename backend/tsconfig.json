@@ -17,6 +17,7 @@
     "ignoreDeprecations": "6.0",
     "strict": false,
     "baseUrl": ".",
+    "rootDir": ".",
     "paths": {
       "@/backend/src/db": ["./src/db/index.ts"],
       "@/backend/*": ["./*"]
@@ -24,6 +25,6 @@
     "outDir": "./dist",
     "sourceMap": true
   },
-  "include": ["src/**/*", "schemas/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "../.autoclaw", "../.openclaw"]
 }

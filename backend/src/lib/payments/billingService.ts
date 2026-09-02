@@ -317,7 +317,7 @@ export class BillingService {
         provider: subscription.provider,
         providerPaymentId,
         currency: subscription.currency,
-        amount: subscription.amount,
+        amount: subscription.amount ?? 0,
         status: 'succeeded',
         paidAt: new Date(),
       },
