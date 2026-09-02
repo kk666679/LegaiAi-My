@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const TRPC_URL = process.env.TRPC_URL || "http://localhost:3001/trpc";
+const TRPC_BACKEND_URL = process.env.TRPC_BACKEND_URL || process.env.NEXT_PUBLIC_TRPC_URL || "http://localhost:3001/trpc";
 
 async function proxy(req: NextRequest, target: string, method: string, body?: string) {
   const headers: Record<string, string> = { "content-type": "application/json" };
@@ -17,10 +17,10 @@ async function proxy(req: NextRequest, target: string, method: string, body?: st
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ trpc: string }> }) {
   const { trpc } = await params;
-  return proxy(req, `${TRPC_URL}/${trpc}${req.nextUrl.search}`, "GET");
+  return proxy(req, `${TRPC_BACKEND_URL}/${trpc}${req.nextUrl.search}`, "GET");
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ trpc: string }> }) {
   const { trpc } = await params;
-  return proxy(req, `${TRPC_URL}/${trpc}`, "POST", await req.text());
+  return proxy(req, `${TRPC_BACKEND_URL}/${trpc}`, "POST", await req.text());
 }
