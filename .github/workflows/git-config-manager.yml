@@ -144,11 +144,12 @@ jobs:
           fi
 
       - name: Commit directly (push)
-        if: ${{ steps.changes.outputs.has_changes == 'true' && github.event.inputs.open_pr != 'true' && github.event_name != 'pull_request' }}
+        if: ${{ steps.changes.outputs.has_changes == 'true' && github.event_name == 'workflow_dispatch' && github.event.inputs.open_pr == 'false' }}
         run: |
           set -euo pipefail
+          git pull --rebase origin "${GITHUB_REF_NAME}"
           git commit -m "chore: normalize git configuration (line endings) [skip ci]"
-          git push
+          git push origin "HEAD:${GITHUB_REF_NAME}"
 
       - name: Open PR with fixes
         if: ${{ steps.changes.outputs.has_changes == 'true' && (github.event.inputs.open_pr == 'true' || github.event_name == 'pull_request') }}
