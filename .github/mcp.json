@@ -4,9 +4,11 @@
       "type": "stdio",
       "command": "uv",
       "args": ["path/to/web-search-mcp.py"],
-      "env": { "OLLAMA_API_KEY": "your_api_key_here" }
+      "env": { "OLLAMA_API_KEY": "your_api_key_here" },
+      "disabled": false
     },
     "allpepper-memory-bank": {
+      "type": "stdio",
       "command": "docker",
       "args": [
         "run", "-i", "--rm",

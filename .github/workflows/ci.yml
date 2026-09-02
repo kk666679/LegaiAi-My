@@ -11,8 +11,8 @@ jobs:
     name: Frontend (Next.js)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: '24'
           cache: npm
@@ -30,8 +30,8 @@ jobs:
     name: Backend (Express/tRPC)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: '24'
           cache: npm
@@ -48,10 +48,10 @@ jobs:
   deploy:
     name: Deploy (Fly.io)
     needs: [frontend, backend]
-    if: ${{ github.ref == 'refs/heads/main' && secrets.FLY_API_TOKEN != '' }}
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - run: flyctl deploy --remote-only
         env:
