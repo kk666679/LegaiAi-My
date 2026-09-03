@@ -56,5 +56,14 @@ next-env.d.ts
 .autoclaw/
 
 # AutoClaw orchestrator runtime state (live SQLite WAL / lock / dispatch queues)
-backend/.claude/autoclaw/
+backend
+workers
+scripts
+.openclaw
+.clinerules
+.kilocodemodes
+AGENTS.md
+CLAUDE.md
+fly.backend.toml
+fly.toml
 
