@@ -55,15 +55,21 @@ next-env.d.ts
 # AutoClaw KDream data
 .autoclaw/
 
-# AutoClaw orchestrator runtime state (live SQLite WAL / lock / dispatch queues)
-backend
-workers
-scripts
-.openclaw
+# Build artifacts
+backend/
+workers/
+scripts/
+
+# Configuration
+.openclaw/
 .clinerules
 .kilocodemodes
+
+# Documentation
 AGENTS.md
 CLAUDE.md
+
+# Deployment
 fly.backend.toml
 fly.toml
 
