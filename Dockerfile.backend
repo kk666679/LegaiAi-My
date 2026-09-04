@@ -12,7 +12,7 @@ RUN npm ci --legacy-peer-deps
 COPY backend/ ./
 
 # Generate the Prisma client from backend/prisma/schema.prisma
-RUN npx prisma generate
+RUN ./node_modules/.bin/prisma generate
 
 # tsx runs the TypeScript server directly (matches `tsx watch backend/src/server.ts`)
 RUN npm install -g tsx
