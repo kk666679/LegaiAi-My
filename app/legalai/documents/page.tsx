@@ -46,6 +46,26 @@ import {
   ArtifactContent,
 } from "@/components/ai-elements/artifact";
 import { Shimmer } from "@/components/ai-elements/shimmer";
+import {
+  Plan,
+  PlanHeader,
+  PlanTitle,
+  PlanDescription,
+  PlanAction,
+  PlanContent,
+  PlanTrigger,
+} from "@/components/ai-elements/plan";
+import {
+  Queue,
+  QueueItem,
+  QueueItemIndicator,
+  QueueItemContent,
+  QueueItemDescription,
+  QueueSection,
+  QueueSectionTrigger,
+  QueueSectionLabel,
+  QueueSectionContent,
+} from "@/components/ai-elements/queue";
 
 const CLASSIFICATION_BADGE: Record<Document["classification"], string> = {
   public: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
@@ -126,6 +146,40 @@ export default function DocumentsPage() {
             message={`${stats.failed} document(s) failed ingestion. Check file formats or retry from the row menu.`}
             action={{ label: "View failed", onClick: () => setTab("failed") }}
           />
+        )}
+
+        {stats.processing > 0 && (
+          <Plan defaultOpen>
+            <PlanHeader>
+              <div>
+                <PlanTitle>Processing pipeline</PlanTitle>
+                <PlanDescription>{`${stats.processing} document(s) being ingested through the AI pipeline`}</PlanDescription>
+              </div>
+              <PlanAction>
+                <PlanTrigger />
+              </PlanAction>
+            </PlanHeader>
+            <PlanContent>
+              <Queue>
+                <QueueSection defaultOpen>
+                  <QueueSectionTrigger>
+                    <QueueSectionLabel count={stats.processing} label="in queue" icon={<FileSearch className="size-3.5" />} />
+                  </QueueSectionTrigger>
+                  <QueueSectionContent>
+                    {MOCK_DOCUMENTS.filter((d) => d.status === "processing" || d.status === "uploading").map((d) => (
+                      <QueueItem key={d.id}>
+                        <div className="flex items-center gap-2">
+                          <QueueItemIndicator />
+                          <QueueItemContent>{d.name}</QueueItemContent>
+                        </div>
+                        <QueueItemDescription>{d.status === "uploading" ? "Uploading…" : "Extracting text & generating embeddings…"}</QueueItemDescription>
+                      </QueueItem>
+                    ))}
+                  </QueueSectionContent>
+                </QueueSection>
+              </Queue>
+            </PlanContent>
+          </Plan>
         )}
 
         {/* Drop zone */}

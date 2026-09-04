@@ -65,6 +65,24 @@ import {
 } from "@/components/ai-elements/task";
 import { Suggestions, Suggestion } from "@/components/ai-elements/suggestion";
 import { AIStatusIndicator } from "@/components/ai/aistatus-indicator";
+import {
+  ChainOfThought,
+  ChainOfThoughtHeader,
+  ChainOfThoughtContent,
+  ChainOfThoughtStep,
+  ChainOfThoughtSearchResults,
+  ChainOfThoughtSearchResult,
+} from "@/components/ai-elements/chain-of-thought";
+import {
+  Checkpoint,
+  CheckpointTrigger,
+} from "@/components/ai-elements/checkpoint";
+import {
+  MessageActions,
+  MessageAction,
+  MessageToolbar,
+} from "@/components/ai-elements/message";
+import { Copy, RefreshCw, ThumbsUp, ThumbsDown } from "lucide-react";
 
 interface UIMsg {
   id: string;
@@ -386,11 +404,29 @@ export default function AssistantPage() {
 function AnalysisContent() {
   return (
     <div className="space-y-3 p-4">
+      <ChainOfThought defaultOpen>
+        <ChainOfThoughtHeader>IRAC Reasoning trace</ChainOfThoughtHeader>
+        <ChainOfThoughtContent>
+          <ChainOfThoughtStep label="Retrieve authoritative sources" status="complete" description="pgVector semantic search across Federal, Appeal and High Court corpora" />
+          <ChainOfThoughtStep label="Identify applicable statutes" status="complete" description="Employment Act 1955 — s.24, s.60A, s.60D" />
+          <ChainOfThoughtStep label="Apply IRAC framework" status="complete" description="Issue → Law → Application → Conclusion" />
+          <ChainOfThoughtStep label="Citation verification" status="complete" description="All authorities cross-checked against LOM">
+            <ChainOfThoughtSearchResults>
+              <ChainOfThoughtSearchResult>EA 1955 s.24</ChainOfThoughtSearchResult>
+              <ChainOfThoughtSearchResult>EA 1955 s.60A</ChainOfThoughtSearchResult>
+              <ChainOfThoughtSearchResult>Regs 1980</ChainOfThoughtSearchResult>
+            </ChainOfThoughtSearchResults>
+          </ChainOfThoughtStep>
+        </ChainOfThoughtContent>
+      </ChainOfThought>
+
+      <Checkpoint>
+        <CheckpointTrigger tooltip="Issue — what legal question is being resolved">
+          <Badge variant="secondary" className="text-[10px]">I</Badge>
+          <span className="ml-1 text-xs font-medium">Issue</span>
+        </CheckpointTrigger>
+      </Checkpoint>
       <Artifact>
-        <ArtifactHeader>
-          <Badge variant="secondary" className="text-[10px]">1</Badge>
-          <ArtifactTitle>Issue</ArtifactTitle>
-        </ArtifactHeader>
         <ArtifactContent className="p-4">
           <p className="text-sm text-muted-foreground">
             Identify the lawful scope of deductions from an
@@ -399,11 +435,13 @@ function AnalysisContent() {
         </ArtifactContent>
       </Artifact>
 
+      <Checkpoint>
+        <CheckpointTrigger tooltip="Relevant law and authorities">
+          <Badge variant="secondary" className="text-[10px]">R</Badge>
+          <span className="ml-1 text-xs font-medium">Law</span>
+        </CheckpointTrigger>
+      </Checkpoint>
       <Artifact>
-        <ArtifactHeader>
-          <Badge variant="secondary" className="text-[10px]">2</Badge>
-          <ArtifactTitle>Law</ArtifactTitle>
-        </ArtifactHeader>
         <ArtifactContent className="p-4">
           <p className="text-sm text-muted-foreground font-mono leading-relaxed">
             Employment Act 1955 — s.24, s.60A, s.60D. Read together with the
@@ -412,11 +450,13 @@ function AnalysisContent() {
         </ArtifactContent>
       </Artifact>
 
+      <Checkpoint>
+        <CheckpointTrigger tooltip="Application of law to facts">
+          <Badge variant="secondary" className="text-[10px]">A</Badge>
+          <span className="ml-1 text-xs font-medium">Application</span>
+        </CheckpointTrigger>
+      </Checkpoint>
       <Artifact>
-        <ArtifactHeader>
-          <Badge variant="secondary" className="text-[10px]">3</Badge>
-          <ArtifactTitle>Application</ArtifactTitle>
-        </ArtifactHeader>
         <ArtifactContent className="p-4">
           <p className="text-sm text-muted-foreground leading-relaxed">
             Deductions require written authorisation and must fall within the
@@ -425,17 +465,35 @@ function AnalysisContent() {
         </ArtifactContent>
       </Artifact>
 
+      <Checkpoint>
+        <CheckpointTrigger tooltip="Conclusion">
+          <Badge className="bg-primary text-primary-foreground text-[10px]">C</Badge>
+          <span className="ml-1 text-xs font-medium">Conclusion</span>
+        </CheckpointTrigger>
+      </Checkpoint>
       <Artifact className="border-primary/30">
-        <ArtifactHeader className="bg-primary/5">
-          <Badge className="bg-primary text-primary-foreground text-[10px]">4</Badge>
-          <ArtifactTitle>Conclusion</ArtifactTitle>
-        </ArtifactHeader>
         <ArtifactContent className="p-4">
           <p className="text-sm font-medium text-foreground leading-relaxed">
             Permitted deductions are limited to those authorised in writing
             under s.24. Verify against the 1980 Regulations before relying on
             any deduction.
           </p>
+          <MessageToolbar className="mt-3">
+            <MessageActions>
+              <MessageAction tooltip="Copy conclusion" onClick={() => navigator.clipboard?.writeText("Permitted deductions are limited to those authorised in writing under s.24.")}>
+                <Copy className="size-3.5" />
+              </MessageAction>
+              <MessageAction tooltip="Regenerate analysis">
+                <RefreshCw className="size-3.5" />
+              </MessageAction>
+              <MessageAction tooltip="Helpful">
+                <ThumbsUp className="size-3.5" />
+              </MessageAction>
+              <MessageAction tooltip="Not helpful">
+                <ThumbsDown className="size-3.5" />
+              </MessageAction>
+            </MessageActions>
+          </MessageToolbar>
         </ArtifactContent>
       </Artifact>
 

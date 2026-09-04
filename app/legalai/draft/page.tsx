@@ -46,6 +46,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
 import {
   Artifact,
   ArtifactHeader,
@@ -59,6 +60,28 @@ import { Message, MessageContent, MessageResponse } from "@/components/ai-elemen
 import { Sources, SourcesTrigger, SourcesContent, Source } from "@/components/ai-elements/sources";
 import { InlineCitation, InlineCitationCard, InlineCitationCardTrigger, InlineCitationCardBody, InlineCitationSource, InlineCitationQuote } from "@/components/ai-elements/inline-citation";
 import { Reasoning, ReasoningTrigger, ReasoningContent } from "@/components/ai-elements/reasoning";
+import {
+  ChainOfThought,
+  ChainOfThoughtHeader,
+  ChainOfThoughtContent,
+  ChainOfThoughtStep,
+} from "@/components/ai-elements/chain-of-thought";
+import {
+  Plan,
+  PlanHeader,
+  PlanTitle,
+  PlanDescription,
+  PlanAction,
+  PlanContent,
+  PlanTrigger,
+} from "@/components/ai-elements/plan";
+import {
+  Tool,
+  ToolHeader,
+  ToolContent,
+  ToolInput,
+  ToolOutput,
+} from "@/components/ai-elements/tool";
 
 const DRAFT_BODY = `Date: 21 August 2026
 
@@ -254,6 +277,27 @@ export default function DraftStudioPage() {
 
         <LegalDisclaimer compact />
 
+        <Plan defaultOpen>
+          <PlanHeader>
+            <div>
+              <PlanTitle>Draft workflow</PlanTitle>
+              <PlanDescription>Template → AI draft → Review → Citation check → Export</PlanDescription>
+            </div>
+            <PlanAction><PlanTrigger /></PlanAction>
+          </PlanHeader>
+          <PlanContent>
+            <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+              {["Template selected", "AI draft generated", "Review in progress", "Citation check", "Export"].map((step, i) => (
+                <span key={step} className={cn("flex items-center gap-1", i < 3 ? "text-foreground" : "")}>
+                  {i < 3 ? <CheckCheck className="size-3 text-emerald-500" /> : <Loader2 className="size-3 opacity-40" />}
+                  {step}
+                  {i < 4 && <span className="text-muted-foreground/40">›</span>}
+                </span>
+              ))}
+            </div>
+          </PlanContent>
+        </Plan>
+
         <Artifact>
           <ArtifactContent className="p-3">
             <div className="flex items-center gap-2 overflow-x-auto">
@@ -364,8 +408,17 @@ export default function DraftStudioPage() {
                 <ScrollArea className="flex-1 min-h-[260px] max-h-[320px] lg:max-h-[420px]">
                   <div className="p-3 space-y-4">
                     {chat.map((msg, i) => (
-                      <Message key={i} from={msg.role}>
-                        {msg.thinking && (
+                      <Message key={i} from={msg.role === "ai" ? "assistant" : "user"}>
+                        {msg.role === "ai" && msg.thinking && (
+                          <ChainOfThought defaultOpen={false}>
+                            <ChainOfThoughtHeader>Reasoning trace</ChainOfThoughtHeader>
+                            <ChainOfThoughtContent>
+                              <ChainOfThoughtStep label="Retrieve authorities" status="complete" />
+                              <ChainOfThoughtStep label="Apply to draft" status="complete" description={msg.thinking} />
+                            </ChainOfThoughtContent>
+                          </ChainOfThought>
+                        )}
+                        {msg.role === "ai" && msg.thinking && (
                           <Reasoning defaultOpen={false}>
                             <ReasoningTrigger />
                             <ReasoningContent>{msg.thinking}</ReasoningContent>
@@ -373,14 +426,16 @@ export default function DraftStudioPage() {
                         )}
                         <MessageContent>
                           <MessageResponse>{msg.content}</MessageResponse>
-                          <Sources>
-                            <SourcesTrigger count={3} />
-                            <SourcesContent>
-                              <Source href="https://lom.gov.my/act/employment-1955" title="Employment Act 1955" />
-                              <Source href="https://lom.gov.my/case/wong-yuen-foo" title="Wong Yuen Foo v Soon Hing" />
-                              <Source href="https://lom.gov.my/internal/disciplinary-policy" title="Internal Disciplinary Policy" />
-                            </SourcesContent>
-                          </Sources>
+                          {msg.role === "ai" && (
+                            <Sources>
+                              <SourcesTrigger count={3} />
+                              <SourcesContent>
+                                <Source href="https://lom.gov.my/act/employment-1955" title="Employment Act 1955" />
+                                <Source href="https://lom.gov.my/case/wong-yuen-foo" title="Wong Yuen Foo v Soon Hing" />
+                                <Source href="https://lom.gov.my/internal/disciplinary-policy" title="Internal Disciplinary Policy" />
+                              </SourcesContent>
+                            </Sources>
+                          )}
                         </MessageContent>
                       </Message>
                     ))}
