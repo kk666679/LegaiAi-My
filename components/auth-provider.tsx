@@ -1,11 +1,18 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 import { useRouter } from "next/navigation";
 import { trpcReact } from "@/clients";
 import { getToken, setToken, clearToken } from "@/lib/auth";
 
-interface AuthUser {
+export interface AuthUser {
   id: string;
   email: string;
   name?: string | null;
@@ -32,7 +39,7 @@ interface AuthContextValue {
     name?: string;
     orgSlug: string;
   }) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -40,63 +47,93 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [token, setTokenState] = useState<string | null>(null);
+  const [tokenHydrated, setTokenHydrated] = useState(false);
   const loginMut = trpcReact.auth.login.useMutation();
   const signupMut = trpcReact.auth.signup.useMutation();
   const registerMut = trpcReact.auth.register.useMutation();
   const logoutMut = trpcReact.auth.logout.useMutation();
 
-  const me = trpcReact.auth.me.useQuery(undefined, { enabled: !!token });
+  const me = trpcReact.auth.me.useQuery(undefined, {
+    enabled: !!token,
+    retry: false,
+  });
 
+  // Read the persisted session token once on mount.
   useEffect(() => {
     setTokenState(getToken());
+    setTokenHydrated(true);
   }, []);
 
-  const persist = (t: string) => {
+  // Session expiry / revocation: the server rejected the token.
+  // Clear the stale local token and send the user back to login.
+  useEffect(() => {
+    if (me.isError && token) {
+      clearToken();
+      setTokenState(null);
+      router.replace("/login");
+    }
+  }, [me.isError, token, router]);
+
+  const persist = useCallback((t: string) => {
     setToken(t);
     setTokenState(t);
-  };
+  }, []);
 
-  const login = async (email: string, password: string) => {
-    const res = await loginMut.mutateAsync({ email, password });
-    persist(res.token);
-  };
+  const login = useCallback(
+    async (email: string, password: string) => {
+      const res = await loginMut.mutateAsync({ email, password });
+      persist(res.token);
+    },
+    [loginMut, persist],
+  );
 
-  const signup = async (input: {
-    email: string;
-    password: string;
-    name?: string;
-    orgName: string;
-    orgSlug: string;
-  }) => {
-    const res = await signupMut.mutateAsync(input);
-    persist(res.token);
-  };
+  const signup = useCallback(
+    async (input: {
+      email: string;
+      password: string;
+      name?: string;
+      orgName: string;
+      orgSlug: string;
+    }) => {
+      const res = await signupMut.mutateAsync(input);
+      persist(res.token);
+    },
+    [signupMut, persist],
+  );
 
-  const registerAndJoin = async (input: {
-    email: string;
-    password: string;
-    name?: string;
-    orgSlug: string;
-  }) => {
-    const res = await registerMut.mutateAsync(input);
-    persist(res.token);
-  };
+  const registerAndJoin = useCallback(
+    async (input: {
+      email: string;
+      password: string;
+      name?: string;
+      orgSlug: string;
+    }) => {
+      const res = await registerMut.mutateAsync(input);
+      persist(res.token);
+    },
+    [registerMut, persist],
+  );
 
-  const logout = () => {
-    try {
-      logoutMut.mutate({ token: token ?? "" });
-    } catch {
-      /* no-op */
-    }
+  const logout = useCallback(async () => {
+    const currentToken = token;
+    // Clear the local session first so a failed server call
+    // cannot leave the user signed in.
     clearToken();
     setTokenState(null);
+    if (currentToken) {
+      try {
+        await logoutMut.mutateAsync({ token: currentToken });
+      } catch {
+        // Local session is already gone; ignore server errors.
+      }
+    }
     router.push("/login");
-  };
+  }, [token, logoutMut, router]);
 
   const value: AuthContextValue = {
-    user: (me.data?.user as AuthUser) ?? null,
-    isLoading: me.isLoading,
-    isAuthenticated: !!me.data?.user,
+    user: (me.data as AuthUser | undefined) ?? null,
+    isLoading: !tokenHydrated || (!!token && me.isLoading),
+    isAuthenticated: !!me.data,
     login,
     signup,
     registerAndJoin,

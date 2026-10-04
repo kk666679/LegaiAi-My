@@ -1,20 +1,11 @@
-import { createHmac, randomBytes, timingSafeEqual } from 'crypto'
+import { randomBytes } from 'crypto'
 import { prisma } from '../db'
+import { hashPassword, needsRehash, verifyPassword } from './security/password'
 
-const SECRET = (process.env.SESSION_SECRET || 'change-me-in-production') as string
+// Re-exported so existing importers keep a single auth entrypoint.
+export { hashPassword, needsRehash, verifyPassword }
+
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000 // 7 days
-
-export function hashPassword(password: string): string {
-  const salt = randomBytes(16).toString('hex')
-  const hash = createHmac('sha256', SECRET).update(salt + password).digest('hex')
-  return `${salt}:${hash}`
-}
-
-export function verifyPassword(password: string, stored: string): boolean {
-  const [salt, hash] = stored.split(':')
-  const candidate = createHmac('sha256', SECRET).update(salt + password).digest('hex')
-  return timingSafeEqual(Buffer.from(hash ?? '', 'hex'), Buffer.from(candidate, 'hex'))
-}
 
 export function generateToken(): string {
   return randomBytes(32).toString('hex')
@@ -34,7 +25,13 @@ export async function validateSession(token: string) {
     where: { token },
     include: { user: { include: { org: true } } },
   })
-  if (!session || session.expiresAt < new Date()) return null
+  if (!session) return null
+  if (session.expiresAt < new Date()) {
+    // Rejected but not removed: purge it so expired rows do not accumulate.
+    // Never let cleanup failure turn a clean 401 into a 500.
+    await prisma.session.deleteMany({ where: { id: session.id } }).catch(() => {})
+    return null
+  }
   return session.user
 }
 

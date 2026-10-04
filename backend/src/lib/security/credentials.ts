@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { requireSecret } from './secrets';
 
 const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 16;
@@ -8,10 +9,11 @@ const KEY_LENGTH = 32;
 const ITERATIONS = 100000;
 
 function getEncryptionKey(): Buffer {
-  const secret = process.env.ENCRYPTION_KEY || process.env.SESSION_SECRET;
-  if (!secret) {
-    throw new Error('ENCRYPTION_KEY or SESSION_SECRET environment variable is required');
-  }
+  // Outside production the legacy SESSION_SECRET fallback is kept so the dev
+  // sandbox still boots. In production ENCRYPTION_KEY must be set on its own:
+  // reusing the session secret would couple two cryptographic domains, so
+  // rotating either would destroy the other.
+  const secret = requireSecret('ENCRYPTION_KEY', { devFallback: process.env.SESSION_SECRET?.trim() });
   const salt = crypto.createHash('sha256').update('lawmate-byok-salt').digest();
   return crypto.pbkdf2Sync(secret, salt, ITERATIONS, KEY_LENGTH, 'sha512');
 }
