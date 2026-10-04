@@ -6,16 +6,19 @@ ENV NODE_ENV=production
 
 # Install dependencies first for better layer caching
 COPY backend/package.json backend/package-lock.json ./
-RUN npm ci --legacy-peer-deps
+RUN npm ci --legacy-peer-deps --include=dev
 
 # Copy backend source
 COPY backend/ ./
 
 # Generate the Prisma client from backend/prisma/schema.prisma
-RUN ./node_modules/.bin/prisma generate
+RUN ./node_modules/.bin/prisma generate \
+    && rm -rf /root/.cache/prisma \
+    && npm cache clean --force
 
 # tsx runs the TypeScript server directly (matches `tsx watch backend/src/server.ts`)
-RUN npm install -g tsx
+RUN npm install -g tsx \
+    && npm cache clean --force
 
 EXPOSE 3001
 CMD ["tsx", "src/server.ts"]

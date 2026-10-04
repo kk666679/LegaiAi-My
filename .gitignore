@@ -56,7 +56,9 @@ next-env.d.ts
 .autoclaw/
 
 # Build artifacts
-backend/
+# backend/ holds tracked source (321 files) — ignore only its build output.
+backend/dist/
+backend/node_modules/
 workers/
 scripts/
 

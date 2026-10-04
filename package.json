@@ -54,7 +54,8 @@
     "intent:list": "npx @tanstack/intent@latest list",
     "intent:install": "npx @tanstack/intent@latest install",
     "intent:validate": "npx @tanstack/intent@latest validate",
-    "intent:stale": "npx @tanstack/intent@latest stale"
+    "intent:stale": "npx @tanstack/intent@latest stale",
+    "test:auth": "node --import tsx --test tests/autoclaw/auth-passwords.test.mjs"
   },
   "files": [
     "SKILL.md"
