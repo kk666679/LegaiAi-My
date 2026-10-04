@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { relayAuthorization, relayClientIpHeaders, BACKEND_ORIGIN } from "@/lib/backend-proxy";
 
-const TRPC_BACKEND_URL = process.env.TRPC_BACKEND_URL || process.env.NEXT_PUBLIC_TRPC_URL || "http://localhost:3001/trpc";
+const TRPC_BACKEND_URL = `${BACKEND_ORIGIN}/trpc`;
 
 async function proxy(req: NextRequest, target: string, method: string, body?: string) {
-  const headers: Record<string, string> = { "content-type": "application/json" };
-  const auth = req.headers.get("authorization");
-  if (auth) headers["authorization"] = auth;
+  const headers: Record<string, string> = { "content-type": "application/json", ...relayAuthorization(req) };
+  // Without this the backend cannot tell callers apart, so per-IP throttling
+  // degrades into one global bucket. See lib/backend-proxy.ts.
+  relayClientIpHeaders(req, headers);
 
   const res = await fetch(target, { method, headers, body });
   const text = await res.text();

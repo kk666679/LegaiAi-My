@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { BACKEND_ORIGIN, relayAuthorization, relayClientIpHeaders } from '@/lib/backend-proxy';
 
 /**
  * Frontend SSE relay for the backend agent event bus.
@@ -14,20 +15,17 @@ import { NextRequest } from 'next/server';
  * header is forwarded so private events still get the user's session.
  */
 export async function GET(req: NextRequest) {
-  const backend = process.env.BACKEND_URL
-    || process.env.TRPC_BACKEND_URL?.replace(/\/trpc$/, '')
-    || 'http://localhost:3001';
-
   const headers: Record<string, string> = {
     Accept: 'text/event-stream',
     'Cache-Control': 'no-cache',
+    ...relayAuthorization(req),
   };
-  const auth = req.headers.get('authorization');
-  if (auth) headers.authorization = auth;
+  // Keeps the backend's per-client throttling meaningful on this hop.
+  relayClientIpHeaders(req, headers);
 
   let upstream: Response;
   try {
-    upstream = await fetch(`${backend}/api/events/stream`, { headers });
+    upstream = await fetch(`${BACKEND_ORIGIN}/api/events/stream`, { headers });
   } catch (err) {
     return new Response(`event: error\ndata: ${JSON.stringify({ error: String(err) })}\n\n`, {
       status: 502,

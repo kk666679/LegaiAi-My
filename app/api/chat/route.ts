@@ -1,13 +1,12 @@
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
+import { BACKEND_ORIGIN, relayClientIpHeaders } from '@/lib/backend-proxy';
 
 const messageSchema = z.object({
   role: z.enum(['user', 'assistant', 'system']),
   content: z.string().trim().min(1).max(12000),
 }).strict();
 const requestSchema = z.object({ messages: z.array(messageSchema).min(1).max(40) }).strict();
-
-const BACKEND_URL = process.env.BACKEND_URL || process.env.TRPC_BACKEND_URL?.replace(/\/trpc$/, '') || 'http://localhost:3001';
 
 /**
  * Frontend streaming chat route.
@@ -34,12 +33,13 @@ export async function POST(req: NextRequest) {
 
   const traceId = req.headers.get('x-trace-id') ?? crypto.randomUUID();
 
-  const upstream = await fetch(`${BACKEND_URL}/api/ai-chat`, {
+  const upstream = await fetch(`${BACKEND_ORIGIN}/api/ai-chat`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
       'x-trace-id': traceId,
       ...(req.headers.get('authorization') ? { authorization: req.headers.get('authorization')! } : {}),
+      ...relayClientIpHeaders(req),
     },
     body: JSON.stringify({ messages: parsed.data.messages, traceId }),
     // @ts-expect-error duplex is required for streaming bodies in undici
