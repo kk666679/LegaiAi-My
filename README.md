@@ -313,7 +313,15 @@ LLM_MODEL=llama3.1
 EMBED_MODEL=mxbai-embed-large
 
 # Auth
-SESSION_SECRET=change-me-in-production
+# 32+ random chars. Generate with: openssl rand -hex 32
+# Production refuses to start on a missing, placeholder, or short value.
+SESSION_SECRET=change-me-at-least-32-random-characters-long
+# Signs agent output + audit hash chain. Also 32+ random chars, also fail-closed.
+HMAC_SECRET=change-me-at-least-32-random-characters-long
+# Encrypts BYOK provider keys at rest. Separate from SESSION_SECRET.
+# MIGRATION: if you relied on the old ENCRYPTION_KEY || SESSION_SECRET fallback,
+# set this to your current SESSION_SECRET first or stored credentials break.
+ENCRYPTION_KEY=change-me-at-least-32-random-characters-long
 
 # Optional: OpenAI (for GPT-4o — confidential data must not be sent)
 OPENAI_API_KEY=sk-...

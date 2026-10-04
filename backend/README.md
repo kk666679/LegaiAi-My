@@ -317,7 +317,15 @@ DATABASE_URL=postgresql://user:pass@localhost:5432/legalai
 REDIS_HOST=localhost
 REDIS_PORT=6379
 OLLAMA_URL=http://localhost:11434
-SESSION_SECRET=change-me-in-production
+# 32+ random chars. Generate with: openssl rand -hex 32
+# Production refuses to start on a missing, placeholder, or short value.
+SESSION_SECRET=change-me-at-least-32-random-characters-long
+# Signs agent output + audit hash chain. Also 32+ random chars, also fail-closed.
+HMAC_SECRET=change-me-at-least-32-random-characters-long
+# Encrypts BYOK provider keys at rest. Separate from SESSION_SECRET.
+# MIGRATION: if you relied on the old ENCRYPTION_KEY || SESSION_SECRET fallback,
+# set this to your current SESSION_SECRET first or stored credentials break.
+ENCRYPTION_KEY=change-me-at-least-32-random-characters-long
 
 # Optional
 PORT=3001                          # default: 3001
