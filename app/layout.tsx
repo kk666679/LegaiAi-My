@@ -57,7 +57,6 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#08090B",
-  colorScheme: "dark",
   width: "device-width",
   initialScale: 1,
 }
@@ -72,12 +71,12 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
       className={cn(
-        "antialiased bg-background dark",
+        "antialiased bg-background",
         fontMono.variable,
         manrope.variable,
         spaceGrotesk.variable,
         outfit.variable,
-        "font-sans"
+        "font-sans",
       )}
     >
       <body className="bg-background text-foreground antialiased">
