@@ -54,6 +54,14 @@ const metrics = {
 app.use(helmetMw)
 app.use(cors())
 app.use(express.json())
+
+// Trust forwarded-client-IP headers only from reverse proxies on the local
+// host or a private network (the Caddy container, the Next.js relay, Fly's
+// edge). This makes req.ip resolve the real caller on every deployment path —
+// see the comment on resolveClientIp in src/trpc/context.ts — while a client
+// connecting straight to this port cannot forge X-Forwarded-For, because its
+// own socket address is not a trusted range. Do NOT widen this to `true`.
+app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'])
 app.use(rateLimit({ windowMs: 60_000, max: 120, message: 'Rate limit exceeded. Try again shortly.' }))
 app.use((_req: Request, _res: Response, next: NextFunction) => { metrics.requests++; next() })
 
