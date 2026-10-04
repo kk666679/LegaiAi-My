@@ -6,8 +6,10 @@
 # Bring it up:
 #   docker compose -f docker-compose.prod.yml --env-file .env up -d --build
 #
-# The frontend is built with NEXT_PUBLIC_TRPC_URL=/trpc so the browser
-# talks to the API on the same origin via Caddy.
+# The frontend is built with NEXT_PUBLIC_TRPC_URL=/trpc so the browser talks to
+# the API on the same origin via Caddy, which routes /trpc* straight to the
+# backend (see Caddyfile). This is the one topology where /trpc is correct: the
+# Fly frontend app has no such route and must stay on /api/trpc.
 
 services:
   postgres:
@@ -71,6 +73,10 @@ services:
     env_file: .env
     environment:
       NEXT_PUBLIC_TRPC_URL: /trpc
+      # Server-side relays (/api/events/stream, /api/chat) need the backend's
+      # real address; the code default of localhost:3001 would point back at
+      # this container.
+      BACKEND_URL: http://backend:3001
     depends_on:
       backend:
         condition: service_healthy

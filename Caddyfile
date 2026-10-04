@@ -2,6 +2,11 @@
 # Frontend and backend are served from the same host, so the browser
 # calls the tRPC API at /trpc (same-origin, no CORS, no public backend DNS).
 #
+# This file only works when the frontend is built with
+# NEXT_PUBLIC_TRPC_URL=/trpc (docker-compose.prod.yml does this). The Fly
+# frontend app has no equivalent route and uses NEXT_PUBLIC_TRPC_URL=/api/trpc,
+# which relays through the Next.js app instead of reaching this block.
+#
 # For production TLS, replace `:80` with your domain and Caddy will
 # auto-provision Let's Encrypt certificates.
 
