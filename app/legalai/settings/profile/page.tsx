@@ -1,104 +1,102 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { toast } from "sonner";
-import { Save, Camera, User as UserIcon } from "lucide-react";
+import { User as UserIcon, Mail, Shield, Scale, Calendar, Info } from "lucide-react";
+import { useAuth } from "@/components/auth-provider";
 import { SettingsLayout } from "../page";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { MOCK_USER } from "@/lib/lawmate/data";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+
+function initials(name?: string | null, email?: string | null) {
+  if (name) {
+    return name
+      .split(" ")
+      .map((p) => p[0])
+      .filter(Boolean)
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+  }
+  if (email) return email.slice(0, 2).toUpperCase();
+  return "?";
+}
 
 export default function ProfileSettingsPage() {
-  const [name, setName] = useState(MOCK_USER.name);
-  const [email, setEmail] = useState(MOCK_USER.email);
-  const [phone, setPhone] = useState("+60 12-345 6789");
-  const [barNumber, setBarNumber] = useState("BC/N/1234");
-  const [bio, setBio] = useState("Senior associate specialising in employment and data protection law.");
-  const fileRef = useRef<HTMLInputElement>(null);
-
-  const saveProfile = () => toast.success("Profile saved", { description: `${name} · ${barNumber}` });
-  const onPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (f) toast.success(`Photo updated: ${f.name}`);
-  };
+  const { user } = useAuth();
 
   return (
     <SettingsLayout>
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Profile</CardTitle>
-          <CardDescription>How you appear to your team and clients.</CardDescription>
+          <CardDescription>
+            How you appear to your team. Profile changes are managed by your
+            organisation administrator.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex items-center gap-4">
             <Avatar className="size-16">
               <AvatarFallback className="bg-primary/10 text-primary text-lg font-medium">
-                {name.split(" ").map((p) => p[0]).slice(0, 2).join("")}
+                {initials(user?.name, user?.email)}
               </AvatarFallback>
             </Avatar>
-            <div className="flex-1">
-              <p className="text-sm font-medium">{name}</p>
-              <p className="text-xs text-muted-foreground">{email}</p>
+            <div className="flex-1 min-w-0">
+              <p className="truncate text-sm font-medium">
+                {user?.name ?? user?.email}
+              </p>
+              <p className="truncate text-xs text-muted-foreground">
+                {user?.email}
+              </p>
+              <Badge variant="outline" className="mt-1 gap-1 text-[10px] capitalize">
+                <Shield className="size-3" aria-hidden />
+                {user?.role ?? "viewer"}
+              </Badge>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={() => fileRef.current?.click()}
-            >
-              <Camera className="size-4" /> Change photo
-            </Button>
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={onPhotoChange}
-            />
           </div>
 
           <Separator />
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <Label className="text-xs">Full name</Label>
-              <Input value={name} onChange={(e) => setName(e.target.value)} className="mt-1" />
-            </div>
-            <div>
-              <Label className="text-xs">Email</Label>
-              <Input value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1" type="email" />
-            </div>
-            <div>
-              <Label className="text-xs">Phone</Label>
-              <Input value={phone} onChange={(e) => setPhone(e.target.value)} className="mt-1" />
-            </div>
-            <div>
-              <Label className="text-xs">Bar number</Label>
-              <Input value={barNumber} onChange={(e) => setBarNumber(e.target.value)} className="mt-1" />
-            </div>
-            <div className="sm:col-span-2">
-              <Label className="text-xs">Bio</Label>
-              <textarea
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary min-h-[80px]"
-              />
-            </div>
+            <ProfileField icon={UserIcon} label="Full name" value={user?.name ?? "Not set"} />
+            <ProfileField icon={Mail} label="Email" value={user?.email ?? "—"} />
+            <ProfileField icon={Scale} label="Organisation" value={user?.org?.name ?? "Personal workspace"} />
+            <ProfileField icon={Shield} label="Role" value={<span className="capitalize">{user?.role ?? "viewer"}</span>} />
           </div>
 
           <Separator />
 
-          <div className="flex justify-end">
-            <Button className="gap-2" onClick={saveProfile}>
-              <Save className="size-4" /> Save profile
-            </Button>
-          </div>
+          <Alert>
+            <Info className="size-4" aria-hidden />
+            <AlertDescription>
+              To update your name, email or role, contact your workspace
+              administrator. Changes to identity fields are audited.
+            </AlertDescription>
+          </Alert>
         </CardContent>
       </Card>
     </SettingsLayout>
+  );
+}
+
+function ProfileField({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-md border bg-card/30 p-3">
+      <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <Icon className="size-3.5" aria-hidden />
+        {label}
+      </p>
+      <p className="mt-1 truncate text-sm font-medium">{value}</p>
+    </div>
   );
 }

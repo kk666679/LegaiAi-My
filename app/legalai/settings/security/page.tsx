@@ -1,53 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import { toast } from "sonner";
-import { Shield, Lock, Key, Smartphone, AlertTriangle, Save } from "lucide-react";
+import { Shield, Key, LogOut, Info, AlertTriangle } from "lucide-react";
+import { useAuth } from "@/components/auth-provider";
 import { SettingsLayout } from "../page";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function SecuritySettingsPage() {
-  const [twoFA, setTwoFA] = useState(true);
-  const [sessionTimeout, setSessionTimeout] = useState(true);
-  const [sessions, setSessions] = useState([
-    { id: "s-1", device: "MacBook Pro · Chrome 128", location: "Kuala Lumpur, MY", current: true },
-    { id: "s-2", device: "iPhone 15 · Safari", location: "Kuala Lumpur, MY", current: false },
-    { id: "s-3", device: "iPad · LawMate App", location: "Kuala Lumpur, MY", current: false },
-  ]);
-  const [currentPwd, setCurrentPwd] = useState("");
-  const [newPwd, setNewPwd] = useState("");
-  const [confirmPwd, setConfirmPwd] = useState("");
+  const { user, logout } = useAuth();
+  const [signingOut, setSigningOut] = useState(false);
 
-  const updatePassword = () => {
-    if (!currentPwd || !newPwd || !confirmPwd) {
-      toast.error("All password fields are required");
-      return;
+  const handleSignOut = async () => {
+    setSigningOut(true);
+    try {
+      await logout();
+    } catch {
+      // AuthProvider already cleared the local session.
+      window.location.href = "/login";
     }
-    if (newPwd !== confirmPwd) {
-      toast.error("New passwords do not match");
-      return;
-    }
-    toast.success("Password updated");
-    setCurrentPwd("");
-    setNewPwd("");
-    setConfirmPwd("");
-  };
-
-  const revokeSession = (id: string) => {
-    setSessions((s) => s.filter((x) => x.id !== id));
-    toast.success("Session revoked");
-  };
-
-  const signOutAll = () => {
-    setSessions((s) => s.filter((x) => x.current));
-    toast.warning("Signed out of all other devices", {
-      description: "Your current session remains active.",
-    });
   };
 
   return (
@@ -55,99 +29,76 @@ export default function SecuritySettingsPage() {
       <div className="space-y-4">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Password</CardTitle>
-            <CardDescription>Update your account password.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label className="text-xs">Current password</Label>
-              <Input
-                type="password"
-                placeholder="••••••••"
-                className="mt-1"
-                value={currentPwd}
-                onChange={(e) => setCurrentPwd(e.target.value)}
-              />
-            </div>
-            <div>
-              <Label className="text-xs">New password</Label>
-              <Input
-                type="password"
-                placeholder="••••••••"
-                className="mt-1"
-                value={newPwd}
-                onChange={(e) => setNewPwd(e.target.value)}
-              />
-            </div>
-            <div>
-              <Label className="text-xs">Confirm new password</Label>
-              <Input
-                type="password"
-                placeholder="••••••••"
-                className="mt-1"
-                value={confirmPwd}
-                onChange={(e) => setConfirmPwd(e.target.value)}
-              />
-            </div>
-            <div className="flex justify-end">
-              <Button className="gap-2" onClick={updatePassword}>
-                <Save className="size-4" /> Update password
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Two-factor authentication</CardTitle>
-            <CardDescription>Add an extra layer of security to your account.</CardDescription>
+            <CardTitle className="text-base">Account security</CardTitle>
+            <CardDescription>
+              How your account is protected in this workspace.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            <PrefRow
-              label="Enable 2FA"
-              desc="Require a second factor (authenticator app) at sign-in."
-              icon={Smartphone}
-              checked={twoFA}
-              onChange={setTwoFA}
+            <SecurityRow
+              icon={Shield}
+              label="Role-based access control"
+              value="Enforced"
+              desc="Every API request is authorised server-side against your role."
             />
-            <PrefRow
-              label="Auto sign-out after 30 minutes"
-              desc="Require re-authentication after idle period."
-              icon={Lock}
-              checked={sessionTimeout}
-              onChange={setSessionTimeout}
+            <SecurityRow
+              icon={Key}
+              label="Session duration"
+              value="7 days"
+              desc="Sessions expire after 7 days of inactivity and are revoked on sign-out."
+            />
+            <SecurityRow
+              icon={Key}
+              label="Credential storage"
+              value="Bcrypt"
+              desc="Passwords are salted and hashed server-side; never stored in plain text."
             />
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Active sessions</CardTitle>
-            <CardDescription>Devices currently signed in to your account.</CardDescription>
+            <CardTitle className="text-base">Current session</CardTitle>
+            <CardDescription>Sign out of this device.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2">
-            {sessions.map((s) => (
-              <SessionRow
-                key={s.id}
-                device={s.device}
-                location={s.location}
-                current={s.current}
-                onRevoke={() => revokeSession(s.id)}
-              />
-            ))}
+          <CardContent className="space-y-3">
+            <div className="rounded-md border bg-card/30 p-3">
+              <p className="text-sm font-medium">{user?.email}</p>
+              <p className="text-xs text-muted-foreground">
+                Signed in as {user?.role ?? "viewer"}
+                {user?.org?.name ? ` · ${user.org.name}` : ""}
+              </p>
+            </div>
+            <Button variant="outline" onClick={() => void handleSignOut()} disabled={signingOut}>
+              <LogOut className="size-4" />
+              {signingOut ? "Signing out…" : "Sign out of this device"}
+            </Button>
           </CardContent>
         </Card>
 
-        <Card className="border-red-500/30">
+        <Separator />
+
+        <Alert>
+          <Info className="size-4" aria-hidden />
+          <AlertDescription>
+            Password changes, two-factor authentication and session
+            management across devices are handled by your organisation
+            administrator. If you are locked out, contact them to
+            reset your access.
+          </AlertDescription>
+        </Alert>
+
+        <Card className="border-destructive/30">
           <CardHeader>
-            <CardTitle className="text-base text-red-500 flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-base text-destructive">
               <AlertTriangle className="size-4" /> Danger zone
             </CardTitle>
-            <CardDescription>Irreversible actions for your account.</CardDescription>
+            <CardDescription>Irreversible actions for this device.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="destructive" onClick={signOutAll}>
-              Sign out of all devices
+            <Button variant="destructive" onClick={() => void handleSignOut()} disabled={signingOut}>
+              <LogOut className="size-4" />
+              {signingOut ? "Signing out…" : "Sign out"}
             </Button>
           </CardContent>
         </Card>
@@ -156,49 +107,31 @@ export default function SecuritySettingsPage() {
   );
 }
 
-function PrefRow({ label, desc, icon: Icon, checked, onChange }: { label: string; desc: string; icon: any; checked: boolean; onChange: (v: boolean) => void }) {
+function SecurityRow({
+  icon: Icon,
+  label,
+  value,
+  desc,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+  desc: string;
+}) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-md border bg-card/30 p-3">
+    <div className="flex items-start justify-between gap-3 rounded-md border bg-card/30 p-3">
       <div className="flex items-start gap-3">
-        <div className="flex size-8 items-center justify-center rounded-md bg-muted">
-          <Icon className="size-4 text-muted-foreground" />
+        <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted">
+          <Icon className="size-4 text-muted-foreground" aria-hidden />
         </div>
         <div>
           <p className="text-sm font-medium">{label}</p>
           <p className="text-xs text-muted-foreground">{desc}</p>
         </div>
       </div>
-      <Switch checked={checked} onCheckedChange={onChange} />
-    </div>
-  );
-}
-
-function SessionRow({
-  device,
-  location,
-  current,
-  onRevoke,
-}: {
-  device: string;
-  location: string;
-  current?: boolean;
-  onRevoke?: () => void;
-}) {
-  return (
-    <div className="flex items-center gap-3 rounded-md border bg-card/30 p-3">
-      <div className="flex size-8 items-center justify-center rounded-md bg-muted">
-        <Key className="size-4 text-muted-foreground" />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium">{device}</p>
-        <p className="text-xs text-muted-foreground">{location}</p>
-      </div>
-      {current && <span className="text-[10px] text-emerald-500 font-medium">Current</span>}
-      {!current && (
-        <Button variant="ghost" size="sm" onClick={onRevoke}>
-          Revoke
-        </Button>
-      )}
+      <Badge variant="secondary" className="shrink-0 text-[10px]">
+        {value}
+      </Badge>
     </div>
   );
 }
