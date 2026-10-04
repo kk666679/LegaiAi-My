@@ -21,11 +21,12 @@ import {
   Command as CommandIcon,
   Languages,
   Check,
+  Users,
 } from "lucide-react";
 import { useTheme } from "next-themes";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Kbd } from "@/components/ui/kbd";
 import {
   DropdownMenu,
@@ -41,14 +42,32 @@ import {
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import { CommandPalette } from "@/components/lawmate/CommandPalette";
-import { MOCK_USER, MOCK_NOTIFICATIONS } from "@/lib/lawmate/data";
+import { useAuth } from "@/components/auth-provider";
+import { trpcReact } from "@/clients";
 import { useTranslation } from "@/lib/i18n/I18nProvider";
+import { AdminGate } from "@/components/shared/PermissionGate";
 import {
   LOCALE_FLAGS,
   LOCALE_LABELS,
   LOCALE_COUNTRY,
   type Locale,
 } from "@/lib/i18n/resources";
+
+function initials(name?: string | null, email?: string | null) {
+  if (name) {
+    return name
+      .split(" ")
+      .map((p) => p[0])
+      .filter(Boolean)
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+  }
+  if (email) {
+    return email.slice(0, 2).toUpperCase();
+  }
+  return "?";
+}
 
 interface TopBarProps {
   onMenu?: () => void;
@@ -60,8 +79,18 @@ export function TopBar({ onMenu }: TopBarProps) {
   const [shortcutKey, setShortcutKey] = useState("Ctrl");
   const { setTheme, theme } = useTheme();
   const { t, locale, setLocale, available } = useTranslation("sidebar");
-  const unread = MOCK_NOTIFICATIONS.filter((n) => !n.read).length;
+  const { user, logout } = useAuth();
   const router = useRouter();
+
+  // Live count of unacknowledged high-severity alerts for the
+  // notification indicator (real data, no fabricated counts).
+  const alerts = trpcReact.matters.getAlerts.useQuery(
+    { limit: 50 },
+    { refetchInterval: 60_000 },
+  );
+  const unread =
+    alerts.data?.filter((a) => a.severity === "high" || a.severity === "critical")
+      .length ?? 0;
 
   useEffect(() => {
     const isMac =
@@ -89,6 +118,18 @@ export function TopBar({ onMenu }: TopBarProps) {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch {
+      // AuthProvider already cleared the local session;
+      // navigate regardless of the server call outcome.
+      router.push("/login");
+    }
+  };
+
+  const displayName = user?.name ?? user?.email ?? "User";
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-background/80 px-3 backdrop-blur supports-[backdrop-filter]:backdrop-blur sm:gap-3 sm:px-4">
@@ -172,7 +213,10 @@ export function TopBar({ onMenu }: TopBarProps) {
         <Link href="/legalai/notifications" className="relative">
           <Bell className="size-4" />
           {unread > 0 && (
-            <span className="absolute right-1.5 top-1.5 flex size-1.5 rounded-full bg-red-500">
+            <span
+              className="absolute right-1.5 top-1.5 flex size-1.5 rounded-full bg-red-500"
+              aria-label={`${unread} unread alerts`}
+            >
               <span className="absolute inset-0 animate-ping rounded-full bg-red-500 opacity-75" />
             </span>
           )}
@@ -184,15 +228,11 @@ export function TopBar({ onMenu }: TopBarProps) {
           <Button variant="ghost" size="sm" className="gap-2 px-2">
             <Avatar className="size-7">
               <AvatarFallback className="bg-primary/10 text-primary text-xs font-medium">
-                {MOCK_USER.name
-                  .split(" ")
-                  .map((p) => p[0])
-                  .slice(0, 2)
-                  .join("")}
+                {initials(user?.name, user?.email)}
               </AvatarFallback>
             </Avatar>
-            <span className="hidden md:inline text-sm font-medium">
-              {MOCK_USER.name.split(" ")[0]}
+            <span className="hidden md:inline max-w-28 truncate text-sm font-medium">
+              {displayName.split(" ")[0]}
             </span>
             <ChevronDown className="size-3 text-muted-foreground" />
           </Button>
@@ -200,10 +240,15 @@ export function TopBar({ onMenu }: TopBarProps) {
         <DropdownMenuContent align="end" className="w-56">
           <DropdownMenuLabel>
             <div className="flex flex-col">
-              <span>{MOCK_USER.name}</span>
-              <span className="text-xs font-normal text-muted-foreground">
-                {MOCK_USER.email}
+              <span className="truncate">{displayName}</span>
+              <span className="truncate text-xs font-normal text-muted-foreground">
+                {user?.email}
               </span>
+              {user?.org?.name && (
+                <span className="truncate text-xs font-normal text-muted-foreground">
+                  {user.org.name}
+                </span>
+              )}
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
@@ -222,6 +267,13 @@ export function TopBar({ onMenu }: TopBarProps) {
               <Sparkles className="size-4" /> AI Settings
             </Link>
           </DropdownMenuItem>
+          <AdminGate>
+            <DropdownMenuItem asChild>
+              <Link href="/legalai/settings/users" className="gap-2">
+                <Users className="size-4" /> Team &amp; users
+              </Link>
+            </DropdownMenuItem>
+          </AdminGate>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
               <Languages className="size-4" />
@@ -284,17 +336,23 @@ export function TopBar({ onMenu }: TopBarProps) {
           </DropdownMenuSub>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
-            <Link href="/legalai/settings" className="gap-2">
+            <Link href="/legalai/docs" className="gap-2">
               <Keyboard className="size-4" /> Keyboard shortcuts
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/legalai/docs" className="gap-2">
-              <HelpCircle className="size-4" /> Help & docs
+              <HelpCircle className="size-4" /> Help &amp; docs
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="text-red-500 focus:text-red-500">
+          <DropdownMenuItem
+            onSelect={(e) => {
+              e.preventDefault();
+              void handleLogout();
+            }}
+            className="text-red-500 focus:text-red-500"
+          >
             <LogOut className="size-4" /> Sign out
           </DropdownMenuItem>
         </DropdownMenuContent>

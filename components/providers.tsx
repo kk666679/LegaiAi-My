@@ -16,7 +16,12 @@ function TRPCProvider({ children }: { children: React.ReactNode }) {
     trpcReact.createClient({
       links: [
         httpBatchLink({
-          url: "/api/trpc",
+          // Inlined at build time. "/trpc" is only correct where an edge proxy
+          // routes that path straight to the backend (Caddy in
+          // docker-compose.prod.yml); "/api/trpc" relays through this app's
+          // own route handler, which is what Fly and local dev need because the
+          // frontend origin cannot serve /trpc itself.
+          url: process.env.NEXT_PUBLIC_TRPC_URL || "/api/trpc",
           headers: () => {
             const token = getToken();
             return token ? { authorization: `Bearer ${token}` } : {};
