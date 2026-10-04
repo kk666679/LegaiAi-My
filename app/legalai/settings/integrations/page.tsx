@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Plug, ExternalLink, Lock } from "lucide-react";
 import { SettingsLayout } from "../page";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 // Integrations are informational until an integration backend
