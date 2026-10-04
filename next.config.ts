@@ -4,7 +4,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   allowedDevOrigins: ['127.0.0.1', '*.daytonaproxy01.net'],
-  webpack: (config) => {
+  webpack: (config: any) => {
     config.resolve.alias['@vercel/analytics/next'] = require.resolve('@vercel/analytics/dist/next/index.mjs');
     return config;
   },

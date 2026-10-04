@@ -105,9 +105,9 @@
     "@streamdown/code": "^1.1.1",
     "@streamdown/math": "^1.0.2",
     "@streamdown/mermaid": "^1.0.2",
-    "@tanstack/ai": "^0.53.0",
-    "@tanstack/ai-ollama": "^0.11.1",
-    "@tanstack/ai-openai": "^0.22.5",
+    "@tanstack/ai": "^0.64.0",
+    "@tanstack/ai-ollama": "^0.11.12",
+    "@tanstack/ai-openai": "^0.26.0",
     "@tanstack/react-query": "^5.102.8",
     "@tensorflow/tfjs-node": "^4.22.0",
     "@trpc/client": "^11.18.0",
@@ -193,11 +193,11 @@
   "allowScripts": {
     "@tensorflow/tfjs-node@4.22.0": true,
     "core-js@3.29.1": true,
-    "esbuild@0.28.2": true,
-    "msgpackr-extract@3.0.4": true,
     "protobufjs@6.11.6": true,
-    "sharp@0.32.6": true,
-    "prisma@7.10.0": true,
-    "@prisma/engines@7.10.0": true
+    "@prisma/engines": true,
+    "esbuild": true,
+    "msgpackr-extract": true,
+    "prisma": true,
+    "sharp": true
   }
 }
