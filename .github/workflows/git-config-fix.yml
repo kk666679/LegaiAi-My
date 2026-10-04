@@ -27,6 +27,10 @@ jobs:
       - name: Validate & fix git configuration
         run: |
           set -euo pipefail
+          # Initialize global gitconfig if missing (fresh runners have no .gitconfig)
+          if [ ! -f ~/.gitconfig ]; then
+            touch ~/.gitconfig
+          fi
           echo "=== Git configuration before fixes ==="
           git config --global --list
 

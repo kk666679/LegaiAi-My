@@ -1,17 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Produce a minimal self-contained server for containerized deployment.
-  // NOTE: the frontend type-imports the backend AppRouter, so `next build`'s
-  // type-check pulls in the backend program. The backend is type-checked as
-  // its own project (verified 0 errors via `backend/` tsconfig) and runs via
-  // tsx, so we skip build-time type errors here. A follow-up is to decouple
-  // the frontend client types from the backend source (e.g. generated types).
-  // NOTE: Vercel recommends against using `output: 'standalone'` for Next.js 16
-  // deployments as it may cause build issues.
   typescript: {
     ignoreBuildErrors: true,
   },
   allowedDevOrigins: ['127.0.0.1', '*.daytonaproxy01.net'],
+  webpack: (config) => {
+    config.resolve.alias['@vercel/analytics/next'] = require.resolve('@vercel/analytics/dist/next/index.mjs');
+    return config;
+  },
   async headers() {
     return [
       {
