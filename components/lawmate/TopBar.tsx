@@ -89,8 +89,10 @@ export function TopBar({ onMenu }: TopBarProps) {
     { refetchInterval: 60_000 },
   );
   const unread =
-    alerts.data?.filter((a) => a.severity === "high" || a.severity === "critical")
-      .length ?? 0;
+    (alerts.data as Array<{ severity: string }> | undefined)?.filter(
+      (a: { severity: string }) =>
+        a.severity === "high" || a.severity === "critical",
+    ).length ?? 0;
 
   useEffect(() => {
     const isMac =
