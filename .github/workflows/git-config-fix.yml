@@ -22,17 +22,48 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '24'
+          node-version: '22'
 
-      - name: Configure Git
+      - name: Validate & fix git configuration
         run: |
-          git config --global core.autocrlf false
-          git config --global core.eol lf
-          git config --global core.ignorecase false
-          git config --global pull.rebase true
-          git config --global push.default simple
-
-      - name: Verify Git configuration
-        run: |
-          echo "Git configuration:"
+          set -euo pipefail
+          echo "=== Git configuration before fixes ==="
           git config --global --list
+
+          FIXES=0
+
+          ensure_config() {
+            local key="$1" expected="$2"
+            local current
+            current=$(git config --global "$key" 2>/dev/null || echo "")
+            if [ "$current" != "$expected" ]; then
+              echo "Fixing $key: '$current' → '$expected'"
+              git config --global "$key" "$expected"
+              FIXES=$((FIXES + 1))
+            else
+              echo "OK: $key='$expected'"
+            fi
+          }
+
+          ensure_config core.autocrlf false
+          ensure_config core.eol lf
+          ensure_config core.ignorecase false
+          ensure_config pull.rebase true
+          ensure_config push.default simple
+
+          echo "=== Git configuration after fixes ==="
+          git config --global --list
+          echo "Total fixes applied: $FIXES"
+
+      - name: Verify .gitattributes line endings
+        run: |
+          set -euo pipefail
+          echo "=== .gitattributes content ==="
+          cat .gitattributes
+          echo "=== Checking for CRLF in tracked files ==="
+          if git grep -Il $'\r' -- '*.ts' '*.tsx' '*.js' '*.mjs' '*.json' '*.yml' '*.yaml' '*.md' '*.sh' 'Dockerfile*' 2>/dev/null; then
+            echo "WARNING: CRLF line endings detected in tracked files"
+            exit 1
+          else
+            echo "No CRLF line endings detected"
+          fi

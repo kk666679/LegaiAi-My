@@ -2,39 +2,31 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
-    branches: [main]
+    branches: [main, develop]
 
 jobs:
   frontend:
     name: Frontend (Next.js)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: npm
-          # No root lock file exists (see commit 2f46fe2), so npm ci would fail
-          # with "Dependencies lock file is not found". Fall back to npm install
-          # for the frontend, which also resolves the @tanstack/ai peer conflict
-          # (ai-ollama@0.11.x wants @tanstack/ai@^0.64.0, root pins ^0.53.0).
-          # The backend keeps its own package-lock.json for reproducible installs.
       - run: npm install --legacy-peer-deps --no-audit --no-fund
       - name: Lint
         continue-on-error: true
         run: npm run lint
       - name: Type-check
-        # Pinning lucide-react/ai/shiki/react-hook-form to compatible versions
-        # resolves the 1219 TS2305 errors. Until `npm ci` picks up the new
-        # lock file this step is best-effort so CI stays green.
         continue-on-error: true
         run: npm run type-check
+      - name: Test
+        run: npm run test:autoclaw
       - name: Build
         env:
-          # Must match fly.toml: this app serves /api/trpc and has no route to
-          # the API app for /trpc. See fly.toml [build.args].
           NEXT_PUBLIC_TRPC_URL: /api/trpc
         run: npm run build
 
@@ -42,23 +34,20 @@ jobs:
     name: Backend (Express/tRPC)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: npm
           cache-dependency-path: backend/package-lock.json
       - name: Validate backend Docker image builds
-        # Uses local ./node_modules/.bin/prisma to avoid npx pulling a
-        # mismatched RC version (fixed in Dockerfile.backend).
         run: docker build -f Dockerfile.backend -t lawmate-backend .
       - name: Prisma generate (schema wiring)
         working-directory: backend
-        # @nestjs/throttler@6.5.0 only declares @nestjs/common peer
-        # ^7.0.0..^11.0.0, but the backend pins @nestjs/common@12.0.1
-        # (which is what @nestjs/bull@12.0.0 requires). --legacy-peer-deps
-        # lets npm install accept that without breaking the tree.
         run: npm ci --legacy-peer-deps && ./node_modules/.bin/prisma generate
+      - name: Backend test
+        working-directory: backend
+        run: npm test --if-present
 
   deploy:
     name: Deploy (Fly.io)
@@ -66,8 +55,8 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - uses: actions/checkout@v5
+      - uses: superfly/flyctl-actions/setup-flyctl@v1
       - run: flyctl deploy --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

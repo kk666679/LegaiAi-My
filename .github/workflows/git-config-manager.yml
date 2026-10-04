@@ -49,11 +49,29 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          # Recommended repo-level settings
           git config core.autocrlf false
           git config core.ignorecase false
           git config pull.rebase true
           git config push.default simple
+
+      - name: Deduplicate .gitattributes
+        id: dedup
+        run: |
+          set -euo pipefail
+          ATTR=".gitattributes"
+          if [ -f "$ATTR" ]; then
+            awk '!seen[$0]++' "$ATTR" > "$ATTR.tmp"
+            if ! cmp -s "$ATTR" "$ATTR.tmp"; then
+              mv "$ATTR.tmp" "$ATTR"
+              echo "deduped=true" >> "$GITHUB_OUTPUT"
+            else
+              rm "$ATTR.tmp"
+              echo "deduped=false" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            touch "$ATTR"
+            echo "deduped=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Ensure .gitattributes normalizes line endings
         if: ${{ github.event.inputs.enforce_eol != 'false' }}
@@ -65,14 +83,15 @@ jobs:
 
           ensure_rule() {
             local pattern="$1" local_attr="$2"
-            if ! grep -qP "^${pattern//./\\.}\s+.*${local_attr}" "$ATTR" 2>/dev/null; then
+            local escaped_pattern="${pattern//./\\.}"
+            escaped_pattern="${escaped_pattern//\*/.*}"
+            if ! grep -qP "^${escaped_pattern}\s+${local_attr}( |$)" "$ATTR" 2>/dev/null; then
               echo "${pattern} ${local_attr}" >> "$ATTR"
               NEEDS_UPDATE=true
             fi
           }
 
           touch "$ATTR"
-          # Text files use LF in the repo and are checked out with native EOL.
           ensure_rule "*"            "text=auto eol=lf"
           ensure_rule "*.sh"         "text eol=lf"
           ensure_rule "*.yml"        "text eol=lf"
@@ -85,7 +104,6 @@ jobs:
           ensure_rule "*.md"         "text eol=lf"
           ensure_rule "Dockerfile*"  "text eol=lf"
           ensure_rule "Makefile"     "text eol=lf"
-          # Binary assets must never be touched.
           ensure_rule "*.png"        "binary"
           ensure_rule "*.jpg"        "binary"
           ensure_rule "*.gif"        "binary"
@@ -107,7 +125,6 @@ jobs:
         continue-on-error: true
         run: |
           set -euo pipefail
-          # Scan tracked text files for carriage returns.
           mapfile -t crlf_files < <(git grep -Il $'\r' -- '*.ts' '*.tsx' '*.js' '*.mjs' '*.json' '*.yml' '*.yaml' '*.md' '*.sh' 'Dockerfile*' || true)
           if [ "${#crlf_files[@]}" -gt 0 ]; then
             echo "The following tracked files contain CRLF line endings:"
