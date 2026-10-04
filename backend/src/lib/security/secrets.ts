@@ -7,7 +7,7 @@
  * value that is public in this repository.
  */
 
-const PLACEHOLDER_SECRETS = new Set([
+export const PLACEHOLDER_SECRETS = new Set([
   'change-me-in-production',
   'change-me-at-least-32-random-characters-long',
   'changeme',
@@ -26,8 +26,6 @@ function isProduction(): boolean {
 export interface RequireSecretOptions {
   /** Only honoured outside production. Keeps local dev and the test sandbox bootable. */
   devFallback?: string
-  /** Minimum accepted length in production. Defaults to PRODUCTION_SECRET_MIN_LENGTH. */
-  minLength?: number
 }
 
 export function requireSecret(name: string, options: RequireSecretOptions = {}): string {
@@ -37,9 +35,8 @@ export function requireSecret(name: string, options: RequireSecretOptions = {}):
     if (isProduction()) {
       if (PLACEHOLDER_SECRETS.has(value.toLowerCase()))
         throw new Error(`${name} is set to a placeholder value and cannot be used in production`)
-      const minLength = options.minLength ?? PRODUCTION_SECRET_MIN_LENGTH
-      if (value.length < minLength)
-        throw new Error(`${name} must be at least ${minLength} characters in production`)
+      if (value.length < PRODUCTION_SECRET_MIN_LENGTH)
+        throw new Error(`${name} must be at least ${PRODUCTION_SECRET_MIN_LENGTH} characters in production`)
     }
     return value
   }

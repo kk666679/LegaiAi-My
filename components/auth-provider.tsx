@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { trpcReact } from "@/clients";
 import { getToken, setToken, clearToken } from "@/lib/auth";
 
@@ -46,6 +47,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [token, setTokenState] = useState<string | null>(null);
   const [tokenHydrated, setTokenHydrated] = useState(false);
   const loginMut = trpcReact.auth.login.useMutation();
@@ -120,6 +122,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // cannot leave the user signed in.
     clearToken();
     setTokenState(null);
+    // Disabling the query does NOT discard its cached data, so without this
+    // `me.data` survives logout: isAuthenticated stays true, the login page
+    // bounces straight back to /legalai, and a shared browser briefly renders
+    // the previous account's role and organisation.
+    queryClient.removeQueries({ queryKey: ["auth", "me"] });
     if (currentToken) {
       try {
         await logoutMut.mutateAsync({ token: currentToken });
@@ -128,7 +135,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
     router.push("/login");
-  }, [token, logoutMut, router]);
+  }, [token, logoutMut, queryClient, router]);
 
   const value: AuthContextValue = {
     user: (me.data as AuthUser | undefined) ?? null,

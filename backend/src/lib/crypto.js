@@ -1,6 +1,12 @@
 import { createHmac, createHash } from 'crypto'
+import { requireSecret } from './security/secrets.ts'
 
-const HMAC_SECRET = process.env.HMAC_SECRET || 'change-me-in-production'
+// Resolved lazily so importing this module never throws at load time, and
+// through the shared policy so production cannot sign with the
+// repository-public fallback.
+function hmacSecret() {
+  return requireSecret('HMAC_SECRET', { devFallback: 'change-me-in-production' })
+}
 
 /** SHA-256 of a string */
 export function sha256(data) {
@@ -9,7 +15,7 @@ export function sha256(data) {
 
 /** HMAC-SHA256 signature for agent output integrity */
 export function signOutput(payload) {
-  return createHmac('sha256', HMAC_SECRET).update(JSON.stringify(payload)).digest('hex')
+  return createHmac('sha256', hmacSecret()).update(JSON.stringify(payload)).digest('hex')
 }
 
 /** Build hash-chain link: SHA-256(prevHash + payload) */

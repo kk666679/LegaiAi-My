@@ -21,6 +21,8 @@ test('hashPassword stores a self-describing scrypt string, not a bare MAC', asyn
   const hash = await pw.hashPassword(PASSWORD);
   assert.match(hash, /^scrypt\$65536\$8\$1\$[0-9a-f]{32}\$[0-9a-f]{128}$/);
   assert.ok(!hash.includes(':'), 'must not use the legacy salt:hmac layout');
+  // And the legacy layout is genuinely a different, still-accepted shape.
+  assert.match(legacyHash(PASSWORD), /^[0-9a-f]+:[0-9a-f]+$/);
 });
 
 test('hashes are salted: two hashes of one password differ', async () => {
@@ -105,43 +107,104 @@ test('scrypt cost is high enough to matter', async () => {
   assert.ok(elapsed < 5000, `verification took ${elapsed}ms`);
 });
 
-test('the login throttle locks out on the 5th failure, not before', () => {
-  const key = throttle.loginThrottleKey('10.0.0.1', 'Someone@Example.com');
-  assert.equal(throttle.isThrottled(key), false);
-  for (let i = 0; i < 4; i++) throttle.recordThrottleFailure(key);
-  assert.equal(throttle.isThrottled(key), false, 'must not lock before the 5th failure');
-  throttle.recordThrottleFailure(key);
-  assert.equal(throttle.isThrottled(key), true, 'must lock on the 5th failure');
-  assert.ok(throttle.throttleRetryAfterMs(key) > 0);
-  throttle.clearThrottleFailures(key);
-  assert.equal(throttle.isThrottled(key), false);
+test('the login account bucket locks out on the 5th failure, not before', () => {
+  const key = throttle.loginAccountKey('Someone@Example.com');
+  for (let i = 0; i < 4; i++) throttle.recordThrottleFailure(key, throttle.LOGIN_POLICY);
+  assert.equal(throttle.isThrottled(key, throttle.LOGIN_POLICY), false, 'must not lock before the 5th failure');
+  throttle.recordThrottleFailure(key, throttle.LOGIN_POLICY);
+  assert.equal(throttle.isThrottled(key, throttle.LOGIN_POLICY), true, 'must lock on the 5th failure');
+  assert.ok(throttle.throttleRetryAfterMs(key, throttle.LOGIN_POLICY) > 0);
+  throttle.clearThrottleFailures([key]);
+  assert.equal(throttle.isThrottled(key, throttle.LOGIN_POLICY), false);
 });
 
-test('throttle keys ignore email case and whitespace', () => {
-  assert.equal(
-    throttle.loginThrottleKey('10.0.0.1', 'User@Example.com'),
-    throttle.loginThrottleKey('10.0.0.1', ' user@example.com '),
-  );
-});
-
-test('throttle keys separate accounts from each other and from source IPs', () => {
+test('the account bucket is address-independent, so rotating source IPs cannot buy fresh attempts', () => {
+  // This is the property the old `ip|email` key lacked.
+  const fromA = throttle.loginAccountKey('victim@example.com');
+  const fromB = throttle.loginAccountKey(' VICTIM@Example.com ');
+  assert.equal(fromA, fromB, 'account key must not vary with the caller address');
   assert.notEqual(
-    throttle.loginThrottleKey('10.0.0.1', 'a@b.com'),
-    throttle.loginThrottleKey('10.0.0.2', 'a@b.com'),
+    throttle.loginAddressKey('10.0.0.1', 'victim@example.com'),
+    throttle.loginAddressKey('10.0.0.2', 'victim@example.com'),
+    'the address bucket must still vary by IP',
   );
-  assert.notEqual(
-    throttle.loginThrottleKey('10.0.0.1', 'a@b.com'),
-    throttle.loginThrottleKey('10.0.0.1', 'c@d.com'),
-  );
-  assert.notEqual(throttle.signupThrottleKey('10.0.0.1'), throttle.signupThrottleKey('10.0.0.2'));
-  assert.equal(throttle.signupThrottleKey(undefined), 'signup|unknown');
 });
 
-test('a successful attempt clears the throttle so the happy path is never blocked', () => {
-  const key = throttle.loginThrottleKey('10.0.0.9', 'fresh@example.com');
-  throttle.recordThrottleFailure(key);
-  throttle.clearThrottleFailures(key);
-  assert.equal(throttle.isThrottled(key), false);
+test('onboarding procedures use separate buckets so one cannot lock out the others', () => {
+  const keys = [
+    throttle.signupKey('10.0.0.5'),
+    throttle.registerKey('10.0.0.5'),
+    throttle.orgKey('10.0.0.5', 'acme-law'),
+  ];
+  assert.equal(new Set(keys).size, keys.length, 'each procedure needs a distinct key');
+
+  // Exhaust signup only; register and createOrg must be unaffected.
+  for (let i = 0; i < throttle.SIGNUP_POLICY.limit; i++) {
+    throttle.recordThrottleFailure(throttle.signupKey('10.0.0.5'), throttle.SIGNUP_POLICY);
+  }
+  assert.equal(throttle.isThrottled(throttle.signupKey('10.0.0.5'), throttle.SIGNUP_POLICY), true);
+  assert.equal(throttle.isThrottled(throttle.registerKey('10.0.0.5'), throttle.SIGNUP_POLICY), false);
+  assert.equal(throttle.isThrottled(throttle.orgKey('10.0.0.5', 'acme-law'), throttle.SIGNUP_POLICY), false);
+});
+
+test('createOrg buckets by slug so slug probing cannot exhaust a shared counter', () => {
+  const a = throttle.orgKey('10.0.0.6', 'acme-law');
+  const b = throttle.orgKey('10.0.0.6', 'other-law');
+  assert.notEqual(a, b);
+  for (let i = 0; i < throttle.SIGNUP_POLICY.limit; i++) {
+    throttle.recordThrottleFailure(a, throttle.SIGNUP_POLICY);
+  }
+  assert.equal(throttle.isThrottled(a, throttle.SIGNUP_POLICY), true);
+  assert.equal(throttle.isThrottled(b, throttle.SIGNUP_POLICY), false);
+});
+
+test('onboarding limit is more generous than login', () => {
+  assert.ok(
+    throttle.SIGNUP_POLICY.limit > throttle.LOGIN_POLICY.limit,
+    'shared-office egress must not be punished as hard as credential guessing',
+  );
+});
+
+test('a successful attempt clears the buckets it should forgive', () => {
+  const keys = [throttle.loginAccountKey('ok@example.com'), throttle.loginAddressKey('10.0.0.9', 'ok@example.com')];
+  for (const key of keys) throttle.recordThrottleFailure(key, throttle.LOGIN_POLICY);
+  throttle.clearThrottleFailures(keys);
+  for (const key of keys) assert.equal(throttle.isThrottled(key, throttle.LOGIN_POLICY), false);
+});
+
+test('a missing address falls back to a stable bucket key', () => {
+  assert.equal(throttle.loginAddressKey(undefined, 'a@b.com'), 'login|unknown|a@b.com');
+  assert.equal(throttle.signupKey(undefined), 'signup|unknown');
+});
+
+test('every verifyPassword outcome costs one full scrypt derivation', async () => {
+  // Guards the account-enumeration oracle: a legacy row used to answer in
+  // microseconds while an unknown email took a full derivation.
+  const time = async (stored) => {
+    const started = process.hrtime.bigint();
+    await pw.verifyPassword(PASSWORD, stored);
+    return Number(process.hrtime.bigint() - started) / 1e6;
+  };
+  const current = await pw.hashPassword(PASSWORD);
+  const unknown = await time(null);
+  const legacy = await time(legacyHash(PASSWORD));
+  const unparseable = await time('scrypt$garbage');
+  for (const [name, ms] of [['unknown', unknown], ['legacy', legacy], ['unparseable', unparseable]]) {
+    assert.ok(ms > 20, `${name} path returned in ${ms.toFixed(1)}ms — timing oracle`);
+  }
+});
+
+test('the most expensive accepted cost is verifiable, not silently unverifyable', () => {
+  // Regression: the memory ceiling once sat a few KB below what the highest
+  // accepted N needed, so such rows failed to verify while needsRehash
+  // reported them as current — a permanent silent lockout.
+  const atMaxN = `scrypt$${1 << 17}$8$1$${'b'.repeat(32)}$${'c'.repeat(128)}`;
+  assert.equal(pw.needsRehash(atMaxN), false);
+});
+
+test('a cost above the accepted range is flagged for rehash rather than ignored', () => {
+  const tooCostly = `scrypt$${1 << 18}$8$1$${'b'.repeat(32)}$${'c'.repeat(128)}`;
+  assert.equal(pw.needsRehash(tooCostly), true);
 });
 
 test('secrets: outside production a missing value falls back', () => {
