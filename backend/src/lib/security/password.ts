@@ -16,9 +16,16 @@ const SCRYPT_MAXMEM = 128 * SCRYPT_PARAMS.N * SCRYPT_PARAMS.r * 2
 // parameters come from the database, so they must never be able to make the
 // process allocate without bound. Sized to allow a further ~2x cost increase
 // over SCRYPT_PARAMS; anything beyond that is rejected, not clamped.
-const SCRYPT_MAXMEM_CEILING = 128 * 1024 * 1024
-const SCRYPT_MAX_COST = SCRYPT_MAXMEM_CEILING / 128
+//
+// OpenSSL also requires 128*p + 256*r + 2048 bytes of headroom on top of
+// 128*N*r. Without it in the ceiling, the most expensive *accepted* cost would
+// sit just above what scrypt allows and every such hash would fail to verify.
 const SCRYPT_MAX_N = 1 << 17
+const SCRYPT_MAX_R = 16
+const SCRYPT_MAX_P = 16
+const SCRYPT_MAXMEM_CEILING =
+  128 * SCRYPT_MAX_N * SCRYPT_MAX_R + 128 * SCRYPT_MAX_P + 256 * SCRYPT_MAX_R + 2048
+const SCRYPT_MAX_COST = SCRYPT_MAXMEM_CEILING / 128
 
 const scryptAsync = promisify(scrypt) as (
   password: string,
@@ -50,8 +57,25 @@ async function deriveScrypt(
     N: params.N,
     r: params.r,
     p: params.p,
-    maxmem: Math.min(Math.max(SCRYPT_MAXMEM, 128 * params.N * params.r), SCRYPT_MAXMEM_CEILING),
+    maxmem: Math.min(
+      Math.max(SCRYPT_MAXMEM, 128 * params.N * params.r + 128 * params.p + 256 * params.r + 2048),
+      SCRYPT_MAXMEM_CEILING,
+    ),
   })
+}
+
+/**
+ * Burns one full derivation on a terminal path. Used so that every outcome of
+ * verifyPassword costs the same: a legacy or unparseable stored value is
+ * otherwise answered in microseconds while an unknown email takes a full
+ * scrypt, which is a remote account-enumeration oracle.
+ */
+async function burnDerivation(password: string): Promise<void> {
+  try {
+    await deriveScrypt(password.normalize('NFKC'), randomBytes(16), SCRYPT_PARAMS.keylen, SCRYPT_PARAMS)
+  } catch {
+    // Never let the decoy itself fail the login.
+  }
 }
 
 export async function hashPassword(password: string): Promise<string> {
@@ -81,7 +105,7 @@ function parseScrypt(stored: string): ParsedScrypt | null {
   // are checked here rather than clamped, so an out-of-range row is treated as
   // an unverifiable hash instead of silently downgrading its cost.
   if (N < 2 || N > SCRYPT_MAX_N || (N & (N - 1)) !== 0) return null
-  if (r < 1 || r > 16 || p < 1 || p > 16) return null
+  if (r < 1 || r > SCRYPT_MAX_R || p < 1 || p > SCRYPT_MAX_P) return null
   if (N * r > SCRYPT_MAX_COST) return null
   if (salt.length < 8 || hash.length < 32) return null
   return { N, r, p, salt, hash }
@@ -91,25 +115,43 @@ function verifyLegacy(password: string, stored: string): boolean {
   // Legacy hashes were computed over the raw password — do not normalise here.
   const separator = stored.indexOf(':')
   if (separator < 1) return false
+  let secret: string
+  try {
+    secret = legacySecret()
+  } catch {
+    // A misconfigured production secret must read as "wrong password", not as
+    // a 500 — and must not be distinguishable from one by timing.
+    return false
+  }
   const salt = stored.slice(0, separator)
-  const candidate = createHmac('sha256', legacySecret()).update(salt + password).digest('hex')
+  const candidate = createHmac('sha256', secret).update(salt + password).digest('hex')
   return safeEqual(Buffer.from(candidate, 'hex'), Buffer.from(stored.slice(separator + 1), 'hex'))
 }
 
 /**
  * Verifies a password against either the current scrypt format or the legacy
- * `salt:hmac` format. A missing `stored` still burns a full derivation so the
- * "unknown email" and "wrong password" paths cost the same.
+ * `salt:hmac` format.
+ *
+ * Every terminal path costs one full scrypt derivation — including unknown
+ * accounts, legacy hashes and unparseable rows — so response time reveals
+ * nothing about which emails exist or which hash format a row uses.
  */
 export async function verifyPassword(password: string, stored: string | null | undefined): Promise<boolean> {
   if (!stored) {
-    await deriveScrypt(password.normalize('NFKC'), randomBytes(16), SCRYPT_PARAMS.keylen, SCRYPT_PARAMS)
+    await burnDerivation(password)
     return false
   }
-  if (!stored.startsWith(SCRYPT_PREFIX)) return verifyLegacy(password, stored)
+  if (!stored.startsWith(SCRYPT_PREFIX)) {
+    const matched = verifyLegacy(password, stored)
+    await burnDerivation(password)
+    return matched
+  }
 
   const parsed = parseScrypt(stored)
-  if (!parsed) return false
+  if (!parsed) {
+    await burnDerivation(password)
+    return false
+  }
   // Verification is on the login hot path and must total: a bad row fails the
   // login, it does not 500 it.
   try {

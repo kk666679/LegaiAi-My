@@ -4,16 +4,23 @@ import { router, publicProcedure, protectedProcedure, adminProcedure } from '../
 import { prisma } from '../../db'
 import { hashPassword, verifyPassword, needsRehash, createSession, deleteSession, ROLES } from '../../lib/auth'
 import {
-  loginThrottleKey,
-  signupThrottleKey,
+  loginAccountKey,
+  loginAddressKey,
+  signupKey,
+  registerKey,
+  orgKey,
   throttleRetryAfterMs,
   recordThrottleFailure,
   clearThrottleFailures,
+  LOGIN_POLICY,
+  SIGNUP_POLICY,
+  type ThrottlePolicy,
 } from '../../lib/security/authThrottle'
 
 /** Blocks the attempt and tells the caller how long the lockout lasts. */
-function assertNotThrottled(key: string): void {
-  const retryAfterMs = throttleRetryAfterMs(key)
+function assertNotThrottled(keys: string[], policy: ThrottlePolicy): void {
+  let retryAfterMs = 0
+  for (const key of keys) retryAfterMs = Math.max(retryAfterMs, throttleRetryAfterMs(key, policy))
   if (retryAfterMs <= 0) return
   throw new TRPCError({
     code: 'TOO_MANY_REQUESTS',
@@ -30,9 +37,12 @@ export const authRouter = router({
       orgSlug: z.string().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
-      const throttleKey = signupThrottleKey(ctx.ipAddress)
-      assertNotThrottled(throttleKey)
-      recordThrottleFailure(throttleKey)
+      const keys = [registerKey(ctx.ipAddress)]
+      assertNotThrottled(keys, SIGNUP_POLICY)
+      // Counted at entry so a caller cannot probe for free; forgiven on any
+      // success. Per-IP and generous, because CONFLICT/NOT_FOUND below are
+      // ordinary user mistakes rather than abuse.
+      recordThrottleFailure(keys[0], SIGNUP_POLICY)
 
       const existing = await prisma.user.findUnique({ where: { email: input.email } })
       if (existing) throw new TRPCError({ code: 'CONFLICT', message: 'Email already registered' })
@@ -55,7 +65,7 @@ export const authRouter = router({
         select: { id: true, email: true, name: true, role: true, orgId: true },
       })
 
-      clearThrottleFailures(throttleKey)
+      clearThrottleFailures(keys)
       const token = await createSession(user.id)
       return { user, token }
     }),
@@ -70,10 +80,11 @@ export const authRouter = router({
     }))
     .mutation(async ({ ctx, input }) => {
       // signup is public and provisions an org + admin user, so it is the real
-      // abuse vector — createOrg below is gated only by this same limit.
-      const throttleKey = signupThrottleKey(ctx.ipAddress)
-      assertNotThrottled(throttleKey)
-      recordThrottleFailure(throttleKey)
+      // abuse vector. Its bucket is separate from register and createOrg so one
+      // endpoint's failures cannot lock out the others.
+      const keys = [signupKey(ctx.ipAddress)]
+      assertNotThrottled(keys, SIGNUP_POLICY)
+      recordThrottleFailure(keys[0], SIGNUP_POLICY)
 
       const existingUser = await prisma.user.findUnique({ where: { email: input.email } })
       if (existingUser) throw new TRPCError({ code: 'CONFLICT', message: 'Email already registered' })
@@ -95,7 +106,7 @@ export const authRouter = router({
         })
       })
 
-      clearThrottleFailures(throttleKey)
+      clearThrottleFailures(keys)
       const token = await createSession(user.id)
       return { user, token }
     }),
@@ -103,19 +114,22 @@ export const authRouter = router({
   login: publicProcedure
     .input(z.object({ email: z.string().email(), password: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const throttleKey = loginThrottleKey(ctx.ipAddress, input.email)
-      assertNotThrottled(throttleKey)
+      // Two buckets: the account bucket is address-independent, so spreading
+      // guesses across source IPs (or forging a header) does not buy fresh
+      // attempts. The address bucket blunts spraying one account from many IPs.
+      const keys = [loginAccountKey(input.email), loginAddressKey(ctx.ipAddress, input.email)]
+      assertNotThrottled(keys, LOGIN_POLICY)
 
       const user = await prisma.user.findUnique({ where: { email: input.email } })
       // verifyPassword also runs a dummy derivation when the account is
       // missing, so unknown-email and wrong-password cost the same.
       const passwordOk = await verifyPassword(input.password, user?.passwordHash)
       if (!user || !passwordOk) {
-        recordThrottleFailure(throttleKey)
+        for (const key of keys) recordThrottleFailure(key, LOGIN_POLICY)
         throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Invalid credentials' })
       }
 
-      clearThrottleFailures(throttleKey)
+      clearThrottleFailures(keys)
 
       // Transparent upgrade: legacy `salt:hmac` hashes and any weaker scrypt
       // parameters are replaced the first time the owner proves the password.
@@ -178,15 +192,17 @@ export const authRouter = router({
   createOrg: publicProcedure
     .input(z.object({ name: z.string(), slug: z.string().regex(/^[a-z0-9-]+$/) }))
     .mutation(async ({ ctx, input }) => {
-      // Unauthenticated org creation is a spam vector; bound it per source IP.
-      const throttleKey = signupThrottleKey(ctx.ipAddress)
-      assertNotThrottled(throttleKey)
-      recordThrottleFailure(throttleKey)
+      // Unauthenticated org creation is a spam vector. Keyed by address and
+      // slug so probing for taken slugs cannot exhaust a shared counter, and
+      // separate from signup so its success cannot reset signup's budget.
+      const keys = [orgKey(ctx.ipAddress, input.slug)]
+      assertNotThrottled(keys, SIGNUP_POLICY)
+      recordThrottleFailure(keys[0], SIGNUP_POLICY)
 
       const existing = await prisma.organisation.findUnique({ where: { slug: input.slug } })
       if (existing) throw new TRPCError({ code: 'CONFLICT', message: 'Slug already taken' })
       const org = await prisma.organisation.create({ data: { name: input.name, slug: input.slug } })
-      clearThrottleFailures(throttleKey)
+      clearThrottleFailures(keys)
       return org
     }),
 })
