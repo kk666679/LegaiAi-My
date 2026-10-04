@@ -16,7 +16,12 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-      - run: npm ci
+          # No root lock file exists (see commit 2f46fe2), so npm ci would fail
+          # with "Dependencies lock file is not found". Fall back to npm install
+          # for the frontend, which also resolves the @tanstack/ai peer conflict
+          # (ai-ollama@0.11.x wants @tanstack/ai@^0.64.0, root pins ^0.53.0).
+          # The backend keeps its own package-lock.json for reproducible installs.
+      - run: npm install --legacy-peer-deps --no-audit --no-fund
       - name: Lint
         continue-on-error: true
         run: npm run lint
@@ -28,7 +33,9 @@ jobs:
         run: npm run type-check
       - name: Build
         env:
-          NEXT_PUBLIC_TRPC_URL: /trpc
+          # Must match fly.toml: this app serves /api/trpc and has no route to
+          # the API app for /trpc. See fly.toml [build.args].
+          NEXT_PUBLIC_TRPC_URL: /api/trpc
         run: npm run build
 
   backend:
@@ -47,7 +54,11 @@ jobs:
         run: docker build -f Dockerfile.backend -t lawmate-backend .
       - name: Prisma generate (schema wiring)
         working-directory: backend
-        run: npm ci && ./node_modules/.bin/prisma generate
+        # @nestjs/throttler@6.5.0 only declares @nestjs/common peer
+        # ^7.0.0..^11.0.0, but the backend pins @nestjs/common@12.0.1
+        # (which is what @nestjs/bull@12.0.0 requires). --legacy-peer-deps
+        # lets npm install accept that without breaking the tree.
+        run: npm ci --legacy-peer-deps && ./node_modules/.bin/prisma generate
 
   deploy:
     name: Deploy (Fly.io)
