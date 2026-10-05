@@ -1,7 +1,6 @@
 // components/documents/types.ts
 import type { ReactNode } from "react";
 
-<<<<<<< HEAD
 import type { LucideIcon } from "lucide-react";
 import {
   BookOpen,
@@ -26,7 +25,6 @@ export type {
   DocumentStats,
 } from "@/hooks/useDocuments";
 
-export type {
   LegalDocument,
   DocStatus,
   DocType,
@@ -34,7 +32,6 @@ export type {
   DocumentParties,
 } from "@/types/documents";
 
-import {
   DOC_COURTS,
   DOC_STATUSES,
   DOC_TYPES,
@@ -44,7 +41,6 @@ import {
   type DocumentStats,
   type DocumentStatus as PersistedDocumentStatus,
   type DocumentType,
-} from "@/hooks/useDocuments";
 import type { DocumentParties } from "@/types/documents";
 
 export { DOC_COURTS, DOC_STATUSES, DOC_TYPES };
@@ -79,24 +75,13 @@ export type DocumentLifecycleStatus =
 
 /** Statuses the `documents` table actually accepts. */
 export const PERSISTED_STATUSES: readonly PersistedDocumentStatus[] = [
-  "draft",
-  "review",
-  "approved",
-  "archived",
 ];
 
 /** Phases that exist only while a request is in flight. */
 export const TRANSIENT_STATUSES: readonly DocumentLifecycleStatus[] = [
-  "uploading",
-  "processing",
-  "analysing",
-  "error",
-];
 
-/**
  * Bridges a lifecycle status back to the persisted enum.
  * Returns `null` for transient phases — the caller must not persist those.
- */
 export function toPersistedStatus(
   status: DocumentLifecycleStatus,
 ): PersistedDocumentStatus | null {
@@ -120,12 +105,10 @@ export function toPersistedStatus(
     case "error":
       return null;
   }
-}
 
 /** True while the document is mid-pipeline (drives spinners and live regions). */
 export function isBusyStatus(status: DocumentLifecycleStatus): boolean {
   return TRANSIENT_STATUSES.includes(status);
-}
 
 /* ── Human labels ──────────────────────────────────────────────────────── */
 
@@ -146,26 +129,8 @@ export const DOCUMENT_LIFECYCLE_LABELS: Record<DocumentLifecycleStatus, string> 
 
 /** `StatusBadge` tone key — it already maps the persisted vocabulary. */
 export function statusToneKey(status: DocumentLifecycleStatus): string {
-  switch (status) {
-    case "approved":
-    case "final":
-    case "ready":
-    case "analysed":
-      return "approved";
-    case "review":
-    case "changes-requested":
-    case "processing":
-    case "uploading":
-    case "analysing":
-      return "review";
-    case "error":
       return "critical";
-    case "archived":
-      return "archived";
     default:
-      return "draft";
-  }
-}
 
 /* ── Type / court labels ───────────────────────────────────────────────── */
 
@@ -187,22 +152,17 @@ export const DOCUMENT_TYPE_ICONS: Record<DocumentType, LucideIcon> = {
   MEMORANDUM: FileText,
   LETTER: Mail,
   OTHER: FileText,
-};
 
 export function documentTypeLabel(type: string): string {
   return DOCUMENT_TYPE_LABELS[type as DocumentType] ?? type;
-}
 
 export function documentCourtLabel(court: string): string {
   return DOCUMENT_COURT_LABELS[court as DocumentCourt] ?? court;
-}
 
 /* ── Collections ───────────────────────────────────────────────────────── */
 
-/**
  * Folder-style navigation (§19). These are *views over the same library*, not
  * separate storage — each maps onto a real query the backend can answer.
- */
 export const DOCUMENT_COLLECTIONS: readonly DocumentCollection[] = [
   {
     id: "all",
@@ -210,55 +170,36 @@ export const DOCUMENT_COLLECTIONS: readonly DocumentCollection[] = [
     icon: FileText,
     description: "Every document you can access",
   },
-  {
     id: "recent",
     label: "Recent",
     icon: BookOpen,
     description: "Recently updated documents",
-  },
-  {
     id: "favorites",
     label: "Favorites",
     icon: Star,
     description: "Documents you starred",
-  },
-  {
     id: "shared",
     label: "Shared",
     icon: Users,
     description: "Documents shared with your team",
-  },
-  {
     id: "contracts",
     label: "Contracts",
     icon: FileSignature,
     description: "Contracts and agreements",
-  },
-  {
     id: "drafts",
     label: "Drafts",
-    icon: FileSignature,
     description: "Documents still in draft",
-  },
-  {
     id: "templates",
     label: "Templates",
-    icon: FileSignature,
     description: "Reusable document templates",
-  },
-  {
     id: "archived",
     label: "Archived",
     icon: Archive,
     description: "Archived documents",
-  },
-] as const;
 
 export function documentLifecycleLabel(
-  status: DocumentLifecycleStatus,
 ): string {
   return DOCUMENT_LIFECYCLE_LABELS[status];
-}
 
 /* ── Presentation view ─────────────────────────────────────────────────── */
 
@@ -269,7 +210,6 @@ export const DOCUMENT_VIEW_LABELS: Record<DocumentView, string> = {
   list: "List",
   grid: "Grid",
   table: "Table",
-};
 
 /* ── Sorting ───────────────────────────────────────────────────────────── */
 
@@ -280,7 +220,6 @@ export const DOCUMENT_SORT_OPTIONS = [
   { value: "createdAt:asc", label: "Oldest first" },
   { value: "title:asc", label: "Name (A–Z)" },
   { value: "title:desc", label: "Name (Z–A)" },
-] as const;
 
 export type DocumentSortValue = (typeof DOCUMENT_SORT_OPTIONS)[number]["value"];
 
@@ -291,20 +230,15 @@ export function parseSort(
   const [sortBy, sortOrder] = value.split(":") as [
     DocumentFilters["sortBy"],
     DocumentFilters["sortOrder"],
-  ];
   return { sortBy, sortOrder };
-}
 
 export function formatSort(filters: DocumentFilters): DocumentSortValue {
   return `${filters.sortBy}:${filters.sortOrder}` as DocumentSortValue;
-}
 
 /* ── Analysis ──────────────────────────────────────────────────────────── */
 
-/**
  * Per-document AI analysis state. Supplied by the caller from a real analysis
  * endpoint; the Documents components never synthesise it.
- */
 export type DocumentAnalysisState =
   | "not-started"
   | "running"
@@ -318,7 +252,6 @@ export interface DocumentAnalysisSummary {
   /** 0–1. Absent means "not reported", not "zero". */
   confidence?: number;
   errorMessage?: string;
-}
 
 export type AnalysisSeverity = "critical" | "high" | "medium" | "low" | "info";
 
@@ -332,7 +265,6 @@ export interface AnalysisFinding {
   /** Page/section locator, when the source document exposes one. */
   locator?: string;
   evidenceIds?: string[];
-}
 
 /* ── Evidence & citations ──────────────────────────────────────────────── */
 
@@ -343,8 +275,6 @@ export type EvidenceVerificationStatus =
 
 /** Maps onto the shape `components/ai/legal/evidence-panel` already accepts. */
 export interface DocumentEvidenceItem {
-  id: string;
-  title: string;
   url?: string;
   court?: string;
   jurisdiction?: string;
@@ -352,23 +282,17 @@ export interface DocumentEvidenceItem {
   date?: string;
   excerpt?: string;
   verificationStatus: EvidenceVerificationStatus;
-  confidence?: number;
   /** Page or section within the owning document, when locatable. */
-  locator?: string;
-}
 
 export interface DocumentCitation {
-  id: string;
   label: string;
   source: string;
   href?: string;
   verified?: boolean;
-}
 
 /* ── Versions, activity, comments ──────────────────────────────────────── */
 
 export interface DocumentVersion {
-  id: string;
   version: number;
   createdAt: string;
   createdBy?: string;
@@ -376,21 +300,18 @@ export interface DocumentVersion {
   isCurrent?: boolean;
   /** Text snapshot for diffing. Only present when a real snapshot exists. */
   content?: string;
-}
 
 export type DocumentActivityKind =
   | "created"
   | "uploaded"
   | "viewed"
   | "edited"
-=======
 export type DocumentStatus =
   | "draft"
   | "uploading"
   | "processing"
   | "ready"
   | "analysing"
->>>>>>> 9d4a0e0 (feat: add irac-engine & convert lom-client to ESM)
   | "analysed"
   | "review"
   | "changes-requested"
@@ -453,11 +374,9 @@ export interface LegalDocument {
   folderId?: string | null;
   size?: number;
   pageCount?: number;
-<<<<<<< HEAD
   parties?: DocumentParties | null;
   jurisdiction?: string | null;
 };
-=======
   language?: string;
   jurisdiction?: string;
   parties?: DocumentParty[];
@@ -481,12 +400,10 @@ export interface DocumentFilters {
   aiStatus?: Array<NonNullable<LegalDocument["aiStatus"]>>;
   dateFrom?: string;
   dateTo?: string;
-}
 
 export interface DocumentSort {
   key: DocumentSortKey;
   direction: SortDirection;
-}
 
 export interface DocumentVersion {
   id: string;
@@ -496,14 +413,10 @@ export interface DocumentVersion {
   isCurrent?: boolean;
   authorId?: string;
   authorName?: string;
-  createdAt: string;
   size?: number;
   summary?: string;
-}
 
 export interface DocumentActivityEvent {
-  id: string;
-  documentId: string;
   kind:
     | "created"
     | "uploaded"
@@ -523,44 +436,32 @@ export interface DocumentActivityEvent {
   timestamp: string;
   message?: string;
   metadata?: Record<string, unknown>;
-}
 
 export interface DocumentComment {
-  id: string;
-  documentId: string;
   authorId: string;
   authorName: string;
   authorAvatarUrl?: string;
   body: string;
-  createdAt: string;
   resolved?: boolean;
   anchor?: {
     page?: number;
     x?: number;
     y?: number;
     excerpt?: string;
-  };
-}
 
 export interface DocumentPermissionEntry {
-  id: string;
   userId: string;
   name: string;
   email?: string;
   avatarUrl?: string;
   role: DocumentRole;
-}
 
 export interface DocumentAnalysisFinding {
-  id: string;
   kind: "risk" | "obligation" | "date" | "clause" | "party" | "compliance";
   title: string;
-  summary?: string;
   severity?: "low" | "medium" | "high" | "critical";
   confidence?: number;
   evidenceIds?: string[];
-}
->>>>>>> 9d4a0e0 (feat: add irac-engine & convert lom-client to ESM)
 
 export interface DocumentEvidence {
   id: string;
@@ -575,16 +476,13 @@ export interface DocumentEvidence {
 export interface DocumentTemplate {
   id: string;
   name: string;
-<<<<<<< HEAD
 }
-=======
   category: string;
   description?: string;
   jurisdiction?: string;
   tags?: string[];
   favorite?: boolean;
   previewUrl?: string;
-}
 
 export interface DocumentsStats {
   total: number;
@@ -594,7 +492,6 @@ export interface DocumentsStats {
   pendingApproval: number;
   analysed: number;
   favorites: number;
-}
 
 export interface DocumentsCapabilities {
   canCreate: boolean;
@@ -603,12 +500,9 @@ export interface DocumentsCapabilities {
   canShare: boolean;
   canDelete: boolean;
   canApprove: boolean;
-}
 
 export interface DocumentActionContext {
   document: LegalDocument;
   permissions: DocumentPermission[];
-}
 
 export type { ReactNode };
->>>>>>> 9d4a0e0 (feat: add irac-engine & convert lom-client to ESM)

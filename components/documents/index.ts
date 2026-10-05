@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 export { DocumentsNav, getDocumentsNavItems } from "./DocumentsNav";
 export { DocumentsShell } from "./DocumentsShell";
 export { DocumentCollections } from "./DocumentCollections";
@@ -8,11 +7,9 @@ export {
   DocumentAIContext,
   type DocumentAIMessage,
 } from "./DocumentAIPanel";
-export {
   CONTRACT_SUGGESTIONS,
   DOCUMENT_SUGGESTIONS,
 } from "./suggestions";
-=======
 // components/documents/index.ts
 export * from "./types";
 
@@ -114,4 +111,3 @@ export { DocumentNotFound } from "./status/document-not-found";
 
 // studio
 export { DraftingStudio } from "./studio/drafting-studio";
->>>>>>> 9d4a0e0 (feat: add irac-engine & convert lom-client to ESM)
