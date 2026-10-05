@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ReasoningPanel } from "@/components/ai/legal/reasoning-panel";
+import { ReasoningPanel } from "@/components/lawmate/ai/legal/reasoning-panel";
 import { cn } from "@/lib/utils";
 import type { DebateArgument } from "@/types/debate";
 

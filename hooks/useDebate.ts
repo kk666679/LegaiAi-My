@@ -8,6 +8,7 @@ import type {
   DebateCriterionKey,
   DebateEntry,
   DebateEvidence,
+  DebateExaminationItem,
   DebateParticipant,
   DebateRound,
   DebateScoreRow,
@@ -506,6 +507,7 @@ const VERDICT: DebateVerdict = {
   outcome: "opponent",
   basis: "ai-evaluation",
   confidence: 0.82,
+  summary: ENTRY_BODY["arg-verdict"],
   keyReasons: [
     "The threshold point under s 4(1) is engaged before any merits argument.",
     "The respondent's cross-examination isolates a concession on price that the claimant never answers.",
@@ -551,6 +553,44 @@ const EPOCH = Date.parse("2026-01-14T09:30:00.000Z");
 
 /** Interval between scripted entries during playback, in milliseconds. */
 const STEP_MS = 900;
+
+/** Cross-examination script for round 4, derived from the Q/A/assessment body. */
+const EXAMINATIONS: DebateExaminationItem[] = [
+  {
+    id: "xexam-1",
+    stage: "question",
+    roundId: "round-4",
+    questionerId: "opponent",
+    answererId: "proponent",
+    question:
+      "The delivery notes record quantity and grade. Do they record the price, and do they record an agreement to sell?",
+    timestamp: new Date(EPOCH + 14 * STEP_MS).toISOString(),
+  },
+  {
+    id: "xexam-2",
+    stage: "answer",
+    roundId: "round-4",
+    questionerId: "opponent",
+    answererId: "proponent",
+    question:
+      "The delivery notes record quantity and grade. Do they record the price, and do they record an agreement to sell?",
+    answer:
+      "No to both. The unit price appears only on Purchase Order PO-1180 at clause 7, and the notes make no reference to an agreement.",
+    evidenceIds: ["ev-po"],
+    timestamp: new Date(EPOCH + 15 * STEP_MS).toISOString(),
+  },
+  {
+    id: "xexam-3",
+    stage: "assessment",
+    roundId: "round-4",
+    questionerId: "opponent",
+    answererId: "proponent",
+    assessment: "weak",
+    assessmentNote:
+      "It concedes that no signed document states the agreed price, which is the precise point on which section 4(1) turns.",
+    timestamp: new Date(EPOCH + 15 * STEP_MS).toISOString(),
+  },
+];
 
 /* ------------------------------------------------------------------ */
 /* Hook                                                                */
@@ -667,6 +707,7 @@ export function useDebate(debateId?: string) {
       arguments: ARGUMENTS,
       evidence: EVIDENCE,
       sources: SOURCES,
+      examinations: EXAMINATIONS,
       activity,
       scores: isComplete ? SCORES : undefined,
       momentum: isComplete ? MOMENTUM : undefined,

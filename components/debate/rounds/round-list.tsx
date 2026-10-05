@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { AILiveBadge } from "@/components/ai/ailive-badge";
+import { AILiveBadge } from "@/components/lawmate/ai/ailive-badge";
 import { DebateLiveState, isDebateActive } from "../core/debate-status";
 import { DebateProgressInline } from "../core/debate-status";
 import { cn } from "@/lib/utils";

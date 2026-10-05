@@ -6,13 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from "@/components/ui/empty";
-import { AILiveBadge } from "@/components/ai/ailive-badge";
+import { AILiveBadge } from "@/components/lawmate/ai/ailive-badge";
 import { DebateEvidencePanel } from "../evidence/debate-evidence-panel";
 import { cn } from "@/lib/utils";
 import type { DebateEntry, DebateEvidence, DebateRound, DebateSource } from "@/types/debate";
 import { DEBATE_ENTRY_LABELS, DEBATE_SIDE_LABELS } from "@/types/debate";
 import { ParticipantAvatar } from "../participants/participant-card";
 import { ParticipantKindBadge, ParticipantStatus } from "../participants/participant-status";
+import { MessageResponse } from "@/components/ai-elements/message";
 import { Copy, Download, Search } from "lucide-react";
 
 export interface DebateTranscriptProps {
@@ -186,7 +187,9 @@ export function DebateTranscript({
                   ) : null}
                 </div>
 
-                <p className="mt-1.5 whitespace-pre-wrap text-sm leading-relaxed">{entry.content}</p>
+                <MessageResponse className="mt-1.5 text-sm leading-relaxed">
+                  {entry.content}
+                </MessageResponse>
 
                 {entry.citations && entry.citations.length > 0 ? (
                   <div className="mt-1.5 flex flex-wrap gap-1">

@@ -5,9 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { AIBadge } from "@/components/ai/aibadge";
-import { ConfidenceIndicator } from "@/components/ai/legal/confidence";
-import { EvidencePanel } from "@/components/ai/legal/evidence-panel";
+import { AIBadge } from "@/components/lawmate/ai/aibadge";
+import { ConfidenceIndicator } from "@/components/lawmate/ai/legal/confidence";
+import { EvidencePanel } from "@/components/lawmate/ai/legal/evidence-panel";
 import { cn } from "@/lib/utils";
 import type { DebateArgument, DebateSide } from "@/types/debate";
 import { DEBATE_ENTRY_LABELS } from "@/types/debate";
@@ -47,9 +47,17 @@ export interface ArgumentCardProps {
 export function ArgumentCard({ argument, onAction, className }: ArgumentCardProps) {
   const cfg = SIDE_CONFIG[argument.side];
   const Icon = cfg.icon;
-  const confidence = argument.confidence ?? 0.5;
+  const confidence = argument.confidence;
   const confidenceLevel: "high" | "medium" | "low" | "insufficient" =
-    confidence >= 0.8 ? "high" : confidence >= 0.6 ? "medium" : confidence >= 0.35 ? "low" : "insufficient";
+    confidence === undefined
+      ? "insufficient"
+      : confidence >= 0.8
+        ? "high"
+        : confidence >= 0.6
+          ? "medium"
+          : confidence >= 0.35
+            ? "low"
+            : "insufficient";
 
   return (
     <Card className={cn("gap-0 overflow-hidden", cfg.cls, className)}>
@@ -68,7 +76,9 @@ export function ArgumentCard({ argument, onAction, className }: ArgumentCardProp
             </Badge>
           ) : null}
           <span className="ml-auto text-xs text-muted-foreground">
-            {argument.confidence !== undefined ? `${Math.round(confidence * 100)}%` : ""}
+            {argument.confidence !== undefined
+              ? `${Math.round(argument.confidence * 100)}%`
+              : ""}
           </span>
         </div>
         <p className="text-sm leading-relaxed">{argument.claim}</p>
@@ -108,7 +118,9 @@ export function ArgumentCard({ argument, onAction, className }: ArgumentCardProp
           ) : null}
 
           <div className="flex flex-wrap items-center gap-2">
-            <ConfidenceIndicator level={confidenceLevel} className="text-xs" />
+            {confidence !== undefined ? (
+              <ConfidenceIndicator level={confidenceLevel} className="text-xs" />
+            ) : null}
           </div>
 
           {onAction ? (

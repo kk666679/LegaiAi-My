@@ -3,8 +3,8 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { EvidencePanel } from "@/components/ai/legal/evidence-panel";
-import { ConfidenceIndicator } from "@/components/ai/legal/confidence";
+import { EvidencePanel } from "@/components/lawmate/ai/legal/evidence-panel";
+import { ConfidenceIndicator } from "@/components/lawmate/ai/legal/confidence";
 import { cn } from "@/lib/utils";
 import type { DebateEvidence, DebateSource } from "@/types/debate";
 import { ChevronDown, ExternalLink, Link as LinkIcon } from "lucide-react";

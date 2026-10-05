@@ -1,8 +1,8 @@
 "use client";
 
-import { AIBadge } from "@/components/ai/aibadge";
-import { AIStatusIndicator } from "@/components/ai/aistatus-indicator";
-import { ClassificationIndicator } from "@/components/ai/legal/classification";
+import { AIBadge } from "@/components/lawmate/ai/aibadge";
+import { AIStatusIndicator } from "@/components/lawmate/ai/aistatus-indicator";
+import { ClassificationIndicator } from "@/components/lawmate/ai/legal/classification";
 import { cn } from "@/lib/utils";
 import type { DebateParticipant, DebateParticipantStatus } from "@/types/debate";
 import { DEBATE_PARTICIPANT_LABELS, DEBATE_SIDE_LABELS } from "@/types/debate";

@@ -3,11 +3,12 @@
 import { useRouter } from "next/navigation";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent } from "@/components/ui/card";
-import { DashboardShell } from "@/components/lawmate/DashboardShell";
+import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { LegalDisclaimer } from "@/components/lawmate/LegalDisclaimer";
 import { usePermission } from "@/components/shared/PermissionGate";
 import { trpcReact } from "@/clients";
 import { DebateSetup, type DebateStartInput } from "@/components/debate/debate-setup";
+import { DebatePreview } from "@/components/debate/workspace/debate-preview";
 import { Swords, ShieldAlert } from "lucide-react";
 
 export default function DebatePage() {
@@ -65,6 +66,8 @@ export default function DebatePage() {
               submitting={startDebate.isPending}
               error={startDebate.error?.message}
             />
+
+            <DebatePreview />
 
             <Card>
               <CardContent className="grid gap-4 pt-5 sm:grid-cols-3">

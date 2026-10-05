@@ -1,4 +1,4 @@
-import GlassCard from '@/components/legalai/GlassCard';
+import GlassCard from '@/components/lawmate/GlassCard';
 import { cn } from '@/lib/utils';
 
 interface ScoreboardProps {
