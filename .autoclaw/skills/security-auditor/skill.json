@@ -1,0 +1,51 @@
+{
+  "id": "security-auditor",
+  "version": "1.0.0",
+  "kind": "review",
+  "summary": "Review any change that touches I/O boundaries.",
+  "inputs": [
+    {
+      "name": "diff",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "scope",
+      "type": "array",
+      "items": "string",
+      "required": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "findings",
+      "type": "array",
+      "items": "{severity, path, issue, remediation}"
+    },
+    {
+      "name": "verdict",
+      "type": "string",
+      "enum": [
+        "pass",
+        "block"
+      ]
+    }
+  ],
+  "triggers": [
+    "audit",
+    "review-security"
+  ],
+  "model": "legal-reasoner-v1",
+  "tools": [
+    "fs_read"
+  ],
+  "escalation": {
+    "on": [
+      "oversize-diff"
+    ],
+    "via": "orchestrator/comms/_wip/gate.json"
+  },
+  "tags": [
+    "security"
+  ]
+}

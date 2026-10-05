@@ -1,0 +1,4 @@
+{"id":"dw-001","input":{"kind":"memo","source":{"issue":"x","rule":"y","application":"z","conclusion":"w"},"lang":"en"},"expect":{"status":"ok","contains":"Legal Memorandum"}}
+{"id":"dw-002","input":{"kind":"summary","source":{},"lang":"en"},"expect":{"status":"escalate","reason":"empty-source"}}
+{"id":"dw-003","input":{"kind":"summary","source":{"text":"One. Two. Three."},"lang":"ms"},"expect":{"status":"ok","contains":"Kesimpulan"}}
+{"id":"dw-004","input":{"kind":"commit","source":{"diff":"x"},"lang":"en"},"expect":{"status":"ok","min_lines":1}}

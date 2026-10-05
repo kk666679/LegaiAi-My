@@ -1,0 +1,19 @@
+{
+  "project": "LegaiAi-My",
+  "current_sprint": null,
+  "total_sprints": 0,
+  "tasks_complete": 0,
+  "tasks_total": 0,
+  "agents": {
+    "hermes":     { "status": "idle",   "sprint": null, "tasks": [] },
+    "architect":  { "status": "idle",   "sprint": null, "tasks": [] },
+    "doc-writer": { "status": "idle",   "sprint": null, "tasks": [] }
+  },
+  "loop": {
+    "hermes":     { "cycles_run": 0 },
+    "architect":  { "cycles_run": 0 },
+    "doc-writer": { "cycles_run": 0 }
+  },
+  "last_updated": "2026-10-04T22:56:54.000Z",
+  "_note": "Shape per .clinerules/orchestrate.md State Tracking. `loop.<agent>.cycles_run` is read by revive.4 to compute {{next_iter}}; `agents.<id>.tasks` supplies {{last_task_id}}. Sprint YAMLs in orchestrator/sprints/ are the source of truth for sprint status."
+}

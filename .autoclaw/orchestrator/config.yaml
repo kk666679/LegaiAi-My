@@ -1,0 +1,99 @@
+# .autoclaw/orchestrator/config.yaml
+# Orchestrator global settings. Spec: .clinerules/orchestrate.md
+#
+# `init` semantics (spec init.1): if this file exists, report current config
+# and skip creation. It is the first thing read, so it must be complete.
+#
+# NOTE ON GATES: spec review.2 names `go build` / `go vet` / `go test` as
+# example gates. This repository has no go.mod, so those gates are replaced
+# with the toolchain that is actually installed (tsc / eslint / next build).
+
+version: 1
+
+agents:
+  # Parallel worker slots available to the bin-packing step (spec plan Phase 5).
+  work_agents: 4
+
+  # Stall threshold in seconds. Referenced twice by the spec:
+  #   - status: "the registry's agents.heartbeat_stall_seconds (default 300)"
+  #   - assign: autoclaw.orchestrate.heartbeatStallSeconds (default 300)
+  # Mirrored into comms/registry.json at top level, since a key literally named
+  # agents.heartbeat_stall_seconds would collide with the agent-id map.
+  heartbeat_stall_seconds: 300
+
+  # Per-agent registration. keepalive_template resolves in this order
+  # (spec revive.2): per-project override, then shipped skill default.
+  registry:
+    hermes:
+      loop_mechanism: cli-headless
+      keepalive_template: templates/keepalive/hermes.md
+    architect:
+      loop_mechanism: plain-message
+      keepalive_template: templates/keepalive/architect.md
+    doc-writer:
+      loop_mechanism: plain-message
+      keepalive_template: templates/keepalive/doc-writer.md
+
+planning:
+  max_tasks_per_agent: 4
+  max_subtasks_per_sprint: 12
+  # Capability-aware routing (spec plan Phase 5) is inert until the registry
+  # carries v2 fields: capabilities, trust_level, cost_budget,
+  # max_parallel_tasks, languages_supported.
+  capability_routing: false
+
+git:
+  base_branch: develop
+  conflict_prevention:
+    # Sequential non-overlapping migration ranges per agent per sprint
+    # (spec plan Phase 6).
+    migration_range_size: 1000
+
+gates:
+  # Quality gates executed during review (spec review.2). Substituted for the
+  # spec's Go examples because this workspace has no go.mod.
+  - name: typecheck
+    command: node_modules/.bin/tsc --noEmit
+    blocking: true
+  - name: lint
+    command: npm run lint
+    blocking: true
+  - name: build
+    command: npm run build
+    blocking: false
+  - name: autoclaw-check
+    command: npm run check --prefix .autoclaw
+    blocking: true
+
+review:
+  checklist: skills/orchestrate/templates/review-checklist.md
+  signal_template: skills/orchestrate/templates/completion-signal.md
+  assignment_template: skills/orchestrate/templates/sprint-assignment.md
+  # A single unchecked box rejects; there is no "note and approve" path.
+  reject_on_unchecked: true
+  # Estimated-days multiplier after which an unfinished agent is flagged stalled
+  # (spec Error Handling).
+  timeout_multiplier: 2
+
+scope:
+  # Scope isolation is sacred (spec Operating Rules 4). Conflicting tasks at
+  # the same level must be split across sprints or agents.
+  enforce_isolation: true
+  detect_overlap: true
+
+logging:
+  comms_log: orchestrator/comms/comms-log.jsonl
+  loop_journal: orchestrator/comms/loop-journal.jsonl
+  heartbeats_dir: orchestrator/comms/heartbeats
+  logs_dir: orchestrator/logs
+  reviews_dir: orchestrator/reviews
+  sprints_dir: orchestrator/sprints
+  manifests_dir: orchestrator/manifests
+  state_file: orchestrator/state.json
+
+paths:
+  agents_dir: orchestrator/agents
+  wip_dir: orchestrator/comms/_wip
+  gc_dir: orchestrator/comms/_gc
+  archive_dir: orchestrator/comms/inboxes/_archive
+  safety_mode: safety/mode

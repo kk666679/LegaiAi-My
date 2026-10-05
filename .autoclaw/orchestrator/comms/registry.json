@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "heartbeat_stall_seconds": 300,
+  "_note": "loop_mechanism and keepalive_template are required by .clinerules/orchestrate.md revive.1-2. heartbeat_stall_seconds is read by status as 'the registry's agents.heartbeat_stall_seconds'; it is held at top level because a literal agents.heartbeat_stall_seconds key would collide with the agent-id map. Mirrored in orchestrator/config.yaml under agents.heartbeat_stall_seconds.",
+  "agents": {
+    "hermes":     { "skill": "hermes",     "role": "worker",  "loop_mechanism": "cli-headless",  "keepalive_template": "templates/keepalive/hermes.md",     "capabilities": ["kg","retrieval","hitl"] },
+    "architect":  { "skill": "architect",  "role": "planner", "loop_mechanism": "plain-message", "keepalive_template": "templates/keepalive/architect.md",  "capabilities": ["design","review"] },
+    "doc-writer": { "skill": "doc-writer", "role": "worker",  "loop_mechanism": "plain-message", "keepalive_template": "templates/keepalive/doc-writer.md", "capabilities": ["writing","i18n"] }
+  },
+  "channels": {
+    "shared":  "orchestrator/comms/inboxes/shared",
+    "archive": "orchestrator/comms/inboxes/_archive"
+  }
+}

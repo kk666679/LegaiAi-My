@@ -1,0 +1,57 @@
+{
+  "id": "architect",
+  "version": "1.0.0",
+  "kind": "reasoning",
+  "summary": "Design workflows, decompose sprint items, review proposals for structural correctness.",
+  "inputs": [
+    {
+      "name": "objective",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "constraints",
+      "type": "array",
+      "items": "string",
+      "required": false
+    },
+    {
+      "name": "context",
+      "type": "object",
+      "required": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "plan",
+      "type": "array",
+      "items": "{skill, inputs}"
+    },
+    {
+      "name": "risks",
+      "type": "array",
+      "items": "{risk, mitigation}"
+    }
+  ],
+  "triggers": [
+    "design",
+    "decompose",
+    "plan",
+    "structure-review"
+  ],
+  "model": "legal-reasoner-v1",
+  "tools": [
+    "kg_query"
+  ],
+  "escalation": {
+    "on": [
+      "ambiguous-objective",
+      "missing-constraints"
+    ],
+    "via": "orchestrator/comms/_wip/gate.json"
+  },
+  "tags": [
+    "planning",
+    "design"
+  ]
+}

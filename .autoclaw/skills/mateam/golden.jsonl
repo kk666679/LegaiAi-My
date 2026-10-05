@@ -1,0 +1,3 @@
+{"id":"mt-001","input":{"item":{"id":"T-1"},"participants":["a","b"],"roles":{"a":"writer","b":"reviewer"}},"expect":{"status":"ok","min_plan":1,"min_deadlocks":0}}
+{"id":"mt-002","input":{"item":{"id":"T-2"},"participants":["a","b"],"roles":{"a":"writer","b":"writer"}},"expect":{"status":"escalate","reason":"role-collision"}}
+{"id":"mt-003","input":{"item":{"id":"T-3"},"participants":["a","b","c"],"roles":{"a":"w","b":"r","c":"w"}},"expect":{"status":"ok","min_plan":2}}

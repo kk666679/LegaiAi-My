@@ -1,0 +1,52 @@
+{
+  "id": "kdream",
+  "version": "1.0.0",
+  "kind": "action",
+  "summary": "Run a knowledge-graph consolidation cycle during idle time.",
+  "inputs": [
+    {
+      "name": "mode",
+      "type": "string",
+      "enum": [
+        "light",
+        "deep",
+        "rem",
+        "focused"
+      ],
+      "required": true
+    },
+    {
+      "name": "dryRun",
+      "type": "boolean",
+      "required": false,
+      "default": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "report",
+      "type": "object",
+      "items": "{ cycleId, mode, dryRun, ok, ms, dreamSetSize, phases }"
+    }
+  ],
+  "triggers": [
+    "idle",
+    "consolidate",
+    "dream"
+  ],
+  "model": "none",
+  "tools": [
+    "kg_read",
+    "kg_write"
+  ],
+  "escalation": {
+    "on": [
+      "dryRun-violated",
+      "ceiling-exceeded"
+    ],
+    "via": "orchestrator/comms/_wip/gate.json"
+  },
+  "tags": [
+    "maintenance"
+  ]
+}

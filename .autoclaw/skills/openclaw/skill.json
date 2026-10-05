@@ -1,0 +1,52 @@
+{
+  "id": "openclaw",
+  "version": "1.0.0",
+  "kind": "action",
+  "summary": "Interact with the file-backed comms queue runtime.",
+  "inputs": [
+    {
+      "name": "channel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "enum": [
+        "poll",
+        "ack",
+        "requeue"
+      ],
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "messages",
+      "type": "array"
+    },
+    {
+      "name": "acked",
+      "type": "number"
+    }
+  ],
+  "triggers": [
+    "inbox-poll",
+    "inbox-ack"
+  ],
+  "model": "none",
+  "tools": [
+    "fs_read",
+    "fs_rename"
+  ],
+  "escalation": {
+    "on": [
+      "lock-held",
+      "outside-inboxes-path"
+    ],
+    "via": "orchestrator/comms/_wip/gate.json"
+  },
+  "tags": [
+    "runtime"
+  ]
+}

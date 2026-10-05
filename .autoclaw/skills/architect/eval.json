@@ -1,0 +1,27 @@
+{
+  "version": "1.0.0",
+  "metrics": [
+    {
+      "name": "plan_min_steps",
+      "target": 2
+    },
+    {
+      "name": "risk_coverage",
+      "target": 0.8
+    },
+    {
+      "name": "constraint_respect",
+      "target": 1
+    }
+  ],
+  "judge": {
+    "kind": "rubric",
+    "criteria": [
+      "decomposition",
+      "constraint-respect",
+      "reversibility"
+    ]
+  },
+  "minGolden": 3,
+  "severity": "warn"
+}

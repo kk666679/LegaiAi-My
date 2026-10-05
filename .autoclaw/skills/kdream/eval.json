@@ -1,0 +1,27 @@
+{
+  "version": "1.0.0",
+  "metrics": [
+    {
+      "name": "dryRun_no_writes",
+      "target": 1.0
+    },
+    {
+      "name": "ceiling_respect",
+      "target": 1.0
+    },
+    {
+      "name": "mode_phase_shape",
+      "target": 1.0
+    }
+  ],
+  "judge": {
+    "kind": "rubric",
+    "criteria": [
+      "dry-run-safety",
+      "ceiling-discipline",
+      "reversibility"
+    ]
+  },
+  "minGolden": 3,
+  "severity": "block"
+}

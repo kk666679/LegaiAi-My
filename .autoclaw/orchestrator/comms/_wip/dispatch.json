@@ -1,0 +1,16 @@
+{
+  "tick": 1285,
+  "dispatched": [
+    {
+      "agent": "architect",
+      "item": "T-104",
+      "priority": 60
+    },
+    {
+      "agent": "doc-writer",
+      "item": "T-103",
+      "priority": 50
+    }
+  ],
+  "ts": "2026-10-04T22:53:40.937Z"
+}

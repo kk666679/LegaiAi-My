@@ -1,0 +1,58 @@
+{
+  "id": "autobuild",
+  "version": "1.0.0",
+  "kind": "action",
+  "summary": "Compile, test, or package after a code change.",
+  "inputs": [
+    {
+      "name": "paths",
+      "type": "array",
+      "items": "string",
+      "required": true
+    },
+    {
+      "name": "target",
+      "type": "string",
+      "enum": [
+        "check",
+        "build",
+        "package"
+      ],
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "status",
+      "type": "string",
+      "enum": [
+        "ok",
+        "failed"
+      ]
+    },
+    {
+      "name": "log",
+      "type": "string"
+    }
+  ],
+  "triggers": [
+    "check",
+    "build",
+    "package"
+  ],
+  "model": "none",
+  "tools": [
+    "exec_npm"
+  ],
+  "escalation": {
+    "on": [
+      "eacces",
+      "permission-denied",
+      "credentials-required"
+    ],
+    "via": "orchestrator/comms/_wip/gate.json"
+  },
+  "tags": [
+    "build"
+  ]
+}

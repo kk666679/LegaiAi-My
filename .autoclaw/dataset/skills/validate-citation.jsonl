@@ -1,0 +1,3 @@
+{"id":"vc-001","input":{"proposal":"See [R1].","rules":[{"id":"R1"}]},"expect":{"vote":"yes"}}
+{"id":"vc-002","input":{"proposal":"See [X9].","rules":[{"id":"R1"}]},"expect":{"vote":"no"}}
+{"id":"vc-003","input":{"proposal":"No citations here.","rules":[{"id":"R1"}]},"expect":{"vote":"abstain"}}

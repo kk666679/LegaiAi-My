@@ -1,0 +1,28 @@
+{
+  "window": "rolling-7d",
+  "generatedAt": "2026-10-05T00:00:00.000Z",
+  "sprints": {
+    "total": 12,
+    "completed": 10,
+    "abandoned": 2,
+    "completionRate": 0.8333
+  },
+  "agents": {
+    "hermes":    { "items": 42, "avgLatencyMs": 1840, "errorRate": 0.024 },
+    "architect": { "items": 17, "avgLatencyMs": 9200, "errorRate": 0.058 },
+    "doc-writer":{ "items": 31, "avgLatencyMs": 2100, "errorRate": 0.010 }
+  },
+  "consensus": {
+    "votes": 128,
+    "accepted": 96,
+    "rejected": 32,
+    "acceptanceRate": 0.75,
+    "avgConfidence": 0.812
+  },
+  "hitl": {
+    "escalated": 24,
+    "autoApproved": 104,
+    "escalationRate": 0.1875,
+    "medianResolutionMs": 240000
+  }
+}

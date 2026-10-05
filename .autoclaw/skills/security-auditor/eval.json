@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "metrics": [
+    {
+      "name": "never_auto_remediates",
+      "target": 1
+    },
+    {
+      "name": "high_implies_block",
+      "target": 1
+    }
+  ],
+  "judge": {
+    "kind": "rubric",
+    "criteria": [
+      "severity-rubric",
+      "no-mutation",
+      "oversize-refusal"
+    ]
+  },
+  "minGolden": 3,
+  "severity": "block"
+}

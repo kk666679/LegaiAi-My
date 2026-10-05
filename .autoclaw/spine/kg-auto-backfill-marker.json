@@ -1,0 +1,7 @@
+{
+  "lastBackfillAt": "2026-10-04T23:00:00.000Z",
+  "processedNodes": 1284,
+  "processedEdges": 3109,
+  "checksum": "sha256:0f1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8",
+  "nextBackfillDueAt": "2026-10-05T23:00:00.000Z"
+}

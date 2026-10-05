@@ -1,0 +1,22 @@
+{
+  "version": "1.0.0",
+  "metrics": [
+    {
+      "name": "every_claim_cites_source",
+      "target": 1
+    },
+    {
+      "name": "confidence_calibrated",
+      "target": 0.8
+    }
+  ],
+  "judge": {
+    "kind": "rubric",
+    "criteria": [
+      "support-traceability",
+      "confidence-reflects-source"
+    ]
+  },
+  "minGolden": 3,
+  "severity": "block"
+}

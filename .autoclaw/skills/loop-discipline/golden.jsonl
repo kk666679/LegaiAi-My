@@ -1,0 +1,3 @@
+{"id":"ld-001","input":{"agent":"hermes","safety":"active","item":"T-101"},"expect":{"status":"ok","actions":["read","claim","work","log","release"]}}
+{"id":"ld-002","input":{"agent":"hermes","safety":"paused","item":"T-101"},"expect":{"status":"escalate","reason":"safety-mode-nonactive"}}
+{"id":"ld-003","input":{"agent":"hermes","safety":"active","item":"T-999","staleClaim":true},"expect":{"status":"escalate","reason":"stale-claim"}}

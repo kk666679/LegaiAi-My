@@ -1,0 +1,3 @@
+{"id":"irac-001","input":{"query":"unfair dismissal Malaysia","k":5},"expect":{"workflow":"irac","minIssues":1}}
+{"id":"irac-002","input":{"query":"constructive dismissal burden of proof"},"expect":{"workflow":"irac"}}
+{"id":"irac-003","input":{"query":"termination without notice"},"expect":{"workflow":"irac","minIssues":1}}

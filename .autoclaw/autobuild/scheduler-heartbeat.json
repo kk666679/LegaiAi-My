@@ -1,0 +1,23 @@
+{
+  "scheduler": "autoclaw-heartbeat",
+  "version": "1.0.0",
+  "lastBeat": "2026-10-04T23:04:17.344Z",
+  "intervalMs": 60000,
+  "consecutiveMisses": 0,
+  "maxMisses": 3,
+  "state": "healthy",
+  "targets": [
+    {
+      "name": "board",
+      "intervalMs": 120000
+    },
+    {
+      "name": "gc",
+      "intervalMs": 900000
+    },
+    {
+      "name": "dream",
+      "intervalMs": 3600000
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "version": "1.0.0",
+  "metrics": [
+    {
+      "name": "max_parallel_respected",
+      "target": 1
+    },
+    {
+      "name": "priority_ordering",
+      "target": 1
+    },
+    {
+      "name": "one_agent_per_item",
+      "target": 1
+    }
+  ],
+  "judge": {
+    "kind": "rubric",
+    "criteria": [
+      "parallelism-bound",
+      "priority-respected",
+      "unique-assignment"
+    ]
+  },
+  "minGolden": 3,
+  "severity": "block"
+}

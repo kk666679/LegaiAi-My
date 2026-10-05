@@ -1,0 +1,20 @@
+{
+  "window": "rolling-24h",
+  "generatedAt": "2026-10-05T00:00:00.000Z",
+  "totals": {
+    "inputTokens": 2841000,
+    "outputTokens": 412000,
+    "cacheReads": 812000,
+    "cacheWrites": 19000
+  },
+  "perModel": {
+    "legal-reasoner-v1": { "input": 1420000, "output": 210000 },
+    "legal-writer-v1":   { "input": 890000,  "output": 168000 },
+    "embed-v1":          { "input": 531000,  "output": 34000  }
+  },
+  "budget": {
+    "dailyCap": 4000000,
+    "usedFraction": 0.813,
+    "state": "healthy"
+  }
+}

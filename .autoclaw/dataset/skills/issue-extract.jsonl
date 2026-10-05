@@ -1,0 +1,3 @@
+{"id":"ie-001","input":{"query":"Is this unfair dismissal?"},"expect":{"minIssues":1}}
+{"id":"ie-002","input":{"query":"Breach of contract. Also negligence?"},"expect":{"minIssues":1}}
+{"id":"ie-003","input":{"query":""},"expect":{"issues":[]}}

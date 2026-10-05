@@ -1,0 +1,27 @@
+{
+  "version": "1.0.0",
+  "metrics": [
+    {
+      "name": "no_fabricated_ids",
+      "target": 1
+    },
+    {
+      "name": "budget_respected",
+      "target": 1
+    },
+    {
+      "name": "read_only_kg",
+      "target": 1
+    }
+  ],
+  "judge": {
+    "kind": "rubric",
+    "criteria": [
+      "source-fidelity",
+      "budget-discipline",
+      "no-writes"
+    ]
+  },
+  "minGolden": 3,
+  "severity": "block"
+}

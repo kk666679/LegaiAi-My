@@ -1,0 +1,12 @@
+{
+  "defaults": {
+    "k": 8,
+    "minScore": 0.2,
+    "rerank": false
+  },
+  "agents": {
+    "hermes":     { "k": 12, "rerank": true  },
+    "architect":  { "k": 6,  "rerank": false },
+    "doc-writer": { "k": 8,  "rerank": false }
+  }
+}

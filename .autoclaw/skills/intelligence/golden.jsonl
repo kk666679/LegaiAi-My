@@ -1,0 +1,3 @@
+{"id":"in-001","input":{"sources":[{"id":"s1","text":"A"}],"question":"q"},"expect":{"status":"ok","min_claims":1}}
+{"id":"in-002","input":{"sources":[],"question":"q"},"expect":{"status":"escalate","reason":"insufficient"}}
+{"id":"in-003","input":{"sources":[{"id":"s1"}],"question":"q"},"expect":{"status":"ok","claim_supports_present":true}}

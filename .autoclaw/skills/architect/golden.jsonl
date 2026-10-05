@@ -1,0 +1,3 @@
+{"id":"arch-001","input":{"objective":"Add EN<->MS translation drift check"},"expect":{"status":"ok","min_plan":2,"min_risks":1}}
+{"id":"arch-002","input":{"objective":""},"expect":{"status":"escalate","reason":"ambiguous-objective"}}
+{"id":"arch-003","input":{"objective":"Backfill KG edges","constraints":["no-writes-to-kg"]},"expect":{"status":"ok","contains":"no-writes-to-kg"}}

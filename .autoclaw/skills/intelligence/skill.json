@@ -1,0 +1,48 @@
+{
+  "id": "intelligence",
+  "version": "1.0.0",
+  "kind": "reasoning",
+  "summary": "Convert raw retrieved material into structured claims.",
+  "inputs": [
+    {
+      "name": "sources",
+      "type": "array",
+      "items": "object",
+      "required": true
+    },
+    {
+      "name": "question",
+      "type": "string",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "claims",
+      "type": "array",
+      "items": "{text, supports, confidence}"
+    },
+    {
+      "name": "insufficient",
+      "type": "boolean",
+      "required": false
+    }
+  ],
+  "triggers": [
+    "extract-claims",
+    "summarize-sources"
+  ],
+  "model": "legal-reasoner-v1",
+  "tools": [
+    "kg_query"
+  ],
+  "escalation": {
+    "on": [
+      "insufficient"
+    ],
+    "via": "orchestrator/comms/_wip/gate.json"
+  },
+  "tags": [
+    "reasoning"
+  ]
+}

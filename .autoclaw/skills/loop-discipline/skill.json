@@ -1,0 +1,35 @@
+{
+  "id": "loop-discipline",
+  "version": "1.0.0",
+  "kind": "behavioral",
+  "summary": "Each agent turn does exactly one unit of work, then stops.",
+  "inputs": [
+    {
+      "name": "agent",
+      "type": "string",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "turn",
+      "type": "object",
+      "items": "{read, claim, work, log, release}"
+    }
+  ],
+  "triggers": [
+    "turn-start"
+  ],
+  "model": "none",
+  "tools": [],
+  "escalation": {
+    "on": [
+      "safety-mode-nonactive",
+      "stale-claim"
+    ],
+    "via": "orchestrator/comms/_wip/gate.json"
+  },
+  "tags": [
+    "behavior"
+  ]
+}

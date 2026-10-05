@@ -1,0 +1,3 @@
+{"id":"oc-001","input":{"channel":"inboxes/shared","action":"poll"},"expect":{"status":"ok","min_messages":0}}
+{"id":"oc-002","input":{"channel":"/etc/passwd","action":"poll"},"expect":{"status":"escalate","reason":"outside-inboxes-path"}}
+{"id":"oc-003","input":{"channel":"inboxes/shared","action":"ack","count":2},"expect":{"status":"ok","min_acked":0}}

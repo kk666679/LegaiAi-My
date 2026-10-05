@@ -1,0 +1,21 @@
+# Autoclaw orchestration hooks — starter config.
+# Copy to orchestrator/hooks.yaml and edit.
+
+version: 1
+
+hooks:
+  on_sprint_start:
+    - run: "npm run init"
+    - run: "npm run check"
+
+  on_item_claim:
+    - append: "orchestrator/comms/comms-log.jsonl"
+    - write:  "orchestrator/comms/loop-state.json"
+
+  on_item_complete:
+    - append: "orchestrator/audit/<YYYY-MM-DD>.jsonl"
+    - run:    "npm run board"
+
+  on_sprint_end:
+    - run: "npm run gc"
+    - run: "npm run dream"

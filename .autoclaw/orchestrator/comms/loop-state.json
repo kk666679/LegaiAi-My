@@ -1,0 +1,22 @@
+{
+  "tick": 1285,
+  "tickedAt": "2026-10-04T22:53:40.936Z",
+  "agents": {
+    "hermes": {
+      "state": "busy",
+      "item": "T-101",
+      "since": "2026-10-04T23:50:00.000Z"
+    },
+    "architect": {
+      "state": "busy",
+      "item": "T-104",
+      "since": "2026-10-04T22:53:40.936Z"
+    },
+    "doc-writer": {
+      "state": "busy",
+      "item": "T-103",
+      "since": "2026-10-04T22:53:40.936Z"
+    }
+  },
+  "supervisor": "orchestrator/comms/supervisor.lock.json"
+}

@@ -1,0 +1,8 @@
+{
+  "agent": "doc-writer",
+  "timestamp": "2026-10-04T20:00:00.000Z",
+  "state": "idle",
+  "item": null,
+  "sprint": "sprint-2026-10-05",
+  "_note": "timestamp is the field compared against heartbeat_stall_seconds (default 300) by `status` and `revive`. Updated by the loop; do not hand-edit."
+}

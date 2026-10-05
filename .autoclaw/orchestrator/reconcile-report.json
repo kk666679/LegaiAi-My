@@ -1,0 +1,10 @@
+{
+  "generatedAt": "2026-10-05T00:15:00.000Z",
+  "boardOk": true,
+  "orphans": [],
+  "duplicates": [],
+  "staleClaims": [
+    { "itemId": "T-102", "owner": "architect", "claimedAt": "2026-10-04T18:00:00.000Z", "ageMinutes": 375 }
+  ],
+  "notes": "One stale claim detected; board not mutated."
+}

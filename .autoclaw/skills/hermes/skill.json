@@ -1,0 +1,50 @@
+{
+  "id": "hermes",
+  "version": "1.0.0",
+  "kind": "retrieval",
+  "summary": "General-purpose retrieval and multi-step research.",
+  "inputs": [
+    {
+      "name": "query",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "budget",
+      "type": "number",
+      "required": false,
+      "default": 6
+    }
+  ],
+  "outputs": [
+    {
+      "name": "findings",
+      "type": "array",
+      "items": "{nodeId, title, why}"
+    },
+    {
+      "name": "used",
+      "type": "number"
+    }
+  ],
+  "triggers": [
+    "search",
+    "retrieve",
+    "research"
+  ],
+  "model": "embed-v1",
+  "tools": [
+    "kg_query",
+    "kg_get_node",
+    "retrieve_hybrid"
+  ],
+  "escalation": {
+    "on": [
+      "zero-hits-after-broaden"
+    ],
+    "via": "orchestrator/comms/comms-log.jsonl"
+  },
+  "tags": [
+    "retrieval"
+  ]
+}

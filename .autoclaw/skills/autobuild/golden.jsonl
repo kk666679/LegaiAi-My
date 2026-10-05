@@ -1,0 +1,3 @@
+{"id":"ab-001","input":{"paths":["x.js"],"target":"check"},"expect":{"status":"ok"}}
+{"id":"ab-002","input":{"paths":["x.js"],"target":"build"},"expect":{"status":"failed","contains":"syntax error"}}
+{"id":"ab-003","input":{"paths":["/root/x"],"target":"check"},"expect":{"status":"escalate","reason":"permission-denied"}}

@@ -1,0 +1,4 @@
+{"id":"kd-001","input":{"mode":"light","dryRun":true},"expect":{"status":"ok","phases":["replay","prune"]}}
+{"id":"kd-002","input":{"mode":"deep","dryRun":true},"expect":{"status":"ok","phases":["replay","consolidate","prune","enrich"]}}
+{"id":"kd-003","input":{"mode":"rem","dryRun":true},"expect":{"status":"ok","phases":["replay","enrich","reflect"]}}
+{"id":"kd-004","input":{"mode":"focused","dryRun":true},"expect":{"status":"ok","phases":["replay","reflect"]}}

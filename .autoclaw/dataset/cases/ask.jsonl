@@ -1,0 +1,2 @@
+{"id":"ask-001","input":{"query":"what is constructive dismissal","k":3},"expect":{"workflow":"ask","minSources":1}}
+{"id":"ask-002","input":{"query":"Employment Act 1955 s.14"},"expect":{"workflow":"ask"}}

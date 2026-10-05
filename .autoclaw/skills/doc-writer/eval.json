@@ -1,0 +1,27 @@
+{
+  "version": "1.0.0",
+  "metrics": [
+    {
+      "name": "cites_only_source",
+      "target": 1
+    },
+    {
+      "name": "no_first_person",
+      "target": 1
+    },
+    {
+      "name": "bilingual_when_requested",
+      "target": 1
+    }
+  ],
+  "judge": {
+    "kind": "rubric",
+    "criteria": [
+      "source-fidelity",
+      "tone",
+      "bilingual-consistency"
+    ]
+  },
+  "minGolden": 3,
+  "severity": "block"
+}

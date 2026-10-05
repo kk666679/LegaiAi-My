@@ -1,0 +1,3 @@
+{"id":"he-001","input":{"query":"unfair dismissal","budget":6},"expect":{"status":"ok","min_findings":1}}
+{"id":"he-002","input":{"query":"xyzzynotathing"},"expect":{"status":"ok","min_findings":0,"max_findings":0}}
+{"id":"he-003","input":{"query":"unfair dismissal","budget":1},"expect":{"status":"ok","max_used":1}}

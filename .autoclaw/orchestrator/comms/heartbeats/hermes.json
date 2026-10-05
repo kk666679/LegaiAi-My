@@ -1,0 +1,8 @@
+{
+  "agent": "hermes",
+  "timestamp": "2026-10-04T23:50:00.000Z",
+  "state": "busy",
+  "item": "T-101",
+  "sprint": "sprint-2026-10-05",
+  "_note": "timestamp is the field compared against heartbeat_stall_seconds (default 300) by `status` and `revive`. Updated by the loop; do not hand-edit."
+}

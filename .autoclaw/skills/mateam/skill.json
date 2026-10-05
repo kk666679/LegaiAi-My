@@ -1,0 +1,51 @@
+{
+  "id": "mateam",
+  "version": "1.0.0",
+  "kind": "coordination",
+  "summary": "Coordinate two or more agents on a shared item.",
+  "inputs": [
+    {
+      "name": "item",
+      "type": "object",
+      "required": true
+    },
+    {
+      "name": "participants",
+      "type": "array",
+      "items": "string",
+      "required": true
+    },
+    {
+      "name": "roles",
+      "type": "object",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "plan",
+      "type": "array",
+      "items": "HANDOFF blocks"
+    },
+    {
+      "name": "deadlocks",
+      "type": "array"
+    }
+  ],
+  "triggers": [
+    "multi-agent",
+    "handoff"
+  ],
+  "model": "legal-reasoner-v1",
+  "tools": [],
+  "escalation": {
+    "on": [
+      "cycle-detected",
+      "role-collision"
+    ],
+    "via": "orchestrator/comms/_wip/gate.json"
+  },
+  "tags": [
+    "coordination"
+  ]
+}

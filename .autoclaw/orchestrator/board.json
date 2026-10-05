@@ -1,0 +1,36 @@
+{
+  "sprint": "sprint-2026-10-05",
+  "startedAt": "2026-10-05T00:00:00.000Z",
+  "state": "active",
+  "items": [
+    {
+      "id": "T-101",
+      "title": "Backfill KG edges for 2019-2022 case law",
+      "owner": "hermes",
+      "status": "in-progress",
+      "priority": 80
+    },
+    {
+      "id": "T-102",
+      "title": "Rewrite validate.citation to reject empty-rule conclusions",
+      "owner": "architect",
+      "status": "blocked",
+      "priority": 90,
+      "blocker": "awaiting-review"
+    },
+    {
+      "id": "T-103",
+      "title": "Add MS ↔ EN translation drift check",
+      "owner": "doc-writer",
+      "status": "in-progress",
+      "priority": 50
+    },
+    {
+      "id": "T-104",
+      "title": "Harden HITL timeout path",
+      "owner": "hermes",
+      "status": "in-progress",
+      "priority": 60
+    }
+  ]
+}

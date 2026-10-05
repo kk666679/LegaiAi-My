@@ -1,0 +1,8 @@
+{
+  "dim": 1024,
+  "model": "embed-v1",
+  "normalize": true,
+  "metric": "cosine",
+  "maxRows": 500000,
+  "backend": "sqlite"
+}

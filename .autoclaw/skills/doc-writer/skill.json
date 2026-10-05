@@ -1,0 +1,65 @@
+{
+  "id": "doc-writer",
+  "version": "1.0.0",
+  "kind": "generation",
+  "summary": "Produce prose: memos, summaries, READMEs, commits, changelogs.",
+  "inputs": [
+    {
+      "name": "kind",
+      "type": "string",
+      "enum": [
+        "memo",
+        "summary",
+        "readme",
+        "commit",
+        "changelog"
+      ],
+      "required": true
+    },
+    {
+      "name": "source",
+      "type": "object",
+      "required": true
+    },
+    {
+      "name": "lang",
+      "type": "string",
+      "enum": [
+        "en",
+        "ms"
+      ],
+      "required": false,
+      "default": "en"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "text",
+      "type": "string"
+    },
+    {
+      "name": "citations",
+      "type": "array",
+      "items": "{id, title}"
+    }
+  ],
+  "triggers": [
+    "write",
+    "summarize",
+    "document"
+  ],
+  "model": "legal-writer-v1",
+  "tools": [
+    "i18n_translate"
+  ],
+  "escalation": {
+    "on": [
+      "empty-source"
+    ],
+    "via": "orchestrator/comms/_wip/gate.json"
+  },
+  "tags": [
+    "writing",
+    "i18n"
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "metrics": [
+    {
+      "name": "single_item_per_turn",
+      "target": 1
+    },
+    {
+      "name": "no_unclaimed_chaining",
+      "target": 1
+    }
+  ],
+  "judge": {
+    "kind": "rubric",
+    "criteria": [
+      "single-work-unit",
+      "safety-check-first",
+      "release-or-escalate"
+    ]
+  },
+  "minGolden": 3,
+  "severity": "block"
+}

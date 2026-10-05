@@ -1,0 +1,8 @@
+{
+  "updatedAt": "2026-10-05T00:00:00.000Z",
+  "clusters": {
+    "legal-reasoning": { "agents": ["hermes","architect"], "channels": ["#reasoning"] },
+    "authoring":       { "agents": ["doc-writer"],          "channels": ["#writing"]   },
+    "ops":             { "agents": ["system"],              "channels": ["#ops"]       }
+  }
+}

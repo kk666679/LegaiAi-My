@@ -1,0 +1,51 @@
+{
+  "id": "orchestrate",
+  "version": "1.0.0",
+  "kind": "coordination",
+  "summary": "Run the sprint loop: allocate, dispatch, reconcile.",
+  "inputs": [
+    {
+      "name": "sprint",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "maxParallel",
+      "type": "number",
+      "required": false,
+      "default": 3
+    }
+  ],
+  "outputs": [
+    {
+      "name": "dispatch",
+      "type": "array",
+      "items": "{agent, item, reason}"
+    },
+    {
+      "name": "reconcile",
+      "type": "object",
+      "items": "{ok, orphans, duplicates, staleClaims}"
+    }
+  ],
+  "triggers": [
+    "tick",
+    "dispatch"
+  ],
+  "model": "none",
+  "tools": [
+    "board_read",
+    "board_write",
+    "comms_log"
+  ],
+  "escalation": {
+    "on": [
+      "board-divergent",
+      "stale-lock"
+    ],
+    "via": "orchestrator/comms/_wip/gate.json"
+  },
+  "tags": [
+    "orchestration"
+  ]
+}

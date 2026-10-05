@@ -1,0 +1,3 @@
+{"id":"or-001","input":{"sprint":"sprint-1","maxParallel":3,"idleAgents":["a","b"],"openItems":[{"id":"T-1","priority":80}]},"expect":{"status":"ok","min_dispatch":1}}
+{"id":"or-002","input":{"sprint":"sprint-1","maxParallel":3,"idleAgents":[],"openItems":[{"id":"T-1"}]},"expect":{"status":"ok","min_dispatch":0}}
+{"id":"or-003","input":{"sprint":"sprint-1","maxParallel":1,"idleAgents":["a","b","c"],"openItems":[{"id":"T-1"},{"id":"T-2"},{"id":"T-3"}]},"expect":{"status":"ok","max_dispatch":1}}

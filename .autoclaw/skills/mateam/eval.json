@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "metrics": [
+    {
+      "name": "one_direction_per_step",
+      "target": 1
+    },
+    {
+      "name": "control_returns_to_coordinator",
+      "target": 1
+    }
+  ],
+  "judge": {
+    "kind": "rubric",
+    "criteria": [
+      "linear-handoff",
+      "no-role-collision",
+      "coordinator-returns"
+    ]
+  },
+  "minGolden": 3,
+  "severity": "block"
+}
