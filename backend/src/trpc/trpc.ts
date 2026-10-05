@@ -35,4 +35,3 @@ export function permissionProcedure(permission: Permission) {
     return next({ ctx });
   });
 }
-

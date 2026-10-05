@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
-import { createRequire } from 'node:module'
 import { router, protectedProcedure, permissionProcedure } from '../trpc'
 import { prisma } from '../../db'
 import { TRPCError } from '@trpc/server'
@@ -13,7 +12,6 @@ import { writeAuditLog } from '../../lib/audit.js'
 import { hasPermission } from '../../lib/auth'
 import { getTemplateConfig, readTemplatePrompt, readTemplateSchema } from '../../templates/registry.js'
 
-const require = createRequire(import.meta.url)
 const lomClient: { normalizeActNumber: typeof NormalizeActNumber; inferDocumentType: typeof InferDocumentType } =
   require('../../../../.autoclaw/memory/interfaces/lom-client.js')
 const { normalizeActNumber, inferDocumentType } = lomClient

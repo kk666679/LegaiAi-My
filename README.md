@@ -2,7 +2,7 @@
 
 ![Version](https://img.shields.io/badge/version-1.0.9-blue?style=flat)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat&logo=next.js)
-![Node](https://img.shields.io/badge/Node-%3E=22-green?style=flat&logo=node.js)
+![Node](https://img.shields.io/badge/Node-%3E=24-green?style=flat&logo=node.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-7-blue?style=flat&logo=typescript)
 ![Prisma](https://img.shields.io/badge/Prisma-7-2D3748?style=flat&logo=prisma)
 ![License](https://img.shields.io/badge/License-MIT-yellow?style=flat)

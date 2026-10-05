@@ -1,15 +1,12 @@
 import { config } from 'dotenv'
-import { resolve, dirname } from 'path'
+import { resolve } from 'path'
 import { existsSync } from 'fs'
-import { fileURLToPath } from 'url'
 import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { Pool } from 'pg'
 
 declare const __dirname: string
-const here: string = typeof __dirname !== 'undefined'
-  ? __dirname
-  : dirname(fileURLToPath(import.meta.url))
+const here = __dirname
 
 function findRepoRoot(start: string): string {
   let dir = start
