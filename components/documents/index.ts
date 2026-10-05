@@ -1,4 +1,5 @@
 export { DocumentsNav, getDocumentsNavItems } from "./DocumentsNav";
+export { DocumentsShell } from "./DocumentsShell";
 export { DocumentWorkspace } from "./DocumentWorkspace";
 export {
   DocumentAIPanel,
