@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { DocumentSort, DocumentSortKey, SortDirection } from "../types";
+export type { DocumentSort } from "../types";
 
 export interface DocumentSortProps {
   value: DocumentSort;

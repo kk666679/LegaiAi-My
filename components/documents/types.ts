@@ -401,6 +401,7 @@ export interface DocumentFolder {
   parentId?: string | null;
   count?: number;
   system?: boolean;
+  children?: DocumentFolder[];
 }
 
 export interface LegalDocument {
