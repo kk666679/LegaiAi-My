@@ -114,6 +114,128 @@ export interface Document {
   classification: "public" | "internal" | "confidential" | "privileged";
   pageCount?: number;
   url?: string;
+  lastModified?: string;
+  matterClient?: string;
+  ownerName?: string;
+  owner?: DocumentOwner;
+  client?: { id: string; name: string };
+  statusBadge?: string;
+  tags?: string[];
+  version?: number;
+  versionsCount?: number;
+  aiInsights?: string;
+  sharedWithMe?: boolean;
+  [key: string]: unknown;
+}
+
+export interface DocumentOwner {
+  id: string;
+  name: string;
+  email?: string;
+  avatarUrl?: string;
+  [key: string]: unknown;
+}
+
+export interface DocumentBadge {
+  label: string;
+  tone?: "neutral" | "success" | "warning" | "danger";
+  [key: string]: unknown;
+}
+
+export interface DocumentVersion {
+  id: string;
+  documentId?: string;
+  label?: string;
+  version?: number;
+  versionNumber?: number;
+  isCurrent?: boolean;
+  authorId?: string;
+  authorName?: string;
+  author?: DocumentOwner;
+  createdAt?: string;
+  size?: number;
+  summary?: string;
+  changeSummary?: string;
+  current?: boolean;
+  [key: string]: unknown;
+}
+
+export type DocumentActivityKind =
+  | "created"
+  | "uploaded"
+  | "viewed"
+  | "edited"
+  | "analysed"
+  | "commented"
+  | "shared"
+  | "reviewed"
+  | "approved"
+  | "rejected"
+  | "exported"
+  | "archived"
+  | "restored"
+  | "version"
+  | "analyse"
+  | "share"
+  | "download"
+  | "review"
+  | "tag"
+  | "move"
+  | "edit";
+
+export interface DocumentActivity {
+  id: string;
+  documentId?: string;
+  kind: DocumentActivityKind;
+  actorId?: string;
+  actorName?: string;
+  actor?: DocumentOwner;
+  title?: string;
+  detail?: string;
+  target?: string;
+  timestamp?: string;
+  at?: string;
+  message?: string;
+  metadata?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+export interface DocumentComment {
+  id: string;
+  documentId?: string;
+  authorId?: string;
+  authorName?: string;
+  author?: DocumentOwner;
+  authorAvatarUrl?: string;
+  body?: string;
+  content?: string;
+  createdAt?: string;
+  resolved?: boolean;
+  replies?: DocumentComment[];
+  anchor?: {
+    page?: number;
+    x?: number;
+    y?: number;
+    excerpt?: string;
+  };
+  [key: string]: unknown;
+}
+
+export interface DocumentAnalysisSummary {
+  documentId?: string;
+  executiveSummary?: string;
+  keyClauses?: Array<{ title?: string; excerpt?: string; page?: number }>;
+  potentialRisks?: Array<{ title?: string; severity?: string; page?: number }>;
+  missingInformation?: string[];
+  importantDates?: string[];
+  parties?: string[];
+  obligations?: string[];
+  clauseCount?: number;
+  issuesCount?: number;
+  unusualClausesCount?: number;
+  lastAnalysedAt?: string;
+  confidence?: number;
+  [key: string]: unknown;
 }
 
 export type FindingKind =

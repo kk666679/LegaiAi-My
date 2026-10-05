@@ -1151,11 +1151,11 @@ const DOC: (Omit<Document, "id" | "owner"> & { ownerName: string })[] = [
   },
 ];
 
-export const MOCK_DOCUMENTS: Document[] = DOC.map((d, i) => ({
+export const MOCK_DOCUMENTS: Document[] = DOC.map((d, i): Document => ({
   id: `doc-${String(i + 1).padStart(3, "0")}`,
   ...d,
   owner: ownerOf(d.ownerName),
-}));
+} as Document));
 
 export const MOCK_DASHBOARD_METRICS: DashboardMetrics = {
   usage: MOCK_USAGE,
