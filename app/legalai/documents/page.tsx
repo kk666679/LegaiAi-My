@@ -30,6 +30,7 @@ import {
   Mail,
 } from "lucide-react";
 import { DashboardShell } from "@/components/lawmate/DashboardShell";
+import { DocumentsShell } from "@/components/documents";
 import { NewDocumentDialog } from "@/components/lawmate/NewDocumentDialog";
 import { UploadDialog } from "@/components/lawmate/UploadDialog";
 import { LegalDisclaimer } from "@/components/lawmate/LegalDisclaimer";
@@ -258,7 +259,8 @@ export default function DocumentsPage() {
 
   return (
     <DashboardShell>
-      <div className="space-y-6">
+      <DocumentsShell>
+        <div className="space-y-6">
         <PageHeader
           title="Documents"
           description="Upload, organise and act on the legal documents in your workspace."
@@ -788,6 +790,7 @@ export default function DocumentsPage() {
       </div>
 
       <UploadDialog open={uploadOpen} onOpenChange={setUploadOpen} />
+      </DocumentsShell>
     </DashboardShell>
   );
 }
