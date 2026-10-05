@@ -65,7 +65,10 @@ function StatCard({ icon: Icon, label, value, detail }: { icon: typeof FileText;
 }
 
 function DocumentRow({ document, clientName }: { document: DocumentListItem; clientName?: string }) {
-  const status = statusMeta[document.status] ?? statusMeta.draft;
+  const status = statusMeta[document.status] ?? {
+    label: "Draft",
+    className: "bg-muted text-muted-foreground",
+  };
   return <div className="group flex items-center gap-3 rounded-xl border bg-card p-3 transition-colors hover:bg-accent/40">
     <DocumentIcon type={document.docType} />
     <div className="min-w-0 flex-1"><Link href={`/legalai/documents/${document.id}`} className="truncate text-sm font-medium hover:text-primary hover:underline">{document.title}</Link><div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground"><span>{typeLabels[document.docType] ?? "Document"}</span><span aria-hidden>·</span><span>{clientName ?? "Workspace"}</span><span aria-hidden>·</span><span>v{document.version}</span></div></div>
@@ -102,7 +105,7 @@ export function DocumentsHub({ clients = [], onCreated }: { clients?: { id: stri
 
     <aside className="flex flex-col gap-4"><Card><CardHeader><CardTitle className="flex items-center gap-2 text-sm"><Sparkles className="text-primary" aria-hidden /> Workflows</CardTitle></CardHeader><CardContent className="flex flex-col gap-2"><Button variant="outline" className="justify-start" asChild><Link href="/legalai/drafting"><FileSignature data-icon="inline-start" /> Draft with AI</Link></Button><Button variant="outline" className="justify-start" asChild><Link href="/legalai/analysis"><BarChart3 data-icon="inline-start" /> Analyse a document</Link></Button><Button variant="outline" className="justify-start" asChild><Link href="/legalai/contracts"><ShieldCheck data-icon="inline-start" /> Review contracts</Link></Button></CardContent></Card><Card><CardHeader><CardTitle className="text-sm">Workspace health</CardTitle></CardHeader><CardContent className="flex flex-col gap-3"><div className="flex items-center justify-between text-sm"><span className="text-muted-foreground">Review completion</span><span className="font-medium">{stats?.total ? Math.round(((stats.byStatus?.approved ?? 0) / stats.total) * 100) : 0}%</span></div><Progress value={stats?.total ? ((stats.byStatus?.approved ?? 0) / stats.total) * 100 : 0} /><div className="flex items-center gap-2 text-xs text-muted-foreground"><Users aria-hidden /> Shared workspace controls enabled</div></CardContent></Card><Card className="bg-primary/5"><CardContent className="flex gap-3 pt-4"><Star className="mt-0.5 shrink-0 text-primary" aria-hidden /><div><p className="text-sm font-medium">Keep important work close</p><p className="mt-1 text-xs leading-relaxed text-muted-foreground">Favourite documents appear here for faster access and review.</p></div></CardContent></Card></aside></div>
 
-    <NewDocumentDialog clients={clients} open={createOpen} onOpenChange={setCreateOpen} onCreated={onCreated} /><UploadDialog open={uploadOpen} onOpenChange={setUploadOpen} />
+    <NewDocumentDialog clients={clients} onCreated={onCreated} /><UploadDialog open={uploadOpen} onOpenChange={setUploadOpen} />
   </div>;
 }
 

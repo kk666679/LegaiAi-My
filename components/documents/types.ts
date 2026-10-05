@@ -26,6 +26,9 @@ import {
   FileText,
   Gavel,
   Mail,
+  Star,
+  Users,
+  Archive,
 } from "lucide-react";
 
 /* ── Re-exported real data-layer types ─────────────────────────────────── */
@@ -59,6 +62,7 @@ import {
   type DocumentStatus as PersistedDocumentStatus,
   type DocumentType,
 } from "@/hooks/useDocuments";
+import type { DocumentParties } from "@/types/documents";
 
 export { DOC_COURTS, DOC_STATUSES, DOC_TYPES };
 
@@ -343,6 +347,10 @@ export interface AnalysisFinding {
   /** e.g. "risk" | "obligation" | "clause" | "date" | "party". */
   kind?: string;
   /** Page/section locator, when the source document exposes one. */
+  locator?: string;
+  evidenceIds?: string[];
+}
+
 /* ── Evidence & citations ──────────────────────────────────────────────── */
 
 export type EvidenceVerificationStatus =
@@ -498,9 +506,6 @@ export type DocumentRecord = DocumentListItem & {
   parties?: DocumentParties | null;
   jurisdiction?: string | null;
 };
-  locator?: string;
-  evidenceIds?: string[];
-}
 
 export interface AnalysisObligation {
   id: string;
@@ -523,23 +528,3 @@ export interface AnalysisParty {
   role: string;
   name: string;
 }
-    case "analysing":
-      return "review";
-    case "error":
-      return "critical";
-    case "archived":
-      return "archived";
-    default:
-      return "draft";
-  }
-}
-
-/* ── Type / court labels ───────────────────────────────────────────────── */
-
-export const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = Object.fromEntries(
-  DOC_TYPES.map((t) => [t.value, t.label]),
-) as Record<DocumentType, string>;
-
-export const DOCUMENT_COURT_LABELS: Record<DocumentCourt, string> = Object.fromEntries(
-  DOC_COURTS.map((c) => [c.value, c.label]),
-) as Record<DocumentCourt, string>;
