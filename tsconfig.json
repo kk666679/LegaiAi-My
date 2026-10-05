@@ -27,7 +27,7 @@
     "noImplicitAny": true,
     "noImplicitThis": true,
     "useUnknownInCatchVariables": true,
-    "alwaysStrict": true,    
+    "alwaysStrict": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "exactOptionalPropertyTypes": false,
@@ -72,15 +72,9 @@
       "~components/*": ["./components/*"]
     },
     "typeRoots": ["./node_modules/@types", "./types"],
-    "allowJs": true,
-    "checkJs": false,
     "plugins": [
-      { 
-        "name": "next" 
-      },
-      {
-        "name": "@typescript-eslint/eslint-plugin"
-      }
+      { "name": "next" },
+      { "name": "@typescript-eslint/eslint-plugin" }
     ]
   },
   "include": [

@@ -23,10 +23,12 @@
     "start": "tsx index.js",
     "dev": "concurrently \"npm run redis\" \"npm run workers:all\" \"npm run api:dev\" \"npm run dev:next\"",
     "dev:next": "next dev -p 3000",
-    "build": "next build --webpack",
+    "build": "node --max-old-space-size=1280 ./node_modules/next/dist/bin/next build --webpack",
     "start:next": "next start",
     "preview": "npm run build && npm run start:next",
-    "db:generate": "prisma generate --schema ./backend/prisma/schema.prisma",
+    "db:generate:backend": "prisma generate --schema ./backend/prisma/schema.prisma",
+    "db:generate:root": "prisma generate --schema ./prisma/schema.prisma",
+    "db:generate": "npm run db:generate:backend && npm run db:generate:root",
     "db:migrate": "prisma migrate dev --schema ./backend/prisma/schema.prisma",
     "db:push": "prisma db push --schema ./backend/prisma/schema.prisma",
     "db:studio": "prisma studio --schema ./backend/prisma/schema.prisma",
@@ -50,7 +52,7 @@
     "lom:validate": "node --test tests/autoclaw/citation-validator.test.js",
     "lom:monitor": "node scripts/lom-sync.mjs all",
     "lom:health": "node scripts/lom-health.mjs",
-    "postinstall": "node scripts/patch-ag-ui-core.mjs && prisma generate --schema ./backend/prisma/schema.prisma",
+    "postinstall": "node scripts/patch-ag-ui-core.mjs && npm run db:generate",
     "intent:list": "npx @tanstack/intent@latest list",
     "intent:install": "npx @tanstack/intent@latest install",
     "intent:validate": "npx @tanstack/intent@latest validate",
@@ -191,13 +193,13 @@
   "author": "Kurnia",
   "license": "MIT",
   "allowScripts": {
-    "@tensorflow/tfjs-node@4.22.0": true,
-    "core-js@3.29.1": true,
-    "protobufjs@6.11.6": true,
     "@prisma/engines": true,
     "esbuild": true,
     "msgpackr-extract": true,
     "prisma": true,
-    "sharp": true
+    "sharp": true,
+    "@tensorflow/tfjs-node": true,
+    "core-js": true,
+    "protobufjs": true
   }
 }

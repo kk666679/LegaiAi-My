@@ -1,11 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Cap webpack parallelism and enable its memory optimisations. This build has
+  // ~90 routes and runs on small containers; without these caps the build worker
+  // peaks high enough to be OOM-killed (it dies with SIGTERM, not a real error).
   experimental: {
     cpus: 1,
     webpackMemoryOptimizations: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
   },
   allowedDevOrigins: ['127.0.0.1', '*.daytonaproxy01.net'],
   async headers() {
