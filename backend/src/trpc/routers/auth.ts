@@ -42,7 +42,7 @@ export const authRouter = router({
       // Counted at entry so a caller cannot probe for free; forgiven on any
       // success. Per-IP and generous, because CONFLICT/NOT_FOUND below are
       // ordinary user mistakes rather than abuse.
-      recordThrottleFailure(keys[0], SIGNUP_POLICY)
+      recordThrottleFailure(keys[0]!, SIGNUP_POLICY)
 
       const existing = await prisma.user.findUnique({ where: { email: input.email } })
       if (existing) throw new TRPCError({ code: 'CONFLICT', message: 'Email already registered' })
@@ -84,7 +84,7 @@ export const authRouter = router({
       // endpoint's failures cannot lock out the others.
       const keys = [signupKey(ctx.ipAddress)]
       assertNotThrottled(keys, SIGNUP_POLICY)
-      recordThrottleFailure(keys[0], SIGNUP_POLICY)
+      recordThrottleFailure(keys[0]!, SIGNUP_POLICY)
 
       const existingUser = await prisma.user.findUnique({ where: { email: input.email } })
       if (existingUser) throw new TRPCError({ code: 'CONFLICT', message: 'Email already registered' })
@@ -197,7 +197,7 @@ export const authRouter = router({
       // separate from signup so its success cannot reset signup's budget.
       const keys = [orgKey(ctx.ipAddress, input.slug)]
       assertNotThrottled(keys, SIGNUP_POLICY)
-      recordThrottleFailure(keys[0], SIGNUP_POLICY)
+      recordThrottleFailure(keys[0]!, SIGNUP_POLICY)
 
       const existing = await prisma.organisation.findUnique({ where: { slug: input.slug } })
       if (existing) throw new TRPCError({ code: 'CONFLICT', message: 'Slug already taken' })

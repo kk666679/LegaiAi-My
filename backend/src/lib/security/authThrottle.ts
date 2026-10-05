@@ -38,6 +38,7 @@ export const SIGNUP_POLICY: ThrottlePolicy = { limit: 10, windowMs: 15 * 60_000,
 interface Bucket {
   failures: number
   firstFailureAt: number
+  windowMs: number
   lockedUntil: number
 }
 
@@ -109,7 +110,7 @@ export function recordThrottleFailure(key: string, policy: ThrottlePolicy): void
   prune(now)
   const bucket = buckets.get(key)
   if (!bucket || now - bucket.firstFailureAt > policy.windowMs) {
-    buckets.set(key, { failures: 1, firstFailureAt: now, lockedUntil: 0 })
+    buckets.set(key, { failures: 1, firstFailureAt: now, windowMs: policy.windowMs, lockedUntil: 0 })
     return
   }
   bucket.failures += 1
