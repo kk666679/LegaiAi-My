@@ -75,6 +75,7 @@ export function DocumentLibrary({
           onOpen={onOpen}
           onFavoriteChange={onFavoriteChange}
           onMenu={onMenu}
+          showFavorite={Boolean(onFavoriteChange)}
         />
       ) : view === "list" ? (
         <DocumentList
@@ -82,6 +83,7 @@ export function DocumentLibrary({
           onOpen={onOpen}
           onFavoriteChange={onFavoriteChange}
           onMenu={onMenu}
+          showFavorite={Boolean(onFavoriteChange)}
         />
       ) : (
         <DocumentTable

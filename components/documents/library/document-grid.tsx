@@ -10,6 +10,7 @@ export interface DocumentGridProps {
   onOpen?: (doc: LegalDocument) => void;
   onFavoriteChange?: (doc: LegalDocument, favorite: boolean) => void;
   onMenu?: (doc: LegalDocument, anchor: HTMLElement) => void;
+  showFavorite?: boolean;
 }
 
 export function DocumentGrid({
@@ -17,6 +18,7 @@ export function DocumentGrid({
   onOpen,
   onFavoriteChange,
   onMenu,
+  showFavorite,
 }: DocumentGridProps) {
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -27,6 +29,7 @@ export function DocumentGrid({
           onOpen={onOpen}
           onFavoriteChange={onFavoriteChange}
           onMenu={onMenu}
+          showFavorite={showFavorite}
         />
       ))}
     </div>

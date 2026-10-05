@@ -14,6 +14,7 @@ export interface DocumentRowProps {
   onOpen?: (doc: LegalDocument) => void;
   onFavoriteChange?: (doc: LegalDocument, favorite: boolean) => void;
   onMenu?: (doc: LegalDocument, anchor: HTMLElement) => void;
+  showFavorite?: boolean;
   className?: string;
 }
 
@@ -22,6 +23,7 @@ export function DocumentRow({
   onOpen,
   onFavoriteChange,
   onMenu,
+  showFavorite = false,
   className,
 }: DocumentRowProps) {
   const menuRef = React.useRef<HTMLButtonElement>(null);
@@ -55,24 +57,28 @@ export function DocumentRow({
       <span className="hidden w-24 truncate text-xs text-muted-foreground sm:block">
         {new Date(doc.updatedAt).toLocaleDateString()}
       </span>
-      <FavoriteToggle
-        active={Boolean(doc.favorite)}
-        onChange={(value) => onFavoriteChange?.(doc, value)}
-      />
-      <Button
-        ref={menuRef}
-        type="button"
-        variant="ghost"
-        size="icon"
-        className="size-7 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
-        aria-label={`Actions for ${doc.name}`}
-        onClick={(e) => {
-          e.stopPropagation();
-          if (menuRef.current) onMenu?.(doc, menuRef.current);
-        }}
-      >
-        <MoreHorizontal className="size-4" />
-      </Button>
+      {showFavorite && onFavoriteChange ? (
+        <FavoriteToggle
+          active={Boolean(doc.favorite)}
+          onChange={(value) => onFavoriteChange(doc, value)}
+        />
+      ) : null}
+      {onMenu ? (
+        <Button
+          ref={menuRef}
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="size-7 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+          aria-label={`Actions for ${doc.name}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (menuRef.current) onMenu(doc, menuRef.current);
+          }}
+        >
+          <MoreHorizontal className="size-4" />
+        </Button>
+      ) : null}
     </div>
   );
 }

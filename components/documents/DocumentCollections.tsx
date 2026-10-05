@@ -8,11 +8,13 @@ export function DocumentCollections({
   active = "all",
   counts = {},
   onSelect,
+  disabledCollections = [],
   className,
 }: {
   active?: DocumentCollectionId;
   counts?: Partial<Record<DocumentCollectionId, number>>;
   onSelect?: (collection: DocumentCollectionId) => void;
+  disabledCollections?: DocumentCollectionId[];
   className?: string;
 }) {
   return (
@@ -24,14 +26,19 @@ export function DocumentCollections({
         {DOCUMENT_COLLECTIONS.map((collection) => {
           const Icon = collection.icon;
           const selected = collection.id === active;
+          const disabled = disabledCollections.includes(collection.id);
           return (
             <button
               key={collection.id}
               type="button"
               onClick={() => onSelect?.(collection.id)}
               aria-pressed={selected}
+              aria-disabled={disabled}
+              disabled={disabled}
+              title={disabled ? "This collection is not available yet" : undefined}
               className={cn(
                 "flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors",
+                disabled && "cursor-not-allowed opacity-50",
                 selected
                   ? "bg-primary/10 font-medium text-primary"
                   : "text-muted-foreground hover:bg-accent hover:text-foreground",

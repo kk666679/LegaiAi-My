@@ -10,6 +10,7 @@ export interface DocumentListProps {
   onOpen?: (doc: LegalDocument) => void;
   onFavoriteChange?: (doc: LegalDocument, favorite: boolean) => void;
   onMenu?: (doc: LegalDocument, anchor: HTMLElement) => void;
+  showFavorite?: boolean;
 }
 
 export function DocumentList({
@@ -17,6 +18,7 @@ export function DocumentList({
   onOpen,
   onFavoriteChange,
   onMenu,
+  showFavorite,
 }: DocumentListProps) {
   return (
     <div className="space-y-2">
@@ -27,6 +29,7 @@ export function DocumentList({
           onOpen={onOpen}
           onFavoriteChange={onFavoriteChange}
           onMenu={onMenu}
+          showFavorite={showFavorite}
         />
       ))}
     </div>

@@ -15,6 +15,7 @@ export interface DocumentCardProps {
   onOpen?: (doc: LegalDocument) => void;
   onFavoriteChange?: (doc: LegalDocument, favorite: boolean) => void;
   onMenu?: (doc: LegalDocument, anchor: HTMLElement) => void;
+  showFavorite?: boolean;
   className?: string;
 }
 
@@ -23,6 +24,7 @@ export function DocumentCard({
   onOpen,
   onFavoriteChange,
   onMenu,
+  showFavorite = false,
   className,
 }: DocumentCardProps) {
   const menuRef = React.useRef<HTMLButtonElement>(null);
@@ -57,24 +59,28 @@ export function DocumentCard({
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <FavoriteToggle
-            active={Boolean(doc.favorite)}
-            onChange={(value) => onFavoriteChange?.(doc, value)}
-          />
-          <Button
-            ref={menuRef}
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="size-7 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
-            aria-label={`Actions for ${doc.name}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (menuRef.current) onMenu?.(doc, menuRef.current);
-            }}
-          >
-            <MoreHorizontal className="size-4" />
-          </Button>
+          {showFavorite && onFavoriteChange ? (
+            <FavoriteToggle
+              active={Boolean(doc.favorite)}
+              onChange={(value) => onFavoriteChange(doc, value)}
+            />
+          ) : null}
+          {onMenu ? (
+            <Button
+              ref={menuRef}
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-7 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+              aria-label={`Actions for ${doc.name}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (menuRef.current) onMenu(doc, menuRef.current);
+              }}
+            >
+              <MoreHorizontal className="size-4" />
+            </Button>
+          ) : null}
         </div>
       </div>
 
