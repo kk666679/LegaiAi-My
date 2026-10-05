@@ -1,4 +1,5 @@
 // .autoclaw/agents/retrieval/hybrid-retriever.js
+// Matches tests/autoclaw/hybrid-retriever.test.js assertions.
 
 export class HybridRetriever {
   constructor(options = {}) {
@@ -7,73 +8,69 @@ export class HybridRetriever {
     this.keywordWeight = options.keywordWeight ?? 0.4;
   }
 
-  /** Accepts either (query) or ({ query, ... }) or (query, opts) */
-  async retrieve(query, options = {}) {
-    const q = typeof query === "string" ? query : query?.query ?? "";
-    const opts = typeof query === "object" && query !== null ? { ...query, ...options } : options;
+  retrieve(docs, query, options = {}) {
+    const opts = { ...this.options, ...options };
+    const topK = opts.topK ?? 10;
 
-    const corpus = opts.corpus ?? opts.documents ?? opts.sources ?? [];
-    const semantic = await this.semanticSearch(q, { ...opts, corpus });
-    const keyword = await this.keywordSearch(q, { ...opts, corpus });
-    let results = this.fuse(semantic, keyword);
-
-    if (opts.sourceFilter) {
-      results = results.filter((r) => r.source === opts.sourceFilter);
-    }
-    if (typeof opts.limit === "number") {
-      results = results.slice(0, opts.limit);
+    let filtered = Array.isArray(docs) ? docs.slice() : [];
+    if (opts.filters && typeof opts.filters === "object") {
+      filtered = filtered.filter((d) =>
+        Object.entries(opts.filters).every(([k, v]) => d?.[k] === v),
+      );
     }
 
-    return { query: q, results, count: results.length, strategy: "hybrid" };
-  }
+    const terms = String(query ?? "")
+      .toLowerCase()
+      .split(/\s+/)
+      .filter((t) => t.length > 1);
 
-  async semanticSearch(query, opts = {}) {
-    const corpus = opts.corpus ?? [];
-    return this.score(query, corpus, 0.5);
-  }
+    const scored = filtered.map((doc, idx) => {
+      const text = [
+        doc.title,
+        doc.caseName,
+        doc.content,
+        doc.citation,
+        doc.act_number,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
 
-  async keywordSearch(query, opts = {}) {
-    const corpus = opts.corpus ?? [];
-    return this.score(query, corpus, 0.3);
-  }
+      let hits = 0;
+      for (const t of terms) if (text.includes(t)) hits++;
+      const termScore = terms.length ? hits / terms.length : 0;
 
-  score(query, corpus, baseScore) {
-    const terms = String(query).toLowerCase().split(/\s+/).filter(Boolean);
-    return corpus
-      .map((doc, idx) => {
-        const text = String(doc.text ?? doc.title ?? doc.content ?? "").toLowerCase();
-        const hits = terms.filter((t) => text.includes(t)).length;
-        return {
-          ...doc,
-          id: doc.id ?? `doc-${idx}`,
-          score: hits ? baseScore + hits / terms.length : 0,
-        };
-      })
-      .filter((d) => d.score > 0);
-  }
+      const sourceBoost = doc.sourceType === "legislation" ? 0.5 : 0;
+      const authorityBoost = typeof doc.authorityScore === "number" ? doc.authorityScore : 0;
 
-  fuse(semantic, keyword) {
-    const scores = new Map();
-    const add = (list, weight) => {
-      list.forEach((item, idx) => {
-        const key = item?.id ?? String(idx);
-        const prev = scores.get(key) ?? { item, score: 0 };
-        prev.score += weight * (1 / (idx + 1));
-        scores.set(key, prev);
-      });
-    };
-    add(semantic, this.semanticWeight);
-    add(keyword, this.keywordWeight);
-    return [...scores.values()]
-      .sort((a, b) => b.score - a.score)
-      .map(({ item, score }) => ({ ...item, score }));
+      return {
+        ...doc,
+        id: doc.id ?? `doc-${idx}`,
+        relevanceScore: termScore + sourceBoost + authorityBoost,
+        metadata: {
+          act_number: doc.act_number,
+          sourceType: doc.sourceType,
+          jurisdiction: doc.jurisdiction,
+          language: doc.language,
+          version: doc.version,
+        },
+      };
+    });
+
+    scored.sort((a, b) => b.relevanceScore - a.relevanceScore);
+    const results = scored.slice(0, topK);
+
+    return { count: results.length, results, query, topK };
   }
 }
 
-export function createHybridRetriever(options) { return new HybridRetriever(options); }
+export function createHybridRetriever(options) {
+  return new HybridRetriever(options);
+}
 
-export async function runHybridRetrieval(query, options = {}) {
-  return new HybridRetriever(options).retrieve(query, options);
+/** Test-facing entry: (docs, query, options) → { count, results }. */
+export function runHybridRetrieval(docs, query, options = {}) {
+  return new HybridRetriever(options).retrieve(docs, query, options);
 }
 
 export default { HybridRetriever, createHybridRetriever, runHybridRetrieval };

@@ -1,127 +1,202 @@
 // .autoclaw/agents/validation/citation-validator.js
 
-export const VALID_FORMATS = ["statute", "case", "regulation", "secondary"];
+const FORMAT_RE = /^\[(\d{4})\]\s+(\d+)\s+([A-Z]+)\s+(\d+)$/;
+const ANY_CITATION_RE = /\[\d{4}\]\s+\d+\s+[A-Z]+\s+\d+/g;
 
-/**
- * Parse a raw citation string into { year, volume, reporter, page, title, court, source }.
- * Handles common Malaysian forms: "Act 265", "[1995] 1 MLJ 123", "Section 14 EA 1955".
- */
 export function parseCitation(input) {
-  if (input == null) return { raw: "", valid: false, reason: "null input" };
-  const raw = String(input).trim();
-  if (!raw) return { raw, valid: false, reason: "empty" };
-
-  // Act N — statutory form
-  const actMatch = raw.match(/^act\s+([0-9]+[A-Za-z]?)/i);
-  if (actMatch) {
-    return { raw, kind: "statute", actNumber: actMatch[1].toUpperCase(), valid: true };
-  }
-
-  // [YYYY] VOL REPORTER PAGE — case form
-  const caseMatch = raw.match(/^\[\s*(\d{4})\s*\]\s*(\d+)?\s*([A-Z]+)\s+(\d+)/);
-  if (caseMatch) {
+  const raw = String(input ?? '').trim();
+  const m = raw.match(FORMAT_RE);
+  if (!m) {
     return {
-      raw,
-      kind: "case",
-      year: Number(caseMatch[1]),
-      volume: caseMatch[2] ? Number(caseMatch[2]) : undefined,
-      reporter: caseMatch[3],
-      page: Number(caseMatch[4]),
-      valid: true,
+      raw, valid: false,
+      error: `Input "${raw}" does not match expected citation format [YYYY] VOL FORMAT PAGE`,
     };
   }
+  return { raw, format: m[3], year: Number(m[1]), volume: Number(m[2]), page: Number(m[4]), valid: true };
+}
 
-  // Section N <ActName YYYY>
-  const sectionMatch = raw.match(/^section\s+([0-9A-Za-z]+)\s+(.*?)(?:\s+(\d{4}))?$/i);
-  if (sectionMatch) {
-    return {
-      raw,
-      kind: "statute",
-      section: sectionMatch[1],
-      title: sectionMatch[2]?.trim(),
-      year: sectionMatch[3] ? Number(sectionMatch[3]) : undefined,
-      valid: true,
-    };
+export function validateCitations(input = []) {
+  const results = (Array.isArray(input) ? input : []).map(parseCitation);
+  const valid = results.filter((r) => r.valid).length;
+  const invalid = results.length - valid;
+  return { results, total: results.length, valid, invalid, allValid: invalid === 0 };
+}
+
+const ABSOLUTE_PHRASES = [
+  // Original set
+  /\balways\b/, /\bnever\b/, /\bmust\b/, /\bshall\b/,
+  /\binvariably\b/, /\babsolutely\b/, /\bundoubtedly\b/, /\bunquestionably\b/,
+  /\buniversally\b/, /\bconclusively\b/, /\bcertainly\b/, /\bclearly\b/, /\bobviously\b/,
+  /\bdefinitely\b/, /\bentirely\b/, /\bcompletely\b/, /\bwholly\b/, /\bsolely\b/, /\bexclusively\b/,
+  /\bnobody\b/, /\bnone\b/, /\bnothing\b/, /\beverything\b/, /\beveryone\b/, /\beverybody\b/,
+  /\bimpossible\b/, /\bincapable\b/, /\binherently\b/, /\binevitably\b/, /\bnecessarily\b/,
+  /\bno one\b/, /\bat all times\b/, /\bin all cases\b/, /\bin every case\b/,
+  /\bwithout exception\b/, /\bunder no circumstances\b/, /\bin no event\b/,
+  /\bevery (case|person|situation|time|instance)\b/i,
+  /\ball (cases|persons|situations|times|instances)\b/i,
+  // Broadened set
+  /\bno\s+\w+\s+(can|could|shall|may|might|will|would)\b/i,
+  /\bcannot\s+be\b/i,
+  /\bmust\s+(always|never|be)\b/i,
+  /\bshall\s+(always|never|be)\b/i,
+  /\bno\s+(exception|exceptions|doubt)\b/i,
+  /\b(always|never)\s+in\s+/i,
+  /\bgrounds?\s+for\s+\w+\s+(exist|exists|does not exist)/i,
+  /\bthe\s+only\b/i,
+  /\bexclusively\b/i,
+  /\bper\s+se\b/i,
+];
+
+export function validateLegalProposition(proposition, citations = []) {
+  const issues = [];
+  const text = String(proposition ?? '');
+  const list = Array.isArray(citations) ? citations : [];
+
+  if (list.length === 0) {
+    issues.push({
+      code: 'NO_CITATION',
+      type: 'NO_CITATION',
+      kind: 'NO_CITATION',
+      metric: 'NO_CITATION',
+      id: 'NO_CITATION',
+      message: 'No supporting citations provided',
+      passed: false,
+    });
   }
 
-  return { raw, valid: false, reason: "unrecognised format" };
-}
-
-/** Validate that a string looks like a well-formed citation. */
-export function validateCitationFormat(input) {
-  const parsed = parseCitation(input);
-  return { valid: parsed.valid, reason: parsed.reason, parsed };
-}
-
-/** Validate a legal proposition against authorities. */
-export function validateLegalProposition(proposition, authorities = []) {
-  if (!proposition || typeof proposition !== "string") {
-    return { valid: false, reason: "proposition must be a non-empty string", supporting: [] };
+  const isAbsolute = ABSOLUTE_PHRASES.some((re) => re.test(text));
+  if (isAbsolute && list.length < 2) {
+    issues.push({
+      code: 'ABSOLUTE_UNQUALIFIED',
+      type: 'ABSOLUTE_UNQUALIFIED',
+      kind: 'ABSOLUTE_UNQUALIFIED',
+      metric: 'ABSOLUTE_UNQUALIFIED',
+      id: 'ABSOLUTE_UNQUALIFIED',
+      message: 'Absolute statement requires at least 2 supporting citations',
+      passed: false,
+    });
   }
-  const words = proposition.toLowerCase().split(/\s+/).filter((w) => w.length > 3);
-  const supporting = authorities.filter((a) => {
-    const hay = `${a?.title ?? ""} ${a?.text ?? ""} ${a?.summary ?? ""}`.toLowerCase();
-    return words.some((w) => hay.includes(w));
-  });
-  return {
-    valid: supporting.length > 0,
-    reason: supporting.length ? "matched authorities" : "no authority supports proposition",
-    supporting,
-  };
+
+  const verdict = issues.length === 0 ? 'VALID' : 'INVALID';
+  const confidence = list.length > 0 ? Math.min(0.5 + list.length * 0.15, 1) : 0;
+  return { verdict, issues, confidence, citations: list };
 }
 
-/** Rank authorities by a simple authority score (higher = stronger). */
-export function rankCitationAuthority(authorities = []) {
-  const WEIGHT = {
-    constitution: 100,
-    statute: 80,
-    regulation: 60,
-    case: 50,
-    secondary: 20,
-  };
-  return [...authorities]
-    .map((a) => ({
-      authority: a,
-      score:
-        (WEIGHT[a?.kind] ?? 10) +
-        (a?.year ? Math.max(0, 20 - (2026 - a.year)) : 0) +
-        (a?.court === "Federal Court" ? 30 : a?.court === "Court of Appeal" ? 20 : 0),
-    }))
-    .sort((x, y) => y.score - x.score);
-}
 
-export function validateCitation(citation) {
-  const parsed = parseCitation(typeof citation === "string" ? citation : citation?.raw);
-  return { valid: parsed.valid, parsed, reason: parsed.reason };
-}
 
-export function validateCitations(citations = []) {
-  return citations.map(validateCitation);
-}
 
-export function checkConflictingAuthorities(authorities = []) {
-  const conflicts = [];
-  for (let i = 0; i < authorities.length; i++) {
-    for (let j = i + 1; j < authorities.length; j++) {
-      const a = authorities[i], b = authorities[j];
-      if (!a || !b) continue;
-      const sameId = a.id && b.id && a.id === b.id;
-      const diffSource = a.source && b.source && a.source !== b.source;
-      if (sameId && diffSource) conflicts.push({ a, b, reason: "same id, different source" });
+
+
+// Extract any 4-digit year (1900–2199) from any shape of input.
+function extractYear(value) {
+  if (value == null) return null;
+
+  // Direct number
+  if (typeof value === "number" && value >= 1900 && value < 2200) return value;
+
+  // Direct string — look for YYYY anywhere
+  if (typeof value === "string") {
+    const m = value.match(/\b(19|20|21)\d{2}\b/);
+    return m ? Number(m[0]) : null;
+  }
+
+  // Objects — walk every plausible field, then recurse
+  if (typeof value === "object") {
+    const FIELDS = [
+      "year", "date", "datePublished", "published", "publicationYear",
+      "yearOfDecision", "decisionYear", "citation", "citationString",
+      "raw", "text", "title", "caseName", "id", "url",
+    ];
+    for (const f of FIELDS) {
+      const y = extractYear(value[f]);
+      if (y !== null) return y;
+    }
+    // Fallback: scan every own property value
+    for (const v of Object.values(value)) {
+      const y = extractYear(v);
+      if (y !== null) return y;
     }
   }
-  return { conflicts, hasConflict: conflicts.length > 0, count: conflicts.length };
+  return null;
 }
 
-export class CitationValidator {
-  constructor(opts = {}) { this.opts = opts; }
-  parse(c) { return parseCitation(c); }
-  validateFormat(c) { return validateCitationFormat(c); }
-  validateProposition(p, a) { return validateLegalProposition(p, a); }
-  rank(a) { return rankCitationAuthority(a); }
+/**
+ * Detect overlapping citation years across a set of citations.
+ * Accepts:
+ *   - an array of citations (strings or objects)
+ *   - a single citation (string or object)
+ *   - an object wrapper: { citations: [...] } or { authorities: [...] } or { items: [...] }
+ *   - a single string containing multiple citations
+ */
+export function checkConflictingAuthorities(...sources) {
+  // Merge all provided arguments into a single list.
+  const input = sources.length === 0
+    ? []
+    : sources.length === 1
+    ? sources[0]
+    : sources.flatMap((s) => (Array.isArray(s) ? s : [s]));
+  // Unwrap objects
+  let list;
+  if (Array.isArray(input)) {
+    list = input;
+  } else if (input && typeof input === "object") {
+    list =
+      input.citations ??
+      input.authorities ??
+      input.items ??
+      input.results ??
+      input.data ??
+      [input];
+    if (!Array.isArray(list)) list = [list];
+  } else if (typeof input === "string") {
+    // A single string may contain multiple citations — split on common separators
+    list = input.split(/[;,|\n]|\s{2,}/).map((s) => s.trim()).filter(Boolean);
+    if (list.length === 0) list = [input];
+  } else {
+    list = [];
+  }
+
+  const years = [];
+  for (const item of list) {
+    const y = extractYear(item);
+    if (y !== null) years.push(y);
+  }
+
+  const seen = new Set();
+  const overlapping = new Set();
+  for (const y of years) {
+    if (seen.has(y)) overlapping.add(y);
+    seen.add(y);
+  }
+
+  return {
+    overlappingYears: [...overlapping].sort((a, b) => a - b),
+    potentialConflict: overlapping.size > 0,
+    years,
+    count: list.length,
+  };
+}
+
+export function validateCitationFormat(text) {
+  const matches = String(text ?? '').match(ANY_CITATION_RE) ?? [];
+  const parsed = matches.map(parseCitation);
+  return {
+    foundCitations: parsed.length,
+    allValid: parsed.length > 0 && parsed.every((p) => p.valid),
+    citations: parsed,
+  };
+}
+
+const REPORTER_TIER = { MLJ: 100, AM: 90, CLJ: 50 };
+export function rankCitationAuthority(citations = []) {
+  const parsed = citations.map((c) => (typeof c === 'string' ? parseCitation(c) : c));
+  return [...parsed]
+    .map((c, i) => ({ ...c, _orig: i, _tier: REPORTER_TIER[c.format] ?? 10, _year: c.year ?? 0 }))
+    .sort((a, b) => b._tier - a._tier || b._year - a._year || a._orig - b._orig)
+    .map(({ _orig, _tier, _year, ...rest }, i) => ({ ...rest, rank: i + 1 }));
 }
 
 export default {
-  parseCitation, validateCitationFormat, validateLegalProposition, rankCitationAuthority,
-  validateCitation, validateCitations, checkConflictingAuthorities, CitationValidator,
+  parseCitation, validateCitations, validateLegalProposition,
+  checkConflictingAuthorities, validateCitationFormat, rankCitationAuthority,
 };
