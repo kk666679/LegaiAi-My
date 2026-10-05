@@ -1,0 +1,10 @@
+{
+  "models": {
+    "text-embedding-3-small": { "dimensions": 1536, "provider": "openai" },
+    "text-embedding-3-large": { "dimensions": 3072, "provider": "openai" },
+    "bge-m3": { "dimensions": 1024, "provider": "local" },
+    "nomic-embed-text-v1.5": { "dimensions": 768, "provider": "local" }
+  },
+  "active": "text-embedding-3-small",
+  "fallback": "bge-m3"
+}

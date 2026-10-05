@@ -1,4 +1,0 @@
-{"ts":"2026-08-29T10:00:00.000Z","runId":"run_042","workflow":"ask","span":"pipeline.run","event":"start"}
-{"ts":"2026-08-29T10:00:00.400Z","runId":"run_042","workflow":"ask","span":"retrieve","event":"end","ms":400}
-{"ts":"2026-08-29T10:00:01.100Z","runId":"run_042","workflow":"ask","span":"synthesize","event":"end","ms":700}
-{"ts":"2026-08-29T10:00:01.100Z","runId":"run_042","workflow":"ask","span":"pipeline.run","event":"end","status":"ok"}

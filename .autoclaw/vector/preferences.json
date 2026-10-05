@@ -1,12 +1,15 @@
 {
-  "defaults": {
-    "k": 8,
-    "minScore": 0.2,
-    "rerank": false
-  },
-  "agents": {
-    "hermes":     { "k": 12, "rerank": true  },
-    "architect":  { "k": 6,  "rerank": false },
-    "doc-writer": { "k": 8,  "rerank": false }
-  }
+  "preferredPatterns": [
+    "Make focused, single-responsibility changes and verify them with tests before moving on.",
+    "Match existing project conventions for naming, error handling, and structure.",
+    "Read the relevant code before editing it; never change code you have not seen."
+  ],
+  "avoided": [
+    "Avoid large speculative rewrites that are not backed by tests.",
+    "Avoid adding new dependencies when an existing project utility already covers the need."
+  ],
+  "tools": [
+    "general-purpose coding agent"
+  ],
+  "updatedAt": "2026-09-23T17:54:42.432Z"
 }

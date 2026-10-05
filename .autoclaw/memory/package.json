@@ -1,0 +1,12 @@
+{
+  "name": "autoclaw",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "memory": "node bin/memory.js status",
+    "memory:recent": "node bin/memory.js recent",
+    "memory:query": "node bin/memory.js query",
+    "memory:decay": "node bin/memory.js decay"
+  }
+}

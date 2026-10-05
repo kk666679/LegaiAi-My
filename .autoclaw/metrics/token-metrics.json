@@ -1,20 +1,152 @@
 {
-  "window": "rolling-24h",
-  "generatedAt": "2026-10-05T00:00:00.000Z",
-  "totals": {
-    "inputTokens": 2841000,
-    "outputTokens": 412000,
-    "cacheReads": 812000,
-    "cacheWrites": 19000
+  "version": 1,
+  "runs": [
+    {
+      "ts": "2026-09-12T06:30:50.334Z",
+      "sessionsAnalyzed": 2,
+      "kept": 0,
+      "keptRate": 0,
+      "patternsLearned": 5,
+      "sources": [
+        "autoclaw-native"
+      ],
+      "estTokens": 520,
+      "gitEnriched": false
+    },
+    {
+      "ts": "2026-09-12T06:30:52.462Z",
+      "sessionsAnalyzed": 2,
+      "kept": 0,
+      "keptRate": 0,
+      "patternsLearned": 5,
+      "sources": [
+        "autoclaw-native"
+      ],
+      "estTokens": 520,
+      "gitEnriched": false
+    },
+    {
+      "ts": "2026-09-23T17:53:40.547Z",
+      "sessionsAnalyzed": 8,
+      "kept": 0,
+      "keptRate": 0,
+      "patternsLearned": 5,
+      "sources": [
+        "autoclaw-native"
+      ],
+      "estTokens": 1779,
+      "gitEnriched": false
+    },
+    {
+      "ts": "2026-09-23T17:54:42.432Z",
+      "sessionsAnalyzed": 8,
+      "kept": 0,
+      "keptRate": 0,
+      "patternsLearned": 5,
+      "sources": [
+        "autoclaw-native"
+      ],
+      "estTokens": 1779,
+      "gitEnriched": false
+    }
+  ],
+  "summary": {
+    "totalRuns": 4,
+    "totalSessions": 20,
+    "totalKept": 0,
+    "avgKeptRate": 0,
+    "totalPatterns": 20,
+    "tokens": {
+      "estimated": 4598,
+      "real": 0,
+      "hasReal": false
+    },
+    "totalCostUsd": 0,
+    "lastRun": {
+      "ts": "2026-09-23T17:54:42.432Z",
+      "sessionsAnalyzed": 8,
+      "kept": 0,
+      "keptRate": 0,
+      "patternsLearned": 5,
+      "sources": [
+        "autoclaw-native"
+      ],
+      "estTokens": 1779,
+      "gitEnriched": false
+    }
   },
-  "perModel": {
-    "legal-reasoner-v1": { "input": 1420000, "output": 210000 },
-    "legal-writer-v1":   { "input": 890000,  "output": 168000 },
-    "embed-v1":          { "input": 531000,  "output": 34000  }
-  },
-  "budget": {
-    "dailyCap": 4000000,
-    "usedFraction": 0.813,
-    "state": "healthy"
+  "trends": {
+    "keptRate": [
+      {
+        "ts": "2026-09-12T06:30:50.334Z",
+        "value": 0
+      },
+      {
+        "ts": "2026-09-12T06:30:52.462Z",
+        "value": 0
+      },
+      {
+        "ts": "2026-09-23T17:53:40.547Z",
+        "value": 0
+      },
+      {
+        "ts": "2026-09-23T17:54:42.432Z",
+        "value": 0
+      }
+    ],
+    "patterns": [
+      {
+        "ts": "2026-09-12T06:30:50.334Z",
+        "value": 5
+      },
+      {
+        "ts": "2026-09-12T06:30:52.462Z",
+        "value": 5
+      },
+      {
+        "ts": "2026-09-23T17:53:40.547Z",
+        "value": 5
+      },
+      {
+        "ts": "2026-09-23T17:54:42.432Z",
+        "value": 5
+      }
+    ],
+    "estTokens": [
+      {
+        "ts": "2026-09-12T06:30:50.334Z",
+        "value": 520
+      },
+      {
+        "ts": "2026-09-12T06:30:52.462Z",
+        "value": 520
+      },
+      {
+        "ts": "2026-09-23T17:53:40.547Z",
+        "value": 1779
+      },
+      {
+        "ts": "2026-09-23T17:54:42.432Z",
+        "value": 1779
+      }
+    ],
+    "realTokens": [
+      {
+        "ts": "2026-09-12T06:30:50.334Z",
+        "value": 0
+      },
+      {
+        "ts": "2026-09-12T06:30:52.462Z",
+        "value": 0
+      },
+      {
+        "ts": "2026-09-23T17:53:40.547Z",
+        "value": 0
+      },
+      {
+        "ts": "2026-09-23T17:54:42.432Z",
+        "value": 0
+      }
+    ]
   }
 }

@@ -1,8 +1,0 @@
-{"ts":"2026-08-28T08:00:01.120Z","runId":"run_001","workflow":"irac","span":"pipeline.run","event":"start"}
-{"ts":"2026-08-28T08:00:01.480Z","runId":"run_001","workflow":"irac","span":"retrieve","event":"end","ms":360}
-{"ts":"2026-08-28T08:00:02.110Z","runId":"run_001","workflow":"irac","span":"issue","event":"end","ms":630}
-{"ts":"2026-08-28T08:00:03.900Z","runId":"run_001","workflow":"irac","span":"rule","event":"end","ms":1790}
-{"ts":"2026-08-28T08:00:05.100Z","runId":"run_001","workflow":"irac","span":"application","event":"end","ms":1200}
-{"ts":"2026-08-28T08:00:05.600Z","runId":"run_001","workflow":"irac","span":"conclusion","event":"end","ms":500}
-{"ts":"2026-08-28T08:00:06.700Z","runId":"run_001","workflow":"irac","span":"validate","event":"end","ms":1100}
-{"ts":"2026-08-28T08:00:06.700Z","runId":"run_001","workflow":"irac","span":"pipeline.run","event":"end","status":"ok"}

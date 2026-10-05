@@ -1,8 +1,13 @@
 {
-  "dim": 1024,
-  "model": "embed-v1",
-  "normalize": true,
-  "metric": "cosine",
-  "maxRows": 500000,
-  "backend": "sqlite"
+  "db_path": ".autoclaw/vector/db.sqlite",
+  "bm25_path": ".autoclaw/vector/bm25.sqlite",
+  "schema_dir": ".autoclaw/vector/schema",
+  "migrations_dir": ".autoclaw/vector/migrations",
+  "models": ".autoclaw/vector/models",
+  "active_model": "text-embedding-3-small",
+  "hybrid_alpha": 0.5,
+  "rerank_ttl_seconds": 3600,
+  "dimension_guard": true,
+  "auto_backup": true,
+  "backup_dir": ".autoclaw/vector/backups"
 }
