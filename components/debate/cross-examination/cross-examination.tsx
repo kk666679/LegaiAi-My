@@ -10,8 +10,7 @@ import { ConfidenceIndicator } from "@/components/ai/legal/confidence";
 import { cn } from "@/lib/utils";
 import type { DebateExaminationItem, DebateSide } from "@/types/debate";
 import { DEBATE_SIDE_LABELS } from "@/types/debate";
-import { ParticipantStatus } from "../participants/participant-status";
-import { participantInitials } from "../participants/participant-card";
+import { ParticipantStatus, participantInitials } from "../participants/participant-status";
 import { HelpCircle, MessageSquareQuote, ShieldCheck, ShieldQuestion } from "lucide-react";
 
 const STAGE_LABEL: Record<string, string> = {
@@ -52,8 +51,7 @@ export function CrossExamination({ items, participants, evidence, className }: C
         const answerer = item.answererId ? participants[item.answererId] : undefined;
         const AskIcon = STAGE_ICON[item.stage] ?? HelpCircle;
         const evidenceItems = item.evidenceIds
-          ?.map((id) => evidence.find((e) => e.id === id))
-          .filter(Boolean) as DebateExaminationItem["evidenceIds"] extends (infer T)[] ? T[] : never;
+          ?.flatMap((id) => evidence.filter((entry) => entry.id === id)) ?? [];
 
         return (
           <Card key={item.id} className={cn("gap-0 overflow-hidden border-l-2", SIDE_CLS[asker?.side ?? "neutral"])}>

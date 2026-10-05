@@ -113,7 +113,7 @@ export function ArgumentCard({ argument, onAction, className }: ArgumentCardProp
 
           {onAction ? (
             <div className="flex flex-wrap gap-2">
-              {argument.kind !== "counterargument" && argument.kind !== "rebuttal" && argument.kind !== "response" && argument.kind !== "objection" && argument.kind !== "concession" ? (
+              {argument.kind !== "counterargument" && argument.kind !== "response" && argument.kind !== "objection" && argument.kind !== "concession" ? (
                 <>
                   <Button size="sm" variant="outline" className="h-7 gap-1 text-xs" onClick={() => onAction(argument, "counter")}>
                     <ArrowDownToLine className="size-3" /> Counter

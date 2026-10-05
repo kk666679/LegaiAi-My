@@ -28,13 +28,13 @@ export function Scoreboard({ applicant, respondent, winner }: LegacyScoreboardPr
       participantId: "applicant",
       overall: applicant,
       confidence: 0.8,
-      criteria: [{ criterion: "overall", label: "Score", score: applicant }],
+      criteria: [{ criterion: "legal-reasoning", label: "Score", score: applicant }],
     },
     {
       participantId: "respondent",
       overall: respondent,
       confidence: 0.8,
-      criteria: [{ criterion: "overall", label: "Score", score: respondent }],
+      criteria: [{ criterion: "legal-reasoning", label: "Score", score: respondent }],
     },
   ];
   return <DebateScoreboard rows={rows} />;

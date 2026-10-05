@@ -3,6 +3,8 @@
 import { Agent, AgentHeader, AgentInstructions } from "@/components/ai-elements/agent";
 import { AIBadge } from "@/components/ai/aibadge";
 import { AIStatistic } from "@/components/ai/aistatistic";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { DebateParticipant } from "@/types/debate";
