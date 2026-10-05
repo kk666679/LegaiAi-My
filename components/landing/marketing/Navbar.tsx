@@ -72,6 +72,12 @@ export function Navbar() {
             Sign in
           </Link>
           <Link
+            href="/legalai/draft"
+            className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            Drafting Studio
+          </Link>
+          <Link
             href="/legalai"
             className="group inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[hsl(var(--brand-blue))] to-[hsl(var(--brand-indigo))] px-4 py-2 text-sm font-semibold text-primary-foreground shadow-[0_10px_30px_-12px_hsl(var(--brand-blue)/0.9)] transition-all hover:shadow-[0_14px_40px_-12px_hsl(var(--brand-blue))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
@@ -96,7 +102,7 @@ export function Navbar() {
         id="mobile-menu"
         className={cn(
           "lg:hidden overflow-hidden border-t border-border/70 bg-background/95 backdrop-blur-xl transition-[max-height,opacity] duration-300",
-          open ? "max-h-[420px] opacity-100" : "max-h-0 opacity-0"
+          open ? "max-h-[560px] opacity-100" : "max-h-0 opacity-0"
         )}
       >
         <ul className="flex flex-col gap-1 px-4 py-4">
@@ -118,6 +124,13 @@ export function Navbar() {
               className="rounded-lg border border-border/70 px-4 py-3 text-center text-sm font-semibold text-foreground"
             >
               Sign in
+            </Link>
+            <Link
+              href="/legalai/draft"
+              onClick={() => setOpen(false)}
+              className="rounded-lg border border-border/70 px-4 py-3 text-center text-sm font-semibold text-foreground"
+            >
+              Drafting Studio
             </Link>
             <Link
               href="/legalai"

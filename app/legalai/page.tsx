@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Bot,
   Upload,
@@ -19,6 +20,17 @@ import {
   CircleDashed,
   Server,
   Scale,
+  CalendarClock,
+  FileSignature,
+  Send,
+  ShieldCheck,
+  Swords,
+  BarChart3,
+  ClipboardList,
+  Bell,
+  History,
+  Bookmark,
+  FileCheck,
   type LucideIcon,
 } from "lucide-react";
 import { DashboardShell } from "@/components/lawmate/DashboardShell";
@@ -35,15 +47,10 @@ import { trpcReact } from "@/clients";
 import { useAuth } from "@/components/auth-provider";
 import { PermissionGate } from "@/components/shared/PermissionGate";
 import { PageHeader } from "@/components/shared/PageHeader";
-import {
-  EmptyState,
-} from "@/components/shared/EmptyState";
-import {
-  DashboardSkeleton,
-  ListSkeleton,
-} from "@/components/shared/PageSkeleton";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { DashboardSkeleton, ListSkeleton } from "@/components/shared/PageSkeleton";
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import { PROMPT_SUGGESTIONS } from "@/lib/lawmate/data";
+import { PROMPT_SUGGESTIONS, DRAFT_TEMPLATES } from "@/lib/lawmate/data";
 import { greeting, relativeTime } from "@/lib/lawmate/utils";
 import { cn } from "@/lib/utils";
 
@@ -129,6 +136,27 @@ interface DocumentsStats {
   recentActivity: number;
 }
 
+interface AlertSummary {
+  id: string;
+  title: string;
+  severity: string;
+  createdAt?: string;
+  matter?: { title: string; matterNumber: string } | null;
+}
+
+const MODULES: { label: string; href: string; icon: LucideIcon }[] = [
+  { label: "Legal Research", href: "/legalai/research", icon: BookOpen },
+  { label: "Document Analysis", href: "/legalai/analysis", icon: ClipboardList },
+  { label: "Contracts", href: "/legalai/contracts", icon: FileCheck },
+  { label: "Risk Engine", href: "/legalai/risk", icon: ShieldCheck },
+  { label: "Debate Simulation", href: "/legalai/debate", icon: Swords },
+  { label: "Change Monitor", href: "/legalai/monitor", icon: Bell },
+  { label: "Analytics", href: "/legalai/analytics", icon: BarChart3 },
+  { label: "Audit Trail", href: "/legalai/audit", icon: Gavel },
+  { label: "Activity History", href: "/legalai/history", icon: History },
+  { label: "Saved Items", href: "/legalai/saved", icon: Bookmark },
+];
+
 function formatDate(iso?: string | null) {
   if (!iso) return "—";
   try {
@@ -141,12 +169,37 @@ function formatDate(iso?: string | null) {
   }
 }
 
+/** Whole days until a deadline; negative when already past. */
+function daysUntil(iso?: string | null) {
+  if (!iso) return null;
+  const ms = new Date(iso).getTime() - Date.now();
+  if (Number.isNaN(ms)) return null;
+  return Math.ceil(ms / 86_400_000);
+}
+
+function deadlineTone(days: number | null) {
+  if (days === null) return { text: "text-muted-foreground", label: "No date", width: "0%" };
+  if (days < 0)
+    return { text: "text-destructive", label: `${Math.abs(days)}d overdue`, width: "100%" };
+  if (days === 0) return { text: "text-destructive", label: "Due today", width: "100%" };
+  if (days <= 3)
+    return { text: "text-amber-500", label: `${days}d left`, width: "85%" };
+  return { text: "text-foreground", label: `${days}d left`, width: "55%" };
+}
+
+function humaniseKey(value: string) {
+  return value.replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());
+}
+
 export default function DashboardHomePage() {
+  const router = useRouter();
   const { user } = useAuth();
   const [askOpen, setAskOpen] = useState(false);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [matterOpen, setMatterOpen] = useState(false);
   const [now, setNow] = useState<Date | null>(null);
+  const [ask, setAsk] = useState("");
+  const askRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => setNow(new Date()), []);
 
@@ -193,7 +246,7 @@ export default function DashboardHomePage() {
   const recentDocs = ((docsList.data as { documents?: DocumentSummary[] } | undefined)?.documents ?? []) as DocumentSummary[];
   const attentionData = (attention.data ?? null) as AttentionRequired | null;
   const pending = ((pendingActions.data ?? []) as PendingAction[]).slice(0, 5);
-  const openAlerts = (alerts.data ?? []).slice(0, 4);
+  const openAlerts = ((alerts.data ?? []) as AlertSummary[]).slice(0, 4);
   const health = (queueHealth.data ?? null) as QueueHealth | null;
 
   const activeMatters =
@@ -238,12 +291,82 @@ export default function DashboardHomePage() {
     ].slice(0, 5);
   }, [attentionData]);
 
+  /** Real deadline list with a countdown, then stale matters as a fallback. */
+  const timeline = useMemo(() => {
+    if (!attentionData) return [];
+    const deadlines = attentionData.deadlineSoon
+      .map((m) => ({
+        id: m.id,
+        kind: "deadline" as const,
+        title: m.title,
+        subtitle: m.client?.name ?? m.matterNumber,
+        when: m.deadlineAt ?? null,
+      }))
+      .sort((a, b) => (a.when ?? "").localeCompare(b.when ?? ""));
+    const stale = attentionData.staleMatters.slice(0, 3).map((m) => ({
+      id: m.id,
+      kind: "stale" as const,
+      title: m.title,
+      subtitle: m.matterNumber,
+      when: null as string | null,
+    }));
+    return [...deadlines, ...stale];
+  }, [attentionData]);
+
+  /** Distribution bars built from the real stats aggregates. */
+  const workload = useMemo(() => {
+    const norm = (record?: Record<string, number>) =>
+      Object.entries(record ?? {})
+        .map(([key, value]) => ({ key, value: value ?? 0 }))
+        .filter((row) => row.value > 0)
+        .sort((a, b) => b.value - a.value);
+    return {
+      mattersByStatus: norm(mStats?.byStatus),
+      mattersByPriority: norm(mStats?.byPriority),
+      docsByStatus: norm(dStats?.byStatus),
+    };
+  }, [mStats, dStats]);
+
   const loading =
     mattersStats.isLoading ||
     mattersList.isLoading ||
     docsStats.isLoading ||
     docsList.isLoading ||
     attention.isLoading;
+
+  // Any core query failing should be surfaced rather than silently rendering
+  // an empty workspace — an empty dashboard is indistinguishable from a
+  // genuinely empty one otherwise.
+  const failed = [
+    mattersStats.error && "matters",
+    mattersList.error && "the matters list",
+    docsStats.error && "document statistics",
+    docsList.error && "the document list",
+    attention.error && "attention items",
+  ].filter(Boolean) as string[];
+
+  const isRefreshing =
+    mattersStats.isRefetching ||
+    docsStats.isRefetching ||
+    mattersList.isRefetching ||
+    docsList.isRefetching;
+
+  const refreshAll = () => {
+    void mattersStats.refetch();
+    void mattersList.refetch();
+    void docsStats.refetch();
+    void docsList.refetch();
+    void attention.refetch();
+    void alerts.refetch();
+    void pendingActions.refetch();
+    void queueHealth.refetch();
+  };
+
+  const submitAsk = (value: string) => {
+    const text = value.trim();
+    if (!text) return;
+    router.push(`/legalai/assistant?q=${encodeURIComponent(text)}`);
+  };
 
   return (
     <DashboardShell>
@@ -270,6 +393,21 @@ export default function DashboardHomePage() {
             }
             actions={
               <>
+                <Button
+                  onClick={refreshAll}
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  disabled={isRefreshing}
+                  aria-label="Refresh workspace data"
+                >
+                  {isRefreshing ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <RefreshCw className="size-4" />
+                  )}
+                  Refresh
+                </Button>
                 <Button onClick={() => setAskOpen(true)} size="sm" className="gap-2">
                   <Bot className="size-4" /> Ask LawMate
                 </Button>
@@ -294,6 +432,70 @@ export default function DashboardHomePage() {
           />
 
           <LegalDisclaimer compact />
+
+          {failed.length > 0 && (
+            <Alert variant="destructive" className="border-destructive/30">
+              <AlertTriangle className="size-4" />
+              <div className="min-w-0 flex-1">
+                <AlertTitle>Some workspace data could not be loaded</AlertTitle>
+                <AlertDescription className="flex flex-wrap items-center gap-3">
+                  <span>
+                    Failed: {failed.join(", ")}. Figures below may be incomplete.
+                  </span>
+                  <Button size="sm" variant="outline" onClick={refreshAll}>
+                    Retry
+                  </Button>
+                </AlertDescription>
+              </div>
+            </Alert>
+          )}
+
+          {/* ── Ask bar + module shortcuts ─────────────────── */}
+          <Card>
+            <CardContent className="p-4 sm:p-5">
+              <form
+                className="flex flex-col gap-2 sm:flex-row"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  submitAsk(ask);
+                }}
+              >
+                <div className="relative min-w-0 flex-1">
+                  <Bot
+                    className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+                    aria-hidden
+                  />
+                  <input
+                    ref={askRef}
+                    value={ask}
+                    onChange={(e) => setAsk(e.target.value)}
+                    placeholder="Ask about your matters, deadlines, documents or Malaysian law…"
+                    aria-label="Ask LawMate"
+                    className="h-11 w-full rounded-lg border bg-background pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+                <Button type="submit" className="h-11 gap-2" disabled={!ask.trim()}>
+                  <Send className="size-4" /> Ask
+                </Button>
+              </form>
+
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {MODULES.map((m) => {
+                  const Icon = m.icon;
+                  return (
+                    <Link
+                      key={m.href}
+                      href={m.href}
+                      className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:border-primary/30 hover:text-foreground"
+                    >
+                      <Icon className="size-3" aria-hidden />
+                      {m.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
 
           {/* ── Attention required (real deadlines & alerts) ── */}
           {attentionItems.length > 0 && (
@@ -498,6 +700,11 @@ export default function DashboardHomePage() {
                             {a.createdAt ? ` · ${relativeTime(a.createdAt)}` : ""}
                           </p>
                         </div>
+                        <StatusBadge
+                          value={a.authLevel >= 3 ? "urgent" : "pending"}
+                          label={`L${a.authLevel}`}
+                          className="hidden sm:inline-flex"
+                        />
                       </Link>
                     ))}
                   </div>
@@ -540,30 +747,45 @@ export default function DashboardHomePage() {
                 ) : (
                   <div className="space-y-2">
                     {recentDocs.map((d) => (
-                      <Link
+                      <div
                         key={d.id}
-                        href={`/legalai/analysis?documentId=${d.id}`}
                         className="flex items-center gap-3 rounded-md border p-3 transition-colors hover:bg-accent/40"
                       >
-                        <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted">
-                          <FileText className="size-4 text-muted-foreground" aria-hidden />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium">{d.title}</p>
-                          <p className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
-                            <span>{d.docType.toLowerCase()}</span>
-                            <span aria-hidden>·</span>
-                            <span>v{d.version}</span>
-                            {d.updatedAt && (
-                              <>
-                                <span aria-hidden>·</span>
-                                <span>{relativeTime(d.updatedAt)}</span>
-                              </>
-                            )}
-                          </p>
-                        </div>
+                        <Link
+                          href={`/legalai/documents/${d.id}`}
+                          className="flex min-w-0 flex-1 items-center gap-3"
+                        >
+                          <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted">
+                            <FileText className="size-4 text-muted-foreground" aria-hidden />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-medium">{d.title}</p>
+                            <p className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
+                              <span>{DOC_TYPE_LABEL[d.docType] ?? d.docType.toLowerCase()}</span>
+                              <span aria-hidden>·</span>
+                              <span>v{d.version}</span>
+                              {d.updatedAt && (
+                                <>
+                                  <span aria-hidden>·</span>
+                                  <span>{relativeTime(d.updatedAt)}</span>
+                                </>
+                              )}
+                            </p>
+                          </div>
+                        </Link>
                         <StatusBadge value={d.status} className="hidden sm:inline-flex" />
-                      </Link>
+                        <Button
+                          asChild
+                          variant="ghost"
+                          size="icon"
+                          className="size-8 shrink-0"
+                          aria-label={`Analyse ${d.title}`}
+                        >
+                          <Link href={`/legalai/analysis?documentId=${d.id}`}>
+                            <Sparkles className="size-4" />
+                          </Link>
+                        </Button>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -573,6 +795,116 @@ export default function DashboardHomePage() {
             <PermissionGate permission="view_audit_log">
               <AuditActivityCard />
             </PermissionGate>
+          </div>
+
+          {/* ── Deadlines · workload · analysis · drafting ──── */}
+          <div className="grid gap-4 lg:grid-cols-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <CalendarClock className="size-4 text-primary" /> Deadlines
+                </CardTitle>
+                <CardDescription>
+                  {attentionData?.deadlineSoon.length
+                    ? `${attentionData.deadlineSoon.length} within 8 days, plus stale matters.`
+                    : "No imminent deadlines detected."}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {attention.isLoading ? (
+                  <ListSkeleton rows={4} />
+                ) : timeline.length === 0 ? (
+                  <EmptyState
+                    icon={CalendarClock}
+                    title="Nothing due"
+                    description="Deadlines inside the next 8 days appear here automatically."
+                  />
+                ) : (
+                  <div className="space-y-2.5">
+                    {timeline.slice(0, 6).map((item) => {
+                      const days = item.kind === "deadline" ? daysUntil(item.when) : null;
+                      const tone = item.kind === "stale"
+                        ? { text: "text-muted-foreground", label: "Stale 21d+", width: "20%" }
+                        : deadlineTone(days);
+                      return (
+                        <Link
+                          key={`${item.kind}-${item.id}`}
+                          href="/legalai/matters"
+                          className="block rounded-md border p-3 transition-colors hover:bg-accent/40"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="min-w-0 truncate text-sm font-medium">{item.title}</p>
+                            <span className={cn("shrink-0 text-[11px] font-medium tabular-nums", tone.text)}>
+                              {item.kind === "deadline" ? (item.when ? formatDate(item.when) : "—") : "No activity"}
+                            </span>
+                          </div>
+                          <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                            {item.subtitle}
+                          </p>
+                          <div className="mt-2 flex items-center gap-2">
+                            <span className="h-1 flex-1 overflow-hidden rounded-full bg-muted">
+                              <span
+                                className={cn(
+                                  "block h-full rounded-full",
+                                  tone.text.includes("destructive")
+                                    ? "bg-destructive"
+                                    : tone.text.includes("amber")
+                                      ? "bg-amber-500"
+                                      : "bg-primary",
+                                )}
+                                style={{ width: tone.width }}
+                                aria-hidden
+                              />
+                            </span>
+                            <span className={cn("shrink-0 text-[10px] font-medium", tone.text)}>
+                              {tone.label}
+                            </span>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <BarChart3 className="size-4 text-primary" /> Workload
+                </CardTitle>
+                <CardDescription>
+                  Matter and document distribution across your workspace.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {mattersStats.isLoading || docsStats.isLoading ? (
+                  <ListSkeleton rows={5} />
+                ) : (
+                  <>
+                    <Distribution
+                      title="Matters by status"
+                      rows={workload.mattersByStatus}
+                      total={mStats?.total ?? 0}
+                    />
+                    <Distribution
+                      title="Matters by priority"
+                      rows={workload.mattersByPriority}
+                      total={mStats?.total ?? 0}
+                    />
+                    <Distribution
+                      title="Documents by status"
+                      rows={workload.docsByStatus}
+                      total={dStats?.total ?? 0}
+                    />
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
+            <DraftingLauncher />
+
+            <DocumentAnalysisCard total={dStats?.total ?? 0} latest={recentDocs[0] ?? null} />
           </div>
 
           {/* ── Quick prompts + system status ───────────────── */}
@@ -589,7 +921,7 @@ export default function DashboardHomePage() {
                   {PROMPT_SUGGESTIONS.slice(0, 5).map((p) => (
                     <button
                       key={p.id}
-                      onClick={() => setAskOpen(true)}
+                      onClick={() => submitAsk(p.prompt)}
                       className="rounded-md border bg-card/50 p-3 text-left text-sm transition-colors hover:bg-accent"
                     >
                       <div className="flex items-center gap-2">
@@ -716,13 +1048,7 @@ export default function DashboardHomePage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {openAlerts.map((a: {
-                    id: string;
-                    title: string;
-                    severity: string;
-                    createdAt?: string;
-                    matter?: { title: string; matterNumber: string } | null;
-                  }) => (
+                  {openAlerts.map((a) => (
                     <Link
                       key={a.id}
                       href="/legalai/notifications"
@@ -769,6 +1095,11 @@ export default function DashboardHomePage() {
                     </Button>
                     <Button onClick={() => setUploadOpen(true)} variant="outline" className="gap-2">
                       <Upload className="size-4" /> Analyse a document
+                    </Button>
+                    <Button asChild variant="outline" className="gap-2">
+                      <Link href="/legalai/draft">
+                        <FileSignature className="size-4" /> Open Drafting Studio
+                      </Link>
                     </Button>
                     <Button asChild variant="outline" className="gap-2">
                       <Link href="/legalai/research">
@@ -829,6 +1160,146 @@ function MetricCard({
         </CardContent>
       </Card>
     </Link>
+  );
+}
+
+/** Horizontal bar list built from a real aggregate record. */
+function Distribution({
+  title,
+  rows,
+  total,
+}: {
+  title: string;
+  rows: { key: string; value: number }[];
+  total: number;
+}) {
+  return (
+    <div>
+      <div className="flex items-baseline justify-between">
+        <p className="text-xs font-medium text-muted-foreground">{title}</p>
+        <span className="text-[11px] tabular-nums text-muted-foreground">{total}</span>
+      </div>
+      {rows.length === 0 ? (
+        <p className="mt-1.5 text-[11px] text-muted-foreground">No data yet.</p>
+      ) : (
+        <ul className="mt-2 space-y-1.5">
+          {rows.map((row) => {
+            const pct = total > 0 ? Math.round((row.value / total) * 100) : 0;
+            return (
+              <li key={row.key} className="space-y-1">
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="text-foreground">{humaniseKey(row.key)}</span>
+                  <span className="tabular-nums text-muted-foreground">
+                    {row.value} · {pct}%
+                  </span>
+                </div>
+                <span className="block h-1.5 overflow-hidden rounded-full bg-muted">
+                  <span
+                    className="block h-full rounded-full bg-primary/70"
+                    style={{ width: `${Math.max(pct, 2)}%` }}
+                    aria-hidden
+                  />
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+/** Quick-start bridge into the real Document Analysis module. */
+function DocumentAnalysisCard({
+  total,
+  latest,
+}: {
+  total: number;
+  latest: DocumentSummary | null;
+}) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <ClipboardList className="size-4 text-primary" /> Document Analysis
+        </CardTitle>
+        <CardDescription>
+          Extract clauses, risks and a quality score. Every finding quotes its source.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <p className="text-xs text-muted-foreground">
+          {total > 0
+            ? `${total} document${total === 1 ? "" : "s"} ready to analyse in your library.`
+            : "Upload a document to run clause and risk extraction."}
+        </p>
+        {latest && (
+          <Link
+            href={`/legalai/analysis?documentId=${latest.id}`}
+            className="flex items-center gap-3 rounded-md border bg-card/40 p-3 text-sm transition-colors hover:bg-accent/40"
+          >
+            <FileText className="size-4 text-muted-foreground" aria-hidden />
+            <span className="min-w-0 flex-1 truncate">{latest.title}</span>
+            <span className="flex shrink-0 items-center gap-1 text-xs font-medium text-primary">
+              Analyse <ArrowRight className="size-3.5" aria-hidden />
+            </span>
+          </Link>
+        )}
+        <Button asChild variant="outline" size="sm" className="w-full gap-2">
+          <Link href="/legalai/analysis">
+            <Sparkles className="size-4" /> Open Document Analysis
+          </Link>
+        </Button>
+        <p className="text-[11px] leading-relaxed text-muted-foreground">
+          Rule-based extraction at HITL level 1 — a lawyer reviews the result before
+          it is relied on.
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
+
+/** Bridge card from the workspace into the Drafting Studio. */
+function DraftingLauncher() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <FileSignature className="size-4 text-primary" /> Drafting Studio
+        </CardTitle>
+        <CardDescription>
+          Start from a Malaysian template. Citations and a quality score come with it.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="flex flex-wrap gap-1.5">
+          {DRAFT_TEMPLATES.slice(0, 6).map((t) => (
+            <Link
+              key={t.id}
+              href={`/legalai/draft?template=${t.id}`}
+              title={t.description}
+              className="rounded-full border px-2.5 py-1 text-[11px] text-muted-foreground transition-colors hover:border-primary/30 hover:text-foreground"
+            >
+              {t.label}
+            </Link>
+          ))}
+        </div>
+        <Link
+          href="/legalai/draft"
+          className="flex items-center justify-between rounded-md border bg-card/40 p-3 text-sm transition-colors hover:bg-accent/40"
+        >
+          <span className="flex items-center gap-2">
+            <Sparkles className="size-4 text-primary" aria-hidden />
+            Open the full studio
+          </span>
+          <ArrowRight className="size-3.5 text-muted-foreground" aria-hidden />
+        </Link>
+        <p className="text-[11px] leading-relaxed text-muted-foreground">
+          Drafts are generated at HITL level 2 — a lawyer must review before the work product is
+          used.
+        </p>
+      </CardContent>
+    </Card>
   );
 }
 

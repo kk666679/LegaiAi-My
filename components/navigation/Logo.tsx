@@ -19,7 +19,7 @@ export function Logo({ className, size = 'md', showText = true }: LogoProps) {
     <span className={cn('flex items-center gap-2.5', className)}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/images/logo.svg"
+        src="/lawmate-logo/lawmate-logo.svg"
         alt="LAW MATE"
         width={width}
         height={height}

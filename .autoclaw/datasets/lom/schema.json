@@ -1,0 +1,6 @@
+{
+  "$schema": "https://example.com/schemas/legislation-record.v1.json",
+  "source": "LOM",
+  "jurisdiction": "MY",
+  "version": 1
+}

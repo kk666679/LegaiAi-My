@@ -111,6 +111,14 @@ export default function AssistantPage() {
   const [conversationsSheetOpen, setConversationsSheetOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Prefill from the workspace ask bar (`/legalai/assistant?q=…`). Read from
+  // window.location instead of useSearchParams so no Suspense boundary is
+  // required for the statically prerendered shell.
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get("q");
+    if (q?.trim()) setInput(q.trim());
+  }, []);
+
   const { messages, sendMessage, status, stop, regenerate, setMessages } =
     useChat({
       api: "/api/chat",

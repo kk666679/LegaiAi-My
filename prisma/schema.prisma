@@ -1,0 +1,21 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model VectorDoc {
+  id           String   @id @default(cuid())
+  collection   String
+  source_type  String?
+  content      String?
+  metadata     Json?
+  vector       Unsupported("vector(1536)")?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([collection])
+  @@map("vector_docs")
+}

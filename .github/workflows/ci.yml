@@ -17,6 +17,8 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Prisma generate
+        run: npx prisma generate
       - name: Lint
         continue-on-error: true
         run: npm run lint

@@ -1,0 +1,16 @@
+{
+  "surface": "principal",
+  "timestamp": "2026-10-05T00:44:59.551Z",
+  "discovered": 3,
+  "indexed": 3,
+  "failed": 0,
+  "retryable": 0,
+  "permanent": 0,
+  "ids": [
+    "da58981f332fdda7",
+    "fa092f438e53e73c",
+    "9e8bd940bffbad10"
+  ],
+  "vectors": 3,
+  "kgNodes": 3
+}

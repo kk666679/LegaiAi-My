@@ -52,8 +52,6 @@ next-env.d.ts
 .env*
 !.env.example
 
-# AutoClaw KDream data
-.autoclaw/
 
 # Build artifacts
 # backend/ holds tracked source (321 files) — ignore only its build output.

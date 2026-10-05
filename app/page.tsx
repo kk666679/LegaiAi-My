@@ -3,7 +3,9 @@ import { Hero } from "@/components/landing/marketing/Hero";
 import { TrustBar } from "@/components/landing/marketing/TrustBar";
 import { FeatureBento } from "@/components/landing/marketing/FeatureBento";
 import { AgentSwarm } from "@/components/landing/marketing/AgentSwarm";
+import { ProductPathways } from "@/components/landing/marketing/ProductPathways";
 import { ProductDashboard } from "@/components/landing/marketing/ProductDashboard";
+import { DraftingStudioPreview } from "@/components/landing/marketing/DraftingStudioPreview";
 import { RegulatoryTimeline } from "@/components/landing/marketing/RegulatoryTimeline";
 import { Security } from "@/components/landing/marketing/Security";
 import { Workflow } from "@/components/landing/marketing/Workflow";
@@ -19,7 +21,9 @@ export default function Home() {
         <TrustBar />
         <FeatureBento />
         <AgentSwarm />
+        <ProductPathways />
         <ProductDashboard />
+        <DraftingStudioPreview />
         <RegulatoryTimeline />
         <Security />
         <Workflow />

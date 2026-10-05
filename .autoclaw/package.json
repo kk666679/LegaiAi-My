@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "Multi-agent orchestration substrate: KG, spine, vector, dream cycle, HITL safety, portable skills.",
-  "type": "commonjs",
+  "type": "module",
   "engines": {
     "node": ">=18"
   },

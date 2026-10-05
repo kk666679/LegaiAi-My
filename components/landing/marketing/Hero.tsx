@@ -64,6 +64,33 @@ export function Hero() {
             </a>
           </div>
 
+          <div
+            className="reveal mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm"
+            style={{ transitionDelay: "280ms" }}
+          >
+            <span className="text-muted-foreground">Or jump straight in:</span>
+            <a
+              href="/legalai"
+              className="group inline-flex items-center gap-1 font-medium text-foreground underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              Open the Workspace
+              <ArrowRight
+                className="size-3.5 transition-transform group-hover:translate-x-0.5"
+                aria-hidden="true"
+              />
+            </a>
+            <a
+              href="/legalai/draft"
+              className="group inline-flex items-center gap-1 font-medium text-foreground underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              Try the Drafting Studio
+              <ArrowRight
+                className="size-3.5 transition-transform group-hover:translate-x-0.5"
+                aria-hidden="true"
+              />
+            </a>
+          </div>
+
           <div className="reveal mt-10" style={{ transitionDelay: "320ms" }}>
             <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Built for modern legal teams

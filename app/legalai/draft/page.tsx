@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   FileSignature,
@@ -16,20 +16,31 @@ import {
   History,
   Plus,
   FileText,
-  GitCompare,
   Gavel,
   Loader2,
   CheckCheck,
-  X,
+  Copy,
+  FilePlus2,
+  ClipboardCopy,
+  RefreshCw,
+  Bot,
+  type LucideIcon,
 } from "lucide-react";
 import { DashboardShell } from "@/components/lawmate/DashboardShell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 import { LegalDisclaimer } from "@/components/lawmate/LegalDisclaimer";
 import { AIComposer } from "@/components/lawmate/AIComposer";
-import { DRAFT_TEMPLATES, MALAYSIAN_SOURCES } from "@/lib/lawmate/data";
+import { DRAFT_TEMPLATES } from "@/lib/lawmate/data";
+import {
+  DEFAULT_TEMPLATE_ID,
+  analyzeDraft,
+  docTypeForTemplate,
+  templateSeed,
+} from "@/lib/lawmate/drafting";
 import {
   Select,
   SelectContent,
@@ -47,19 +58,20 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { trpcReact } from "@/clients";
 import {
   Artifact,
   ArtifactHeader,
   ArtifactTitle,
   ArtifactDescription,
   ArtifactActions,
-  ArtifactAction,
   ArtifactContent,
 } from "@/components/ai-elements/artifact";
-import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
-import { Sources, SourcesTrigger, SourcesContent, Source } from "@/components/ai-elements/sources";
-import { InlineCitation, InlineCitationCard, InlineCitationCardTrigger, InlineCitationCardBody, InlineCitationSource, InlineCitationQuote } from "@/components/ai-elements/inline-citation";
-import { Reasoning, ReasoningTrigger, ReasoningContent } from "@/components/ai-elements/reasoning";
+import {
+  Message,
+  MessageContent,
+  MessageResponse,
+} from "@/components/ai-elements/message";
 import {
   ChainOfThought,
   ChainOfThoughtHeader,
@@ -75,187 +87,783 @@ import {
   PlanContent,
   PlanTrigger,
 } from "@/components/ai-elements/plan";
-import {
-  Tool,
-  ToolHeader,
-  ToolContent,
-  ToolInput,
-  ToolOutput,
-} from "@/components/ai-elements/tool";
 
-const DRAFT_BODY = `Date: 21 August 2026
+/* ---------------------------------------------------------------------- */
+/* Local shapes. trpcReact is typed as `any` upstream (see clients.ts), so   */
+/* the shapes consumed here are narrowed locally.                          */
+/* ---------------------------------------------------------------------- */
 
-Dear Mr. Lim Wei Jian,
+interface DraftRow {
+  id: string;
+  title: string;
+  content?: string | null;
+  status?: string | null;
+  updatedAt?: string | null;
+  tags?: string[] | null;
+}
 
-We refer to your recent conduct on 18 August 2026 in which you were observed accessing restricted systems without authorisation. This letter serves as a FORMAL WARNING regarding the seriousness of your actions and the consequences should similar behaviour recur.
+interface EvidenceRow {
+  id: string;
+  title: string;
+  citation?: string | null;
+  jurisdiction?: string | null;
+  relevance?: number | null;
+  status?: string | null;
+  supportType?: string | null;
+}
 
-You are required to respond in writing within seven (7) working days explaining the circumstances and providing any mitigating factors you wish the Company to consider.
+interface LomHit {
+  id: string;
+  type?: string | null;
+  actNumber?: string | null;
+  titleEn?: string | null;
+  titleBm?: string | null;
+  citation?: string | null;
+  sourceUrl?: string | null;
+}
 
-Failure to respond, or a finding that the conduct warrants disciplinary action, may result in suspension or termination of your employment.
+interface QualityResult {
+  qualityScore: number;
+  citationCoverage: number;
+  citations: { total: number; verified: number; pending: number };
+  evidence: { count: number };
+  unsupported: { sentence: string; rationale: string }[];
+  reasons: string[];
+  disclaimer: string;
+}
 
-Please treat this matter with the seriousness it deserves.
+interface DraftJob {
+  id: string;
+  status: string;
+  completedAt?: string | null;
+}
 
-Yours faithfully,
-For and on behalf of TechNova Sdn Bhd
+type SaveStatus = "local" | "unsaved" | "saving" | "saved" | "error";
 
-Aisyah Rahman
-Head of People Operations`;
+interface Snapshot {
+  id: string;
+  label: string;
+  at: number;
+  author: string;
+  content: string;
+}
 
-const AI_ACTIONS = [
-  { id: "improve", label: "Improve wording", icon: Wand2 },
-  { id: "simplify", label: "Simplify language", icon: Sparkles },
-  { id: "formal", label: "Make more formal", icon: Shield },
-  { id: "cautious", label: "Make legally cautious", icon: Shield },
-  { id: "consistency", label: "Check consistency", icon: ListChecks },
-  { id: "risk", label: "Identify risks", icon: AlertTriangle },
-  { id: "translate", label: "Translate to Malay", icon: Languages },
-  { id: "summarise", label: "Summarise", icon: FileText },
-  { id: "compare", label: "Compare to template", icon: GitCompare },
-];
+interface StudioCitation {
+  /** Database id once persisted; absent for purely local entries. */
+  dbId?: string;
+  displayText: string;
+  section?: string;
+  status: string;
+  confidence?: number;
+  explanation?: string;
+  matchedTitle?: string;
+  matchedCitation?: string;
+}
 
-const QUALITY_SCORES = {
-  overall: 82,
-  completeness: 88,
-  citationCoverage: 76,
-  citationValidity: 94,
-  clarity: 81,
-  evidenceGrounding: 79,
-  consistency: 85,
-  structure: 86,
+type ChatMsg = {
+  role: "user" | "ai";
+  content: string;
+  thinking?: string;
 };
 
-const EVIDENCE = MALAYSIAN_SOURCES.slice(0, 4).map((s, i) => ({
-  ...s,
-  relevance: 0.95 - i * 0.08,
-  confidence: 0.92 - i * 0.05,
-  verified: s.verified ?? true,
-  snippet: s.excerpt,
-}));
-
-const VERSIONS = [
-  { id: "v-1", label: "Current draft", date: "Just now", author: "Aisyah Rahman", ai: false },
-  { id: "v-2", label: "AI improved wording", date: "5m ago", author: "AI (Llama 3.1)", ai: true },
-  { id: "v-3", label: "Initial draft", date: "2h ago", author: "Aisyah Rahman", ai: false },
-  { id: "v-4", label: "Template: warning_letter", date: "2h ago", author: "system", ai: false },
+const AI_ACTIONS: { id: string; label: string; icon: LucideIcon; instruction: string }[] = [
+  {
+    id: "improve",
+    label: "Improve wording",
+    icon: Wand2,
+    instruction: "Rewrite the selected passage for clarity and professional register without changing its legal effect.",
+  },
+  {
+    id: "simplify",
+    label: "Simplify language",
+    icon: Sparkles,
+    instruction: "Simplify the selected passage into plain English while preserving its legal meaning.",
+  },
+  {
+    id: "formal",
+    label: "Make more formal",
+    icon: Shield,
+    instruction: "Rewrite the selected passage in a more formal, court-appropriate register.",
+  },
+  {
+    id: "cautious",
+    label: "Make legally cautious",
+    icon: Shield,
+    instruction: "Qualify the selected passage so it does not overstate any obligation. Flag anything that needs an authority we have not yet verified.",
+  },
+  {
+    id: "consistency",
+    label: "Check consistency",
+    icon: ListChecks,
+    instruction: "List any internal inconsistency, undefined term or numbering error in this document. Do not rewrite it.",
+  },
+  {
+    id: "risk",
+    label: "Identify risks",
+    icon: AlertTriangle,
+    instruction: "Identify legal and commercial risks in the selected passage. For each risk, name the authority you rely on, or say plainly that no verified authority was available.",
+  },
+  {
+    id: "translate",
+    label: "Translate to Malay",
+    icon: Languages,
+    instruction: "Translate the selected passage into Bahasa Melayu, keeping defined terms in English in brackets on first use.",
+  },
+  {
+    id: "summarise",
+    label: "Summarise",
+    icon: FileText,
+    instruction: "Summarise this document in no more than five bullet points, noting what it obliges each party to do.",
+  },
 ];
 
-type ChatMsg = { role: "user" | "ai"; content: string; thinking?: string };
+const SESSION_KEY = "lawmate:drafting-studio:session";
+const HISTORY_KEY = "lawmate:drafting-studio:history";
+const CITATIONS_KEY = "lawmate:drafting-studio:citations";
+
+function readJson<T>(key: string, fallback: T): T {
+  try {
+    const raw = window.localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function writeJson(key: string, value: unknown) {
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* storage unavailable — the draft still lives in memory */
+  }
+}
+
+function slugify(value: string) {
+  return (
+    value
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 60) || "draft"
+  );
+}
+
+function titleForTemplate(templateId: string) {
+  return (
+    DRAFT_TEMPLATES.find((t) => t.id === templateId)?.label ?? "Untitled draft"
+  );
+}
 
 export default function DraftStudioPage() {
-  const [template, setTemplate] = useState<string>("warning_letter");
-  const [body, setBody] = useState(DRAFT_BODY);
+  /* ---------------- local editor session ---------------- */
+  const [template, setTemplate] = useState<string>(DEFAULT_TEMPLATE_ID);
+  const [title, setTitle] = useState<string>("Warning Letter");
+  const [body, setBody] = useState<string>(() => templateSeed(DEFAULT_TEMPLATE_ID));
+  const [draftId, setDraftId] = useState<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>("local");
   const [chat, setChat] = useState<ChatMsg[]>([
     {
       role: "ai",
       content:
-        "I've prepared a draft warning letter. Review it and let me know if you'd like me to make it more legally cautious, identify risks, or improve wording.",
+        "Drafting Studio is ready. Select a passage in the editor and apply an AI action, or ask me a question about this document.",
       thinking:
-        "Drafted from the warning_letter template. Cross-referenced Section 14 of the Employment Act 1955 on disciplinary procedures and the company's internal grievance policy.",
+        "Load the selected template seed. Citations are validated against the LOM catalogue before they are marked verified.",
     },
   ]);
   const [chatInput, setChatInput] = useState("");
-  const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "unsaved">("saved");
   const [selectedTab, setSelectedTab] = useState("editor");
-  const [citationInput, setCitationInput] = useState("");
   const [activeAction, setActiveAction] = useState<string | null>(null);
+  const [citationQuery, setCitationQuery] = useState("");
+  const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
+  const [citations, setCitations] = useState<StudioCitation[]>([]);
+  const [comparing, setComparing] = useState<Snapshot | null>(null);
+  const [jobId, setJobId] = useState<string | null>(null);
+  const [hasSelection, setHasSelection] = useState(false);
+  const editorRef = useRef<HTMLTextAreaElement>(null);
+  const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const sessionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const wordCount = body.split(/\s+/).filter(Boolean).length;
+  /* ---------------- restore local session ---------------- */
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const requested = params.get("template");
+    if (requested && DRAFT_TEMPLATES.some((t) => t.id === requested)) {
+      setTemplate(requested);
+      setBody(templateSeed(requested));
+      setTitle(titleForTemplate(requested));
+      return;
+    }
+    const session = readJson<{ template?: string; title?: string; body?: string }>(
+      SESSION_KEY,
+      {},
+    );
+    if (session.body) {
+      if (session.template) setTemplate(session.template);
+      if (session.title) setTitle(session.title);
+      setBody(session.body);
+    }
+  }, []);
 
-  const runAction = (id: string, label: string) => {
+  useEffect(() => {
+    setSnapshots(readJson<Snapshot[]>(HISTORY_KEY, []));
+    setCitations(readJson<StudioCitation[]>(CITATIONS_KEY, []));
+  }, []);
+
+  /* Persist the working session so an unsaved draft survives a reload.
+     Debounced so a burst of keystrokes writes once. */
+  useEffect(() => {
+    if (!body) return;
+    if (sessionTimer.current) clearTimeout(sessionTimer.current);
+    sessionTimer.current = setTimeout(() => {
+      writeJson(SESSION_KEY, { template, title, body });
+    }, 600);
+  }, [template, title, body]);
+
+  useEffect(() => {
+    writeJson(CITATIONS_KEY, citations);
+  }, [citations]);
+
+  useEffect(
+    () => () => {
+      if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
+      if (sessionTimer.current) clearTimeout(sessionTimer.current);
+    },
+    [],
+  );
+
+  /* ---------------- real data ---------------- */
+  const draftList = trpcReact.drafting.list.useQuery(
+    { limit: 25 },
+    { staleTime: 30_000, retry: false },
+  );
+  const drafts = ((draftList.data ?? []) as DraftRow[]).filter(
+    (d) => d.status !== "archived",
+  );
+
+  const qualityQuery = trpcReact.drafting.quality.useQuery(
+    { draftId: draftId ?? "" },
+    { enabled: !!draftId, staleTime: 15_000, retry: false },
+  );
+  const serverQuality = (qualityQuery.data ?? null) as QualityResult | null;
+
+  const evidenceQuery = trpcReact.drafting.listEvidence.useQuery(
+    { draftId: draftId ?? "" },
+    { enabled: !!draftId, staleTime: 30_000, retry: false },
+  );
+  const serverEvidence = (evidenceQuery.data ?? []) as EvidenceRow[];
+
+  const lomSearch = trpcReact.drafting.lomSearch.useQuery(
+    { q: citationQuery, limit: 8 },
+    { enabled: citationQuery.trim().length > 1, staleTime: 60_000, retry: false },
+  );
+  const lomHits = (lomSearch.data ?? []) as LomHit[];
+
+  const jobStatus = trpcReact.drafting.jobStatus.useQuery(
+    { jobId: jobId ?? "" },
+    {
+      enabled: !!jobId,
+      retry: false,
+      refetchInterval: (query: any) => {
+        const status = query?.state?.data?.status;
+        return status === "COMPLETED" || status === "FAILED" || status === "CANCELLED"
+          ? false
+          : 3000;
+      },
+    },
+  );
+  const job = (jobStatus.data ?? null) as DraftJob | null;
+
+  const createMutation = trpcReact.drafting.create.useMutation();
+  const updateMutation = trpcReact.drafting.update.useMutation();
+  const aiSuggest = trpcReact.drafting.aiSuggest.useMutation();
+  const insertCitationMutation = trpcReact.drafting.insertCitation.useMutation();
+  const validateCitationMutation = trpcReact.drafting.validateCitation.useMutation();
+  const retrieveEvidenceMutation = trpcReact.drafting.retrieveEvidence.useMutation();
+  const generateMutation = trpcReact.drafting.generate.useMutation();
+  const utils = trpcReact.useUtils?.();
+
+  /* ---------------- derived analysis ---------------- */
+  const analysis = useMemo(() => analyzeDraft(body), [body]);
+  const verifiedCitations = citations.filter((c) => c.status === "VERIFIED").length;
+
+  const scoreRows = useMemo(() => {
+    if (serverQuality) {
+      return [
+        { key: "Citation coverage", value: Math.round(serverQuality.citationCoverage * 100) },
+        { key: "Citations verified", value: serverQuality.citations.total ? Math.round((serverQuality.citations.verified / serverQuality.citations.total) * 100) : 0 },
+        { key: "Evidence attached", value: Math.min(100, serverQuality.evidence.count * 20) },
+        { key: "Unsupported claims", value: Math.max(0, 100 - serverQuality.unsupported.length * 20) },
+      ];
+    }
+    return [
+      { key: "Citation coverage", value: Math.round(analysis.coverage * 100) },
+      { key: "Citations detected", value: Math.min(100, analysis.citations.length * 15) },
+      { key: "Evidence attached", value: serverEvidence.length ? Math.min(100, serverEvidence.length * 25) : 40 },
+      { key: "Unsupported claims", value: Math.max(0, 100 - analysis.unsupported.length * 20) },
+    ];
+  }, [serverQuality, analysis, serverEvidence.length]);
+
+  const overallScore = serverQuality
+    ? serverQuality.qualityScore
+    : analysis.score;
+
+  const unsupportedAssertions =
+    serverQuality?.unsupported ??
+    analysis.unsupported.map((u) => ({
+      sentence: u.sentence,
+      rationale: u.rationale,
+    }));
+
+  const steps = useMemo(
+    () => [
+      { label: "Template selected", done: true },
+      { label: draftId ? "Draft saved" : "Draft saved (local)", done: !!draftId },
+      { label: "Citations validated", done: citations.length > 0 && verifiedCitations > 0 },
+      { label: "Quality reviewed", done: !!serverQuality },
+      { label: "Export", done: false },
+    ],
+    [draftId, citations.length, verifiedCitations, serverQuality],
+  );
+
+  /* ---------------- editor helpers ---------------- */
+  const selection = useCallback(() => {
+    const el = editorRef.current;
+    if (!el) return "";
+    return el.value.slice(el.selectionStart, el.selectionEnd).trim();
+  }, []);
+
+  /**
+   * Applies an edit to the editor: replaces the current selection when there
+   * is one, otherwise appends the text on a new block.
+   */
+  const applyEdit = useCallback(
+    (text: string) => {
+      const el = editorRef.current;
+      if (!el) {
+        setBody((current) => `${current}${current.endsWith("\n") ? "" : "\n\n"}${text}`);
+        return;
+      }
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      const prefix = start === end ? "\n\n" : "";
+      setBody((current) => `${current.slice(0, start)}${prefix}${text}${current.slice(end)}`);
+      requestAnimationFrame(() => {
+        el.focus();
+        const pos = start + prefix.length + text.length;
+        el.setSelectionRange(pos, pos);
+        setHasSelection(false);
+      });
+    },
+    [],
+  );
+
+  const pushSnapshot = useCallback(
+    (label: string, author: string, content: string) => {
+      setSnapshots((current) => {
+        const next = [
+          { id: `${Date.now()}-${current.length}`, label, at: Date.now(), author, content },
+          ...current,
+        ].slice(0, 20);
+        writeJson(HISTORY_KEY, next);
+        return next;
+      });
+    },
+    [],
+  );
+
+  const persist = useCallback(
+    async (nextBody: string, nextTitle: string, quiet = false) => {
+      if (!draftId) {
+        if (!quiet) toast.success("Draft kept locally", {
+          description: "Sign in and press Save to store it in your workspace.",
+        });
+        return;
+      }
+      setSaveStatus("saving");
+      try {
+        await updateMutation.mutateAsync({ id: draftId, content: nextBody, title: nextTitle });
+        setSaveStatus("saved");
+        if (!quiet) toast.success("Draft saved");
+      } catch {
+        setSaveStatus("error");
+        toast.error("Could not save the draft", {
+          description: "Your changes remain in this browser session.",
+        });
+      }
+    },
+    [draftId, updateMutation],
+  );
+
+  const markDirty = useCallback(() => {
+    setSaveStatus(draftId ? "unsaved" : "local");
+  }, [draftId]);
+
+  const handleBodyChange = (value: string) => {
+    setBody(value);
+    markDirty();
+    if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
+    autosaveTimer.current = setTimeout(() => {
+      if (draftId) void persist(value, title, true);
+    }, 1500);
+  };
+
+  const changeTemplate = (next: string) => {
+    setTemplate(next);
+    setBody(templateSeed(next));
+    setTitle(titleForTemplate(next));
+    setSaveStatus("local");
+    pushSnapshot(`Template → ${titleForTemplate(next)}`, "You", body);
+    toast.info(`Template applied: ${titleForTemplate(next)}`);
+  };
+
+  const newDraft = () => {
+    setDraftId(null);
+    setBody(templateSeed(template));
+    setTitle(titleForTemplate(template));
+    setCitations([]);
+    setSaveStatus("local");
+    setJobId(null);
+    toast.success("Started a new local draft");
+  };
+
+  const openDraft = (row: DraftRow) => {
+    setDraftId(row.id);
+    setTitle(row.title || "Untitled draft");
+    setBody(row.content ?? "");
+    setSaveStatus("saved");
+    const tag = row.tags?.find((t) => DRAFT_TEMPLATES.some((d) => d.id === t));
+    if (tag) setTemplate(tag);
+    toast.success(`Opened “${row.title}”`);
+  };
+
+  const saveDraft = async () => {
+    if (!body.trim()) {
+      toast.error("Nothing to save", { description: "The draft is empty." });
+      return;
+    }
+    if (!draftId) {
+      setSaveStatus("saving");
+      try {
+        const created = (await createMutation.mutateAsync({
+          title: title.trim() || "Untitled draft",
+          content: body,
+          docType: docTypeForTemplate(template),
+        })) as DraftRow;
+        setDraftId(created.id);
+        setSaveStatus("saved");
+        pushSnapshot("Saved to workspace", "You", body);
+        await utils?.drafting?.list?.invalidate?.();
+        toast.success("Draft saved to your workspace");
+      } catch {
+        setSaveStatus("error");
+        toast.error("Save failed", {
+          description: "The draft is safe in this browser. Sign in to persist it server-side.",
+        });
+      }
+      return;
+    }
+    await persist(body, title);
+    pushSnapshot("Manual save", "You", body);
+  };
+
+  /* ---------------- AI actions ---------------- */
+  const runAction = async (id: string, instruction: string) => {
+    const action = AI_ACTIONS.find((a) => a.id === id);
+    const picked = selection();
     setActiveAction(id);
-    setSaveStatus("saving");
-    setChat((c) => [
-      ...c,
-      { role: "user", content: label },
+    setChat((current) => [
+      ...current,
       {
-        role: "ai",
-        content: `Applied: ${label}. Changes are streaming into the editor with citation-backed justifications.`,
-        thinking: `Streaming response for "${label}". Verifying changes against the active authorities before applying.`,
+        role: "user",
+        content: picked
+          ? `${action?.label ?? instruction}\n\nSelection: “${picked}”`
+          : `${action?.label ?? instruction} (whole draft)`,
       },
     ]);
-    setTimeout(() => {
-      setSaveStatus("saved");
+    try {
+      const result = await aiSuggest.mutateAsync({
+        instruction,
+        documentType: docTypeForTemplate(template),
+        ...(picked ? { selection: picked } : {}),
+      });
+      if (result?.ok) {
+        applyEdit(result.text);
+        setChat((current) => [
+          ...current,
+          {
+            role: "ai",
+            content: result.text,
+            thinking: `${result.provider} · ${result.model} · ${result.latencyMs ?? 0}ms`,
+          },
+        ]);
+        pushSnapshot(`AI: ${action?.label ?? id}`, "AI", `${body}\n\n${result.text}`);
+        toast.success(
+          `${action?.label ?? "AI action"} ${picked ? "applied to selection" : "appended to draft"}`,
+        );
+      } else {
+        setChat((current) => [
+          ...current,
+          { role: "ai", content: result?.message ?? "No suggestion was returned." },
+        ]);
+        toast.warning("No suggestion", {
+          description: result?.message ?? "Configure a BYOK provider in Settings to enable AI drafting.",
+        });
+      }
+    } catch {
+      setChat((current) => [
+        ...current,
+        {
+          role: "ai",
+          content:
+            "The drafting agent could not be reached. Check your connection or provider settings — the draft on the left is unaffected.",
+        },
+      ]);
+      toast.error("AI action failed");
+    } finally {
       setActiveAction(null);
-    }, 800);
-    toast.success(`AI action queued: ${label}`);
+      markDirty();
+    }
   };
 
   const sendChat = () => {
-    if (!chatInput.trim()) return;
-    setChat((c) => [
-      ...c,
-      { role: "user", content: chatInput },
-      {
-        role: "ai",
-        content: "Noted. I'll apply the suggested change after verifying it against the active authorities.",
-        thinking: "Reviewing user request against active authorities before applying changes.",
-      },
-    ]);
+    const text = chatInput.trim();
+    if (!text) return;
     setChatInput("");
+    void runAction("chat", text);
   };
 
-  const saveDraft = () => {
-    setSaveStatus("saving");
-    setTimeout(() => setSaveStatus("saved"), 400);
-    toast.success("Draft saved");
+  /* ---------------- citations ---------------- */
+  const addCitation = async (hit: LomHit) => {
+    const displayText = hit.actNumber ?? hit.titleEn ?? hit.titleBm ?? "Untitled authority";
+    const entry: StudioCitation = { displayText, status: "PENDING" };
+    setCitations((current) => [{ ...entry }, ...current]);
+    applyEdit(`[${displayText}]`);
+    markDirty();
+    setCitationQuery("");
+    if (draftId) {
+      try {
+        const ref = (await insertCitationMutation.mutateAsync({
+          draftId,
+          displayText,
+          ...(hit.sourceUrl ? { sourceId: hit.sourceUrl } : {}),
+        })) as { id: string };
+        setCitations((current) =>
+          current.map((c) => (c.displayText === displayText && !c.dbId ? { ...c, dbId: ref.id } : c)),
+        );
+      } catch {
+        toast.warning("Citation kept locally", {
+          description: "It could not be persisted — validate it from the Quality tab once saved.",
+        });
+      }
+    }
+    await void validateOne(entry.displayText);
+    toast.success(`Inserted ${displayText}`);
   };
 
-  const exportDraft = (format: "PDF" | "DOCX" | "TXT") => {
-    const blob = new Blob([body], { type: "text/plain" });
+  const validateOne = async (displayText: string) => {
+    const existing = citations.find((c) => c.displayText === displayText);
+    if (existing?.dbId) {
+      try {
+        const updated = (await validateCitationMutation.mutateAsync({ id: existing.dbId })) as {
+          status: string;
+          confidence?: number;
+          explanation?: string;
+          matchedTitle?: string;
+          matchedCitation?: string;
+        };
+        setCitations((current) =>
+          current.map((c) =>
+            c.dbId === existing.dbId
+              ? {
+                  ...c,
+                  status: updated.status,
+                  confidence: updated.confidence,
+                  explanation: updated.explanation,
+                  matchedTitle: updated.matchedTitle,
+                  matchedCitation: updated.matchedCitation,
+                }
+              : c,
+          ),
+        );
+      } catch {
+        toast.error(`Validation failed for ${displayText}`);
+      }
+      return;
+    }
+    // Local heuristic: confirm the text matches a recognisable citation format.
+    const known = detectFormat(displayText);
+    setCitations((current) =>
+      current.map((c) =>
+        c.displayText === displayText
+          ? {
+              ...c,
+              status: known,
+              confidence: known === "VERIFIED" ? 0.6 : 0,
+              explanation:
+                known === "VERIFIED"
+                  ? "Format matches a recognised Malaysian reporter. Authority text not yet matched against the LOM catalogue."
+                  : "No recognised format and no LOM match found.",
+            }
+          : c,
+      ),
+    );
+  };
+
+  const removeCitation = (displayText: string) => {
+    setCitations((current) => current.filter((c) => c.displayText !== displayText));
+    toast.message("Citation removed from the list", {
+      description: "It was left in the draft text — delete it manually if needed.",
+    });
+  };
+
+  const pullEvidence = async () => {
+    if (!draftId) {
+      toast.error("Save the draft first", {
+        description: "Evidence is attached to a persisted draft so it stays auditable.",
+      });
+      return;
+    }
+    const query = analysis.citations.map((c) => c.raw).join(" ") || title;
+    try {
+      const created = (await retrieveEvidenceMutation.mutateAsync({
+        draftId,
+        q: query.slice(0, 500),
+      })) as EvidenceRow[];
+      await utils?.drafting?.listEvidence?.invalidate?.();
+      toast.success(
+        created.length ? `Attached ${created.length} source(s)` : "No LOM matches found",
+        {
+          description: created.length
+            ? undefined
+            : "Try a different Act number in the Citations tab.",
+        },
+      );
+    } catch {
+      toast.error("Evidence retrieval failed");
+    }
+  };
+
+  const runGenerate = async () => {
+    try {
+      const res = (await generateMutation.mutateAsync({
+        docType: docTypeForTemplate(template),
+        title: title.trim() || "Untitled draft",
+        facts: body.slice(0, 8000),
+        tone: "neutral",
+        citations: analysis.citations.map((c) => c.raw).slice(0, 20),
+      })) as { jobId: string; documentId: string; status: string };
+      setJobId(res.jobId);
+      toast.success("Drafting agent queued", {
+        description: "Track progress in the workflow bar above the editor.",
+      });
+    } catch {
+      toast.error("Could not queue the drafting job");
+    }
+  };
+
+  const exportTxt = () => {
+    const blob = new Blob([`${title}\n${"=".repeat(title.length)}\n\n${body}`], {
+      type: "text/plain;charset=utf-8",
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `warning-letter.${format.toLowerCase()}`;
+    a.download = `${slugify(title)}.txt`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success(`Exported as ${format}`);
+    toast.success("Exported as TXT");
   };
 
-  const handleBodyChange = (val: string) => {
-    setBody(val);
-    setSaveStatus("unsaved");
-    setTimeout(() => {
-      setSaveStatus("saving");
-      setTimeout(() => setSaveStatus("saved"), 600);
-    }, 800);
+  const copyAll = async () => {
+    try {
+      await navigator.clipboard.writeText(body);
+      toast.success("Draft copied to clipboard");
+    } catch {
+      toast.error("Clipboard unavailable in this browser");
+    }
   };
+
+  const saveBadge = {
+    local: { label: "Local session", icon: FileText, tone: "text-muted-foreground" },
+    unsaved: { label: "Unsaved changes", icon: AlertTriangle, tone: "text-amber-500" },
+    saving: { label: "Saving…", icon: Loader2, tone: "text-muted-foreground" },
+    saved: { label: "All changes saved", icon: CheckCheck, tone: "text-emerald-500" },
+    error: { label: "Save failed", icon: AlertTriangle, tone: "text-destructive" },
+  }[saveStatus];
+
+  const SaveIcon = saveBadge.icon;
 
   return (
     <DashboardShell>
       <div className="space-y-4">
-        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-          <div className="min-w-0">
-            <p className="text-xs text-muted-foreground">Document Drafting</p>
-            <h1 className="text-2xl font-semibold tracking-tight truncate">
-              Warning Letter — Lim Wei Jian
-            </h1>
-            <p className="text-xs text-muted-foreground mt-1 flex items-center gap-2 flex-wrap">
-              <Badge variant="secondary" className="text-[10px]">Draft</Badge>
-              <Badge variant="outline" className="text-[10px] gap-1">
-                {saveStatus === "saving" && <Loader2 className="size-3 animate-spin" />}
-                {saveStatus === "saved" && <CheckCheck className="size-3 text-emerald-500" />}
-                {saveStatus === "unsaved" && <AlertTriangle className="size-3 text-amber-500" />}
-                {saveStatus === "saving" ? "Saving…" : saveStatus === "saved" ? "All changes saved" : "Unsaved changes"}
+        {/* ── Header ──────────────────────────────────────── */}
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+          <div className="min-w-0 flex-1">
+            <p className="text-xs text-muted-foreground">Drafting Studio</p>
+            <input
+              value={title}
+              onChange={(e) => {
+                setTitle(e.target.value);
+                markDirty();
+              }}
+              aria-label="Draft title"
+              className="mt-1 w-full truncate border-none bg-transparent p-0 text-2xl font-semibold tracking-tight outline-none focus:ring-0"
+            />
+            <p className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+              <Badge variant="secondary" className="text-[10px]">
+                {titleForTemplate(template)}
               </Badge>
-              <span>· {wordCount} words</span>
+              <Badge variant="outline" className={cn("gap-1 text-[10px]", saveBadge.tone)}>
+                <SaveIcon className={cn("size-3", saveStatus === "saving" && "animate-spin")} />
+                {saveBadge.label}
+              </Badge>
+              <span aria-hidden>·</span>
+              <span>{analysis.words} words</span>
+              <span aria-hidden>·</span>
+              <span>{analysis.citations.length} citations</span>
+              <span aria-hidden>·</span>
+              <span>HITL L2 · review required</span>
             </p>
           </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <Select value={template} onValueChange={setTemplate}>
-              <SelectTrigger className="h-9 w-auto text-xs">
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Select value={template} onValueChange={changeTemplate}>
+              <SelectTrigger className="h-9 w-auto gap-1.5 text-xs">
                 <FileSignature className="size-3.5" />
-                <SelectValue />
+                <SelectValue placeholder="Template" />
               </SelectTrigger>
               <SelectContent>
                 {DRAFT_TEMPLATES.map((t) => (
-                  <SelectItem key={t.id} value={t.id}>{t.label}</SelectItem>
+                  <SelectItem key={t.id} value={t.id}>
+                    {t.label}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <Button variant="outline" size="sm" className="gap-1.5" onClick={() => { setSelectedTab("history"); toast.info("Showing version history"); }}>
-              <History className="size-3.5" /> History
+
+            {drafts.length > 0 && (
+              <Select value={draftId ?? "__new"} onValueChange={(v) => {
+                const row = drafts.find((d) => d.id === v);
+                if (row) openDraft(row);
+              }}>
+                <SelectTrigger className="h-9 w-auto gap-1.5 text-xs" aria-label="Open saved draft">
+                  <FileText className="size-3.5" />
+                  <SelectValue placeholder="Saved drafts" />
+                </SelectTrigger>
+                <SelectContent>
+                  {drafts.map((d) => (
+                    <SelectItem key={d.id} value={d.id}>
+                      <span className="max-w-[220px] truncate">{d.title}</span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+
+            <Button variant="outline" size="sm" className="gap-1.5" onClick={newDraft}>
+              <FilePlus2 className="size-3.5" /> New
             </Button>
-            <Button variant="outline" size="sm" className="gap-1.5" onClick={saveDraft}>
+            <Button variant="outline" size="sm" className="gap-1.5" onClick={() => void saveDraft()}>
               <Save className="size-3.5" /> Save
             </Button>
             <DropdownMenu>
@@ -265,11 +873,25 @@ export default function DraftStudioPage() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Export format</DropdownMenuLabel>
+                <DropdownMenuLabel>Export</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => exportDraft("PDF")}>PDF</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => exportDraft("DOCX")}>DOCX</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => exportDraft("TXT")}>TXT</DropdownMenuItem>
+                <DropdownMenuItem onClick={exportTxt} className="gap-2">
+                  <Download className="size-3.5" /> Plain text (.txt)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => void copyAll()} className="gap-2">
+                  <ClipboardCopy className="size-3.5" /> Copy to clipboard
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() =>
+                    toast.info("Use your browser's print dialog", {
+                      description: "Choose “Save as PDF” to produce a paginated document.",
+                    })
+                  }
+                  className="gap-2"
+                >
+                  <FileText className="size-3.5" /> PDF via print dialog
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -277,35 +899,123 @@ export default function DraftStudioPage() {
 
         <LegalDisclaimer compact />
 
+        {/* ── Workflow ─────────────────────────────────────── */}
         <Plan defaultOpen>
           <PlanHeader>
             <div>
               <PlanTitle>Draft workflow</PlanTitle>
-              <PlanDescription>Template → AI draft → Review → Citation check → Export</PlanDescription>
+              <PlanDescription>
+                Template → draft → citations → quality → export
+              </PlanDescription>
             </div>
-            <PlanAction><PlanTrigger /></PlanAction>
+            <PlanAction>
+              <PlanTrigger />
+            </PlanAction>
           </PlanHeader>
-          <PlanContent>
-            <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-              {["Template selected", "AI draft generated", "Review in progress", "Citation check", "Export"].map((step, i) => (
-                <span key={step} className={cn("flex items-center gap-1", i < 3 ? "text-foreground" : "")}>
-                  {i < 3 ? <CheckCheck className="size-3 text-emerald-500" /> : <Loader2 className="size-3 opacity-40" />}
-                  {step}
-                  {i < 4 && <span className="text-muted-foreground/40">›</span>}
-                </span>
+          <PlanContent className="space-y-3">
+            <ol className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+              {steps.map((step, i) => (
+                <li key={step.label} className="flex items-center gap-1">
+                  <span className={cn("flex items-center gap-1", step.done && "text-foreground")}>
+                    {step.done ? (
+                      <CheckCheck className="size-3 text-emerald-500" />
+                    ) : (
+                      <span
+                        className="inline-block size-3 rounded-full border border-current opacity-40"
+                        aria-hidden
+                      />
+                    )}
+                    {step.label}
+                  </span>
+                  {i < steps.length - 1 && (
+                    <span className="text-muted-foreground/40" aria-hidden>
+                      ›
+                    </span>
+                  )}
+                </li>
               ))}
-            </div>
+            </ol>
+
+            {job ? (
+              <div className="rounded-md border bg-card/40 p-3">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-medium">
+                    Drafting agent · job {job.id.slice(0, 8)}
+                  </span>
+                  <Badge variant="outline" className="text-[10px]">
+                    {job.status}
+                  </Badge>
+                </div>
+                <Progress
+                  className="mt-2 h-1.5"
+                  value={
+                    job.status === "COMPLETED"
+                      ? 100
+                      : job.status === "FAILED" || job.status === "CANCELLED"
+                        ? 100
+                        : 45
+                  }
+                />
+                <p className="mt-1.5 text-[11px] text-muted-foreground">
+                  {job.status === "QUEUED"
+                    ? "Queued on the legal-drafting worker."
+                    : job.status === "PROCESSING"
+                      ? "Running the template pipeline. Results land in the document library."
+                      : `Job ${job.status.toLowerCase()}.`}
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-1.5"
+                  onClick={() => void runGenerate()}
+                  disabled={generateMutation.isPending}
+                >
+                  {generateMutation.isPending ? (
+                    <Loader2 className="size-3.5 animate-spin" />
+                  ) : (
+                    <Bot className="size-3.5" />
+                  )}
+                  Generate with drafting agent
+                </Button>
+                <Button size="sm" variant="ghost" className="gap-1.5" onClick={() => void pullEvidence()}>
+                  <Gavel className="size-3.5" /> Retrieve evidence
+                </Button>
+                {jobId && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="gap-1.5"
+                    onClick={() => void jobStatus.refetch()}
+                  >
+                    <RefreshCw className="size-3.5" /> Refresh job
+                  </Button>
+                )}
+              </div>
+            )}
           </PlanContent>
         </Plan>
 
+        {/* ── AI action bar ────────────────────────────────── */}
         <Artifact>
           <ArtifactContent className="p-3">
             <div className="flex items-center gap-2 overflow-x-auto">
-              <span className="text-xs text-muted-foreground whitespace-nowrap">Apply AI to draft:</span>
+              <span className="whitespace-nowrap text-xs text-muted-foreground">
+                Apply AI to {hasSelection ? "selection" : "whole draft"}:
+              </span>
               {AI_ACTIONS.map((a) => {
                 const Icon = a.icon;
                 return (
-                  <Button key={a.id} variant="outline" size="sm" onClick={() => runAction(a.id, a.label)} className="gap-1.5 whitespace-nowrap shrink-0">
+                  <Button
+                    key={a.id}
+                    variant="outline"
+                    size="sm"
+                    className="shrink-0 gap-1.5 whitespace-nowrap"
+                    disabled={activeAction !== null}
+                    onClick={() => void runAction(a.id, a.instruction)}
+                  >
                     {activeAction === a.id ? (
                       <Loader2 className="size-3.5 animate-spin" />
                     ) : (
@@ -319,8 +1029,9 @@ export default function DraftStudioPage() {
           </ArtifactContent>
         </Artifact>
 
+        {/* ── Tabs ─────────────────────────────────────────── */}
         <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-          <TabsList>
+          <TabsList className="flex-wrap">
             <TabsTrigger value="editor">Editor</TabsTrigger>
             <TabsTrigger value="evidence">Evidence</TabsTrigger>
             <TabsTrigger value="quality">Quality</TabsTrigger>
@@ -328,71 +1039,58 @@ export default function DraftStudioPage() {
             <TabsTrigger value="history">History</TabsTrigger>
           </TabsList>
 
+          {/* Editor */}
           <TabsContent value="editor" className="mt-3">
-            <div className="grid gap-4 lg:grid-cols-[1fr_minmax(320px,360px)]">
+            <div className="grid gap-4 lg:grid-cols-[1fr_minmax(320px,380px)]">
               <Artifact>
                 <ArtifactHeader>
-                  <div className="flex items-center gap-2 text-sm">
-                    <FileSignature className="size-4 text-primary" />
-                    <ArtifactTitle>Document editor</ArtifactTitle>
-                    <InlineCitation>
-                      <InlineCitationCard>
-                        <InlineCitationCardTrigger sources={["https://lom.gov.my/act/employment-1955"]} />
-                        <InlineCitationCardBody>
-                          <div className="p-3 space-y-2">
-                            <InlineCitationSource
-                              title="Employment Act 1955 — Section 14"
-                              url="https://lom.gov.my/act/employment-1955"
-                              description="Governs disciplinary procedures for misconduct in Malaysian employment relationships."
-                            />
-                            <InlineCitationQuote>
-                              The contract of service may be terminated by either party on grounds of misconduct.
-                            </InlineCitationQuote>
-                          </div>
-                        </InlineCitationCardBody>
-                      </InlineCitationCard>
-                    </InlineCitation>
+                  <div className="flex min-w-0 items-center gap-2 text-sm">
+                    <FileSignature className="size-4 shrink-0 text-primary" />
+                    <ArtifactTitle className="truncate">Document editor</ArtifactTitle>
                   </div>
                   <ArtifactActions>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <ArtifactAction tooltip="AI actions" asChild>
-                          <Button variant="outline" size="sm" className="size-auto gap-1.5 px-2">
-                            <Wand2 className="size-3.5" /> AI actions
-                          </Button>
-                        </ArtifactAction>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-56">
-                        <DropdownMenuLabel>Apply to selection</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        {AI_ACTIONS.map((a) => {
-                          const Icon = a.icon;
-                          return (
-                            <DropdownMenuItem key={a.id} onClick={() => runAction(a.id, a.label)} className="gap-2">
-                              <Icon className="size-3.5" /> {a.label}
-                            </DropdownMenuItem>
-                          );
-                        })}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="gap-1.5"
+                      onClick={() => void copyAll()}
+                    >
+                      <Copy className="size-3.5" /> Copy
+                    </Button>
                   </ArtifactActions>
                 </ArtifactHeader>
                 <textarea
+                  ref={editorRef}
                   value={body}
                   onChange={(e) => handleBodyChange(e.target.value)}
-                  className="w-full min-h-[420px] lg:min-h-[560px] resize-none bg-transparent p-4 sm:p-6 font-mono text-xs sm:text-sm leading-relaxed text-foreground focus:outline-none"
+                  onSelect={() => setHasSelection(selection().length > 0)}
+                  spellCheck={false}
+                  aria-label="Draft text"
+                  className="min-h-[420px] w-full resize-none bg-transparent p-4 font-mono text-xs leading-relaxed text-foreground focus:outline-none sm:p-6 sm:text-sm"
                 />
-                <div className="flex items-center gap-3 border-t px-4 py-2 text-[11px] text-muted-foreground">
-                  <span>{wordCount} words</span>
-                  <span>·</span>
-                  <span>{body.length} characters</span>
+                <div className="flex flex-wrap items-center gap-3 border-t px-4 py-2 text-[11px] text-muted-foreground">
+                  <span>{analysis.words} words</span>
+                  <span aria-hidden>·</span>
+                  <span>{analysis.characters} characters</span>
+                  <span aria-hidden>·</span>
+                  <span>{analysis.paragraphs} paragraphs</span>
                   <span className="ml-auto inline-flex items-center gap-1">
                     {saveStatus === "saving" ? (
-                      <><Loader2 className="size-3 animate-spin" /> Saving…</>
+                      <>
+                        <Loader2 className="size-3 animate-spin" /> Saving…
+                      </>
                     ) : saveStatus === "saved" ? (
-                      <><CheckCircle2 className="size-3 text-emerald-500" /> Saved</>
+                      <>
+                        <CheckCircle2 className="size-3 text-emerald-500" /> Saved
+                      </>
+                    ) : saveStatus === "error" ? (
+                      <>
+                        <AlertTriangle className="size-3 text-destructive" /> Not saved
+                      </>
                     ) : (
-                      <><AlertTriangle className="size-3 text-amber-500" /> Unsaved</>
+                      <>
+                        <FileText className="size-3" /> {draftId ? "Unsaved" : "Local session"}
+                      </>
                     )}
                   </span>
                 </div>
@@ -405,49 +1103,43 @@ export default function DraftStudioPage() {
                     <ArtifactTitle>AI Assistant</ArtifactTitle>
                   </div>
                 </ArtifactHeader>
-                <ScrollArea className="flex-1 min-h-[260px] max-h-[320px] lg:max-h-[420px]">
-                  <div className="p-3 space-y-4">
+                <ScrollArea className="min-h-[260px] max-h-[320px] flex-1 lg:max-h-[460px]">
+                  <div className="space-y-4 p-3">
                     {chat.map((msg, i) => (
                       <Message key={i} from={msg.role === "ai" ? "assistant" : "user"}>
                         {msg.role === "ai" && msg.thinking && (
                           <ChainOfThought defaultOpen={false}>
-                            <ChainOfThoughtHeader>Reasoning trace</ChainOfThoughtHeader>
+                            <ChainOfThoughtHeader>Provenance</ChainOfThoughtHeader>
                             <ChainOfThoughtContent>
-                              <ChainOfThoughtStep label="Retrieve authorities" status="complete" />
-                              <ChainOfThoughtStep label="Apply to draft" status="complete" description={msg.thinking} />
+                              <ChainOfThoughtStep label="Instruction prepared" status="complete" />
+                              <ChainOfThoughtStep
+                                label="Provider call"
+                                status="complete"
+                                description={msg.thinking}
+                              />
+                              <ChainOfThoughtStep
+                                label="Citation check"
+                                status="complete"
+                                description="Authorities are validated against the LOM catalogue before they are marked verified."
+                              />
                             </ChainOfThoughtContent>
                           </ChainOfThought>
                         )}
-                        {msg.role === "ai" && msg.thinking && (
-                          <Reasoning defaultOpen={false}>
-                            <ReasoningTrigger />
-                            <ReasoningContent>{msg.thinking}</ReasoningContent>
-                          </Reasoning>
-                        )}
                         <MessageContent>
                           <MessageResponse>{msg.content}</MessageResponse>
-                          {msg.role === "ai" && (
-                            <Sources>
-                              <SourcesTrigger count={3} />
-                              <SourcesContent>
-                                <Source href="https://lom.gov.my/act/employment-1955" title="Employment Act 1955" />
-                                <Source href="https://lom.gov.my/case/wong-yuen-foo" title="Wong Yuen Foo v Soon Hing" />
-                                <Source href="https://lom.gov.my/internal/disciplinary-policy" title="Internal Disciplinary Policy" />
-                              </SourcesContent>
-                            </Sources>
-                          )}
                         </MessageContent>
                       </Message>
                     ))}
                   </div>
                 </ScrollArea>
-                <div className="border-t p-3 space-y-2">
+                <div className="space-y-2 border-t p-3">
                   <AIComposer
                     value={chatInput}
                     onChange={setChatInput}
                     onSubmit={sendChat}
                     placeholder="Ask the AI to refine, check or translate this draft…"
                     showAttachments={false}
+                    isLoading={activeAction !== null}
                     compact
                   />
                 </div>
@@ -455,171 +1147,415 @@ export default function DraftStudioPage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="evidence" className="mt-3">
+          {/* Evidence */}
+          <TabsContent value="evidence" className="mt-3 space-y-4">
             <Artifact>
               <ArtifactHeader>
                 <div>
-                  <ArtifactTitle>Supporting evidence</ArtifactTitle>
-                  <ArtifactDescription>Authoritative sources relevant to this draft.</ArtifactDescription>
+                  <ArtifactTitle>Evidence attached to this draft</ArtifactTitle>
+                  <ArtifactDescription>
+                    {draftId
+                      ? "Sources retrieved from the LOM catalogue and stored against this draft."
+                      : "Save the draft to attach sources — evidence stays auditable only once persisted."}
+                  </ArtifactDescription>
                 </div>
+                <ArtifactActions>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1.5"
+                    onClick={() => void pullEvidence()}
+                    disabled={retrieveEvidenceMutation.isPending}
+                  >
+                    {retrieveEvidenceMutation.isPending ? (
+                      <Loader2 className="size-3.5 animate-spin" />
+                    ) : (
+                      <Gavel className="size-3.5" />
+                    )}
+                    Retrieve
+                  </Button>
+                </ArtifactActions>
               </ArtifactHeader>
               <ArtifactContent className="space-y-2">
-                {EVIDENCE.map((e, i) => (
-                  <div key={i} className="flex items-start gap-3 rounded-md border bg-card/30 p-3">
-                    <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted">
-                      <Gavel className="size-4 text-muted-foreground" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-medium text-sm">{e.title}</p>
-                        <Badge variant="outline" className="text-[10px]">{e.type}</Badge>
-                        {e.section && <Badge variant="secondary" className="text-[10px]">{e.section}</Badge>}
-                        {e.verified && (
-                          <Badge variant="outline" className="text-[10px] gap-1 border-emerald-500/30 text-emerald-500">
-                            <CheckCircle2 className="size-3" /> Verified
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{e.snippet}</p>
-                      <div className="mt-2 flex items-center gap-3 text-[11px] text-muted-foreground">
-                        <span>Relevance {(e.relevance * 100).toFixed(0)}%</span>
-                        <span>Confidence {(e.confidence * 100).toFixed(0)}%</span>
-                      </div>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="shrink-0"
-                      onClick={() => {
-                        setBody((b) => `${b}\n\n${e.title}${e.section ? ` — ${e.section}` : ""}: ${e.snippet ?? ""}`);
-                        toast.success(`Inserted reference: ${e.title}`);
-                      }}
-                    >
-                      Insert
-                    </Button>
+                {evidenceQuery.isLoading ? (
+                  <p className="py-6 text-center text-sm text-muted-foreground">Loading evidence…</p>
+                ) : serverEvidence.length === 0 ? (
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      No evidence attached yet. Detected references in the draft:
+                    </p>
+                    {analysis.citations.length === 0 ? (
+                      <p className="rounded-md border bg-card/40 p-3 text-xs text-muted-foreground">
+                        No Act numbers, section references or Malaysian reporter citations were found in
+                        the current text. Insert citations from the Citations tab to build the record.
+                      </p>
+                    ) : (
+                      <ul className="space-y-1.5">
+                        {analysis.citations.map((c, i) => (
+                          <li
+                            key={`${c.raw}-${i}`}
+                            className="flex items-center gap-2 rounded-md border bg-card/40 px-3 py-2 text-xs"
+                          >
+                            <Badge variant="outline" className="text-[10px]">
+                              {c.type}
+                            </Badge>
+                            <span className="truncate">{c.raw}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
-                ))}
+                ) : (
+                  serverEvidence.map((e) => (
+                    <div
+                      key={e.id}
+                      className="flex items-start gap-3 rounded-md border bg-card/30 p-3"
+                    >
+                      <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted">
+                        <Gavel className="size-4 text-muted-foreground" aria-hidden />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="text-sm font-medium">{e.title}</p>
+                          {e.citation && (
+                            <Badge variant="secondary" className="text-[10px]">
+                              {e.citation}
+                            </Badge>
+                          )}
+                          {e.jurisdiction && (
+                            <Badge variant="outline" className="text-[10px]">
+                              {e.jurisdiction}
+                            </Badge>
+                          )}
+                          <Badge
+                            variant="outline"
+                            className={cn(
+                              "text-[10px]",
+                              e.status === "VERIFIED" && "border-emerald-500/30 text-emerald-500",
+                            )}
+                          >
+                            {(e.status ?? "PENDING").toLowerCase()}
+                          </Badge>
+                        </div>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {e.supportType ? `Support: ${e.supportType} · ` : ""}
+                          Relevance{" "}
+                          {e.relevance != null ? `${Math.round(e.relevance * 100)}%` : "—"}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
               </ArtifactContent>
             </Artifact>
           </TabsContent>
 
-          <TabsContent value="quality" className="mt-3">
+          {/* Quality */}
+          <TabsContent value="quality" className="mt-3 space-y-4">
             <Artifact>
               <ArtifactHeader>
                 <div>
                   <ArtifactTitle>Draft quality</ArtifactTitle>
-                  <ArtifactDescription>Multi-dimensional quality assessment.</ArtifactDescription>
+                  <ArtifactDescription>
+                    {serverQuality
+                      ? serverQuality.disclaimer
+                      : "Local heuristic preview. Save the draft to score it against persisted citations and evidence."}
+                  </ArtifactDescription>
                 </div>
+                {qualityQuery.isFetching && (
+                  <Loader2 className="size-4 animate-spin text-muted-foreground" aria-hidden />
+                )}
               </ArtifactHeader>
-              <ArtifactContent className="space-y-4">
+              <ArtifactContent className="space-y-5">
                 <div>
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="mb-2 flex items-center justify-between">
                     <span className="text-sm font-medium">Overall</span>
                     <span className="text-2xl font-semibold tracking-tight">
-                      {QUALITY_SCORES.overall}<span className="text-sm text-muted-foreground">/100</span>
+                      {overallScore}
+                      <span className="text-sm text-muted-foreground">/100</span>
                     </span>
                   </div>
-                  <Progress value={QUALITY_SCORES.overall} className="h-2" />
+                  <Progress value={overallScore} className="h-2" />
+                  <p className="mt-1.5 text-[11px] text-muted-foreground">
+                    {serverQuality
+                      ? "Computed from persisted citations, evidence and unsupported assertions."
+                      : "Computed in this browser from the citation patterns in your text."}
+                  </p>
                 </div>
+
                 <div className="grid gap-3 sm:grid-cols-2">
-                  {Object.entries(QUALITY_SCORES).filter(([k]) => k !== "overall").map(([key, value]) => (
-                    <div key={key} className="space-y-1">
+                  {scoreRows.map((row) => (
+                    <div key={row.key} className="space-y-1">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="capitalize">{key.replace(/([A-Z])/g, " $1").trim()}</span>
-                        <span className="font-medium">{value}</span>
+                        <span>{row.key}</span>
+                        <span className="font-medium tabular-nums">{row.value}</span>
                       </div>
-                      <Progress value={value} className="h-1.5" />
+                      <Progress value={row.value} className="h-1.5" />
                     </div>
                   ))}
                 </div>
+
+                {serverQuality && serverQuality.reasons.length > 0 && (
+                  <>
+                    <Separator />
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground">Breakdown</p>
+                      <ul className="mt-2 space-y-1">
+                        {serverQuality.reasons.map((r) => (
+                          <li key={r} className="text-xs text-muted-foreground">
+                            {r}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </>
+                )}
+              </ArtifactContent>
+            </Artifact>
+
+            <Artifact>
+              <ArtifactHeader>
+                <div>
+                  <ArtifactTitle>Unsupported assertions</ArtifactTitle>
+                  <ArtifactDescription>
+                    Legal-sounding statements with no authority attached.
+                  </ArtifactDescription>
+                </div>
+              </ArtifactHeader>
+              <ArtifactContent className="space-y-2">
+                {unsupportedAssertions.length === 0 ? (
+                  <p className="flex items-center gap-2 rounded-md border bg-card/40 p-3 text-xs text-muted-foreground">
+                    <CheckCircle2 className="size-3.5 text-emerald-500" aria-hidden />
+                    No unsupported assertions detected.
+                  </p>
+                ) : (
+                  unsupportedAssertions.map((u, i) => (
+                    <div key={`${u.sentence}-${i}`} className="rounded-md border bg-card/40 p-3">
+                      <p className="text-xs font-medium">{u.sentence}</p>
+                      <p className="mt-1 text-[11px] text-amber-600 dark:text-amber-400">
+                        {u.rationale}
+                      </p>
+                    </div>
+                  ))
+                )}
               </ArtifactContent>
             </Artifact>
           </TabsContent>
 
-          <TabsContent value="citations" className="mt-3">
+          {/* Citations */}
+          <TabsContent value="citations" className="mt-3 space-y-4">
             <Artifact>
               <ArtifactHeader>
                 <div>
-                  <ArtifactTitle>Citations</ArtifactTitle>
-                  <ArtifactDescription>Insert and validate citations from LOM.</ArtifactDescription>
+                  <ArtifactTitle>Insert and validate citations</ArtifactTitle>
+                  <ArtifactDescription>
+                    Search the LOM legislation catalogue, insert, then validate the format.
+                  </ArtifactDescription>
                 </div>
               </ArtifactHeader>
               <ArtifactContent className="space-y-3">
                 <input
-                  value={citationInput}
-                  onChange={(e) => setCitationInput(e.target.value)}
-                  placeholder="Search LOM: Act, case, section…"
+                  value={citationQuery}
+                  onChange={(e) => setCitationQuery(e.target.value)}
+                  placeholder="Search LOM: Act number, title, section…"
+                  aria-label="Search the LOM catalogue"
                   className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
                 />
-                {citationInput && (
+
+                {citationQuery.trim().length > 1 && (
                   <div className="space-y-1 rounded-md border bg-card/30 p-2">
-                    {MALAYSIAN_SOURCES.filter((s) =>
-                      s.title.toLowerCase().includes(citationInput.toLowerCase()) ||
-                      s.section?.toLowerCase().includes(citationInput.toLowerCase())
-                    ).slice(0, 4).map((s) => (
-                      <button
-                        key={s.id}
-                        onClick={() => setCitationInput("")}
-                        className="flex w-full items-center gap-2 rounded-md p-2 text-left text-sm hover:bg-accent/40 transition-colors"
-                      >
-                        <Gavel className="size-3.5 text-muted-foreground" />
-                        <div className="flex-1 min-w-0">
-                          <p className="truncate font-medium">{s.title}</p>
-                          <p className="text-[10px] text-muted-foreground truncate">{s.section} · {s.area}</p>
-                        </div>
-                        <Plus className="size-3 text-muted-foreground" />
-                      </button>
-                    ))}
+                    {lomSearch.isFetching ? (
+                      <p className="p-2 text-xs text-muted-foreground">Searching LOM…</p>
+                    ) : lomHits.length === 0 ? (
+                      <p className="p-2 text-xs text-muted-foreground">
+                        No LOM match. Try the Act number, e.g. “Act 265”.
+                      </p>
+                    ) : (
+                      lomHits.map((hit) => (
+                        <button
+                          key={hit.id}
+                          onClick={() => void addCitation(hit)}
+                          className="flex w-full items-center gap-2 rounded-md p-2 text-left text-sm transition-colors hover:bg-accent/40"
+                        >
+                          <Gavel className="size-3.5 shrink-0 text-muted-foreground" />
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate font-medium">
+                              {hit.titleEn ?? hit.titleBm ?? hit.actNumber}
+                            </span>
+                            <span className="block truncate text-[10px] text-muted-foreground">
+                              {hit.actNumber ?? hit.type}
+                              {hit.citation ? ` · ${hit.citation}` : ""}
+                            </span>
+                          </span>
+                          <Plus className="size-3 shrink-0 text-muted-foreground" />
+                        </button>
+                      ))
+                    )}
                   </div>
                 )}
+
                 <div className="space-y-2">
-                  {MALAYSIAN_SOURCES.slice(0, 2).map((s) => (
-                    <div key={s.id} className="flex items-start gap-3 rounded-md border bg-card/30 p-3">
-                      <CheckCircle2 className="size-4 text-emerald-500 mt-0.5 shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium">{s.title} {s.section && `— ${s.section}`}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">{s.excerpt}</p>
+                  {citations.length === 0 ? (
+                    <p className="rounded-md border bg-card/40 p-3 text-xs text-muted-foreground">
+                      No citations in this draft yet. Search the LOM catalogue above, or write an Act
+                      reference directly in the editor — it will be detected by the Quality tab.
+                    </p>
+                  ) : (
+                    citations.map((c) => (
+                      <div
+                        key={`${c.displayText}-${c.dbId ?? "local"}`}
+                        className="flex items-start gap-3 rounded-md border bg-card/30 p-3"
+                      >
+                        <span className="mt-0.5 shrink-0">
+                          {c.status === "VERIFIED" ? (
+                            <CheckCircle2 className="size-4 text-emerald-500" aria-hidden />
+                          ) : c.status === "INVALID" ? (
+                            <AlertTriangle className="size-4 text-destructive" aria-hidden />
+                          ) : (
+                            <AlertTriangle className="size-4 text-amber-500" aria-hidden />
+                          )}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium">{c.displayText}</p>
+                          {c.matchedTitle && (
+                            <p className="text-[11px] text-muted-foreground">
+                              Matched: {c.matchedTitle}
+                              {c.matchedCitation ? ` · ${c.matchedCitation}` : ""}
+                            </p>
+                          )}
+                          <p className="mt-0.5 text-[11px] text-muted-foreground">
+                            {c.status.toLowerCase()}
+                            {c.confidence != null &&
+                              ` · ${Math.round(c.confidence * 100)}% confidence`}
+                            {c.explanation ? ` — ${c.explanation}` : ""}
+                          </p>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          aria-label={`Validate ${c.displayText}`}
+                          onClick={() => void validateOne(c.displayText)}
+                        >
+                          <RefreshCw className="size-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          aria-label={`Remove ${c.displayText}`}
+                          onClick={() => removeCitation(c.displayText)}
+                        >
+                          <span aria-hidden>×</span>
+                        </Button>
                       </div>
-                      <Button variant="ghost" size="icon-sm" aria-label="Remove" onClick={() => toast.message("Citation removed")}>
-                        <X className="size-3" />
-                      </Button>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </ArtifactContent>
             </Artifact>
           </TabsContent>
 
-          <TabsContent value="history" className="mt-3">
+          {/* History */}
+          <TabsContent value="history" className="mt-3 space-y-4">
             <Artifact>
               <ArtifactHeader>
                 <div>
                   <ArtifactTitle>Version history</ArtifactTitle>
-                  <ArtifactDescription>Restore previous versions or compare.</ArtifactDescription>
+                  <ArtifactDescription>
+                    Every template change, save and AI action in this browser session.
+                  </ArtifactDescription>
                 </div>
               </ArtifactHeader>
               <ArtifactContent className="space-y-2">
-                {VERSIONS.map((v) => (
-                  <div key={v.id} className="flex items-center gap-3 rounded-md border bg-card/30 p-3">
-                    <div className="flex size-9 items-center justify-center rounded-md bg-muted">
-                      <History className="size-4 text-muted-foreground" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-medium text-sm">{v.label}</p>
-                        {v.ai && <Badge variant="outline" className="text-[10px]">AI</Badge>}
+                {snapshots.length === 0 ? (
+                  <p className="rounded-md border bg-card/40 p-3 text-xs text-muted-foreground">
+                    No snapshots yet. Saving, switching templates or applying an AI action records one.
+                  </p>
+                ) : (
+                  snapshots.map((v) => (
+                    <div key={v.id} className="flex items-center gap-3 rounded-md border bg-card/30 p-3">
+                      <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted">
+                        <History className="size-4 text-muted-foreground" aria-hidden />
                       </div>
-                      <p className="text-xs text-muted-foreground">{v.author} · {v.date}</p>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="text-sm font-medium">{v.label}</p>
+                          {v.author === "AI" && (
+                            <Badge variant="outline" className="text-[10px]">
+                              AI
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {v.author} · {new Date(v.at).toLocaleString("en-MY")} ·{" "}
+                          {v.content.split(/\s+/).filter(Boolean).length} words
+                        </p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setComparing(v)}
+                      >
+                        Compare
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setBody(v.content);
+                          setSaveStatus(draftId ? "unsaved" : "local");
+                          toast.success(`Restored “${v.label}”`);
+                        }}
+                      >
+                        Restore
+                      </Button>
                     </div>
-                    <Button variant="ghost" size="sm" onClick={() => toast.info(`Comparing with "${v.label}"`)}>Compare</Button>
-                    <Button variant="outline" size="sm" onClick={() => toast.success(`Restored "${v.label}"`)}>Restore</Button>
-                  </div>
-                ))}
+                  ))
+                )}
               </ArtifactContent>
             </Artifact>
+
+            {comparing && (
+              <Artifact>
+                <ArtifactHeader>
+                  <div>
+                    <ArtifactTitle>Comparison</ArtifactTitle>
+                    <ArtifactDescription>
+                      Current draft vs “{comparing.label}”
+                    </ArtifactDescription>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => setComparing(null)}>
+                    Close
+                  </Button>
+                </ArtifactHeader>
+                <ArtifactContent className="grid gap-4 sm:grid-cols-2">
+                  {[
+                    { label: `Snapshot · ${new Date(comparing.at).toLocaleString("en-MY")}`, text: comparing.content },
+                    { label: "Current draft", text: body },
+                  ].map((col) => {
+                    const words = col.text.split(/\s+/).filter(Boolean).length;
+                    return (
+                      <div key={col.label} className="space-y-1.5">
+                        <p className="text-xs font-medium">{col.label}</p>
+                        <p className="text-[11px] text-muted-foreground">{words} words</p>
+                        <pre className="max-h-56 overflow-auto whitespace-pre-wrap rounded-md border bg-card/40 p-3 font-mono text-[11px] leading-relaxed">
+                          {col.text}
+                        </pre>
+                      </div>
+                    );
+                  })}
+                </ArtifactContent>
+              </Artifact>
+            )}
           </TabsContent>
         </Tabs>
       </div>
     </DashboardShell>
   );
+}
+
+/** Recognises a Malaysian reporter or Act format in a citation string. */
+function detectFormat(value: string) {
+  if (/\[\d{4}\]\s+\d+\s+(?:MLJ|AM|AMCR)\s+\d+/.test(value)) return "VERIFIED";
+  if (/\bAct\s+(?:[Aa]\d+|\d+)/.test(value)) return "UNVERIFIED";
+  return "INVALID";
 }
