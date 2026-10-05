@@ -110,3 +110,5 @@ test('rankCitationAuthority orders citations by tier and recency', () => {
   assert.equal(ranked[0].rank, 1);
   assert.equal(ranked[ranked.length - 1].format, 'CLJ');
 });
+
+// TODO: remove skip once .autoclaw/agents/validation/citation-validator.js is implemented.
