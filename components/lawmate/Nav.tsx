@@ -48,8 +48,10 @@ const NAV_GROUPS = [
     items: [
       { href: "/legalai/matters", label: "Matters", icon: Briefcase },
       { href: "/legalai/clients", label: "Clients", icon: Users },
+      { href: "/legalai/documents", label: "Documents", icon: FileText },
+      { href: "/legalai/drafting", label: "Document Drafting", icon: FileText },
+      { href: "/legalai/draft", label: "Drafting Studio", icon: FileSignature },
       { href: "/legalai/contracts", label: "Contracts", icon: FileSignature },
-      { href: "/legalai/draft", label: "Document Drafting", icon: FileText },
       { href: "/legalai/debate", label: "Debate Simulation", icon: Swords },
     ],
   },
@@ -154,7 +156,15 @@ export default function Nav() {
           <nav className="hidden min-w-0 flex-1 items-center justify-end gap-1 overflow-x-auto lg:flex">
             {NAV_GROUPS.flatMap((g) => g.items)
               .filter((i) =>
-                ["/legalai/agent", "/legalai/matters", "/legalai/contracts", "/legalai/hitl", "/legalai/governance", "/legalai"].includes(i.href)
+                [
+                  "/legalai/agent",
+                  "/legalai/matters",
+                  "/legalai/documents",
+                  "/legalai/contracts",
+                  "/legalai/hitl",
+                  "/legalai/governance",
+                  "/legalai",
+                ].includes(i.href)
               )
               .map((item) => (
                 <Link
