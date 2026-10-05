@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { LOMClient, normalizeActNumber, buildLegislationPdfUrl, inferDocumentType } from '../../.autoclaw/memory/interfaces/lom-client.js';
+import { LOMClient, normalizeActNumber, buildLegislationPdfUrl, inferDocumentType } from '../../.autoclaw/memory/interfaces/lom-client.mjs';
 
 test('normalizeActNumber strips prefix and preserves real act id', () => {
   assert.equal(normalizeActNumber('Act 1'), '1');
