@@ -1,28 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  Briefcase,
-  Users,
-  Clock,
   AlertTriangle,
-  Bot,
-  Search,
-  Filter,
+  Briefcase,
+  CalendarClock,
+  ChevronLeft,
   ChevronRight,
-  Activity,
-  MessageSquare,
-  FileText,
-  CheckCircle2,
-  CircleDot,
-  FileSignature,
-  BookOpen,
+  Clock,
+  FileCheck,
+  Filter,
+  Search,
+  Users,
 } from "lucide-react";
 import { DashboardShell } from "@/components/lawmate/DashboardShell";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { CreateMatterDialog } from "@/components/lawmate/CreateMatterDialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Drawer, DrawerContent } from "@/components/ui/drawer";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -30,295 +28,491 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
-import { MOCK_MATTERS, MOCK_TASKS, MOCK_RISKS } from "@/lib/lawmate/data";
-import { relativeTime, severityClasses } from "@/lib/lawmate/utils";
+import { ListSkeleton } from "@/components/shared/PageSkeleton";
+import { trpcReact } from "@/clients";
+import { useDebounce } from "@/hooks/useDebounce";
+import { relativeTime } from "@/lib/lawmate/utils";
 import { cn } from "@/lib/utils";
-import type { Matter, TaskStatus } from "@/types/lawmate";
-import { CreateMatterDialog } from "@/components/lawmate/CreateMatterDialog";
 
-const STATUS_BADGE: Record<Matter["status"], string> = {
-  active: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-  pending: "bg-amber-500/10 text-amber-500 border-amber-500/20",
-  review: "bg-blue-500/10 text-blue-500 border-blue-500/20",
-  completed: "bg-muted text-muted-foreground",
+interface MatterRow {
+  id: string;
+  title: string;
+  matterNumber: string;
+  status: string;
+  priority: string;
+  matterType?: string;
+  description?: string | null;
+  deadlineAt?: string | null;
+  updatedAt?: string;
+  client?: { id: string; name: string } | null;
+  _count?: { agentActions: number; alerts: number };
+}
+
+interface MatterDetail extends MatterRow {
+  jurisdiction?: string;
+  court?: string | null;
+  caseNumber?: string | null;
+  openedAt?: string;
+  riskLevel?: string | null;
+  riskScore?: number | null;
+  timeline?: Array<{
+    id: string;
+    title: string;
+    eventType: string;
+    eventDate: string;
+    description?: string | null;
+  }>;
+  contracts?: Array<{
+    id: string;
+    title: string;
+    status: string;
+    expiryDate?: string | null;
+  }>;
+  alerts?: Array<{
+    id: string;
+    title: string;
+    severity: string;
+    createdAt: string;
+  }>;
+}
+
+interface MatterStats {
+  total: number;
+  byStatus: Record<string, number>;
+  byPriority: Record<string, number>;
+}
+
+const STATUS_OPTIONS = [
+  { value: "all", label: "All statuses" },
+  { value: "open", label: "Open" },
+  { value: "active", label: "Active" },
+  { value: "on_hold", label: "On hold" },
+  { value: "closed", label: "Closed" },
+  { value: "archived", label: "Archived" },
+] as const;
+
+const STATUS_CLASSES: Record<string, string> = {
+  open: "border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300",
+  active: "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
+  on_hold: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300",
+  closed: "bg-muted text-muted-foreground",
   archived: "bg-muted text-muted-foreground",
 };
 
-const TASK_STATUS_ICON: Record<TaskStatus, React.ComponentType<{ className?: string }>> = {
-  todo: CircleDot,
-  in_progress: Activity,
-  blocked: AlertTriangle,
-  done: CheckCircle2,
-};
+function displayValue(value?: string | null) {
+  return value
+    ? value.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase())
+    : "—";
+}
 
 export default function MattersPage() {
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [selected, setSelected] = useState<string>(MOCK_MATTERS[0]?.id ?? "");
-  const [matters, setMatters] = useState(MOCK_MATTERS);
+  const debouncedSearch = useDebounce(search, 300);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [cursorStack, setCursorStack] = useState<string[]>([]);
+  const [selectedId, setSelectedId] = useState("");
   const [mobileDetail, setMobileDetail] = useState(false);
+  const cursor = cursorStack[cursorStack.length - 1];
 
-  const filtered = matters.filter((m) => {
-    if (statusFilter !== "all" && m.status !== statusFilter) return false;
-    if (
-      search &&
-      !m.name.toLowerCase().includes(search.toLowerCase()) &&
-      !(m.client ?? "").toLowerCase().includes(search.toLowerCase())
-    )
-      return false;
-    return true;
+  const mattersQuery = trpcReact.matters.list.useQuery(
+    {
+      search: debouncedSearch || undefined,
+      status: statusFilter === "all" ? undefined : statusFilter,
+      limit: 25,
+      cursor,
+    },
+    { retry: false },
+  );
+  const statsQuery = trpcReact.matters.stats.useQuery(undefined, {
+    retry: false,
   });
+  const matterRows = (mattersQuery.data?.matters ?? []) as MatterRow[];
+  const stats = statsQuery.data as MatterStats | undefined;
+  const detailQuery = trpcReact.matters.getById.useQuery(selectedId, {
+    enabled: !!selectedId,
+    retry: false,
+  });
+  const matter = detailQuery.data as MatterDetail | undefined;
 
-  const matter = matters.find((m) => m.id === selected);
-  const matterTasks = MOCK_TASKS.filter((t) => t.matterId === selected);
-  const matterRisks = MOCK_RISKS.filter((r) => r.matterId === selected);
+  useEffect(() => {
+    if (!matterRows.some((row) => row.id === selectedId)) {
+      setSelectedId(matterRows[0]?.id ?? "");
+    }
+  }, [matterRows, selectedId]);
 
-  const handleSelect = (id: string) => {
-    setSelected(id);
+  const resetCursor = () => setCursorStack([]);
+  const setSearchFilter = (value: string) => {
+    setSearch(value);
+    resetCursor();
+  };
+  const setStatus = (value: string) => {
+    setStatusFilter(value);
+    resetCursor();
+  };
+
+  const activeCount =
+    (stats?.byStatus.open ?? 0) + (stats?.byStatus.active ?? 0);
+  const priorityCount = stats?.byPriority ?? {};
+
+  const selectMatter = (id: string) => {
+    setSelectedId(id);
     setMobileDetail(true);
   };
 
-  const DetailContent = matter && (
-    <div className="space-y-4 p-4 lg:p-0">
+  const detailPanel = matter ? (
+    <div className="space-y-5 p-4 lg:p-0">
       <div>
         <p className="text-xs text-muted-foreground">Matter</p>
-        <h3 className="text-lg font-semibold leading-tight">{matter.name}</h3>
-        <div className="flex items-center gap-2 flex-wrap mt-2 text-xs">
-          <Badge variant="secondary">{matter.number}</Badge>
-          <Badge variant="outline">{matter.area}</Badge>
-          <Badge variant="outline">{matter.classification}</Badge>
+        <h2 className="mt-1 text-lg font-semibold leading-tight">
+          {matter.title}
+        </h2>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <Badge variant="secondary">{matter.matterNumber}</Badge>
+          <Badge variant="outline">{displayValue(matter.matterType)}</Badge>
+          <Badge
+            variant="outline"
+            className={STATUS_CLASSES[matter.status] ?? ""}
+          >
+            {displayValue(matter.status)}
+          </Badge>
         </div>
       </div>
-      <p className="text-sm text-muted-foreground leading-relaxed">
-        {matter.description}
-      </p>
 
-      <div className="grid grid-cols-2 gap-2 text-xs">
-        <DetailRow label="Status" value={matter.status} />
-        <DetailRow label="Priority" value={matter.priority} />
-        <DetailRow label="Client" value={matter.client ?? "—"} />
-        <DetailRow label="Updated" value={relativeTime(matter.updatedAt)} />
-      </div>
-
-      <div className="space-y-2">
-        <p className="text-xs font-medium text-muted-foreground">
-          Tasks ({matterTasks.length})
+      {matter.description ? (
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          {matter.description}
         </p>
-        {matterTasks.length === 0 ? (
-          <p className="text-xs text-muted-foreground">No tasks yet.</p>
-        ) : (
-          matterTasks.slice(0, 4).map((t) => {
-            const Icon = TASK_STATUS_ICON[t.status];
-            return (
-              <div
-                key={t.id}
-                className="flex items-center gap-2 rounded-md border p-2 text-xs"
-              >
-                <Icon
-                  className={cn(
-                    "size-3.5 shrink-0",
-                    t.status === "done" && "text-emerald-500",
-                    t.status === "in_progress" && "text-primary",
-                    t.status === "blocked" && "text-red-500",
-                    t.status === "todo" && "text-muted-foreground",
-                  )}
-                />
-                <span className="flex-1 truncate">{t.title}</span>
-                <span className="text-muted-foreground">
-                  {relativeTime(t.dueDate ?? "")}
-                </span>
-              </div>
-            );
-          })
-        )}
-      </div>
+      ) : null}
 
-      <div className="space-y-2">
-        <p className="text-xs font-medium text-muted-foreground">
-          AI Risk Summary ({matterRisks.length})
-        </p>
-        {matterRisks.slice(0, 3).map((r) => {
-          const s = severityClasses(r.severity);
-          return (
-            <div
-              key={r.id}
-              className={cn("rounded-md border p-2 text-xs", s.border, s.bg)}
-            >
-              <div className="flex items-center gap-2">
-                <span className={cn("size-1.5 rounded-full", s.dot)} />
-                <span className="font-medium">{r.title}</span>
+      <dl className="grid grid-cols-2 gap-3 text-sm">
+        <div>
+          <dt className="text-xs text-muted-foreground">Client</dt>
+          <dd className="mt-1">{matter.client?.name ?? "—"}</dd>
+        </div>
+        <div>
+          <dt className="text-xs text-muted-foreground">Priority</dt>
+          <dd className="mt-1">{displayValue(matter.priority)}</dd>
+        </div>
+        <div>
+          <dt className="text-xs text-muted-foreground">Jurisdiction</dt>
+          <dd className="mt-1">{matter.jurisdiction ?? "—"}</dd>
+        </div>
+        <div>
+          <dt className="text-xs text-muted-foreground">Last updated</dt>
+          <dd className="mt-1">
+            {matter.updatedAt ? relativeTime(matter.updatedAt) : "—"}
+          </dd>
+        </div>
+        {matter.deadlineAt ? (
+          <div className="col-span-2">
+            <dt className="text-xs text-muted-foreground">Deadline</dt>
+            <dd className="mt-1">
+              {new Date(matter.deadlineAt).toLocaleDateString("en-MY")}
+            </dd>
+          </div>
+        ) : null}
+      </dl>
+
+      {matter.alerts?.length ? (
+        <section className="space-y-2">
+          <h3 className="text-xs font-medium text-muted-foreground">
+            Unacknowledged alerts ({matter.alerts.length})
+          </h3>
+          {matter.alerts.slice(0, 4).map((alert) => (
+            <div key={alert.id} className="rounded-md border p-3 text-sm">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-medium">{alert.title}</span>
+                <Badge variant="outline">{displayValue(alert.severity)}</Badge>
               </div>
-              <p className="mt-0.5 text-[11px] text-muted-foreground line-clamp-2">
-                {r.description}
+              <p className="mt-1 text-xs text-muted-foreground">
+                {relativeTime(alert.createdAt)}
               </p>
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </section>
+      ) : (
+        <p className="text-xs text-muted-foreground">No unacknowledged alerts.</p>
+      )}
+
+      {matter.contracts?.length ? (
+        <section className="space-y-2">
+          <h3 className="text-xs font-medium text-muted-foreground">
+            Related contracts
+          </h3>
+          {matter.contracts.slice(0, 5).map((contract) => (
+            <div
+              key={contract.id}
+              className="flex items-center justify-between gap-2 rounded-md border p-2 text-xs"
+            >
+              <span className="truncate font-medium">{contract.title}</span>
+              <Badge variant="outline">{displayValue(contract.status)}</Badge>
+            </div>
+          ))}
+        </section>
+      ) : null}
+
+      {matter.timeline?.length ? (
+        <section className="space-y-2">
+          <h3 className="text-xs font-medium text-muted-foreground">
+            Recent timeline
+          </h3>
+          {matter.timeline.slice(0, 5).map((event) => (
+            <div key={event.id} className="border-l-2 border-primary/30 pl-3">
+              <p className="text-sm font-medium">{event.title}</p>
+              <p className="text-xs text-muted-foreground">
+                {displayValue(event.eventType)} ·{" "}
+                {new Date(event.eventDate).toLocaleDateString("en-MY")}
+              </p>
+              {event.description ? (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {event.description}
+                </p>
+              ) : null}
+            </div>
+          ))}
+        </section>
+      ) : (
+        <p className="text-xs text-muted-foreground">No timeline events yet.</p>
+      )}
+    </div>
+  ) : detailQuery.isLoading ? (
+    <div className="p-4">
+      <ListSkeleton rows={4} />
+    </div>
+  ) : (
+    <div className="p-4 text-sm text-muted-foreground">
+      Select a matter to view its persisted details.
     </div>
   );
 
   return (
     <DashboardShell>
       <div className="space-y-6">
-        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Matters</h1>
             <p className="text-sm text-muted-foreground">
-              Manage legal matters with AI-powered insights.
+              Search and manage matters recorded in your workspace.
             </p>
           </div>
-          <CreateMatterDialog onCreate={(m) => setMatters((cur) => [m, ...cur])} />
+          <CreateMatterDialog />
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {(mattersQuery.isError || statsQuery.isError || detailQuery.isError) && (
+          <Alert variant="destructive">
+            <AlertTitle>Some matter data could not be loaded</AlertTitle>
+            <AlertDescription className="flex flex-wrap items-center justify-between gap-3">
+              <span>
+                {mattersQuery.error?.message ??
+                  statsQuery.error?.message ??
+                  detailQuery.error?.message}
+              </span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  void mattersQuery.refetch();
+                  void statsQuery.refetch();
+                  if (selectedId) void detailQuery.refetch();
+                }}
+              >
+                Retry
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <StatCard
             icon={Briefcase}
-            label="Active matters"
-            value={matters.filter((m) => m.status === "active").length}
-            accent="bg-primary/10 text-primary"
-          />
-          <StatCard
-            icon={AlertTriangle}
-            label="High priority"
-            value={matters.filter((m) => m.priority === "high").length}
-            accent="bg-red-500/10 text-red-500"
+            label="Total matters"
+            value={stats?.total}
+            loading={statsQuery.isLoading}
           />
           <StatCard
             icon={Clock}
-            label="In review"
-            value={matters.filter((m) => m.status === "review").length}
-            accent="bg-blue-500/10 text-blue-500"
+            label="Open and active"
+            value={activeCount}
+            loading={statsQuery.isLoading}
           />
           <StatCard
-            icon={Bot}
-            label="AI analyses run"
-            value={12}
-            accent="bg-violet-500/10 text-violet-500"
+            icon={AlertTriangle}
+            label="Urgent priority"
+            value={priorityCount.urgent ?? 0}
+            loading={statsQuery.isLoading}
           />
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
+          <section className="min-w-0 space-y-3" aria-label="Matter list">
+            <div className="flex flex-col gap-2 sm:flex-row">
               <div className="relative flex-1">
-                <Search className="absolute left-2.5 top-2.5 size-3.5 text-muted-foreground" />
+                <Search
+                  className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+                  aria-hidden
+                />
                 <Input
                   value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  onChange={(event) => setSearchFilter(event.target.value)}
                   placeholder="Search matters…"
-                  className="pl-8 h-9 text-sm"
+                  aria-label="Search matters"
+                  className="h-9 pl-9"
                 />
               </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="h-9 w-auto text-xs">
-                  <Filter className="size-3" />
-                  <SelectValue placeholder="Status" />
+              <Select value={statusFilter} onValueChange={setStatus}>
+                <SelectTrigger className="h-9 w-full sm:w-44" aria-label="Filter by status">
+                  <Filter className="size-3.5" aria-hidden />
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All status</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="review">Review</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="archived">Archived</SelectItem>
+                  {STATUS_OPTIONS.map((status) => (
+                    <SelectItem key={status.value} value={status.value}>
+                      {status.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
 
-            {filtered.length === 0 ? (
-              <EmptyState />
-            ) : (
+            {mattersQuery.isError ? null : mattersQuery.isLoading ? (
+              <ListSkeleton rows={5} />
+            ) : matterRows.length ? (
               <div className="space-y-2">
-                {filtered.map((m) => {
-                  const priorityColor =
-                    m.priority === "high"
-                      ? "text-red-500 border-red-500/30 bg-red-500/10"
-                      : m.priority === "medium"
-                      ? "text-amber-500 border-amber-500/30 bg-amber-500/10"
-                      : "text-blue-500 border-blue-500/30 bg-blue-500/10";
-                  return (
-                    <button
-                      key={m.id}
-                      onClick={() => handleSelect(m.id)}
-                      className={cn(
-                        "flex w-full items-start gap-3 rounded-md border p-3 text-left transition-colors",
-                        selected === m.id
-                          ? "border-primary/50 bg-primary/5"
-                          : "hover:bg-accent/40",
-                      )}
-                    >
-                      <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted">
-                        <Briefcase className="size-4 text-muted-foreground" />
+                {matterRows.map((row) => (
+                  <button
+                    key={row.id}
+                    type="button"
+                    onClick={() => selectMatter(row.id)}
+                    aria-pressed={selectedId === row.id}
+                    className={cn(
+                      "flex w-full items-start gap-3 rounded-md border p-3 text-left transition-colors hover:bg-accent/40",
+                      selectedId === row.id && "border-primary/50 bg-primary/5",
+                    )}
+                  >
+                    <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted">
+                      <Briefcase className="size-4 text-muted-foreground" aria-hidden />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="truncate font-semibold leading-tight">
+                          {row.title}
+                        </span>
+                        <Badge variant="secondary">{row.matterNumber}</Badge>
+                        <Badge
+                          variant="outline"
+                          className={STATUS_CLASSES[row.status] ?? ""}
+                        >
+                          {displayValue(row.status)}
+                        </Badge>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <p className="font-semibold leading-tight truncate">
-                            {m.name}
-                          </p>
-                          <Badge variant="outline" className="text-[10px]">
-                            {m.number}
-                          </Badge>
-                          <Badge
-                            variant="outline"
-                            className={cn("text-[10px]", priorityColor)}
-                          >
-                            {m.priority} priority
-                          </Badge>
-                          <Badge
-                            variant="outline"
-                            className={cn("text-[10px] hidden sm:inline-flex", STATUS_BADGE[m.status])}
-                          >
-                            {m.status}
-                          </Badge>
-                        </div>
-                        <p className="mt-1 text-xs text-muted-foreground truncate">
-                          {m.client && (
-                            <span className="inline-flex items-center gap-1">
-                              <Users className="size-3" /> {m.client}
-                            </span>
-                          )}
-                          {m.client && " · "}
-                          <span>{m.area}</span>
-                        </p>
-                        <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
+                      <p className="mt-1 truncate text-xs text-muted-foreground">
+                        <span className="inline-flex items-center gap-1">
+                          <Users className="size-3" aria-hidden />
+                          {row.client?.name ?? "No client name"}
+                        </span>
+                        <span> · {displayValue(row.matterType)}</span>
+                      </p>
+                      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                        {row.deadlineAt ? (
                           <span className="inline-flex items-center gap-1">
-                            <FileText className="size-3" /> {m.documentsCount} docs
+                            <CalendarClock className="size-3" aria-hidden />
+                            Due {new Date(row.deadlineAt).toLocaleDateString("en-MY")}
                           </span>
-                          <span className="inline-flex items-center gap-1">
-                            <MessageSquare className="size-3" /> {m.conversationsCount} chats
-                          </span>
-                          <span className="inline-flex items-center gap-1">
-                            <CheckCircle2 className="size-3" /> {m.tasksCount} tasks
-                          </span>
-                          <span className="ml-auto">{relativeTime(m.updatedAt)}</span>
-                        </div>
+                        ) : null}
+                        <span className="inline-flex items-center gap-1">
+                          <FileCheck className="size-3" aria-hidden />
+                          {row._count?.agentActions ?? 0} agent actions
+                        </span>
+                        <span className="ml-auto">
+                          {row.updatedAt ? relativeTime(row.updatedAt) : "—"}
+                        </span>
                       </div>
-                      <ChevronRight className="mt-2 size-4 text-muted-foreground shrink-0" />
-                    </button>
-                  );
-                })}
+                    </div>
+                    <ChevronRight
+                      className="mt-2 size-4 shrink-0 text-muted-foreground"
+                      aria-hidden
+                    />
+                  </button>
+                ))}
               </div>
+            ) : (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <Briefcase className="mx-auto mb-3 size-8 text-muted-foreground opacity-40" />
+                  <h2 className="font-medium">
+                    {search || statusFilter !== "all"
+                      ? "No matching matters"
+                      : "No matters recorded"}
+                  </h2>
+                  <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">
+                    {search || statusFilter !== "all"
+                      ? "Change the search or status filter to see other matters."
+                      : "Create a matter linked to an existing client to start organizing its work."}
+                  </p>
+                  {!search && statusFilter === "all" ? (
+                    <div className="mt-4">
+                      <CreateMatterDialog />
+                    </div>
+                  ) : null}
+                </CardContent>
+              </Card>
             )}
-          </div>
 
-          {/* Desktop detail */}
-          <Card className="hidden lg:block self-start sticky top-20">
-            {DetailContent}
+            {cursorStack.length > 0 || mattersQuery.data?.hasMore ? (
+              <div className="flex items-center justify-between border-t pt-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={!cursorStack.length || mattersQuery.isFetching}
+                  onClick={() => setCursorStack((current) => current.slice(0, -1))}
+                >
+                  <ChevronLeft className="mr-1 size-4" aria-hidden />
+                  Previous
+                </Button>
+                <span className="text-xs text-muted-foreground">
+                  Page {cursorStack.length + 1}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={mattersQuery.isFetching || !mattersQuery.data?.hasMore}
+                  onClick={() => {
+                    const nextCursor = mattersQuery.data?.nextCursor;
+                    if (nextCursor) {
+                      setCursorStack((current) => [...current, nextCursor]);
+                    }
+                  }}
+                >
+                  Next
+                  <ChevronRight className="ml-1 size-4" aria-hidden />
+                </Button>
+              </div>
+            ) : null}
+          </section>
+
+          <Card className="hidden self-start lg:sticky lg:top-20 lg:block">
+            <CardContent className="p-4">
+              {detailQuery.isError ? (
+                <Alert variant="destructive">
+                  <AlertTitle>Could not load matter details</AlertTitle>
+                  <AlertDescription>{detailQuery.error.message}</AlertDescription>
+                </Alert>
+              ) : (
+                detailPanel
+              )}
+            </CardContent>
           </Card>
 
-          {/* Mobile detail drawer */}
           <Drawer open={mobileDetail} onOpenChange={setMobileDetail}>
-            <DrawerTrigger asChild>
-              <span className="hidden" />
-            </DrawerTrigger>
-            <DrawerContent className="max-h-[85vh]">
-              <div className="overflow-y-auto p-4">{DetailContent}</div>
+            <DrawerContent className="max-h-[85vh] overflow-y-auto p-4">
+              {detailQuery.isError ? (
+                <Alert variant="destructive">
+                  <AlertTitle>Could not load matter details</AlertTitle>
+                  <AlertDescription>{detailQuery.error.message}</AlertDescription>
+                </Alert>
+              ) : (
+                detailPanel
+              )}
             </DrawerContent>
           </Drawer>
         </div>
@@ -331,49 +525,26 @@ function StatCard({
   icon: Icon,
   label,
   value,
-  accent,
+  loading,
 }: {
-  icon: React.ComponentType<{ className?: string }>;
+  icon: typeof Briefcase;
   label: string;
-  value: number;
-  accent: string;
+  value?: number;
+  loading: boolean;
 }) {
   return (
     <Card>
       <CardContent className="flex items-center gap-3 p-4">
-        <div className={cn("rounded-md p-2", accent)}>
-          <Icon className="size-4" />
+        <div className="rounded-md bg-primary/10 p-2 text-primary">
+          <Icon className="size-4" aria-hidden />
         </div>
         <div>
           <p className="text-xs text-muted-foreground">{label}</p>
-          <p className="text-2xl font-semibold tracking-tight">{value}</p>
+          <p className="text-2xl font-semibold tracking-tight">
+            {loading ? "…" : (value ?? "—")}
+          </p>
         </div>
       </CardContent>
     </Card>
-  );
-}
-
-function DetailRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p className="text-[11px] text-muted-foreground">{label}</p>
-      <p className="capitalize">{value}</p>
-    </div>
-  );
-}
-
-function EmptyState() {
-  return (
-    <div className="flex flex-col items-center justify-center rounded-md border py-12 text-center">
-      <Briefcase className="size-8 text-muted-foreground opacity-40 mb-3" />
-      <p className="font-medium">No matters yet</p>
-      <p className="text-sm text-muted-foreground max-w-sm mt-1">
-        Create your first matter to organise documents, research, conversations
-        and tasks in one workspace.
-      </p>
-      <div className="mt-4">
-        <CreateMatterDialog />
-      </div>
-    </div>
   );
 }

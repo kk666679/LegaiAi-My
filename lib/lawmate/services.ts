@@ -253,7 +253,7 @@ export const mockSearch: SearchService = {
     );
     MOCK_DRAFTS.forEach((d) =>
       d.title.toLowerCase().includes(q)
-        ? items.push({ kind: "draft", title: d.title, href: "/legalai/drafting" })
+        ? items.push({ kind: "draft", title: d.title, href: "/legalai/draft" })
         : null,
     );
     return items.slice(0, 10);

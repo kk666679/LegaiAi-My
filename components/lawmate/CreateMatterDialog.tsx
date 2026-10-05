@@ -1,15 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetDescription,
   SheetTrigger,
-  SheetFooter,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,65 +22,94 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Plus, Briefcase, Loader2 } from "lucide-react";
-import { LEGAL_AREAS } from "@/lib/lawmate/data";
-import type { Matter } from "@/types/lawmate";
+import { toast } from "sonner";
+import { trpcReact } from "@/clients";
+
+const MATTER_TYPES = [
+  { value: "LITIGATION", label: "Litigation" },
+  { value: "CONTRACT", label: "Contract" },
+  { value: "ADVISORY", label: "Advisory" },
+  { value: "COMPLIANCE", label: "Compliance" },
+  { value: "CONVEYANCING", label: "Conveyancing" },
+  { value: "CORPORATE", label: "Corporate" },
+  { value: "CRIMINAL", label: "Criminal" },
+  { value: "FAMILY", label: "Family" },
+  { value: "EMPLOYMENT", label: "Employment" },
+  { value: "IP", label: "Intellectual property" },
+] as const;
 
 interface CreateMatterDialogProps {
   trigger?: React.ReactNode;
-  onCreate?: (matter: Matter) => void;
   open?: boolean;
-  onOpenChange?: (v: boolean) => void;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export function CreateMatterDialog({
   trigger,
-  onCreate,
   open: controlledOpen,
   onOpenChange: controlledOnOpenChange,
 }: CreateMatterDialogProps) {
-  const router = useRouter();
   const [internalOpen, setInternalOpen] = useState(false);
   const open = controlledOpen ?? internalOpen;
-  const setOpen = (v: boolean) => {
-    if (controlledOnOpenChange) controlledOnOpenChange(v);
-    else setInternalOpen(v);
+  const setOpen = (value: boolean) => {
+    controlledOnOpenChange?.(value);
+    if (controlledOpen === undefined) setInternalOpen(value);
   };
-  const [name, setName] = useState("");
-  const [client, setClient] = useState("");
-  const [area, setArea] = useState("Employment");
-  const [priority, setPriority] = useState<"low" | "medium" | "high">("medium");
+  const [title, setTitle] = useState("");
+  const [clientSearch, setClientSearch] = useState("");
+  const [clientId, setClientId] = useState("");
+  const [matterType, setMatterType] =
+    useState<(typeof MATTER_TYPES)[number]["value"]>("EMPLOYMENT");
+  const [priority, setPriority] = useState<"low" | "medium" | "high" | "urgent">(
+    "medium",
+  );
   const [description, setDescription] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const clientsQuery = trpcReact.clients.list.useQuery(
+    { search: clientSearch || undefined, limit: 25 },
+    { enabled: open, retry: false },
+  );
+  const createMatter = trpcReact.matters.create.useMutation();
+  const utils = trpcReact.useUtils();
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim()) return;
-    setSubmitting(true);
-    const created: Matter = {
-      id: `m-${Date.now()}`,
-      number: `M-${new Date().getFullYear()}-${Math.floor(Math.random() * 900 + 100)}`,
-      name,
-      client: client || undefined,
-      description,
-      status: "active",
-      priority,
-      area: area as Matter["area"],
-      documentsCount: 0,
-      conversationsCount: 0,
-      tasksCount: 0,
-      researchCount: 0,
-      updatedAt: new Date().toISOString(),
-      classification: "internal",
-    };
-    onCreate?.(created);
-    setSubmitting(false);
-    setOpen(false);
-    setName("");
-    setClient("");
-    setDescription("");
+  const submit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!title.trim() || !clientId) return;
+
+    try {
+      await createMatter.mutateAsync({
+        clientId,
+        title: title.trim(),
+        matterType,
+        priority,
+        jurisdiction: "MY",
+        description: description.trim() || undefined,
+      });
+      setTitle("");
+      setClientSearch("");
+      setClientId("");
+      setDescription("");
+      setOpen(false);
+      toast.success("Matter created");
+      void Promise.all([
+        utils.matters.list.invalidate(),
+        utils.matters.stats.invalidate(),
+      ]).catch((error) => {
+        toast.error("Matter created, but the list could not refresh", {
+          description:
+            error instanceof Error ? error.message : "Refresh the page to see it.",
+        });
+      });
+    } catch (error) {
+      toast.error("Could not create matter", {
+        description:
+          error instanceof Error ? error.message : "Please try again.",
+      });
+    }
   };
+
+  const clients = clientsQuery.data?.clients ?? [];
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -97,90 +126,160 @@ export function CreateMatterDialog({
             <Briefcase className="size-4 text-primary" /> Create matter
           </SheetTitle>
           <SheetDescription>
-            Organise documents, conversations and tasks for a new legal matter.
+            Create a matter linked to an existing client in your workspace.
           </SheetDescription>
         </SheetHeader>
-        <form onSubmit={submit} className="space-y-4 p-4 flex-1 overflow-y-auto">
-          <div>
-            <Label className="text-xs">Matter name *</Label>
+        <form
+          id="create-matter-form"
+          onSubmit={submit}
+          className="flex-1 space-y-4 overflow-y-auto p-4"
+        >
+          <div className="space-y-1">
+            <Label htmlFor="matter-title" className="text-xs">
+              Matter name *
+            </Label>
             <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              id="matter-title"
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
               placeholder="e.g. ABC Holdings v XYZ Corp"
+              maxLength={500}
               required
-              className="mt-1"
             />
           </div>
-          <div>
-            <Label className="text-xs">Client</Label>
+
+          <div className="space-y-2">
+            <Label htmlFor="matter-client-search" className="text-xs">
+              Client *
+            </Label>
             <Input
-              value={client}
-              onChange={(e) => setClient(e.target.value)}
-              placeholder="Client name (optional)"
-              className="mt-1"
+              id="matter-client-search"
+              value={clientSearch}
+              onChange={(event) => {
+                setClientSearch(event.target.value);
+                setClientId("");
+              }}
+              placeholder="Search existing clients"
             />
+            {clientsQuery.isError ? (
+              <Alert variant="destructive">
+                <AlertDescription>
+                  Could not load clients: {clientsQuery.error.message}
+                </AlertDescription>
+              </Alert>
+            ) : clients.length > 0 ? (
+              <Select value={clientId} onValueChange={setClientId}>
+                <SelectTrigger aria-label="Select a client">
+                  <SelectValue
+                    placeholder={
+                      clientsQuery.isLoading ? "Loading clients…" : "Select a client"
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {clients.map((client: { id: string; name: string }) => (
+                    <SelectItem key={client.id} value={client.id}>
+                      {client.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : clientsQuery.isLoading ? (
+              <p className="text-xs text-muted-foreground">Loading clients…</p>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                No matching clients.{" "}
+                <Link className="text-primary underline" href="/legalai/clients">
+                  Create a client first
+                </Link>
+                .
+              </p>
+            )}
           </div>
+
           <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label className="text-xs">Area</Label>
-              <Select value={area} onValueChange={setArea}>
-                <SelectTrigger className="mt-1">
+            <div className="space-y-1">
+              <Label className="text-xs">Matter type</Label>
+              <Select
+                value={matterType}
+                onValueChange={(value: (typeof MATTER_TYPES)[number]["value"]) =>
+                  setMatterType(value)
+                }
+              >
+                <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {LEGAL_AREAS.map((a) => (
-                    <SelectItem key={a.id} value={a.id}>
-                      {a.label}
+                  {MATTER_TYPES.map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-            <div>
+            <div className="space-y-1">
               <Label className="text-xs">Priority</Label>
-              <Select value={priority} onValueChange={(v: any) => setPriority(v)}>
-                <SelectTrigger className="mt-1">
+              <Select
+                value={priority}
+                onValueChange={(value: typeof priority) => setPriority(value)}
+              >
+                <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="low">Low</SelectItem>
                   <SelectItem value="medium">Medium</SelectItem>
                   <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="urgent">Urgent</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
-          <div>
-            <Label className="text-xs">Description</Label>
+
+          <div className="space-y-1">
+            <Label htmlFor="matter-description" className="text-xs">
+              Description
+            </Label>
             <Textarea
+              id="matter-description"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(event) => setDescription(event.target.value)}
               placeholder="Brief summary (optional)"
-              className="mt-1 min-h-[100px]"
+              className="min-h-[100px]"
             />
           </div>
-          <div className="rounded-md bg-muted/40 p-3 text-xs text-muted-foreground">
-            <Badge variant="outline" className="mr-2 text-[10px]">
-              Tip
-            </Badge>
-            You can attach documents and assign tasks once the matter is created.
-          </div>
+          {createMatter.isError ? (
+            <Alert variant="destructive">
+              <AlertDescription>
+                Could not create matter: {createMatter.error.message}
+              </AlertDescription>
+            </Alert>
+          ) : null}
         </form>
         <SheetFooter className="border-t p-4">
           <Button
             variant="outline"
             onClick={() => setOpen(false)}
             type="button"
+            disabled={createMatter.isPending}
           >
             Cancel
           </Button>
           <Button
             type="submit"
-            disabled={submitting || !name.trim()}
-            onClick={submit}
+            form="create-matter-form"
+            disabled={
+              createMatter.isPending ||
+              !title.trim() ||
+              !clientId ||
+              clientsQuery.isError
+            }
             className="gap-2"
           >
-            {submitting && <Loader2 className="size-3.5 animate-spin" />}
+            {createMatter.isPending && (
+              <Loader2 className="size-3.5 animate-spin" />
+            )}
             Create matter
           </Button>
         </SheetFooter>

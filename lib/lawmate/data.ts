@@ -656,7 +656,7 @@ export const MOCK_ACTIVITY: RecentActivity[] = [
     kind: "draft",
     title: "Warning Letter — Lim Wei Jian",
     detail: "Edited · draft",
-    href: "/legalai/drafting",
+    href: "/legalai/draft",
     at: isoDaysFromNow(-1),
   },
   {
