@@ -1,1 +1,2 @@
-export { default } from "@/components/lawmate/LegalTimeline/LegalTimeline";
+export { default as LegalTimeline } from "@/components/timeline/LegalTimeline";
+export { default } from "@/components/timeline/LegalTimeline";

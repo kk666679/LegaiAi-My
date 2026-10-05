@@ -1,34 +1,28 @@
-import Link from 'next/link'
-import { Scale3D, FileText, Scale, BarChart3, FileCheck, Monitor, BookOpen } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { BRAND } from '@/lib/brand'
+import Link from "next/link";
+import { BRAND } from "@/lib/brand";
+import { Button } from "@/components/ui/button";
+
+const LINKS = [
+  { href: "/copilot", label: "Copilot" },
+  { href: "/draft", label: "Draft" },
+  { href: "/debate", label: "Debate" },
+  { href: "/audit", label: "Audit" },
+  { href: "/monitor", label: "Monitor" },
+];
 
 export function AppNav() {
   return (
     <nav className="glass sticky top-0 z-50 flex items-center justify-between px-6 py-4">
-      <Link href="/" className="flex items-center gap-3">
-        <div className="w-8 h-8 flex items-center justify-center rounded-lg" style={{clipPath: 'polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%)', background: 'linear-gradient(135deg,rgba(0,200,255,0.3),rgba(120,0,255,0.2))'}}>
-          <Scale3D className="w-4 h-4 text-cyan-400" />
-        </div>
-        <span className="font-semibold text-lg tracking-tight font-heading text-white">{BRAND.name}</span>
+      <Link href="/" className="font-heading text-lg font-semibold tracking-tight">
+        {BRAND.name}
       </Link>
       <div className="flex items-center gap-2">
-        <Button variant="ghost" asChild size="sm" className="text-xs font-medium">
-          <Link href="/copilot">Copilot</Link>
-        </Button>
-        <Button variant="ghost" asChild size="sm" className="text-xs font-medium">
-          <Link href="/draft">Draft</Link>
-        </Button>
-        <Button variant="ghost" asChild size="sm" className="text-xs font-medium">
-          <Link href="/debate">Debate</Link>
-        </Button>
-        <Button variant="ghost" asChild size="sm" className="text-xs font-medium">
-          <Link href="/audit">Audit</Link>
-        </Button>
-        <Button variant="ghost" asChild size="sm" className="text-xs font-medium">
-          <Link href="/monitor">Monitor</Link>
-        </Button>
+        {LINKS.map(({ href, label }) => (
+          <Button key={href} variant="ghost" asChild size="sm" className="text-xs font-medium">
+            <Link href={href}>{label}</Link>
+          </Button>
+        ))}
       </div>
     </nav>
-  )
+  );
 }

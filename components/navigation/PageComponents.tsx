@@ -1,10 +1,8 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { ChevronRight, Home } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import Link from "next/link";
+import { ChevronRight, Home } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface BreadcrumbItem {
   label: string;
@@ -20,34 +18,43 @@ interface PageHeaderProps {
   children?: React.ReactNode;
 }
 
-export function PageHeader({ title, description, breadcrumbs, actions, badge, children }: PageHeaderProps) {
+export function PageHeader({
+  title,
+  description,
+  breadcrumbs,
+  actions,
+  badge,
+  children,
+}: PageHeaderProps) {
   return (
     <div className="border-b border-border/70 bg-card/20">
-      <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10 py-12 sm:py-16">
-        {breadcrumbs && breadcrumbs.length > 0 && (
-          <nav className="mb-4 flex items-center gap-1.5 text-sm text-muted-foreground" aria-label="Breadcrumb">
-            <Link href="/" className="hover:text-foreground transition-colors">
+      <div className="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 sm:py-16 lg:px-10">
+        {breadcrumbs?.length ? (
+          <nav
+            className="mb-4 flex items-center gap-1.5 text-sm text-muted-foreground"
+            aria-label="Breadcrumb"
+          >
+            <Link href="/" className="transition-colors hover:text-foreground">
               <Home className="size-3.5" />
             </Link>
-            {breadcrumbs.map((item, i) => (
-              <span key={i} className="flex items-center gap-1.5">
+            {breadcrumbs.map((item, index) => (
+              <span key={`${item.label}-${index}`} className="flex items-center gap-1.5">
                 <ChevronRight className="size-3.5" />
                 {item.href ? (
-                  <Link href={item.href} className="hover:text-foreground transition-colors">
+                  <Link href={item.href} className="transition-colors hover:text-foreground">
                     {item.label}
                   </Link>
                 ) : (
-                  <span className="text-foreground font-medium">{item.label}</span>
+                  <span className="font-medium text-foreground">{item.label}</span>
                 )}
               </span>
             ))}
           </nav>
-        )}
-
+        ) : null}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="max-w-2xl">
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
+            <div className="mb-2 flex items-center gap-3">
+              <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                 {title}
               </h1>
               {badge && (
@@ -56,13 +63,12 @@ export function PageHeader({ title, description, breadcrumbs, actions, badge, ch
                 </span>
               )}
             </div>
-            <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
+            <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
               {description}
             </p>
           </div>
-          {actions && <div className="flex items-center gap-3 shrink-0">{actions}</div>}
+          {actions && <div className="flex shrink-0 items-center gap-3">{actions}</div>}
         </div>
-
         {children}
       </div>
     </div>
@@ -78,17 +84,18 @@ interface FeatureCardProps {
 }
 
 export function FeatureCard({ icon, title, description, href, badge }: FeatureCardProps) {
-  const cardContent = (
-    <div className={cn(
-      'rounded-xl border border-border/70 bg-card/50 p-6 transition-all duration-300',
-      href && 'hover:border-primary/30 hover:bg-card/80 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-0.5'
-    )}>
+  const content = (
+    <div
+      className={cn(
+        "rounded-xl border border-border/70 bg-card/50 p-6 transition-all duration-300",
+        href &&
+          "hover:-translate-y-0.5 hover:border-primary/30 hover:bg-card/80 hover:shadow-lg hover:shadow-primary/5",
+      )}
+    >
       <div className="flex items-start gap-4">
-        <div className="shrink-0 rounded-lg bg-primary/10 p-2.5 text-primary">
-          {icon}
-        </div>
+        <div className="shrink-0 rounded-lg bg-primary/10 p-2.5 text-primary">{icon}</div>
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="mb-1 flex items-center gap-2">
             <h3 className="font-semibold text-foreground">{title}</h3>
             {badge && (
               <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary uppercase">
@@ -96,21 +103,19 @@ export function FeatureCard({ icon, title, description, href, badge }: FeatureCa
               </span>
             )}
           </div>
-          <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
+          <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>
         </div>
       </div>
     </div>
   );
 
-  if (href) {
-    return (
-      <Link href={href} className="group block">
-        {cardContent}
-      </Link>
-    );
-  }
-
-  return <div className="group block">{cardContent}</div>;
+  return href ? (
+    <Link href={href} className="group block">
+      {content}
+    </Link>
+  ) : (
+    <div className="group block">{content}</div>
+  );
 }
 
 interface SectionProps {
@@ -122,14 +127,16 @@ interface SectionProps {
 
 export function Section({ title, description, children, className }: SectionProps) {
   return (
-    <section className={cn('py-12 sm:py-16', className)}>
+    <section className={cn("py-12 sm:py-16", className)}>
       <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10">
         {(title || description) && (
           <div className="mb-8">
-            {title && <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">{title}</h2>}
-            {description && (
-              <p className="mt-2 text-muted-foreground max-w-2xl">{description}</p>
+            {title && (
+              <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                {title}
+              </h2>
             )}
+            {description && <p className="mt-2 max-w-2xl text-muted-foreground">{description}</p>}
           </div>
         )}
         {children}
@@ -138,17 +145,13 @@ export function Section({ title, description, children, className }: SectionProp
   );
 }
 
-interface StatsBarProps {
-  stats: { label: string; value: string }[];
-}
-
-export function StatsBar({ stats }: StatsBarProps) {
+export function StatsBar({ stats }: { stats: { label: string; value: string }[] }) {
   return (
     <div className="flex flex-wrap gap-6 sm:gap-10">
       {stats.map((stat) => (
         <div key={stat.label}>
-          <p className="text-2xl sm:text-3xl font-bold text-foreground">{stat.value}</p>
-          <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
+          <p className="text-2xl font-bold text-foreground sm:text-3xl">{stat.value}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{stat.label}</p>
         </div>
       ))}
     </div>

@@ -1,1 +1,1 @@
-export { GlassPanel } from "@/components/lawmate/GlassPanel";
+export { GlassPanel } from "@/components/shared/GlassPanel";
