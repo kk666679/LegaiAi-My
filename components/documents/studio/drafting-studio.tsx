@@ -35,7 +35,7 @@ export function DraftingStudio({
       ) : null}
 
       <div className="hidden min-h-0 flex-1 lg:block">
-        <ResizablePanelGroup direction="horizontal">
+        <ResizablePanelGroup orientation="horizontal">
           {outline ? (
             <>
               <ResizablePanel defaultSize={22} minSize={16} maxSize={32}>

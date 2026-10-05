@@ -129,9 +129,9 @@ export default function AssistantPage() {
 
   const displayMessages: UIMsg[] = [
     ...history,
-    ...messages
-      .filter((m) => m.role === "assistant")
-      .map((m) => ({ id: m.id, role: m.role as "assistant", content: (m as any).content ?? "" })),
+    ...(messages as Array<{ id: string; role: string; content?: string }> )
+      .filter((m: { role: string }) => m.role === "assistant")
+      .map((m: { id: string; role: string; content?: string }) => ({ id: m.id, role: m.role as "assistant", content: m.content ?? "" })),
   ];
 
   useEffect(() => {

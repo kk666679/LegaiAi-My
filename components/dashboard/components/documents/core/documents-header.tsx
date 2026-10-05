@@ -4,7 +4,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-export interface DocumentsHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface DocumentsHeaderProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
   title: React.ReactNode;
   description?: React.ReactNode;
   breadcrumbs?: React.ReactNode;
