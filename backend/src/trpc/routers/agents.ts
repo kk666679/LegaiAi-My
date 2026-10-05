@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { TRPCError } from '@trpc/server'
 import { router, publicProcedure, protectedProcedure, permissionProcedure } from '../trpc'
 import { queues } from '../../queues/index'
 import { prisma } from '../../db'
@@ -131,13 +132,32 @@ export const agentsRouter: AnyRouter = router({
   // ── Agent 9: Debate ──────────────────────────────────────────────────────
   debate: permissionProcedure('run_agents')
     .input(z.object({
-      problem: z.string(),
-      citations: z.array(z.string()).default([]),
-      rounds: z.number().default(2),
+      problem: z.string().trim().min(10).max(10000),
+      citations: z.array(z.string().trim().min(1).max(500)).max(30).default([]),
+      rounds: z.number().int().min(1).max(4).default(2),
     }))
     .mutation(async ({ input, ctx }) => {
-      const job = await queues.debate.add('debate', { ...input, traceId: ctx.traceId })
+      const job = await queues.debate.add('debate', {
+        ...input,
+        traceId: ctx.traceId,
+        userId: ctx.user.id,
+      })
       return { jobId: job.id, traceId: ctx.traceId }
+    }),
+
+  debateStatus: permissionProcedure('run_agents')
+    .input(z.object({ jobId: z.string().min(1).max(256) }))
+    .query(async ({ input, ctx }) => {
+      const job = await queues.debate.getJob(input.jobId)
+      if (!job || job.data.userId !== ctx.user.id) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Debate job not found' })
+      }
+
+      const state = await job.getState()
+      return {
+        state,
+        result: state === 'completed' ? job.returnvalue : null,
+      }
     }),
 
   // ── Agent 10: Monitoring / Alerts ────────────────────────────────────────
