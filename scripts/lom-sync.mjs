@@ -24,7 +24,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 
-import { LOMClient } from '../.autoclaw/memory/interfaces/lom-client.js';
+import { LOMClient } from '../.autoclaw/memory/interfaces/lom-client.mjs';
 import { VectorStore } from '../.autoclaw/memory/interfaces/vector-store.js';
 import { KnowledgeGraphStore } from '../.autoclaw/memory/interfaces/kg-store.js';
 

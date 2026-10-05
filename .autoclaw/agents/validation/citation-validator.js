@@ -1,87 +1,127 @@
 // .autoclaw/agents/validation/citation-validator.js
-// ESM. Exports the functions imported by tests/autoclaw/citation-validator.test.js.
+
+export const VALID_FORMATS = ["statute", "case", "regulation", "secondary"];
 
 /**
- * @typedef {Object} Authority
- * @property {string} [id]
- * @property {string} [title]
- * @property {string} [source]
- * @property {string} [url]
- * @property {string} [court]
- * @property {number} [year]
+ * Parse a raw citation string into { year, volume, reporter, page, title, court, source }.
+ * Handles common Malaysian forms: "Act 265", "[1995] 1 MLJ 123", "Section 14 EA 1955".
  */
+export function parseCitation(input) {
+  if (input == null) return { raw: "", valid: false, reason: "null input" };
+  const raw = String(input).trim();
+  if (!raw) return { raw, valid: false, reason: "empty" };
 
-/**
- * @typedef {Object} Citation
- * @property {string} id
- * @property {string} [source]
- * @property {string} [title]
- * @property {string} [url]
- */
+  // Act N — statutory form
+  const actMatch = raw.match(/^act\s+([0-9]+[A-Za-z]?)/i);
+  if (actMatch) {
+    return { raw, kind: "statute", actNumber: actMatch[1].toUpperCase(), valid: true };
+  }
 
-/** Validate a single citation. */
-export function validateCitation(citation) {
-  if (!citation || typeof citation !== "object") {
-    return { valid: false, reason: "citation is not an object" };
+  // [YYYY] VOL REPORTER PAGE — case form
+  const caseMatch = raw.match(/^\[\s*(\d{4})\s*\]\s*(\d+)?\s*([A-Z]+)\s+(\d+)/);
+  if (caseMatch) {
+    return {
+      raw,
+      kind: "case",
+      year: Number(caseMatch[1]),
+      volume: caseMatch[2] ? Number(caseMatch[2]) : undefined,
+      reporter: caseMatch[3],
+      page: Number(caseMatch[4]),
+      valid: true,
+    };
   }
-  if (!citation.id) {
-    return { valid: false, reason: "missing id", citation };
+
+  // Section N <ActName YYYY>
+  const sectionMatch = raw.match(/^section\s+([0-9A-Za-z]+)\s+(.*?)(?:\s+(\d{4}))?$/i);
+  if (sectionMatch) {
+    return {
+      raw,
+      kind: "statute",
+      section: sectionMatch[1],
+      title: sectionMatch[2]?.trim(),
+      year: sectionMatch[3] ? Number(sectionMatch[3]) : undefined,
+      valid: true,
+    };
   }
-  if (citation.url && !/^https?:\/\//i.test(citation.url)) {
-    return { valid: false, reason: "invalid url", citation };
-  }
-  return { valid: true, citation };
+
+  return { raw, valid: false, reason: "unrecognised format" };
 }
 
-/** Validate many citations. Returns array of results. */
+/** Validate that a string looks like a well-formed citation. */
+export function validateCitationFormat(input) {
+  const parsed = parseCitation(input);
+  return { valid: parsed.valid, reason: parsed.reason, parsed };
+}
+
+/** Validate a legal proposition against authorities. */
+export function validateLegalProposition(proposition, authorities = []) {
+  if (!proposition || typeof proposition !== "string") {
+    return { valid: false, reason: "proposition must be a non-empty string", supporting: [] };
+  }
+  const words = proposition.toLowerCase().split(/\s+/).filter((w) => w.length > 3);
+  const supporting = authorities.filter((a) => {
+    const hay = `${a?.title ?? ""} ${a?.text ?? ""} ${a?.summary ?? ""}`.toLowerCase();
+    return words.some((w) => hay.includes(w));
+  });
+  return {
+    valid: supporting.length > 0,
+    reason: supporting.length ? "matched authorities" : "no authority supports proposition",
+    supporting,
+  };
+}
+
+/** Rank authorities by a simple authority score (higher = stronger). */
+export function rankCitationAuthority(authorities = []) {
+  const WEIGHT = {
+    constitution: 100,
+    statute: 80,
+    regulation: 60,
+    case: 50,
+    secondary: 20,
+  };
+  return [...authorities]
+    .map((a) => ({
+      authority: a,
+      score:
+        (WEIGHT[a?.kind] ?? 10) +
+        (a?.year ? Math.max(0, 20 - (2026 - a.year)) : 0) +
+        (a?.court === "Federal Court" ? 30 : a?.court === "Court of Appeal" ? 20 : 0),
+    }))
+    .sort((x, y) => y.score - x.score);
+}
+
+export function validateCitation(citation) {
+  const parsed = parseCitation(typeof citation === "string" ? citation : citation?.raw);
+  return { valid: parsed.valid, parsed, reason: parsed.reason };
+}
+
 export function validateCitations(citations = []) {
   return citations.map(validateCitation);
 }
 
-/**
- * Detect conflicting authorities — same id resolved from different sources,
- * or same case name with different citations.
- * Returns { conflicts, hasConflict, count }.
- */
 export function checkConflictingAuthorities(authorities = []) {
   const conflicts = [];
   for (let i = 0; i < authorities.length; i++) {
     for (let j = i + 1; j < authorities.length; j++) {
-      const a = authorities[i];
-      const b = authorities[j];
+      const a = authorities[i], b = authorities[j];
       if (!a || !b) continue;
-
       const sameId = a.id && b.id && a.id === b.id;
       const diffSource = a.source && b.source && a.source !== b.source;
-      const sameNameDiffCourt =
-        a.title && b.title && a.title === b.title && a.court && b.court && a.court !== b.court;
-
-      if ((sameId && diffSource) || sameNameDiffCourt) {
-        conflicts.push({
-          a,
-          b,
-          reason: sameId ? "same id, different source" : "same case name, different court",
-        });
-      }
+      if (sameId && diffSource) conflicts.push({ a, b, reason: "same id, different source" });
     }
   }
-  return {
-    conflicts,
-    hasConflict: conflicts.length > 0,
-    count: conflicts.length,
-  };
+  return { conflicts, hasConflict: conflicts.length > 0, count: conflicts.length };
 }
 
 export class CitationValidator {
   constructor(opts = {}) { this.opts = opts; }
-  validate(c) { return validateCitation(c); }
-  validateAll(cs) { return validateCitations(cs); }
-  checkConflicts(a) { return checkConflictingAuthorities(a); }
+  parse(c) { return parseCitation(c); }
+  validateFormat(c) { return validateCitationFormat(c); }
+  validateProposition(p, a) { return validateLegalProposition(p, a); }
+  rank(a) { return rankCitationAuthority(a); }
 }
 
 export default {
-  validateCitation,
-  validateCitations,
-  checkConflictingAuthorities,
-  CitationValidator,
+  parseCitation, validateCitationFormat, validateLegalProposition, rankCitationAuthority,
+  validateCitation, validateCitations, checkConflictingAuthorities, CitationValidator,
 };
