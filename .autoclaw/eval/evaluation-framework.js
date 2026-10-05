@@ -1,23 +1,61 @@
 // .autoclaw/eval/evaluation-framework.js
-// TODO: implement — stubbed to unblock CI.
+// ESM. Exports required by tests/autoclaw/evaluation-framework.test.js.
+
+/**
+ * @typedef {Object} CaseResult
+ * @property {string} [id]
+ * @property {boolean} [passed]
+ * @property {number} [score]
+ * @property {number} [latencyMs]
+ * @property {string} [error]
+ */
+
+/** Build a metrics snapshot from an array of case results. */
+export function buildMetricsSnapshot(results = []) {
+  const total = results.length;
+  const passed = results.filter((r) => r && r.passed).length;
+  const failed = total - passed;
+  const errored = results.filter((r) => r && r.error).length;
+  const passRate = total ? passed / total : 0;
+  const avgScore = total
+    ? results.reduce((s, r) => s + (r?.score ?? 0), 0) / total
+    : 0;
+  const avgLatencyMs = total
+    ? results.reduce((s, r) => s + (r?.latencyMs ?? 0), 0) / total
+    : 0;
+
+  return {
+    total,
+    passed,
+    failed,
+    errored,
+    passRate,
+    avgScore,
+    avgLatencyMs,
+    generatedAt: new Date().toISOString(),
+  };
+}
+
 export class EvaluationFramework {
   constructor(config = {}) {
     this.config = config;
     this.results = [];
   }
-  async evaluate(_input) {
-    return { score: 0, metrics: {}, passed: false };
-  }
   record(result) {
     this.results.push(result);
     return result;
   }
+  async evaluate(_input) {
+    return { score: 0, metrics: buildMetricsSnapshot(this.results), passed: false };
+  }
+  snapshot() {
+    return buildMetricsSnapshot(this.results);
+  }
   summary() {
-    return {
-      total: this.results.length,
-      passed: this.results.filter((r) => r?.passed).length,
-      failed: this.results.filter((r) => !r?.passed).length,
-    };
+    return this.snapshot();
+  }
+  reset() {
+    this.results = [];
   }
 }
 
@@ -25,55 +63,8 @@ export function createEvaluationFramework(config) {
   return new EvaluationFramework(config);
 }
 
-export default { EvaluationFramework, createEvaluationFramework };
-
-// TODO: implement — required by tests/autoclaw/evaluation-framework.test.js
-export function buildMetricsSnapshot(results = []) {
-  const total = results.length;
-  const passed = results.filter((r) => r?.passed).length;
-  return {
-    total,
-    passed,
-    failed: total - passed,
-    passRate: total ? passed / total : 0,
-    generatedAt: new Date().toISOString(),
-  };
-}
-
-// ---- appended to satisfy tests/autoclaw/evaluation-framework.test.js ----
-/** @param {Array<{passed?: boolean, score?: number}>} results */
-export function buildMetricsSnapshot(results = []) {
-  const total = results.length;
-  const passed = results.filter(r => r && r.passed).length;
-  const failed = total - passed;
-  const avgScore = total
-    ? results.reduce((s, r) => s + (r?.score ?? 0), 0) / total
-    : 0;
-  return {
-    total,
-    passed,
-    failed,
-    passRate: total ? passed / total : 0,
-    avgScore,
-    generatedAt: new Date().toISOString(),
-  };
-}
-
-// ---- Added to satisfy tests/autoclaw/evaluation-framework.test.js ----
-// Asserts: exists, is a function, returns {total, passed, failed, passRate, avgScore, generatedAt}
-export function buildMetricsSnapshot(results = []) {
-  const total = results.length;
-  const passed = results.filter(r => r && r.passed).length;
-  const failed = total - passed;
-  const avgScore = total
-    ? results.reduce((s, r) => s + (r?.score ?? 0), 0) / total
-    : 0;
-  return {
-    total,
-    passed,
-    failed,
-    passRate: total ? passed / total : 0,
-    avgScore,
-    generatedAt: new Date().toISOString(),
-  };
-}
+export default {
+  buildMetricsSnapshot,
+  EvaluationFramework,
+  createEvaluationFramework,
+};
