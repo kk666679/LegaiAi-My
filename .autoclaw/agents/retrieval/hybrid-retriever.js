@@ -23,3 +23,15 @@ export function createHybridRetriever(opts) {
 }
 
 export default { HybridRetriever, createHybridRetriever };
+
+// TODO: implement — required by tests/autoclaw/hybrid-retriever.test.js
+export async function runHybridRetrieval(query, options = {}) {
+  const retriever = new HybridRetriever(options);
+  return retriever.retrieve(query, options);
+}
+
+// ---- appended to satisfy tests/autoclaw/hybrid-retriever.test.js ----
+export async function runHybridRetrieval(query, options = {}) {
+  const retriever = new HybridRetriever(options);
+  return retriever.retrieve(query, options);
+}
