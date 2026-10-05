@@ -49,7 +49,7 @@ const NAV_GROUPS = [
       { href: "/legalai/matters", label: "Matters", icon: Briefcase },
       { href: "/legalai/clients", label: "Clients", icon: Users },
       { href: "/legalai/documents", label: "Documents", icon: FileText },
-      { href: "/legalai/drafting", label: "Document Drafting", icon: FileText },
+      { href: "/legalai/draft", label: "Document Drafting", icon: FileText },
       { href: "/legalai/draft", label: "Drafting Studio", icon: FileSignature },
       { href: "/legalai/contracts", label: "Contracts", icon: FileSignature },
       { href: "/legalai/debate", label: "Debate Simulation", icon: Swords },

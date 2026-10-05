@@ -69,7 +69,7 @@ export const NAVIGATION_GROUPS: NavGroup[] = [
     defaultOpen: true,
     items: [
       { href: "/legalai/documents", label: "Documents", icon: FileText, matchPrefix: "/legalai/documents", description: "Document library" },
-      { href: "/legalai/drafting", label: "Document Drafting", icon: FileSignature, matchPrefix: "/legalai/drafting", description: "AI-powered drafting workspace" },
+      { href: "/legalai/draft", label: "Document Drafting", icon: FileSignature, matchPrefix: "/legalai/draft", description: "AI-powered drafting workspace" },
       { href: "/legalai/draft", label: "Drafting Studio", icon: Sparkles, matchPrefix: "/legalai/draft", description: "Advanced drafting tools" },
       { href: "/legalai/contracts", label: "Contracts", icon: FileCheck, matchPrefix: "/legalai/contracts", description: "Contract review & management" },
       { href: "/legalai/analysis", label: "Document Analysis", icon: Sparkles, matchPrefix: "/legalai/analysis", description: "AI-powered document analysis" },
@@ -141,7 +141,7 @@ export const COMMAND_ITEMS: CommandItem[] = [
   { id: "nav-research", label: "Go to Legal Research", group: "Navigate", icon: BookOpen, href: "/legalai/research", keywords: ["law", "cases", "statutes"] },
   { id: "nav-search", label: "Go to Universal Search", group: "Navigate", icon: Search, href: "/legalai/search", keywords: ["find", "query"] },
   { id: "nav-documents", label: "Go to Documents", group: "Navigate", icon: FileText, href: "/legalai/documents", keywords: ["files", "library"] },
-  { id: "nav-drafting", label: "Go to Document Drafting", group: "Navigate", icon: FileSignature, href: "/legalai/drafting", keywords: ["draft", "create", "write"] },
+  { id: "nav-drafting", label: "Go to Document Drafting", group: "Navigate", icon: FileSignature, href: "/legalai/draft", keywords: ["draft", "create", "write"] },
   { id: "nav-contracts", label: "Go to Contracts", group: "Navigate", icon: FileCheck, href: "/legalai/contracts", keywords: ["agreements"] },
   { id: "nav-matters", label: "Go to Matters", group: "Navigate", icon: Briefcase, href: "/legalai/matters", keywords: ["cases", "matters"] },
   { id: "nav-clients", label: "Go to Clients", group: "Navigate", icon: Users, href: "/legalai/clients", keywords: ["parties", "contacts"] },

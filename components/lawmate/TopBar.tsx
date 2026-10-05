@@ -188,7 +188,7 @@ export function TopBar({ onMenu }: TopBarProps) {
           <DropdownMenuLabel>Create new</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
-            <Link href="/legalai/drafting" className="gap-2">
+            <Link href="/legalai/draft" className="gap-2">
               <Plus className="size-4" /> New document
             </Link>
           </DropdownMenuItem>
