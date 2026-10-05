@@ -7,14 +7,14 @@ export {
   DocumentAIContext,
   type DocumentAIMessage,
 } from "./DocumentAIPanel";
+export {
   CONTRACT_SUGGESTIONS,
   DOCUMENT_SUGGESTIONS,
 } from "./suggestions";
-// components/documents/index.ts
 export * from "./types";
 
 // core
-export { DocumentsShell } from "./core/documents-shell";
+export { DocumentsShell as LegacyDocumentsShell } from "./core/documents-shell";
 export { DocumentsHeader } from "./core/documents-header";
 export { DocumentsNavigation } from "./core/documents-navigation";
 export { DocumentsToolbar } from "./core/documents-toolbar";
@@ -66,7 +66,7 @@ export { DocumentActionMenu } from "./actions/document-action-menu";
 export { FavoriteToggle } from "./organization/favorite-toggle";
 
 // workspace
-export { DocumentWorkspace } from "./workspace/document-workspace";
+export { DocumentWorkspace as LegacyDocumentWorkspace } from "./workspace/document-workspace";
 
 // ai
 export { DocumentAIWorkspace } from "./ai/document-ai-workspace";
