@@ -1,5 +1,6 @@
 // .autoclaw/agents/analysis/irac-engine.js
-// Align with tests/autoclaw/irac-engine.test.js.
+// Created to satisfy tests/autoclaw/irac-engine.test.js.
+// Adjust the shape below to match every assertion in the test.
 
 export const IRAC_STAGES = ["issue", "rule", "application", "conclusion"];
 

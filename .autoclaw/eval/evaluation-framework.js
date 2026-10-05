@@ -58,3 +58,22 @@ export function buildMetricsSnapshot(results = []) {
     generatedAt: new Date().toISOString(),
   };
 }
+
+// ---- Added to satisfy tests/autoclaw/evaluation-framework.test.js ----
+// Asserts: exists, is a function, returns {total, passed, failed, passRate, avgScore, generatedAt}
+export function buildMetricsSnapshot(results = []) {
+  const total = results.length;
+  const passed = results.filter(r => r && r.passed).length;
+  const failed = total - passed;
+  const avgScore = total
+    ? results.reduce((s, r) => s + (r?.score ?? 0), 0) / total
+    : 0;
+  return {
+    total,
+    passed,
+    failed,
+    passRate: total ? passed / total : 0,
+    avgScore,
+    generatedAt: new Date().toISOString(),
+  };
+}

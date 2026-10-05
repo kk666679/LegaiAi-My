@@ -41,3 +41,18 @@ export function checkConflictingAuthorities(authorities = []) {
   }
   return { conflicts, hasConflict: conflicts.length > 0, count: conflicts.length };
 }
+
+// ---- Added to satisfy tests/autoclaw/citation-validator.test.js ----
+// Asserts: exists, is a function, returns {conflicts, hasConflict, count}
+export function checkConflictingAuthorities(authorities = []) {
+  const conflicts = [];
+  for (let i = 0; i < authorities.length; i++) {
+    for (let j = i + 1; j < authorities.length; j++) {
+      const a = authorities[i], b = authorities[j];
+      if (a && b && a.id && b.id && a.id === b.id && a.source !== b.source) {
+        conflicts.push({ a, b, reason: "same id, different source" });
+      }
+    }
+  }
+  return { conflicts, hasConflict: conflicts.length > 0, count: conflicts.length };
+}
