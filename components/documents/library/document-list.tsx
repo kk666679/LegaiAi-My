@@ -1,0 +1,34 @@
+// components/documents/library/document-list.tsx
+"use client";
+
+import * as React from "react";
+import type { LegalDocument } from "../types";
+import { DocumentRow } from "./document-row";
+
+export interface DocumentListProps {
+  documents: LegalDocument[];
+  onOpen?: (doc: LegalDocument) => void;
+  onFavoriteChange?: (doc: LegalDocument, favorite: boolean) => void;
+  onMenu?: (doc: LegalDocument, anchor: HTMLElement) => void;
+}
+
+export function DocumentList({
+  documents,
+  onOpen,
+  onFavoriteChange,
+  onMenu,
+}: DocumentListProps) {
+  return (
+    <div className="space-y-2">
+      {documents.map((doc) => (
+        <DocumentRow
+          key={doc.id}
+          document={doc}
+          onOpen={onOpen}
+          onFavoriteChange={onFavoriteChange}
+          onMenu={onMenu}
+        />
+      ))}
+    </div>
+  );
+}
