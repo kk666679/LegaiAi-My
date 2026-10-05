@@ -46,7 +46,7 @@ const SECTIONS = [
     icon: Bot,
     items: [
       { title: "AI Assistant", desc: "Conversational legal research with citations.", href: "/legalai/assistant", tag: "AI" },
-      { title: "Document drafting", desc: "Generate legal documents with AI assistance.", href: "/legalai/drafting", tag: "AI" },
+      { title: "Document drafting", desc: "Generate legal documents with AI assistance.", href: "/legalai/draft", tag: "AI" },
       { title: "AI Copilot (agent)", desc: "Autonomous multi-step legal workflows.", href: "/legalai/agent", tag: "AI" },
       { title: "Citation validation", desc: "Verify legal citations against authoritative sources.", href: "/legalai/research", tag: "AI" },
     ],
@@ -55,7 +55,7 @@ const SECTIONS = [
     title: "Workflows",
     icon: FileSignature,
     items: [
-      { title: "Document drafting workflow", desc: "From template to AI-assisted draft to finalised document.", href: "/legalai/drafting", tag: "Guide" },
+      { title: "Document drafting workflow", desc: "From template to AI-assisted draft to finalised document.", href: "/legalai/draft", tag: "Guide" },
       { title: "Legal research workflow", desc: "Search, evaluate and save legal sources.", href: "/legalai/research", tag: "Guide" },
       { title: "Matter management", desc: "Organise documents, research and tasks by matter.", href: "/legalai/matters", tag: "Guide" },
     ],

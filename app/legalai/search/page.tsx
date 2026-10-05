@@ -133,7 +133,7 @@ function buildIndex(query: string): SearchResult[] {
         kind: "Drafts",
         title: d.title,
         description: d.status,
-        href: "/legalai/drafting",
+        href: "/legalai/draft",
         icon: Sparkles,
         group: "Drafts",
         relevance: score,

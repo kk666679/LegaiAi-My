@@ -115,7 +115,7 @@ const DOCUMENT_SECTION_LINKS = [
   {
     title: "Document Drafting",
     description: "Create legal documents with AI.",
-    href: "/legalai/drafting",
+    href: "/legalai/draft",
     icon: FileSignature,
     accent: "bg-blue-500/10 text-blue-500 border-blue-500/20",
   },
@@ -304,7 +304,7 @@ export default function DocumentsPage() {
 
             <div className="flex flex-wrap items-center gap-2">
               <Button asChild size="sm" className="gap-2">
-                <Link href="/legalai/drafting">
+                <Link href="/legalai/draft">
                   <Sparkles className="size-4" /> New draft
                 </Link>
               </Button>
@@ -386,7 +386,7 @@ export default function DocumentsPage() {
 
               <div className="space-y-2">
                 <Button asChild variant="secondary" className="w-full justify-start gap-2">
-                  <Link href="/legalai/drafting">
+                  <Link href="/legalai/draft">
                     <FileSignature className="size-4" /> Draft a contract
                   </Link>
                 </Button>

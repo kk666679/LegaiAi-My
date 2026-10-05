@@ -403,7 +403,7 @@ export default function AnalysisPage() {
                     <ArtifactActions>
                       {analysis.findings.length > 0 && (
                         <Button variant="outline" size="sm" asChild>
-                          <Link href="/legalai/drafting">
+                          <Link href="/legalai/draft">
                             <Sparkles className="size-4" />
                             <span>Apply fixes</span>
                           </Link>

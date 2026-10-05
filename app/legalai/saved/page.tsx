@@ -42,7 +42,7 @@ const KIND_HREF = (kind: string): string => {
     case "answer":
       return "/legalai/assistant";
     case "clause":
-      return "/legalai/drafting";
+      return "/legalai/draft";
     case "research":
       return "/legalai/research";
     default:
