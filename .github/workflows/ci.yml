@@ -39,7 +39,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: '24'
           cache: npm
           cache-dependency-path: backend/package-lock.json
       - name: Validate backend Docker image builds
@@ -50,15 +50,3 @@ jobs:
       - name: Backend test
         working-directory: backend
         run: npm test --if-present
-
-  deploy:
-    name: Deploy (Fly.io)
-    needs: [frontend, backend]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: superfly/flyctl-actions/setup-flyctl@v1
-      - run: flyctl deploy --remote-only
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

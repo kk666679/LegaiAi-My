@@ -110,6 +110,44 @@ const DOC_TYPE_ICON: Record<string, ComponentType<{ className?: string }>> = {
   OTHER: FileText,
 };
 
+const DOCUMENT_SECTION_LINKS = [
+  {
+    title: "Document Drafting",
+    description: "Create legal documents with AI.",
+    href: "/legalai/drafting",
+    icon: FileSignature,
+    accent: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+  },
+  {
+    title: "Drafting Studio",
+    description: "Work through an interactive drafting workflow.",
+    href: "/legalai/draft",
+    icon: Sparkles,
+    accent: "bg-violet-500/10 text-violet-500 border-violet-500/20",
+  },
+  {
+    title: "Contracts",
+    description: "Create, manage and review contracts.",
+    href: "/legalai/contracts",
+    icon: FileText,
+    accent: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+  },
+  {
+    title: "Document Analysis",
+    description: "Upload documents and extract legal insights.",
+    href: "/legalai/analysis",
+    icon: Search,
+    accent: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+  },
+  {
+    title: "Documentation",
+    description: "Learn how LegAI's workflows and AI features work.",
+    href: "/legalai/docs",
+    icon: BookOpen,
+    accent: "bg-slate-500/10 text-slate-500 border-slate-500/20",
+  },
+] as const;
+
 function IconForDocType({ docType }: { docType: string }) {
   const Icon = DOC_TYPE_ICON[docType] ?? FileText;
   return <Icon className="size-4 text-muted-foreground" aria-hidden />;
@@ -247,6 +285,123 @@ export default function DocumentsPage() {
         />
 
         <LegalDisclaimer compact />
+
+        <div className="rounded-2xl border bg-gradient-to-br from-primary/5 via-background to-background p-4 sm:p-5">
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+            <div className="space-y-2">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                Legal document workspace
+              </p>
+              <h2 className="text-2xl font-semibold tracking-tight">
+                Create, manage, analyse and work with legal documents.
+              </h2>
+              <p className="max-w-2xl text-sm text-muted-foreground">
+                LegAI helps users create, manage, understand, analyse, and work with legal documents.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <Button asChild size="sm" className="gap-2">
+                <Link href="/legalai/drafting">
+                  <Sparkles className="size-4" /> New draft
+                </Link>
+              </Button>
+              <Button variant="outline" size="sm" className="gap-2" onClick={() => setUploadOpen(true)}>
+                <Upload className="size-4" /> Upload
+              </Button>
+            </div>
+          </div>
+
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+            {DOCUMENT_SECTION_LINKS.map(({ title, description, href, icon: Icon, accent }) => (
+              <Link
+                key={title}
+                href={href}
+                className="group rounded-xl border bg-background/60 p-3 transition-colors hover:border-primary/30 hover:bg-accent/30"
+              >
+                <div className={`inline-flex rounded-md border p-2 ${accent}`}>
+                  <Icon className="size-4" />
+                </div>
+                <p className="mt-3 text-sm font-medium text-foreground">{title}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{description}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid gap-4 xl:grid-cols-[1.4fr_0.6fr]">
+          <Card>
+            <CardContent className="p-4">
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <div>
+                  <p className="text-sm font-medium">Recent documents</p>
+                  <p className="text-xs text-muted-foreground">Most recently updated in your workspace</p>
+                </div>
+                <Button asChild variant="ghost" size="sm">
+                  <Link href="/legalai/documents">View library</Link>
+                </Button>
+              </div>
+
+              <div className="space-y-2">
+                {(documents ?? []).slice(0, 4).map((doc) => (
+                  <Link
+                    key={doc.id}
+                    href={`/legalai/documents/${doc.id}`}
+                    className="flex items-center justify-between gap-3 rounded-lg border bg-card/30 p-3 transition-colors hover:bg-accent/30"
+                  >
+                    <div className="flex min-w-0 items-center gap-3">
+                      <div className="flex size-9 items-center justify-center rounded-md bg-muted text-muted-foreground">
+                        <IconForDocType docType={doc.docType} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium">{doc.title}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {DOC_TYPE_LABEL[doc.docType] ?? "Document"} • {formatDate(doc.updatedAt)}
+                        </p>
+                      </div>
+                    </div>
+                    <Badge variant="outline" className="shrink-0 text-[10px]">
+                      {doc.status}
+                    </Badge>
+                  </Link>
+                ))}
+
+                {(!documents || documents.length === 0) && (
+                  <div className="rounded-lg border border-dashed bg-muted/20 p-6 text-center text-sm text-muted-foreground">
+                    No documents yet. Upload or draft a document to get started.
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="mb-3">
+                <p className="text-sm font-medium">Quick actions</p>
+                <p className="text-xs text-muted-foreground">AI-powered document workflows</p>
+              </div>
+
+              <div className="space-y-2">
+                <Button asChild variant="secondary" className="w-full justify-start gap-2">
+                  <Link href="/legalai/drafting">
+                    <FileSignature className="size-4" /> Draft a contract
+                  </Link>
+                </Button>
+                <Button asChild variant="secondary" className="w-full justify-start gap-2">
+                  <Link href="/legalai/analysis">
+                    <Search className="size-4" /> Analyse a file
+                  </Link>
+                </Button>
+                <Button asChild variant="secondary" className="w-full justify-start gap-2">
+                  <Link href="/legalai/docs">
+                    <BookOpen className="size-4" /> View documentation
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
         {error && (
           <Alert variant="destructive">

@@ -31,6 +31,8 @@ import {
   History,
   Bookmark,
   FileCheck,
+  Loader2,
+  RefreshCw,
   type LucideIcon,
 } from "lucide-react";
 import { DashboardShell } from "@/components/lawmate/DashboardShell";
@@ -53,6 +55,11 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { PROMPT_SUGGESTIONS, DRAFT_TEMPLATES } from "@/lib/lawmate/data";
 import { greeting, relativeTime } from "@/lib/lawmate/utils";
 import { cn } from "@/lib/utils";
+import { DOC_TYPES } from "@/hooks/useDocuments";
+
+const DOC_TYPE_LABEL: Record<string, string> = Object.fromEntries(
+  DOC_TYPES.map((t) => [t.value, t.label]),
+);
 
 // ─────────────────────────────────────────────────────────────
 // Local types mirroring the tRPC output shapes. trpcReact is
@@ -146,6 +153,7 @@ interface AlertSummary {
 
 const MODULES: { label: string; href: string; icon: LucideIcon }[] = [
   { label: "Legal Research", href: "/legalai/research", icon: BookOpen },
+  { label: "Documents", href: "/legalai/documents", icon: FileText },
   { label: "Document Analysis", href: "/legalai/analysis", icon: ClipboardList },
   { label: "Contracts", href: "/legalai/contracts", icon: FileCheck },
   { label: "Risk Engine", href: "/legalai/risk", icon: ShieldCheck },

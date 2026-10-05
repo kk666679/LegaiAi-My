@@ -6,22 +6,6 @@ declare module '@wrksz/themes' {
   export function useTheme(): { theme: string; setTheme: (theme: string) => void };
 }
 
-declare module 'lucide-react' {
-  import type { ComponentType, SVGProps } from 'react';
-  type IconProps = SVGProps<SVGSVGElement> & {
-    size?: number | string;
-    strokeWidth?: number | string;
-    absoluteStrokeWidth?: boolean;
-    color?: string;
-  };
-  const icons: { [iconName: string]: ComponentType<IconProps> };
-  export = icons;
-}
-declare module 'lucide-react/*' {
-  const Icon: any;
-  export default Icon;
-}
-
 declare module 'ai' {
   export function streamText(options: any): any;
   export function generateText(options: any): Promise<any>;
