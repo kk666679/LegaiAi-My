@@ -1,24 +1,7 @@
-/**
- * Shared Documents domain types (§39).
- *
- * There is exactly ONE document model in this application: the Prisma
- * `legal_documents` row, surfaced through the `documents` tRPC router and typed
- * in `@/types/documents` / `@/hooks/useDocuments`. This module does **not**
- * introduce a competing model — it re-exports the real types and adds only the
- * presentation-layer vocabulary the Documents domain needs:
- *
- *   • `DocumentLifecycleStatus` — the full lifecycle, including transient
- *     pipeline phases (uploading, processing, analysing…) that are NOT
- *     persisted. `toPersistedStatus()` is the single bridge back to the
- *     database enum, so the UI can never invent a status the backend rejects.
- *   • analysis / evidence / version / activity / permission shapes that the
- *     domain components accept as props.
- *
- * Nothing here fabricates data. Fields the backend does not store are optional
- * and stay absent until a real endpoint supplies them (AGENTS.md safety rule 1:
- * never fabricate).
- */
+// components/documents/types.ts
+import type { ReactNode } from "react";
 
+<<<<<<< HEAD
 import type { LucideIcon } from "lucide-react";
 import {
   BookOpen,
@@ -400,131 +383,232 @@ export type DocumentActivityKind =
   | "uploaded"
   | "viewed"
   | "edited"
+=======
+export type DocumentStatus =
+  | "draft"
+  | "uploading"
+  | "processing"
+  | "ready"
+  | "analysing"
+>>>>>>> 9d4a0e0 (feat: add irac-engine & convert lom-client to ESM)
   | "analysed"
-  | "commented"
-  | "shared"
-  | "reviewed"
+  | "review"
+  | "changes-requested"
   | "approved"
-  | "exported"
-  | "archived";
-
-export interface DocumentActivityEntry {
-  id: string;
-  kind: DocumentActivityKind;
-  actor?: string;
-  /** ISO timestamp. */
-  at: string;
-  detail?: string;
-}
-
-export interface DocumentComment {
-  id: string;
-  author: string;
-  body: string;
-  at: string;
-  /** Anchor inside the document (page/clause) when the backend records one. */
-  locator?: string;
-  resolved?: boolean;
-  replies?: DocumentComment[];
-}
-
-/* ── Permissions & sharing ─────────────────────────────────────────────── */
-
-export type DocumentShareRole = "owner" | "editor" | "reviewer" | "viewer";
-
-export const DOCUMENT_SHARE_ROLE_LABELS: Record<DocumentShareRole, string> = {
-  owner: "Owner",
-  editor: "Editor",
-  reviewer: "Reviewer",
-  viewer: "Viewer",
-};
-
-export interface DocumentPermissionEntry {
-  id: string;
-  /** Display name of the user or team. */
-  name: string;
-  role: DocumentShareRole;
-  avatarUrl?: string;
-}
-
-/** The capability set the UI gates on. */
-export interface DocumentCapabilities {
-  canView: boolean;
-  canEdit: boolean;
-  canComment: boolean;
-  canShare: boolean;
-  canExport: boolean;
-  canDelete: boolean;
-  canApprove: boolean;
-}
-
-/* ── Collections / folders / tags ──────────────────────────────────────── */
-
-export type DocumentCollectionId =
-  | "all"
-  | "recent"
-  | "favorites"
-  | "shared"
+  | "final"
   | "archived"
-  | "contracts"
-  | "drafts"
-  | "templates";
+  | "error";
 
-export interface DocumentCollection {
-  id: DocumentCollectionId;
+export type DocumentPermission =
+  | "view"
+  | "edit"
+  | "comment"
+  | "share"
+  | "export"
+  | "delete"
+  | "approve";
+
+export type DocumentRole = "owner" | "editor" | "reviewer" | "viewer";
+
+export type DocumentViewMode = "list" | "grid" | "table";
+
+export type DocumentSortKey =
+  | "updatedAt"
+  | "createdAt"
+  | "name"
+  | "type"
+  | "status";
+
+export type SortDirection = "asc" | "desc";
+
+export interface DocumentParty {
+  id: string;
+  name: string;
+  role?: string;
+  kind?: "individual" | "company" | "government" | "other";
+}
+
+export interface DocumentTag {
+  id: string;
   label: string;
-  icon: LucideIcon;
-  description: string;
+  color?: string;
 }
 
 export interface DocumentFolder {
   id: string;
   name: string;
-  parentId?: string;
-  documentCount?: number;
+  parentId?: string | null;
+  count?: number;
+  system?: boolean;
 }
 
-/* ── Grouping helpers ──────────────────────────────────────────────────── */
-
-export interface DocumentGroup<T = DocumentListItem> {
-  key: string;
-  label: string;
-  items: T[];
-}
-
-export interface DocumentLibraryStats {
-  total: number;
-  stats: DocumentStats | null;
-  clientNames: Map<string, string>;
-  clients: { id: string; name: string }[];
-}
-
-/** Convenience alias so pages don't re-import the Prisma model. */
-export type DocumentRecord = DocumentListItem & {
-  fileSize?: number;
+export interface LegalDocument {
+  id: string;
+  name: string;
+  type: string;
+  category?: string;
+  status: DocumentStatus;
+  ownerId?: string;
+  ownerName?: string;
+  folderId?: string | null;
+  size?: number;
   pageCount?: number;
+<<<<<<< HEAD
   parties?: DocumentParties | null;
   jurisdiction?: string | null;
 };
-
-export interface AnalysisObligation {
-  id: string;
-  description: string;
-  /** ISO date when known. */
-  dueOn?: string;
-  party?: string;
+=======
+  language?: string;
+  jurisdiction?: string;
+  parties?: DocumentParty[];
+  tags?: DocumentTag[];
+  favorite?: boolean;
+  aiStatus?: "idle" | "queued" | "running" | "done" | "failed";
+  createdAt: string;
+  updatedAt: string;
+  thumbnailUrl?: string;
+  url?: string;
 }
 
-export interface AnalysisDate {
+export interface DocumentFilters {
+  query?: string;
+  type?: string[];
+  status?: DocumentStatus[];
+  category?: string[];
+  ownerId?: string[];
+  folderId?: string | null;
+  tagIds?: string[];
+  aiStatus?: Array<NonNullable<LegalDocument["aiStatus"]>>;
+  dateFrom?: string;
+  dateTo?: string;
+}
+
+export interface DocumentSort {
+  key: DocumentSortKey;
+  direction: SortDirection;
+}
+
+export interface DocumentVersion {
   id: string;
+  documentId: string;
   label: string;
-  /** ISO date. */
-  value: string;
-  kind?: "effective" | "expiry" | "notice" | "filing" | "other";
+  versionNumber: number;
+  isCurrent?: boolean;
+  authorId?: string;
+  authorName?: string;
+  createdAt: string;
+  size?: number;
+  summary?: string;
 }
 
-export interface AnalysisParty {
+export interface DocumentActivityEvent {
   id: string;
-  role: string;
-  name: string;
+  documentId: string;
+  kind:
+    | "created"
+    | "uploaded"
+    | "viewed"
+    | "edited"
+    | "analysed"
+    | "commented"
+    | "shared"
+    | "reviewed"
+    | "approved"
+    | "rejected"
+    | "exported"
+    | "archived"
+    | "restored";
+  actorId?: string;
+  actorName?: string;
+  timestamp: string;
+  message?: string;
+  metadata?: Record<string, unknown>;
 }
+
+export interface DocumentComment {
+  id: string;
+  documentId: string;
+  authorId: string;
+  authorName: string;
+  authorAvatarUrl?: string;
+  body: string;
+  createdAt: string;
+  resolved?: boolean;
+  anchor?: {
+    page?: number;
+    x?: number;
+    y?: number;
+    excerpt?: string;
+  };
+}
+
+export interface DocumentPermissionEntry {
+  id: string;
+  userId: string;
+  name: string;
+  email?: string;
+  avatarUrl?: string;
+  role: DocumentRole;
+}
+
+export interface DocumentAnalysisFinding {
+  id: string;
+  kind: "risk" | "obligation" | "date" | "clause" | "party" | "compliance";
+  title: string;
+  summary?: string;
+  severity?: "low" | "medium" | "high" | "critical";
+  confidence?: number;
+  evidenceIds?: string[];
+}
+>>>>>>> 9d4a0e0 (feat: add irac-engine & convert lom-client to ESM)
+
+export interface DocumentEvidence {
+  id: string;
+  documentId: string;
+  page?: number;
+  section?: string;
+  excerpt: string;
+  relevance?: string;
+  confidence?: number;
+}
+
+export interface DocumentTemplate {
+  id: string;
+  name: string;
+<<<<<<< HEAD
+}
+=======
+  category: string;
+  description?: string;
+  jurisdiction?: string;
+  tags?: string[];
+  favorite?: boolean;
+  previewUrl?: string;
+}
+
+export interface DocumentsStats {
+  total: number;
+  ready: number;
+  processing: number;
+  review: number;
+  pendingApproval: number;
+  analysed: number;
+  favorites: number;
+}
+
+export interface DocumentsCapabilities {
+  canCreate: boolean;
+  canUpload: boolean;
+  canAnalyse: boolean;
+  canShare: boolean;
+  canDelete: boolean;
+  canApprove: boolean;
+}
+
+export interface DocumentActionContext {
+  document: LegalDocument;
+  permissions: DocumentPermission[];
+}
+
+export type { ReactNode };
+>>>>>>> 9d4a0e0 (feat: add irac-engine & convert lom-client to ESM)
