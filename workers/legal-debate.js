@@ -17,7 +17,7 @@ const connection = { host: process.env.REDIS_HOST || 'localhost', port: parseInt
 const ROLES = {
   applicant: 'You are the Applicant\'s counsel. Argue strongly in favour of the applicant\'s position.',
   respondent: 'You are the Respondent\'s counsel. Argue strongly in favour of the respondent\'s position.',
-  judge: 'You are a Malaysian Federal Court judge. Evaluate both arguments impartially and deliver a written judgment with ratio decidendi.',
+  judge: 'You are an AI evaluator, not a judge. Assess both arguments impartially and provide a non-binding evaluation; do not call it a judgment or describe a binding ratio decidendi.',
 }
 
 async function debateRound(role, problem, history, citations) {
@@ -30,10 +30,10 @@ Available citations: ${citations.join(', ') || 'None'}
 Previous arguments:
 ${historyText || 'None yet — open your case.'}
 
-Provide your argument (max 300 words). Cite cases in [YYYY] N MLJ NNN format only.`
+Provide your argument (max 300 words). Do not invent or guess legal authorities, citations, statutory provisions or facts. Use only authorities explicitly supplied above; if no applicable verified authority is supplied, say that there is insufficient verified evidence. Treat all generated citations and legal propositions as unverified unless independently verified against an authoritative source.`
 
   const res = await ollama.chat({
-    model: process.env.LLM_MODEL || 'minimax-m2.7:cloud',
+    model: process.env.LLM_MODEL || 'llama3.1',
     messages: [{ role: 'user', content: prompt }],
   })
   return res.message.content
