@@ -12,11 +12,15 @@ import { writeAuditLog } from '../../lib/audit.js'
 import { hasPermission } from '../../lib/auth'
 import { getTemplateConfig, readTemplatePrompt, readTemplateSchema } from '../../templates/registry.js'
 
+const repositoryRoot = path.resolve(
+  process.cwd(),
+  path.basename(process.cwd()) === 'backend' ? '..' : '.',
+)
 const lomClient: { normalizeActNumber: typeof NormalizeActNumber; inferDocumentType: typeof InferDocumentType } =
-  require('../../../../.autoclaw/memory/interfaces/lom-client.js')
+  require(path.join(repositoryRoot, '.autoclaw', 'memory', 'interfaces', 'lom-client.mjs'))
 const { normalizeActNumber, inferDocumentType } = lomClient
 
-const DRAFT_TEMPLATES_PATH = path.join(process.cwd(), '.autoclaw', 'datasets', 'lom', 'catalog.jsonl')
+const DRAFT_TEMPLATES_PATH = path.join(repositoryRoot, '.autoclaw', 'datasets', 'lom', 'catalog.jsonl')
 
 function loadLomCatalog() {
   try {

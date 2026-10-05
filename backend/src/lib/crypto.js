@@ -1,5 +1,5 @@
 import { createHmac, createHash } from 'crypto'
-import { requireSecret } from './security/secrets.ts'
+import { requireSecret } from './security/secrets'
 
 // Resolved lazily so importing this module never throws at load time, and
 // through the shared policy so production cannot sign with the
