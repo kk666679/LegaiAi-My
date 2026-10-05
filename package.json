@@ -23,7 +23,7 @@
     "start": "tsx index.js",
     "dev": "concurrently \"npm run redis\" \"npm run workers:all\" \"npm run api:dev\" \"npm run dev:next\"",
     "dev:next": "next dev -p 3000",
-    "build": "next build",
+    "build": "next build --webpack",
     "start:next": "next start",
     "preview": "npm run build && npm run start:next",
     "db:generate": "prisma generate --schema ./backend/prisma/schema.prisma",
