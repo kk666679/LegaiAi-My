@@ -1,0 +1,79 @@
+{"id":"i18n-d-001","lang":"en","script":"latn","domain":"case","text":"The court held that the defendant breached the contract."}
+{"id":"i18n-d-002","lang":"ms","script":"latn","domain":"case","text":"Mahkamah telah memutuskan bahawa defendan telah melanggar kontrak."}
+{"id":"i18n-d-003","lang":"en","script":"latn","domain":"issue","text":"The issue is whether the limitation period bars the claim."}
+{"id":"i18n-d-004","lang":"ms","script":"latn","domain":"issue","text":"Isu ini adalah sama ada tempoh had masa menghalang tuntutan tersebut."}
+{"id":"i18n-d-005","lang":"en","script":"latn","domain":"statute","text":"Section 14 of the Employment Act 1955 governs dismissals for misconduct."}
+{"id":"i18n-d-006","lang":"ms","script":"latn","domain":"statute","text":"Seksyen 14 Akta Kerja 1955 mengawal pemecatan atas salah laku."}
+{"id":"i18n-d-007","lang":"en","script":"latn","domain":"contract","text":"The parties agree that any dispute shall be resolved by arbitration in Kuala Lumpur."}
+{"id":"i18n-d-008","lang":"ms","script":"latn","domain":"contract","text":"Pihak-pihak bersetuju bahawa apa-apa pertikaian akan diselesaikan melalui timbang tara di Kuala Lumpur."}
+{"id":"i18n-d-009","lang":"en","script":"latn","domain":"holding","text":"The Federal Court confirmed that a domestic inquiry must precede dismissal."}
+{"id":"i18n-d-010","lang":"ms","script":"latn","domain":"holding","text":"Mahkamah Persekutuan mengesahkan bahawa siasatan dalaman mesti dijalankan sebelum pemecatan."}
+{"id":"i18n-d-011","lang":"en","script":"latn","domain":"memo","text":"This memorandum examines the applicable limitation period under the Limitation Act 1953."}
+{"id":"i18n-d-012","lang":"ms","script":"latn","domain":"memo","text":"Memorandum ini mengkaji tempoh had masa yang terpakai di bawah Akta Had Masa 1953."}
+
+{"id":"i18n-d-013","lang":"id","script":"latn","domain":"case","text":"Pengadilan memutuskan bahwa tergugat telah melanggar perjanjian tersebut."}
+{"id":"i18n-d-014","lang":"id","script":"latn","domain":"issue","text":"Permasalahannya adalah apakah masa kedaluwarsa menghalangi gugatan ini."}
+{"id":"i18n-d-015","lang":"id","script":"latn","domain":"statute","text":"Pasal 14 Undang-Undang Ketenagakerjaan mengatur pemecatan karena kesalahan berat."}
+{"id":"i18n-d-016","lang":"id","script":"latn","domain":"contract","text":"Para pihak sepakat bahwa setiap sengketa akan diselesaikan melalui arbitrase di Jakarta."}
+{"id":"i18n-d-017","lang":"id","script":"latn","domain":"holding","text":"Mahkamah Agung menegaskan bahwa pemeriksaan internal wajib dilakukan sebelum pemecatan."}
+{"id":"i18n-d-018","lang":"id","script":"latn","domain":"memo","text":"Catatan ini mengkaji jangka waktu daluwarsa yang berlaku berdasarkan KUHPerdata."}
+
+{"id":"i18n-d-019","lang":"th","script":"thai","domain":"case","text":"ศาลตัดสินว่าจำเลยได้ละเมิดสัญญา"}
+{"id":"i18n-d-020","lang":"th","script":"thai","domain":"issue","text":"ประเด็นคืออายุความใช้บังคับกับข้อเรียกร้องนี้หรือไม่"}
+{"id":"i18n-d-021","lang":"th","script":"thai","domain":"statute","text":"มาตรา 14 แห่งพระราชบัญญัติคุ้มครองแรงงาน governs การเลิกจ้าง"}
+{"id":"i18n-d-022","lang":"th","script":"thai","domain":"contract","text":"คู่สัญญาตกลงว่าข้อพิพาทใด ๆ จะได้รับการระงับโดยอนุญาโตตุลาการ"}
+{"id":"i18n-d-023","lang":"th","script":"thai","domain":"holding","text":"ศาลฎีกายืนยันว่าต้องมีการสอบสวนภายในก่อนการเลิกจ้าง"}
+{"id":"i18n-d-024","lang":"th","script":"thai","domain":"memo","text":"บันทึกนี้พิจารณาอายุความที่ใช้บังคับตามประมวลกฎหมายแพ่งและพาณิชย์"}
+
+{"id":"i18n-d-025","lang":"vi","script":"latn","domain":"case","text":"Tòa án đã phán quyết rằng bị đơn đã vi phạm hợp đồng."}
+{"id":"i18n-d-026","lang":"vi","script":"latn","domain":"issue","text":"Vấn đề là liệu thời hiệu khởi kiện có được áp dụng hay không."}
+{"id":"i18n-d-027","lang":"vi","script":"latn","domain":"statute","text":"Điều 14 của Bộ luật Lao động quy định về việc sa thải người lao động."}
+{"id":"i18n-d-028","lang":"vi","script":"latn","domain":"contract","text":"Các bên đồng ý rằng mọi tranh chấp sẽ được giải quyết bằng trọng tài tại Hà Nội."}
+{"id":"i18n-d-029","lang":"vi","script":"latn","domain":"holding","text":"Tòa án nhân dân tối cao khẳng định rằng phải tiến hành điều tra nội bộ trước khi sa thải."}
+{"id":"i18n-d-030","lang":"vi","script":"latn","domain":"memo","text":"Bản ghi nhớ này xem xét thời hiệu khởi kiện theo Bộ luật Dân sự."}
+
+{"id":"i18n-d-031","lang":"tl","script":"latn","domain":"case","text":"Nagpasya ang hukuman na nilabag ng nasasakdal ang kontrata."}
+{"id":"i18n-d-032","lang":"tl","script":"latn","domain":"issue","text":"Ang isyu ay kung ang panahon ng paglilimita ay sumasaklaw sa paghahabol."}
+{"id":"i18n-d-033","lang":"tl","script":"latn","domain":"statute","text":"Ang Seksyon 14 ng Kodigo sa Paggawa ay tumutukoy sa pagpapaalis ng empleyado."}
+{"id":"i18n-d-034","lang":"tl","script":"latn","domain":"contract","text":"Sumasang-ayon ang mga partido na ang anumang hindi pagkakaunawaan ay malulutas sa pamamagitan ng arbitrasyon."}
+{"id":"i18n-d-035","lang":"tl","script":"latn","domain":"holding","text":"Pinagtibay ng Korte Suprema na dapat magsagawa ng panloob na pagsisiyasat bago ang pagpapaalis."}
+{"id":"i18n-d-036","lang":"tl","script":"latn","domain":"memo","text":"Sinusuri ng memorandum na ito ang nalalapat na panahon ng paglilimita."}
+
+{"id":"i18n-d-037","lang":"km","script":"khmr","domain":"case","text":"តុលាការបានសម្រេចថាចុងចោទបានបំពានកិច្ចសន្យា។"}
+{"id":"i18n-d-038","lang":"km","script":"khmr","domain":"issue","text":"បញ្ហាគឺថាតើរយៈពេលកំណត់អនុវត្តចំពោះការទាមទារនេះឬអត់។"}
+{"id":"i18n-d-039","lang":"km","script":"khmr","domain":"statute","text":"មាតិកា ១៤ នៃច្បាប់ការងារគ្រប់គ្រងការបណ្តេញចេញដោយសារកំហុស។"}
+{"id":"i18n-d-040","lang":"km","script":"khmr","domain":"contract","text":"ភាគីទាំងអស់យល់ព្រមថាវិវាទនឹងត្រូវបានដោះស្រាយតាមរយៈអាជ្ញាកណ្តាល។"}
+{"id":"i18n-d-041","lang":"km","script":"khmr","domain":"holding","text":"តុលាការកំពូលបានបញ្ជាក់ថាត្រូវធ្វើការស៊ើបអង្កេតផ្ទៃក្នុងមុននឹងបណ្តេញចេញ។"}
+
+{"id":"i18n-d-042","lang":"lo","script":"laoo","domain":"case","text":"ສານໄດ້ຕັດສິນວ່າຈຳເລີຍລະເມີດສັນຍາ."}
+{"id":"i18n-d-043","lang":"lo","script":"laoo","domain":"issue","text":"ບັນຫາແມ່ນວ່າໄລຍະເວລາຈຳກັດໃຊ້ບັງຄັບກັບການຮຽກຮ້ອງນີ້ຫຼືບໍ່."}
+{"id":"i18n-d-044","lang":"lo","script":"laoo","domain":"statute","text":"ມາດຕາ 14 ຂອງກົດໝາຍແຮງງານຄຸ້ມຄອງການປົດອອກຍ້ອນຄວາມຜິດ."}
+{"id":"i18n-d-045","lang":"lo","script":"laoo","domain":"contract","text":"ຄູ່ສັນຍາຕົກລົງວ່າຂໍ້ຂັດແຍ່ງຈະໄດ້ຮັບການແກ້ໄຂໂດຍຜ່ານການຊີ້ຂາດ."}
+
+{"id":"i18n-d-046","lang":"my","script":"mymr","domain":"case","text":"တရားရုံးက တရားခံသည် စာချုပ်ကို ချိုးဖောက်သည်ဟု ဆုံးဖြတ်ခဲ့သည်။"}
+{"id":"i18n-d-047","lang":"my","script":"mymr","domain":"issue","text":"အငြင်းပွားစရာမှာ သက်တမ်းကန့်သတ်ချက် သက်ရောက်ခြင်း ရှိ၊ မရှိ ဖြစ်သည်။"}
+{"id":"i18n-d-048","lang":"my","script":"mymr","domain":"statute","text":"အလုပ်သမားဥပဒေ ပုဒ်မ ၁၄ သည် ပြစ်မှုကြောင့် အလုပ်ထုတ်ခြင်းကို ထိန်းချုပ်သည်။"}
+{"id":"i18n-d-049","lang":"my","script":"mymr","domain":"contract","text":"အဖွဲ့ဝင်များသည် အငြင်းပွားမှုများကို ခုံသမာဓိဖြင့် ဖြေရှင်းရန် သဘောတူညီကြသည်။"}
+
+{"id":"i18n-d-050","lang":"bn","script":"beng","domain":"case","text":"আদালত রায় দিয়েছেন যে বিবাদী চুক্তি ভঙ্গ করেছেন।"}
+{"id":"i18n-d-051","lang":"bn","script":"beng","domain":"issue","text":"সমস্যা হল সীমাবদ্ধতার সময়কাল এই দাবির উপর প্রযোজ্য কিনা।"}
+{"id":"i18n-d-052","lang":"bn","script":"beng","domain":"statute","text":"শ্রম আইনের ধারা ১৪ অসদাচরণের কারণে চাকরিচ্যুতি নিয়ন্ত্রণ করে।"}
+{"id":"i18n-d-053","lang":"bn","script":"beng","domain":"contract","text":"পক্ষগণ সম্মত যে যেকোনো বিরোধ সালিশের মাধ্যমে নিষ্পত্তি করা হবে।"}
+{"id":"i18n-d-054","lang":"bn","script":"beng","domain":"holding","text":"সুপ্রিম কোর্ট নিশ্চিত করেছেন যে চাকরিচ্যুতির আগে অভ্যন্তরীণ তদন্ত আবশ্যক।"}
+
+{"id":"i18n-d-055","lang":"jv","script":"latn","domain":"case","text":"Pengadilan mutusake yen terdakwa nglanggar kontrak kasebut."}
+{"id":"i18n-d-056","lang":"jv","script":"latn","domain":"issue","text":"Masalahe yaiku apa wektu watesan bisa ditrapake kanggo tuntutan iki."}
+{"id":"i18n-d-057","lang":"jv","script":"latn","domain":"statute","text":"Pasal 14 saka Undhang-undhang Tenaga Kerja ngatur pemecatan amarga kesalahan."}
+{"id":"i18n-d-058","lang":"jv","script":"latn","domain":"contract","text":"Para pihak setuju yen kabeh regejegan bakal dirampungake liwat arbitrase."}
+{"id":"i18n-d-059","lang":"jv","script":"latn","domain":"memo","text":"Memorandum iki nliti wektu watesan sing ditrapake miturut Undhang-undhang Watesan Wektu."}
+
+{"id":"i18n-d-060","lang":"en","script":"latn","domain":"short","text":"Breach of contract."}
+{"id":"i18n-d-061","lang":"ms","script":"latn","domain":"short","text":"Pelanggaran kontrak."}
+{"id":"i18n-d-062","lang":"id","script":"latn","domain":"short","text":"Pelanggaran kontrak."}
+{"id":"i18n-d-063","lang":"vi","script":"latn","domain":"short","text":"Vi phạm hợp đồng."}
+{"id":"i18n-d-064","lang":"tl","script":"latn","domain":"short","text":"Paglabag sa kontrata."}
+
+{"id":"i18n-d-065","lang":"en","script":"latn","domain":"code-switch","text":"Section 14 of the Employment Act — dismissal requires due inquiry."}
+{"id":"i18n-d-066","lang":"ms","script":"latn","domain":"code-switch","text":"Seksyen 14 Akta Kerja 1955 — pemecatan memerlukan siasatan dalaman."}
+{"id":"i18n-d-067","lang":"en","script":"latn","domain":"citation","text":"Wong Yuen Foo v Soon Hing [1973] 1 MLJ 225"}
+{"id":"i18n-d-068","lang":"ms","script":"latn","domain":"citation","text":"Dr James Alfred v K.K. Mart Sdn Bhd [2019] 4 MLJ 479"}

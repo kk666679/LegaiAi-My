@@ -1,6 +1,7 @@
 #!/usr/bin/env node
+import * as ds from '../dataset.js';
 'use strict';
-const ds = require('../dataset');
+
 const cmd = process.argv[2] || 'validate';
 if (cmd === 'validate') {
   const r = ds.validate();

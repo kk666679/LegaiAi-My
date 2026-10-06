@@ -1,0 +1,5 @@
+{"id":"asean-001","input":{"query":"What is the ASEAN Charter?","jurisdiction":"ASEAN"},"expect":{"workflow":"ask","minSources":1,"region":"ASEAN"}}
+{"id":"asean-002","input":{"query":"ASEAN Free Trade Area member states","jurisdiction":"ASEAN"},"expect":{"workflow":"ask","minSources":1,"region":"ASEAN"}}
+{"id":"asean-003","input":{"query":"Timor-Leste ASEAN membership status","jurisdiction":"TL"},"expect":{"workflow":"ask","minSources":1,"region":"ASEAN"}}
+{"id":"asean-004","input":{"query":"cross-border contract enforcement Singapore and Malaysia","jurisdiction":["SG","MY"]},"expect":{"workflow":"ask","minSources":2,"region":"ASEAN"}}
+{"id":"asean-005","input":{"query":"investment protection in ASEAN","jurisdiction":"ASEAN"},"expect":{"workflow":"ask","minSources":1,"region":"ASEAN"}}

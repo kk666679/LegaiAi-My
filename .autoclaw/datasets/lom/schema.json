@@ -1,6 +1,39 @@
 {
-  "$schema": "https://example.com/schemas/legislation-record.v1.json",
+  "$schema": "https://example.com/schemas/legislation-record.v2.json",
   "source": "LOM",
   "jurisdiction": "MY",
-  "version": 1
+  "version": 2,
+  "description": "Multi-jurisdiction legislation schema. Add `jurisdiction` and `source_type` to support ASEAN national sources.",
+  "required": ["id", "act_number", "type", "status", "jurisdiction", "source", "provenance"],
+  "properties": {
+    "id": { "type": "string", "description": "Stable unique identifier" },
+    "act_number": { "type": "string", "description": "Normalized Act/law number" },
+    "title": { "type": "string", "description": "Official short title" },
+    "type": { "type": "string", "enum": ["principal", "amendment", "subsidiary", "pu_a", "pu_b", "ordinance", "federal-constitution", "historical", "law", "decree", "regulation", "presidential", "ministerial", "royal-decree", "organic-act", "emergency-decree"] },
+    "document_type": { "type": "string", "description": "Inferred from name" },
+    "status": { "type": "string", "enum": ["current", "amended", "repealed", "historical", "unknown"] },
+    "jurisdiction": { "type": "string", "pattern": "^[A-Z]{2}$", "description": "ISO 3166-1 alpha-2" },
+    "language": { "type": "string", "enum": ["en", "bm", "ms", "id", "th", "vi", "km", "lo", "my", "tl", "pt", "fil", "zh", "ta", "unknown"] },
+    "version": { "type": "string" },
+    "royal_assent": { "type": ["string", "null"] },
+    "publication_date": { "type": ["string", "null"] },
+    "commencement_date": { "type": ["string", "null"] },
+    "parent_act": { "type": ["string", "null"] },
+    "relationships": { "type": "array" },
+    "provenance": {
+      "type": "object",
+      "required": ["source", "source_url", "retrieved_at", "trust"],
+      "properties": {
+        "source": { "type": "string" },
+        "source_url": { "type": "string", "format": "uri" },
+        "source_title": { "type": "string" },
+        "retrieved_at": { "type": "string", "format": "date-time" },
+        "version_date": { "type": "string" },
+        "trust": { "type": "string", "enum": ["authoritative", "secondary", "uncertain"] }
+      }
+    },
+    "content_hash": { "type": "string" },
+    "history": { "type": "array" },
+    "retrieved_at": { "type": "string", "format": "date-time" }
+  }
 }

@@ -1,9 +1,9 @@
-'use strict';
-const { toolResult, toolError } = require('../protocol');
+import { toolResult, toolError } from '../protocol.js';
+
+import * as ds from '../../dataset.js;
 
 function build() {
   let ds;
-  try { ds = require('../../dataset'); } catch (_) { ds = null; }
 
   return [
     {
@@ -35,4 +35,6 @@ function build() {
     }
   ];
 }
-module.exports = { build };
+;
+
+export { build };

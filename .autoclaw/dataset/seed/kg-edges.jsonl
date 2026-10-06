@@ -1,5 +1,0 @@
-{"id":"e1","from":"case:mbb-v-mahkamah","to":"statute:employment-act-1955","rel":"cites","weight":0.9}
-{"id":"e2","from":"case:mbb-v-mahkamah","to":"concept:constructive-dismissal","rel":"discusses","weight":0.85}
-{"id":"e3","from":"statute:ira-1967","to":"concept:constructive-dismissal","rel":"defines","weight":0.8}
-{"id":"e4","from":"case:unfair-dismissal-malaysia","to":"statute:employment-act-1955","rel":"cites","weight":0.7}
-{"id":"e5","from":"case:unfair-dismissal-malaysia","to":"concept:constructive-dismissal","rel":"related","weight":0.1}

@@ -1,0 +1,5 @@
+{"id":"asean-irac-001","input":{"query":"A dispute arises between an Indonesian investor and a Vietnamese state entity. Which ASEAN agreements apply?","jurisdiction":["ID","VN"],"k":5},"expect":{"workflow":"irac","minIssues":1,"region":"ASEAN"}}
+{"id":"asean-irac-002","input":{"query":"A Filipino worker is dismissed in Malaysia without notice. What protections exist under ASEAN and Malaysian law?","jurisdiction":["PH","MY"],"k":5},"expect":{"workflow":"irac","minIssues":1,"region":"ASEAN"}}
+{"id":"asean-irac-003","input":{"query":"Timor-Leste applies for ASEAN membership. What legal implications follow?","jurisdiction":"TL","k":3},"expect":{"workflow":"irac","minIssues":1,"region":"ASEAN"}}
+{"id":"asean-irac-004","input":{"query":"A Thai company wishes to invest in Singapore under ASEAN economic integration rules.","jurisdiction":["TH","SG"],"k":5},"expect":{"workflow":"irac","minIssues":1,"region":"ASEAN"}}
+{"id":"asean-irac-005","input":{"query":"Disaster relief coordination under ASEAN law after a cyclone in Myanmar.","jurisdiction":"MM","k":3},"expect":{"workflow":"irac","minIssues":1,"region":"ASEAN"}}

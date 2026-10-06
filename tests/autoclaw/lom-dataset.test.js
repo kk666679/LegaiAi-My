@@ -22,11 +22,11 @@ async function readJsonl(p) {
     .map(JSON.parse);
 }
 
-test('LOM dataset schema file exists and declares v1 contract', async () => {
+test('LOM dataset schema file exists and declares v2 contract', async () => {
   const schema = JSON.parse(await fs.readFile(SCHEMA_PATH, 'utf8'));
   assert.equal(schema.source, 'LOM');
   assert.equal(schema.jurisdiction, 'MY');
-  assert.match(schema['$schema'], /legislation-record\.v1\.json$/);
+  assert.match(schema['$schema'], /legislation-record\.v2\.json$/);
 });
 
 test('catalog.jsonl loads with required fields', async () => {

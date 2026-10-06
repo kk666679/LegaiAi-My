@@ -1,0 +1,24 @@
+{"id":"case:mbb-v-mahkamah","type":"case","title":"MBB v Mahkamah","canonical":"mbb v mahkamah","salience":0.9,"lastSeen":1730000000000,"accessCount":12}
+{"id":"statute:employment-act-1955","type":"statute","title":"Employment Act 1955","canonical":"employment act 1955","salience":0.95,"lastSeen":1730000001000,"accessCount":20}
+{"id":"statute:ira-1967","type":"statute","title":"Industrial Relations Act 1967","canonical":"industrial relations act 1967","salience":0.9,"lastSeen":1730000002000,"accessCount":15}
+{"id":"concept:constructive-dismissal","type":"concept","title":"Constructive dismissal","canonical":"constructive dismissal","salience":0.85,"lastSeen":1730000003000,"accessCount":9}
+{"id":"case:unfair-dismissal-malaysia","type":"case","title":"Unfair Dismissal Malaysia","canonical":"unfair dismissal malaysia","salience":0.8,"lastSeen":1730000004000,"accessCount":7}
+{"id":"jurisdiction:MY","type":"jurisdiction","title":"Malaysia","canonical":"malaysia","salience":0.95,"lastSeen":1730000005000,"accessCount":30}
+{"id":"jurisdiction:SG","type":"jurisdiction","title":"Singapore","canonical":"singapore","salience":0.9,"lastSeen":1730000005001,"accessCount":25}
+{"id":"jurisdiction:ID","type":"jurisdiction","title":"Indonesia","canonical":"indonesia","salience":0.85,"lastSeen":1730000005002,"accessCount":20}
+{"id":"jurisdiction:TH","type":"jurisdiction","title":"Thailand","canonical":"thailand","salience":0.85,"lastSeen":1730000005003,"accessCount":18}
+{"id":"jurisdiction:VN","type":"jurisdiction","title":"Vietnam","canonical":"vietnam","salience":0.8,"lastSeen":1730000005004,"accessCount":15}
+{"id":"jurisdiction:PH","type":"jurisdiction","title":"Philippines","canonical":"philippines","salience":0.85,"lastSeen":1730000005005,"accessCount":20}
+{"id":"jurisdiction:KH","type":"jurisdiction","title":"Cambodia","canonical":"cambodia","salience":0.7,"lastSeen":1730000005006,"accessCount":10}
+{"id":"jurisdiction:LA","type":"jurisdiction","title":"Laos","canonical":"laos","salience":0.7,"lastSeen":1730000005007,"accessCount":8}
+{"id":"jurisdiction:MM","type":"jurisdiction","title":"Myanmar","canonical":"myanmar","salience":0.75,"lastSeen":1730000005008,"accessCount":12}
+{"id":"jurisdiction:BN","type":"jurisdiction","title":"Brunei Darussalam","canonical":"brunei darussalam","salience":0.75,"lastSeen":1730000005009,"accessCount":10}
+{"id":"jurisdiction:TL","type":"jurisdiction","title":"Timor-Leste","canonical":"timor-leste","salience":0.6,"lastSeen":1730000005010,"accessCount":5}
+{"id":"treaty:asean-charter","type":"treaty","title":"ASEAN Charter","canonical":"asean charter","salience":0.9,"lastSeen":1730000006000,"accessCount":15}
+{"id":"treaty:tac","type":"treaty","title":"Treaty of Amity and Cooperation","canonical":"treaty of amity and cooperation","salience":0.85,"lastSeen":1730000006001,"accessCount":12}
+{"id":"treaty:afta","type":"treaty","title":"ASEAN Free Trade Area","canonical":"asean free trade area","salience":0.9,"lastSeen":1730000006002,"accessCount":18}
+{"id":"treaty:acia","type":"treaty","title":"ASEAN Comprehensive Investment Agreement","canonical":"asean comprehensive investment agreement","salience":0.8,"lastSeen":1730000006003,"accessCount":10}
+{"id":"treaty:seanwfz","type":"treaty","title":"SEANWFZ","canonical":"seanwfz","salience":0.7,"lastSeen":1730000006004,"accessCount":5}
+{"id":"institution:asean-secretariat","type":"institution","title":"ASEAN Secretariat","canonical":"asean secretariat","salience":0.85,"lastSeen":1730000007000,"accessCount":10}
+{"id":"concept:cross-border-dispute","type":"concept","title":"Cross-border dispute","canonical":"cross border dispute","salience":0.7,"lastSeen":1730000008000,"accessCount":8}
+{"id":"concept:foreign-investment","type":"concept","title":"Foreign investment","canonical":"foreign investment","salience":0.75,"lastSeen":1730000008001,"accessCount":12}

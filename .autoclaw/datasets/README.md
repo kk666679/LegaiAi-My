@@ -9,6 +9,7 @@ Golden fixtures + evaluation corpus. Every `.jsonl` line is one record.
 | `skills/` | Per-skill behavior cases |
 | `consensus/` | Ballot scenarios |
 | `i18n/` | Language detection cases |
+| `asean/` | ASEAN jurisdiction metadata and treaty records |
 
 ## Usage
 ```js
@@ -27,3 +28,18 @@ node bin/dataset.js counts
 
 Self-contained by design: `dataset/index.js` has no cross-module dependency,
 so an evaluation harness can load it without pulling in the rest of the tree.
+
+## ASEAN coverage
+
+The `asean/` group contains:
+
+| File | Purpose |
+|------|---------|
+| `schema.json` | JSON Schema for jurisdiction records |
+| `jurisdictions.jsonl` | One record per ASEAN member state + Timor-Leste |
+| `treaties.jsonl` | ASEAN treaties, agreements, conventions, protocols |
+
+ASEAN `cases/` and `skills/` files extend evaluation coverage for:
+- Cross-jurisdiction retrieval (`cases/asean-ask.jsonl`)
+- ASEAN legal reasoning (`cases/asean-irac.jsonl`)
+- Jurisdiction-specific retrieval validation (`skills/asean-jurisdiction-retrieval.jsonl`)

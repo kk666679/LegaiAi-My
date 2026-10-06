@@ -1,0 +1,10 @@
+{"id":"asean-retrieval-001","input":{"jurisdiction":"MY","query":"Companies Act director duties"},"expect":{"status":"ok","jurisdiction":"MY"}}
+{"id":"asean-retrieval-002","input":{"jurisdiction":"SG","query":"Companies Act director duties"},"expect":{"status":"ok","jurisdiction":"SG"}}
+{"id":"asean-retrieval-003","input":{"jurisdiction":"ID","query":"UU No. 1 Tahun 2023"},"expect":{"status":"ok","jurisdiction":"ID"}}
+{"id":"asean-retrieval-004","input":{"jurisdiction":"TH","query":"Civil and Commercial Code"},"expect":{"status":"ok","jurisdiction":"TH"}}
+{"id":"asean-retrieval-005","input":{"jurisdiction":"PH","query":"Republic Act No. 386"},"expect":{"status":"ok","jurisdiction":"PH"}}
+{"id":"asean-retrieval-006","input":{"jurisdiction":"ASEAN","query":"ASEAN Charter institutions"},"expect":{"status":"ok","jurisdiction":"ASEAN"}}
+{"id":"asean-retrieval-007","input":{"jurisdiction":"VN","query":"Law No. 91/2015/QH13"},"expect":{"status":"ok","jurisdiction":"VN"}}
+{"id":"asean-retrieval-008","input":{"jurisdiction":"KH","query":"Constitution of Cambodia"},"expect":{"status":"ok","jurisdiction":"KH"}}
+{"id":"asean-retrieval-009","input":{"jurisdiction":"BN","query":"Companies Act Brunei"},"expect":{"status":"ok","jurisdiction":"BN"}}
+{"id":"asean-retrieval-010","input":{"jurisdiction":"TL","query":"Membership in ASEAN"},"expect":{"status":"ok","jurisdiction":"TL","member_state":false}}

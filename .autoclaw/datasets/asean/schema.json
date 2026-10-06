@@ -1,0 +1,34 @@
+{
+  "$schema": "https://example.com/schemas/asean-jurisdiction.v1.json",
+  "description": "ASEAN jurisdiction metadata records.",
+  "required": ["id", "iso", "name", "legal_tradition", "official_language", "source", "provenance"],
+  "properties": {
+    "id": { "type": "string" },
+    "iso": { "type": "string", "pattern": "^[A-Z]{2}$" },
+    "name": { "type": "string" },
+    "legal_tradition": { "type": "string" },
+    "official_language": { "type": "string" },
+    "legislature": { "type": "string" },
+    "head_of_state": { "type": "string" },
+    "supreme_court": { "type": "string" },
+    "official_gazette": { "type": "string" },
+    "legislation_portal": { "type": "string" },
+    "free_access": { "type": "boolean" },
+    "asean_member": { "type": "boolean" },
+    "asean_accession_date": { "type": ["string", "null"] },
+    "bilingual_availability": { "type": "string" },
+    "source": { "type": "string" },
+    "provenance": {
+      "type": "object",
+      "required": ["source", "source_url", "retrieved_at", "trust"],
+      "properties": {
+        "source": { "type": "string" },
+        "source_url": { "type": "string", "format": "uri" },
+        "source_title": { "type": "string" },
+        "retrieved_at": { "type": "string", "format": "date-time" },
+        "version_date": { "type": "string" },
+        "trust": { "type": "string", "enum": ["authoritative", "secondary", "uncertain"] }
+      }
+    }
+  }
+}
