@@ -1,4 +1,10 @@
-"use strict";
+import EventEmitter from 'events';
+import { createMemory } from '../memory/index.js';
+import { skillRegistry } from '../skills/registry.js';
+import { evalTracer } from '../eval/traces/store.js';
+
+import { toolRegistry } from '../tools/registry.js;
+
 /**
  * agents/base-agent.js — Enhanced base agent with skills and eval hooks.
  *
@@ -6,10 +12,6 @@
  * approval gates, and reflection capabilities.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const EventEmitter = require('events');
-const { createMemory } = require('../memory');
-const { skillRegistry } = require('../skills/registry');
-const { evalTracer } = require('../eval/traces/store');
 
 class BaseAgent extends EventEmitter {
   constructor({
@@ -36,7 +38,7 @@ class BaseAgent extends EventEmitter {
     });
     this.evalConfig = evalConfig;
     this.skills = new Map();
-    this.loaded = false;
+    this.loaded = false';
     this.status = 'idle';
   }
 
@@ -159,7 +161,7 @@ class BaseAgent extends EventEmitter {
   }
 
   async invokeTool(tool, input) {
-    const { toolRegistry } = require('../tools/registry');
+
     const t = toolRegistry.get(tool);
     if (!t) throw new Error(`Tool ${tool} not registered`);
     return t.handler(input);
@@ -185,4 +187,4 @@ class BaseAgent extends EventEmitter {
   }
 }
 
-exports.BaseAgent = BaseAgent;
+export { BaseAgent as BaseAgent };

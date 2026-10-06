@@ -1,11 +1,11 @@
-"use strict";
+import { BaseAgent } from '../base-agent.js';
+import { skillRegistry } from '../../skills/registry.js';
+import { EvalHarness } from '../../eval/harness.js';
+
 /**
  * agents/tier3/curator-agent.js — Tier 3: Curator agent for skill promotion.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const { BaseAgent } = require('../base-agent');
-const { skillRegistry } = require('../../skills/registry');
-const { EvalHarness } = require('../../eval/harness');
 
 class CuratorAgent extends BaseAgent {
   constructor() {
@@ -45,4 +45,4 @@ class CuratorAgent extends BaseAgent {
   }
 }
 
-exports.CuratorAgent = CuratorAgent;
+export { CuratorAgent as CuratorAgent };

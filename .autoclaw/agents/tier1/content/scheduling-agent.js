@@ -1,9 +1,11 @@
-"use strict";
+import { BaseAgent } from '../../base-agent.js';
+
+import { toolRegistry } from '../../../tools/registry.js;
+
 /**
  * agents/tier1/content/scheduling-agent.js — Tier 1: Content scheduling.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-const { BaseAgent } = require('../../base-agent');
+Object.defineProperty(exports, "__esModule", { value: true })';
 
 class SchedulingAgent extends BaseAgent {
   constructor(deps = {}) {
@@ -42,11 +44,11 @@ class SchedulingAgent extends BaseAgent {
   }
 
   async invokeTool(tool, input) {
-    const { toolRegistry } = require('../../../tools/registry');
+
     const t = toolRegistry.get(tool);
     if (!t) throw new Error(`Tool ${tool} not registered`);
     return t.handler(input, this.deps);
   }
 }
 
-exports.SchedulingAgent = SchedulingAgent;
+export { SchedulingAgent as SchedulingAgent };

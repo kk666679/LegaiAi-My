@@ -1,9 +1,11 @@
-"use strict";
+import { BaseAgent } from '../../base-agent.js';
+
+import { toolRegistry } from '../../../tools/registry.js;
+
 /**
  * agents/tier1/content/content-agent.js — Tier 1: Content generation.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-const { BaseAgent } = require('../../base-agent');
+Object.defineProperty(exports, "__esModule", { value: true })';
 
 class ContentAgent extends BaseAgent {
   constructor(deps = {}) {
@@ -47,11 +49,11 @@ class ContentAgent extends BaseAgent {
   }
 
   async invokeTool(tool, input) {
-    const { toolRegistry } = require('../../../tools/registry');
+
     const t = toolRegistry.get(tool);
     if (!t) throw new Error(`Tool ${tool} not registered`);
     return t.handler(input, this.deps);
   }
 }
 
-exports.ContentAgent = ContentAgent;
+export { ContentAgent as ContentAgent };

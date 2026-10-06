@@ -1,9 +1,9 @@
-"use strict";
+import { agentRegistry } from './registry.js';
+
 /**
  * agents/lifecycle.js — Agent lifecycle management: spawn → run → retire.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const { agentRegistry } = require('./registry');
 
 class AgentLifecycle {
   constructor({ registry = agentRegistry } = {}) {
@@ -39,4 +39,4 @@ class AgentLifecycle {
   }
 }
 
-exports.AgentLifecycle = AgentLifecycle;
+export { AgentLifecycle as AgentLifecycle };

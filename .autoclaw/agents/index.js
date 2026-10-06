@@ -1,30 +1,30 @@
-"use strict";
+import { agentRegistry } from './registry.js';
+import { OrchestratorAgent } from './tier0/orchestrator-agent.js';
+import { FleetAgent } from './tier1/deviceops/fleet-agent.js';
+import { ProvisioningAgent } from './tier1/deviceops/provisioning-agent.js';
+import { ProfileAgent } from './tier1/deviceops/profile-agent.js';
+import { DeviceControlAgent } from './tier1/deviceops/device-control-agent.js';
+import { WorkflowAgent } from './tier1/deviceops/workflow-agent.js';
+import { CostAgent } from './tier1/deviceops/cost-agent.js';
+import { SecurityAgent } from './tier1/deviceops/security-agent.js';
+import { ContentAgent } from './tier1/content/content-agent.js';
+import { VideoAgent } from './tier1/content/video-agent.js';
+import { SchedulingAgent } from './tier1/content/scheduling-agent.js';
+import { SocialListeningAgent } from './tier1/content/social-listening-agent.js';
+import { DiagnosticWorker } from './tier2/diagnostic-worker.js';
+import { RemediationWorker } from './tier2/remediation-worker.js';
+import { ValidationWorker } from './tier2/validation-worker.js';
+import { ReportWorker } from './tier2/report-worker.js';
+import { NotificationWorker } from './tier2/notification-worker.js';
+import { ComplianceWorker } from './tier2/compliance-worker.js';
+import { CriticAgent } from './tier3/critic-agent.js';
+import { CuratorAgent } from './tier3/curator-agent.js';
+import { EvaluatorAgent } from './tier3/evaluator-agent.js';
+
 /**
  * agents/index.js — Register all agents.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const { agentRegistry } = require('./registry');
-const { OrchestratorAgent } = require('./tier0/orchestrator-agent');
-const { FleetAgent } = require('./tier1/deviceops/fleet-agent');
-const { ProvisioningAgent } = require('./tier1/deviceops/provisioning-agent');
-const { ProfileAgent } = require('./tier1/deviceops/profile-agent');
-const { DeviceControlAgent } = require('./tier1/deviceops/device-control-agent');
-const { WorkflowAgent } = require('./tier1/deviceops/workflow-agent');
-const { CostAgent } = require('./tier1/deviceops/cost-agent');
-const { SecurityAgent } = require('./tier1/deviceops/security-agent');
-const { ContentAgent } = require('./tier1/content/content-agent');
-const { VideoAgent } = require('./tier1/content/video-agent');
-const { SchedulingAgent } = require('./tier1/content/scheduling-agent');
-const { SocialListeningAgent } = require('./tier1/content/social-listening-agent');
-const { DiagnosticWorker } = require('./tier2/diagnostic-worker');
-const { RemediationWorker } = require('./tier2/remediation-worker');
-const { ValidationWorker } = require('./tier2/validation-worker');
-const { ReportWorker } = require('./tier2/report-worker');
-const { NotificationWorker } = require('./tier2/notification-worker');
-const { ComplianceWorker } = require('./tier2/compliance-worker');
-const { CriticAgent } = require('./tier3/critic-agent');
-const { CuratorAgent } = require('./tier3/curator-agent');
-const { EvaluatorAgent } = require('./tier3/evaluator-agent');
 
 const agents = [
   () => new OrchestratorAgent(),
@@ -57,4 +57,4 @@ async function registerAllAgents() {
   }
 }
 
-exports.registerAllAgents = registerAllAgents;
+export { registerAllAgents as registerAllAgents };

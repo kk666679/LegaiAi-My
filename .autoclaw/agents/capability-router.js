@@ -1,9 +1,9 @@
-"use strict";
+import { agentRegistry } from './registry.js';
+
 /**
  * agents/capability-router.js — Route tasks to agents by capability.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const { agentRegistry } = require('./registry');
 
 class CapabilityRouter {
   constructor({ registry = agentRegistry } = {}) {
@@ -31,4 +31,4 @@ class CapabilityRouter {
   }
 }
 
-exports.CapabilityRouter = CapabilityRouter;
+export { CapabilityRouter as CapabilityRouter };

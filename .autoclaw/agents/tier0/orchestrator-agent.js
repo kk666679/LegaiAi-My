@@ -1,4 +1,6 @@
-"use strict";
+import { BaseAgent } from '../base-agent.js';
+import { board } from '../../orchestrator/board.js';
+
 /**
  * agents/tier0/orchestrator-agent.js — Tier 0: Central orchestrator agent.
  *
@@ -6,8 +8,6 @@
  * and maintains the global view of the system.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const { BaseAgent } = require('../base-agent');
-const { board } = require('../../orchestrator/board');
 
 class OrchestratorAgent extends BaseAgent {
   constructor(deps = {}) {
@@ -87,4 +87,4 @@ class OrchestratorAgent extends BaseAgent {
   }
 }
 
-exports.OrchestratorAgent = OrchestratorAgent;
+export { OrchestratorAgent as OrchestratorAgent };

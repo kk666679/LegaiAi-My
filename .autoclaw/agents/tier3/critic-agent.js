@@ -1,10 +1,10 @@
-"use strict";
+import { BaseAgent } from '../base-agent.js';
+import { llm } from '../../llm.js';
+
 /**
  * agents/tier3/critic-agent.js — Tier 3: Critic agent for plan/output review.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const { BaseAgent } = require('../base-agent');
-const { llm } = require('../../llm');
 
 class CriticAgent extends BaseAgent {
   constructor() {
@@ -40,4 +40,4 @@ Identify issues, missing steps, and risks. Return JSON:
   }
 }
 
-exports.CriticAgent = CriticAgent;
+export { CriticAgent as CriticAgent };

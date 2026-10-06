@@ -1,9 +1,11 @@
-"use strict";
+import { BaseAgent } from '../base-agent.js';
+
+import { toolRegistry } from '../../tools/registry.js;
+
 /**
  * agents/tier2/validation-worker.js — Tier 2: Validation worker.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-const { BaseAgent } = require('../base-agent');
+Object.defineProperty(exports, "__esModule", { value: true })';
 
 class ValidationWorker extends BaseAgent {
   constructor(deps = {}) {
@@ -37,11 +39,11 @@ class ValidationWorker extends BaseAgent {
   }
 
   async invokeTool(tool, input) {
-    const { toolRegistry } = require('../../tools/registry');
+
     const t = toolRegistry.get(tool);
     if (!t) throw new Error(`Tool ${tool} not registered`);
     return t.handler(input, this.deps);
   }
 }
 
-exports.ValidationWorker = ValidationWorker;
+export { ValidationWorker as ValidationWorker };

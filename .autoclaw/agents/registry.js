@@ -1,12 +1,12 @@
-"use strict";
+import EventEmitter from 'events';
+
 /**
  * agents/registry.js — Agent registry with capability routing.
  *
  * Agents register themselves at startup. The registry provides lookup by
  * ID, capability, and tier. Used by the orchestrator and capability router.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-const EventEmitter = require('events');
+
 
 class AgentRegistry extends EventEmitter {
   constructor() {
@@ -78,5 +78,6 @@ class AgentRegistry extends EventEmitter {
   }
 }
 
-exports.AgentRegistry = AgentRegistry;
-exports.agentRegistry = new AgentRegistry();
+export let agentRegistry = new AgentRegistry();
+
+export { AgentRegistry as AgentRegistry };

@@ -1,11 +1,11 @@
-"use strict";
+import { BaseAgent } from '../base-agent.js';
+import { EvalHarness } from '../../eval/harness.js';
+import { runRegression } from '../../eval/regression.js';
+
 /**
  * agents/tier3/evaluator-agent.js — Tier 3: Evaluator agent for eval runs.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const { BaseAgent } = require('../base-agent');
-const { EvalHarness } = require('../../eval/harness');
-const { runRegression } = require('../../eval/regression');
 
 class EvaluatorAgent extends BaseAgent {
   constructor() {
@@ -30,4 +30,4 @@ class EvaluatorAgent extends BaseAgent {
   }
 }
 
-exports.EvaluatorAgent = EvaluatorAgent;
+export { EvaluatorAgent as EvaluatorAgent };
