@@ -73,3 +73,12 @@ CLAUDE.md
 fly.backend.toml
 fly.toml
 
+# Generated runtime state — never commit
+.autoclaw/kg/kg.db
+.autoclaw/spine/spine.db
+.autoclaw/vector/db.sqlite
+.autoclaw/orchestrator/comms/comms-log.jsonl
+.autoclaw/orchestrator/comms/loop-journal.jsonl
+.autoclaw/orchestrator/comms/loop-state.json
+.autoclaw/orchestrator/comms/_gc/last-run.json
+

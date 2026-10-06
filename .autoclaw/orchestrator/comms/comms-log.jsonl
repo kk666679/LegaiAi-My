@@ -1,4 +1,0 @@
-{"ts":"2026-10-04T22:00:00.000Z","agent":"system","kind":"sprint.start","sprint":"sprint-2026-10-05"}
-{"ts":"2026-10-04T23:50:00.000Z","agent":"hermes","kind":"claim","item":"T-101"}
-{"ts":"2026-10-05T00:00:00.000Z","agent":"system","kind":"tick","tick":1284}
-{"ts":"2026-10-04T22:53:40.937Z","agent":"system","kind":"tick","tick":1285,"dispatched":2}
