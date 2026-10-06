@@ -17,7 +17,7 @@ interface IRACSection {
   verified?: boolean;
 }
 
-interface ReasoningPanelProps {
+export interface ReasoningPanelProps {
   irac?: IRACSection[];
   assumptions?: string[];
   missingInfo?: string[];

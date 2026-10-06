@@ -16,7 +16,7 @@ export interface DocumentDropzoneProps {
 
 export function DocumentDropzone({
   onFiles,
-  accept = ".pdf,.doc,.docx,.txt,.rtf,.md",
+  accept = ".pdf,.doc,.docx,.txt,.csv,.json",
   multiple = true,
   className,
   disabled,
@@ -55,7 +55,7 @@ export function DocumentDropzone({
       </div>
       <div>
         <p className="text-sm font-medium">Drop files here or click to browse</p>
-        <p className="text-xs text-muted-foreground">PDF, DOCX, TXT up to 50 MB each</p>
+        <p className="text-xs text-muted-foreground">PDF, DOC, DOCX, TXT, CSV, or JSON up to 25 MB each</p>
       </div>
       <input
         ref={inputRef}
@@ -71,6 +71,7 @@ export function DocumentDropzone({
         variant="outline"
         size="sm"
         onClick={() => inputRef.current?.click()}
+        disabled={disabled}
       >
         Choose files
       </Button>

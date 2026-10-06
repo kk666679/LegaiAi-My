@@ -156,7 +156,7 @@ export async function generateWithRouting(
     });
 
     if (configs.length > 0) {
-      const config = configs[0];
+      const config = configs[0]!
       if (config.provider && config.model) {
         const credentials = await credentialStore.list(orgId, userId);
         const cred = credentials.find((c) => c.provider === config.provider && c.isActive);

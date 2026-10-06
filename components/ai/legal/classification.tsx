@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 
 type Classification = 'public' | 'internal' | 'confidential' | 'privileged';
 
-interface ClassificationIndicatorProps {
+export interface ClassificationIndicatorProps {
   classification: Classification;
   className?: string;
   showLabel?: boolean;

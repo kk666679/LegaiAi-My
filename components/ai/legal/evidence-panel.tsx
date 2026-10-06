@@ -8,7 +8,7 @@ import { copyToClipboard } from '@/lib/utils';
 import { BookOpen, ChevronDown, ExternalLink, Copy, Check, Shield } from 'lucide-react';
 import { useState } from 'react';
 
-interface EvidenceItem {
+export interface EvidenceItem {
   title: string;
   url?: string;
   court?: string;
@@ -20,7 +20,7 @@ interface EvidenceItem {
   confidence?: number;
 }
 
-interface EvidencePanelProps {
+export interface EvidencePanelProps {
   evidence: EvidenceItem[];
   title?: string;
   className?: string;

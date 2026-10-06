@@ -6,7 +6,6 @@
  */
 import { Worker } from 'bullmq'
 import ollama from 'ollama'
-import { pipeline } from '@xenova/transformers'
 import { prisma } from '@/backend/src/db/index.js'
 import { randomUUID } from 'crypto'
 import { agentLogger } from '@/backend/src/lib/logger.js'
@@ -17,17 +16,9 @@ import { runHybridRetrieval } from '../.autoclaw/agents/retrieval/hybrid-retriev
 const log = agentLogger('legal-retrieval')
 const connection = { host: process.env.REDIS_HOST || 'localhost', port: parseInt(process.env.REDIS_PORT || '6379') }
 
-// Lazy-loaded multilingual embedder
-let embedder = null
-async function getEmbedder() {
-  if (!embedder) embedder = await pipeline('feature-extraction', 'Xenova/multilingual-e5-small')
-  return embedder
-}
-
 async function embedQuery(text) {
-  const model = await getEmbedder()
-  const out = await model(text, { pooling: 'mean', normalize: true })
-  return Array.from(out.data)
+  const res = await ollama.embeddings({ model: process.env.EMBED_MODEL || 'mxbai-embed-large', prompt: text })
+  return res.embedding
 }
 
 const worker = new Worker('legal-retrieval', async (job) => {

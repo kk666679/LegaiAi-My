@@ -1,0 +1,138 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ES2023"
+    ],
+    "jsx": "react-jsx",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "checkJs": false,
+    "noEmit": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "paths": {
+      "@/*": [
+        "./*"
+      ],
+      "@/backend/*": [
+        "./backend/*"
+      ],
+      "@/components/*": [
+        "./components/*"
+      ],
+      "@/components/ui/*": [
+        "./components/ui/*"
+      ],
+      "@/components/ai/*": [
+        "./components/ai/*"
+      ],
+      "@/components/ai-elements/*": [
+        "./components/ai-elements/*"
+      ],
+      "@/lib/*": [
+        "./lib/*"
+      ],
+      "@/lib/utils/*": [
+        "./lib/utils/*"
+      ],
+      "@/hooks/*": [
+        "./hooks/*"
+      ],
+      "@/hooks/use*": [
+        "./hooks/use*.ts"
+      ],
+      "@/types/*": [
+        "./types/*"
+      ],
+      "@/utils/*": [
+        "./utils/*"
+      ],
+      "@/config/*": [
+        "./config/*"
+      ],
+      "@/constants/*": [
+        "./constants/*"
+      ],
+      "@/services/*": [
+        "./services/*"
+      ],
+      "@/workers/*": [
+        "./workers/*"
+      ],
+      "@/queues/*": [
+        "./src/queues/*"
+      ],
+      "@/prisma/*": [
+        "./prisma/*"
+      ],
+      "@/validators/*": [
+        "./validators/*"
+      ],
+      "@/public/*": [
+        "./public/*"
+      ],
+      "@ui": [
+        "./components/ui/index.ts"
+      ],
+      "@ai": [
+        "./components/ai/index.ts"
+      ],
+      "@ai-elements": [
+        "./components/ai-elements/index.ts"
+      ],
+      "~/*": [
+        "./*"
+      ],
+      "~backend/*": [
+        "./backend/*"
+      ],
+      "~components/*": [
+        "./components/*"
+      ]
+    },
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.js",
+    "**/*.jsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    ".openclaw/**",
+    "dist",
+    "build",
+    ".next",
+    "out",
+    "coverage",
+    "backend/**/*.test.ts",
+    "backend/**/*.test.tsx",
+    "backend/**/*.spec.ts",
+    "backend/**/*.spec.tsx",
+    "backend/**/dist/**",
+    "backend/**/test/**",
+    "backend/**/node_modules/**",
+    "backend/schemas"
+  ]
+}

@@ -1,0 +1,6 @@
+import React from 'react'
+
+export function AILiveBadge(props: React.HTMLAttributes<HTMLDivElement> &
+  Record<string, unknown>) {
+  return <div {...props} />
+}

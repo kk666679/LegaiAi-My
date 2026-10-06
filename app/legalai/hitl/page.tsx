@@ -18,18 +18,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { cn } from "@/lib/utils";
 
-const AUTH_LEVELS = [0, 1, 2, 3, 4, 5] as const;
-const ACTION_TYPES = ["RETRIEVE", "RECOMMEND", "DRAFT", "EXECUTE", "AUTOMATE"] as const;
 const STATUSES = ["pending", "approved", "rejected", "executed", "cancelled"] as const;
-
-const AUTH_LEVEL_LABELS: Record<number, string> = {
-  0: "Read",
-  1: "Recommend",
-  2: "Draft",
-  3: "Execute + Approval",
-  4: "Controlled Auto",
-  5: "Prohibited",
-};
 
 const STATUS_LABELS: Record<string, string> = {
   pending: "Pending",
@@ -56,13 +45,18 @@ export default function HITLPage() {
   const filters = {
     matterId: getParam("matterId") ?? undefined,
     agentName: getParam("agentName") ?? undefined,
-    authLevel: getParam("authLevel") ? Number(getParam("authLevel")) : undefined,
     status: getParam("status") ?? undefined,
     limit: 20,
     cursor: getParam("cursor") ?? undefined,
   };
 
-  const { data, isLoading, isError, error, refetch } = trpcReact.hitl.listAll.useQuery(filters);
+  const { data, isLoading, isError, error, refetch } = trpcReact.hitl.listAll.useQuery({
+    matterId: filters.matterId,
+    agentName: filters.agentName,
+    status: filters.status as (typeof STATUSES)[number] | undefined,
+    limit: filters.limit,
+    cursor: filters.cursor,
+  });
   const stats = trpcReact.hitl.stats.useQuery(undefined, { staleTime: 30_000 });
 
   const actions = data?.actions ?? [];
@@ -89,7 +83,9 @@ export default function HITLPage() {
     router.push("/legalai/hitl");
   };
 
-  const hasActiveFilters = Object.values(filters).some(v => v !== undefined && v !== "" && v !== 20);
+  const hasActiveFilters =
+    Object.values(filters).some(v => v !== undefined && v !== "" && v !== 20) ||
+    searchParams.has("authLevel");
 
   const formatDate = (iso?: string | null) => {
     if (!iso) return "—";
@@ -165,13 +161,9 @@ export default function HITLPage() {
                 </CardTitle>
               </div>
               <div className="flex flex-wrap gap-2">
-                <Select value={filters.authLevel !== undefined ? String(filters.authLevel) : "all"} onValueChange={(v) => updateFilters({ authLevel: v === "all" ? undefined : Number(v) })}>
-                  <SelectTrigger className="w-[180px]"><SelectValue placeholder="All levels" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All levels</SelectItem>
-                    {AUTH_LEVELS.map(l => <SelectItem key={l} value={String(l)}>L{l} - {AUTH_LEVEL_LABELS[l]}</SelectItem>)}
-                  </SelectContent>
-                </Select>
+                <Button variant="outline" size="sm" disabled>
+                  Auth-level filter unavailable
+                </Button>
                 <Select value={filters.status ?? "all"} onValueChange={(v) => updateFilters({ status: v === "all" ? undefined : v })}>
                   <SelectTrigger className="w-[160px]"><SelectValue placeholder="All statuses" /></SelectTrigger>
                   <SelectContent>
@@ -190,6 +182,9 @@ export default function HITLPage() {
             </div>
           </CardHeader>
           <CardContent>
+            <p role="note" className="mb-4 text-sm text-muted-foreground">
+              Auth-level filtering is not supported by this endpoint; results are not filtered by authorization level.
+            </p>
             {isLoading ? (
               <Table>
                 <TableHeader>

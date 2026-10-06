@@ -22,7 +22,7 @@ export function MatterDeadlines({ deadlines, onAdd, onSelect }: MatterDeadlinesP
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">{upcoming.length} upcoming</p>
+        <p className="text-sm text-muted-foreground">{upcoming.length} open</p>
         {onAdd ? (
           <Button size="sm" variant="outline" className="gap-1.5" onClick={onAdd}>
             <Plus className="size-3.5" /> Add deadline
@@ -31,7 +31,7 @@ export function MatterDeadlines({ deadlines, onAdd, onSelect }: MatterDeadlinesP
       </div>
       <div className="space-y-2">
         {upcoming.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No upcoming deadlines.</p>
+          <p className="text-sm text-muted-foreground">No open deadlines.</p>
         ) : (
           upcoming.map((d) => <DeadlineCard key={d.id} deadline={d} onSelect={onSelect} />)
         )}

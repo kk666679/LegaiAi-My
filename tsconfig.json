@@ -87,9 +87,15 @@
     ".next/dev/types/**/*.ts",
     "types/**/*.d.ts",
     "workers/**/*.ts",
+    "workers/**/*.js",
     "queues/**/*.ts",
+    "queues/**/*.js",
     "prisma/**/*.ts",
     "scripts/**/*.ts",
+    "backend/**/*.ts",
+    "backend/**/*.tsx",
+    "backend/**/*.js",
+    "backend/**/*.jsx",
     "**/*.test.ts",
     "**/*.test.tsx",
     "**/*.spec.ts",
@@ -120,7 +126,8 @@
     "**/*.log",
     ".env*",
     ".env.local",
-    "!.env.example"
+    "!.env.example",
+    "backend/schemas"
   ],
   "watchOptions": {
     "watchFile": "useFsEvents",

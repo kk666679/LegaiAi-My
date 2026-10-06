@@ -121,11 +121,17 @@ Full list and defaults: [environment-variables.md](environment-variables.md).
 ## Auth + session
 
 - The frontend `AuthProvider` calls the tRPC `auth.login`, `auth.signup`, `auth.register`, `auth.me`, and `auth.logout` procedures.
-- The browser stores the returned session token and sends it as a Bearer `Authorization` header on tRPC requests.
-- The Next.js tRPC relay forwards that header; `backend/src/trpc/context.ts` validates the session and attaches the user to the request context.
+- The frontend stores the returned session token and includes it on subsequent tRPC requests.
+- The Next.js tRPC relay forwards the token; `backend/src/trpc/context.ts` validates it and attaches the user to the request context.
 - Protected procedures use `protectedProcedure`; role- and permission-scoped operations use the corresponding backend guards.
 
 ---
+
+## Frontend feature wiring
+
+- Document creation uses `documents.create`; file uploads use `POST /api/blob/upload` before creating a document record.
+- Matter deadline entry creates a `DEADLINE` matter event and updates the matter's current `deadlineAt`. The cross-matter view lists current matter deadline dates; it does not represent completion history.
+- HITL queue views query supported action statuses and agent filters. Assignment, team, escalation-level, and authorization-level filters are marked unavailable where the backend has no matching filter.
 
 ## Event bus
 

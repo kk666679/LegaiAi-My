@@ -17,12 +17,10 @@ import type {
 
 const STATUSES: HITLStatus[] = [
   "pending",
-  "in-review",
-  "escalated",
-  "changes-requested",
   "approved",
   "rejected",
-  "deferred",
+  "executed",
+  "cancelled",
 ];
 
 const PRIORITIES: HITLPriority[] = ["low", "normal", "high", "urgent"];

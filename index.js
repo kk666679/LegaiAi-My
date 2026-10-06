@@ -64,10 +64,10 @@ async function openRouterChat() {
   }
 }
 
-// Start tRPC server (if not running api:dev)
+// Start backend tRPC server in development when not already running via api:dev
 if (process.env.npm_lifecycle_script !== 'api:dev' && !process.env.API_DEV) {
-  console.log('Starting tRPC/pgVector server...')
-  await import('./src/server.js')
+  console.log('Starting backend tRPC server...')
+  await import('./backend/src/server.js')
 }
 
 console.log('Running original Ollama snippet...')

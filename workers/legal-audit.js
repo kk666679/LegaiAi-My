@@ -3,8 +3,7 @@
  * - Immutable hash-chain logs, anomaly detection (TF.js), legal hold
  * - PDPA compliance, searchable JSONL, right to be forgotten
  */
-import { Worker } from 'bullmq'
-import * as tf from '@tensorflow/tfjs-node'
+import { Worker, Worker as BullWorker } from 'bullmq'
 import { prisma } from '@/backend/src/db/index.js'
 import { createWriteStream, appendFileSync } from 'fs'
 import { randomUUID } from 'crypto'
@@ -29,15 +28,11 @@ function detectAnomaly(durationMs) {
   durationWindow.push(durationMs)
   if (durationWindow.length > WINDOW_SIZE) durationWindow.shift()
   if (durationWindow.length < 10) return false
-
-  const t = tf.tensor1d(durationWindow)
-  const mean = t.mean().arraySync()
-  const std = t.sub(mean).square().mean().sqrt().arraySync()
+  const mean = durationWindow.reduce((a, b) => a + b, 0) / durationWindow.length
+  const std = Math.sqrt(durationWindow.reduce((a, b) => a + (b - mean) ** 2, 0) / durationWindow.length)
   const z = std > 0 ? Math.abs((durationMs - mean) / std) : 0
   return z > ANOMALY_Z_THRESHOLD
 }
-
-import { Worker as BullWorker } from 'bullmq'
 
 const worker = new BullWorker('legal-audit', async (job) => {
   const { action, traceId = randomUUID(), userId, caseId, data } = job.data

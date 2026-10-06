@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LAWMATE — Enterprise QA &amp; AI Architecture</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#0a0e1a;color:#e2e8f0;font-size:11px;line-height:1.4}
+.page{max-width:1600px;margin:0 auto;padding:24px}
+h1{font-size:22px;font-weight:700;color:#f8fafc;letter-spacing:.5px}
+h2{font-size:11px;font-weight:400;color:#94a3b8;margin-top:4px;letter-spacing:1px}
+.title-block{text-align:center;padding:20px 0 28px;border-bottom:1px solid #1e293b}
+.badge{display:inline-block;padding:2px 8px;border-radius:3px;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin:0 2px}
+.badge-red{background:#7f1d1d;color:#fca5a5}
+.badge-amber{background:#78350f;color:#fcd34d}
+.badge-blue{background:#1e3a5f;color:#93c5fd}
+.badge-green{background:#14532d;color:#86efac}
+.badge-purple{background:#3b0764;color:#d8b4fe}
+.badge-gray{background:#1e293b;color:#94a3b8}
+
+/* LAYERS */
+.layer{margin:10px 0;border-radius:8px;padding:12px 14px;position:relative}
+.layer-label{font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:8px;opacity:.7}
+.l1{background:#0f172a;border:1px solid #1e3a5f}
+.l2{background:#0d1b2a;border:1px solid #1e3a5f}
+.l3{background:#130f1e;border:2px solid #7c3aed}
+.l4{background:#0f1a0f;border:1px solid #166534}
+.l5{background:#1a1200;border:1px solid #92400e}
+.l6{background:#0f1a2a;border:1px solid #1e40af}
+.l7{background:#1a0f1a;border:1px solid #6b21a8}
+.l8{background:#0f1a0f;border:1px solid #15803d}
+.l9{background:#1a0f0f;border:2px solid #dc2626}
+.l10{background:#0a1628;border:1px dashed #334155}
+
+/* BOXES */
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start}
+.box{border-radius:5px;padding:7px 10px;font-size:10px;font-weight:600;min-width:90px;text-align:center;border:1px solid transparent}
+.box-blue{background:#1e3a5f;border-color:#3b82f6;color:#bfdbfe}
+.box-purple{background:#2e1065;border-color:#7c3aed;color:#ddd6fe}
+.box-green{background:#14532d;border-color:#16a34a;color:#bbf7d0}
+.box-red{background:#7f1d1d;border-color:#dc2626;color:#fecaca}
+.box-amber{background:#451a03;border-color:#d97706;color:#fde68a}
+.box-gray{background:#1e293b;border-color:#475569;color:#cbd5e1}
+.box-teal{background:#134e4a;border-color:#0d9488;color:#99f6e4}
+.box-pink{background:#500724;border-color:#be185d;color:#fbcfe8}
+.box-indigo{background:#1e1b4b;border-color:#4338ca;color:#c7d2fe}
+.box-orange{background:#431407;border-color:#ea580c;color:#fed7aa}
+
+.box-BLOCK{background:#450a0a;border:2px solid #ef4444;color:#fca5a5;font-weight:800;letter-spacing:.5px}
+.box-AUDIT{background:#1c1917;border:1px solid #a16207;color:#fde68a}
+
+/* SECURITY BOUNDARY */
+.sec-boundary{border:2px dashed #ef4444;border-radius:8px;padding:10px;margin:6px 0;position:relative}
+.sec-boundary-label{position:absolute;top:-9px;left:10px;background:#0a0e1a;padding:0 6px;font-size:9px;color:#ef4444;font-weight:700;letter-spacing:.8px}
+.trust-boundary{border:2px dashed #f59e0b;border-radius:8px;padding:10px;margin:6px 0;position:relative}
+.trust-boundary-label{position:absolute;top:-9px;left:10px;background:#0a0e1a;padding:0 6px;font-size:9px;color:#f59e0b;font-weight:700;letter-spacing:.8px}
+
+/* ARROWS */
+.arrow-row{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:6px 0}
+.arr{color:#64748b;font-size:14px;font-weight:700}
+.arr-red{color:#ef4444}
+.arr-green{color:#22c55e}
+.arr-amber{color:#f59e0b}
+.arr-blue{color:#3b82f6}
+.arr-purple{color:#a855f7}
+
+/* FLOW CARDS */
+.flow-card{background:#0f172a;border:1px solid #1e293b;border-radius:6px;padding:10px 12px;margin:6px 0}
+.flow-title{font-size:10px;font-weight:700;color:#f8fafc;margin-bottom:6px}
+.flow-steps{display:flex;flex-wrap:wrap;align-items:center;gap:3px}
+.flow-step{background:#1e293b;border-radius:3px;padding:3px 7px;font-size:9px;color:#cbd5e1}
+.flow-step-red{background:#450a0a;border:1px solid #ef4444;color:#fca5a5;font-weight:700}
+.flow-step-green{background:#14532d;border:1px solid #16a34a;color:#bbf7d0}
+.flow-step-amber{background:#451a03;border:1px solid #d97706;color:#fde68a}
+
+/* LEGEND */
+.legend{display:flex;flex-wrap:wrap;gap:12px;padding:12px;background:#0f172a;border-radius:6px;border:1px solid #1e293b;margin-top:10px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:9px;color:#94a3b8}
+.legend-line{width:28px;height:3px;border-radius:2px}
+.legend-dashed{width:28px;height:0;border-top:2px dashed #f59e0b}
+.legend-dashed-red{width:28px;height:0;border-top:2px dashed #ef4444}
+
+/* QA PLANE */
+.qa-section{background:#050d1a;border:2px dashed #1e40af;border-radius:8px;padding:12px;margin:10px 0}
+.qa-section-title{font-size:10px;font-weight:700;color:#60a5fa;margin-bottom:8px;letter-spacing:.5px}
+.qa-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px}
+.qa-box{background:#0f172a;border:1px solid #1e3a5f;border-radius:4px;padding:6px 8px}
+.qa-box-title{font-size:9px;font-weight:700;color:#93c5fd;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.qa-box ul{list-style:none;padding:0}
+.qa-box ul li{font-size:9px;color:#64748b;padding:1px 0}
+.qa-box ul li::before{content:"• ";color:#3b82f6}
+
+/* GATE */
+.gate-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0}
+.gate-box{border-radius:4px;padding:5px 10px;font-size:9px;font-weight:700;text-align:center;border:1px solid}
+.gate-normal{background:#1e293b;border-color:#475569;color:#cbd5e1}
+.gate-p0{background:#450a0a;border-color:#ef4444;color:#fca5a5}
+.gate-p1{background:#451a03;border-color:#d97706;color:#fde68a}
+.gate-pass{background:#14532d;border-color:#16a34a;color:#bbf7d0}
+
+/* DIVIDER */
+.divider{border:none;border-top:1px solid #1e293b;margin:14px 0}
+.section-title{font-size:13px;font-weight:700;color:#f1f5f9;margin:16px 0 8px;padding-left:4px;border-left:3px solid #3b82f6}
+
+/* HITL TABLE */
+.hitl-table{width:100%;border-collapse:collapse;font-size:10px;margin:6px 0}
+.hitl-table th{background:#1e293b;color:#94a3b8;padding:5px 8px;text-align:left;font-weight:700;font-size:9px;letter-spacing:.5px}
+.hitl-table td{padding:5px 8px;border-bottom:1px solid #1e293b;color:#cbd5e1}
+.hitl-table tr:hover td{background:#0f172a}
+
+/* RBAC TABLE */
+.rbac-table{width:100%;border-collapse:collapse;font-size:10px;margin:6px 0}
+.rbac-table th{background:#1e293b;color:#94a3b8;padding:4px 8px;text-align:center;font-size:9px}
+.rbac-table td{padding:4px 8px;border-bottom:1px solid #1e293b;text-align:center}
+.rbac-table td:first-child{text-align:left;color:#cbd5e1;font-weight:600}
+.chk{color:#22c55e;font-weight:700}
+.cross{color:#ef4444}
+
+.small{font-size:9px;color:#64748b;margin-top:3px}
+.tbd{color:#f59e0b;font-size:9px;font-style:italic}
+.note{background:#1c1917;border-left:3px solid #f59e0b;padding:6px 10px;border-radius:0 4px 4px 0;font-size:9px;color:#fde68a;margin:6px 0}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- TITLE -->
+<div class="title-block">
+  <h1>LAWMATE ⚖️🤖 — Enterprise QA &amp; AI Architecture</h1>
+  <h2>Secure Legal AI Operating Platform &nbsp;|&nbsp; RAG + RBAC + BullMQ + Ollama + HITL + Immutable Audit</h2>
+  <div style="margin-top:10px">
+    <span class="badge badge-blue">Next.js 16</span>
+    <span class="badge badge-purple">tRPC + Express</span>
+    <span class="badge badge-green">PostgreSQL + pgVector</span>
+    <span class="badge badge-amber">BullMQ + Redis</span>
+    <span class="badge badge-red">12 AI Workers</span>
+    <span class="badge badge-gray">Ollama Local AI</span>
+    <span class="badge badge-purple">HITL L0–L5</span>
+    <span class="badge badge-red">Immutable Audit</span>
+  </div>
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-line" style="background:#3b82f6"></div> Data Flow (tRPC/SQL/Vector)</div>
+  <div class="legend-item"><div class="legend-line" style="background:#a855f7"></div> Control Flow (Auth/RBAC)</div>
+  <div class="legend-item"><div class="legend-dashed-red"></div> Security Boundary</div>
+  <div class="legend-item"><div class="legend-dashed"></div> Trust Boundary</div>
+  <div class="legend-item"><div class="legend-line" style="background:#f59e0b"></div> Audit Flow</div>
+  <div class="legend-item"><div class="legend-line" style="background:#22c55e"></div> Human Approval Flow</div>
+  <div class="legend-item"><div class="legend-line" style="background:#ef4444"></div> Blocked / Fail-Closed Path</div>
+  <div class="legend-item"><div class="legend-line" style="background:#0d9488"></div> AI Inference Flow</div>
+</div>
+
+<!-- LAYER 1: USERS -->
+<div class="layer l1" style="margin-top:16px">
+  <div class="layer-label">Layer 1 — Users / Presentation Entry Points</div>
+  <div class="row">
+    <div class="box box-purple">👤 Admin</div>
+    <div class="box box-blue">⚖️ Lawyer</div>
+    <div class="box box-teal">📋 Paralegal</div>
+    <div class="box box-gray">👁️ Viewer</div>
+    <div style="flex:1;min-width:200px">
+      <div class="small" style="color:#64748b;margin-bottom:4px">Access via HTTPS browser session — untrusted input boundary</div>
+      <div class="row">
+        <span class="badge badge-gray">LegalAI Chat</span>
+        <span class="badge badge-gray">AI Copilot</span>
+        <span class="badge badge-gray">Matters</span>
+        <span class="badge badge-gray">Clients</span>
+        <span class="badge badge-gray">Contracts</span>
+        <span class="badge badge-gray">Documents</span>
+        <span class="badge badge-gray">Research</span>
+        <span class="badge badge-gray">Drafting</span>
+        <span class="badge badge-gray">HITL Control</span>
+        <span class="badge badge-gray">Governance</span>
+        <span class="badge badge-gray">Analytics</span>
+        <span class="badge badge-gray">Audit</span>
+        <span class="badge badge-gray">Billing</span>
+        <span class="badge badge-gray">Search</span>
+      </div>
+    </div>
+  </div>
+  <div class="note">⚠️ TRUST BOUNDARY: Browser is untrusted. All security enforcement occurs server-side. Frontend controls are UI convenience only — they cannot be relied upon for security.</div>
+</div>
+
+<!-- LAYER 2: FRONTEND -->
+<div class="layer l2">
+  <div class="layer-label">Layer 2 — Next.js 16 Frontend (Port 3000)</div>
+  <div class="row">
+    <div class="box box-blue">/legalai<br><span class="small">IRAC Chat</span></div>
+    <div class="box box-blue">/legalai/agent<br><span class="small">AI Copilot</span></div>
+    <div class="box box-blue">/legalai/matters<br><span class="small">Matter Mgmt</span></div>
+    <div class="box box-blue">/legalai/clients<br><span class="small">Client Registry</span></div>
+    <div class="box box-blue">/legalai/contracts<br><span class="small">Contract Intel</span></div>
+    <div class="box box-blue">/legalai/draft<br><span class="small">Drafting</span></div>
+    <div class="box box-blue">/legalai/research<br><span class="small">Research</span></div>
+    <div class="box box-blue">/legalai/hitl<br><span class="small">HITL Control</span></div>
+    <div class="box box-blue">/legalai/governance<br><span class="small">AI Governance</span></div>
+    <div class="box box-blue">/legalai/audit<br><span class="small">Audit Trail</span></div>
+    <div class="box box-blue">/legalai/analytics<br><span class="small">Executive</span></div>
+    <div class="box box-blue">/legalai/risk<br><span class="small">Risk Alerts</span></div>
+    <div class="box box-blue">/legalai/debate<br><span class="small">Debate</span></div>
+    <div class="box box-blue">/legalai/billing<br><span class="small">Billing Intel</span></div>
+  </div>
+  <div class="row" style="margin-top:8px">
+    <div class="box box-gray">Loading States</div>
+    <div class="box box-gray">Error States</div>
+    <div class="box box-gray">Empty States</div>
+    <div class="box box-gray">Validation Messages</div>
+    <div class="box box-gray">Permission Gates (UI only)</div>
+    <div class="box box-gray">Session Expiry Handling</div>
+    <div class="box box-gray">tRPC React Query Client</div>
+  </div>
+  <div class="note">⚠️ Frontend permission gates are UI convenience only. Backend enforces all permissions independently. HITL cannot be bypassed via frontend manipulation (HITL-003).</div>
+</div>
+
+<!-- LAYER 3: API -->
+<div class="layer l3">
+  <div class="layer-label">Layer 3 — Express + tRPC API Backend (Port 3001) — SERVER-SIDE SECURITY ENFORCEMENT</div>
+  <div class="sec-boundary">
+    <div class="sec-boundary-label">🔒 SECURITY ENFORCEMENT BOUNDARY — Cannot be bypassed by frontend</div>
+    <div class="row">
+      <div class="box box-purple">Authentication<br><span class="small">AUTH-001–007</span></div>
+      <div class="box box-purple">Session Validation<br><span class="small">Token + TTL</span></div>
+      <div class="box box-purple">RBAC Enforcement<br><span class="small">RBAC-001–005</span></div>
+      <div class="box box-purple">Tenant Isolation<br><span class="small">TENANT-001–005</span></div>
+      <div class="box box-purple">Input Validation<br><span class="small">All inputs</span></div>
+      <div class="box box-purple">Business Rules<br><span class="small">Domain logic</span></div>
+      <div class="box box-purple">Tenant Context<br><span class="small">From session only</span></div>
+      <div class="box box-purple">Error Handling<br><span class="small">No secret exposure</span></div>
+      <div class="box box-purple">IDOR Protection<br><span class="small">TENANT-004</span></div>
+      <div class="box box-purple">Audit Middleware<br><span class="small">AUDIT-001</span></div>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <div class="box box-gray">12 tRPC Routers</div>
+      <div class="box box-gray">Pino Structured Logs</div>
+      <div class="box box-gray">Prometheus /metrics</div>
+      <div class="box box-gray">SSE Event Stream</div>
+      <div class="box box-gray">Health Endpoints</div>
+      <div class="box box-gray">HMAC-SHA256 Signing</div>
+    </div>
+  </div>
+  <div class="row" style="margin-top:6px">
+    <div class="arrow-row">
+      <span class="box box-red box-BLOCK">AUTH FAIL → 401</span>
+      <span class="arr arr-red">→</span>
+      <span class="box box-red box-BLOCK">RBAC FAIL → 403</span>
+      <span class="arr arr-red">→</span>
+      <span class="box box-red box-BLOCK">TENANT MISMATCH → 403/404</span>
+      <span class="arr arr-red">→</span>
+      <span class="box box-red box-BLOCK">NO SECRET EXPOSURE</span>
+    </div>
+  </div>
+</div>
+
+<!-- LAYER 4: RBAC + TENANT -->
+<div class="layer l4">
+  <div class="layer-label">Layer 4 — RBAC + Tenant Isolation + Data Classification Gate</div>
+  <div class="row">
+    <div style="flex:1;min-width:300px">
+      <div class="section-title" style="font-size:10px;border-color:#22c55e">RBAC Permission Matrix</div>
+      <table class="rbac-table">
+        <tr><th>Permission</th><th>Admin</th><th>Lawyer</th><th>Paralegal</th><th>Viewer</th></tr>
+        <tr><td>create_case</td><td class="chk">✓</td><td class="chk">✓</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+        <tr><td>edit_document</td><td class="chk">✓</td><td class="chk">✓</td><td class="chk">✓</td><td class="cross">✗</td></tr>
+        <tr><td>delete_document</td><td class="chk">✓</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+        <tr><td>view_audit_log</td><td class="chk">✓</td><td class="chk">✓</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+        <tr><td>manage_users</td><td class="chk">✓</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+        <tr><td>run_agents</td><td class="chk">✓</td><td class="chk">✓</td><td class="chk">✓</td><td class="cross">✗</td></tr>
+        <tr><td>view_drafts</td><td class="chk">✓</td><td class="chk">✓</td><td class="chk">✓</td><td class="chk">✓</td></tr>
+        <tr><td>approve_agent_action</td><td class="chk">✓</td><td class="chk">✓</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+      </table>
+    </div>
+    <div style="flex:1;min-width:260px">
+      <div class="section-title" style="font-size:10px;border-color:#22c55e">Tenant Isolation Rules</div>
+      <div class="box box-green" style="margin-bottom:6px;text-align:left;padding:8px">
+        <div style="font-weight:700;margin-bottom:4px">TENANT-001–005</div>
+        <div class="small" style="color:#86efac">• Org-A user NEVER accesses Org-B data</div>
+        <div class="small" style="color:#86efac">• Enforced server-side only</div>
+        <div class="small" style="color:#86efac">• Client-supplied orgId is UNTRUSTED</div>
+        <div class="small" style="color:#86efac">• Direct object refs validated vs session org</div>
+        <div class="small" style="color:#86efac">• Workers preserve tenant context</div>
+      </div>
+      <div class="section-title" style="font-size:10px;border-color:#22c55e">Data Classification Gate</div>
+      <div class="row">
+        <div class="box box-green" style="font-size:9px">🌐 Public<br>All models</div>
+        <div class="box box-amber" style="font-size:9px">🏢 Internal<br>Local/approved</div>
+        <div class="box box-red" style="font-size:9px">🔒 Confidential<br>Local only</div>
+        <div class="box box-pink" style="font-size:9px">⚖️ Privileged<br>Local embed only</div>
+      </div>
+    </div>
+    <div style="flex:1;min-width:200px">
+      <div class="section-title" style="font-size:10px;border-color:#22c55e">Privilege Escalation Protection</div>
+      <div class="box box-red box-BLOCK" style="margin-bottom:6px">RBAC-003: User cannot self-elevate role</div>
+      <div class="box box-red box-BLOCK" style="margin-bottom:6px">RBAC-004: No out-of-scope resource access</div>
+      <div class="box box-red box-BLOCK">TENANT-003: Client orgId not trusted</div>
+    </div>
+  </div>
+</div>
+
+<!-- LAYER 5: DATA -->
+<div class="layer l5">
+  <div class="layer-label">Layer 5 — Data Layer — PostgreSQL + pgVector (Prisma ORM)</div>
+  <div class="row">
+    <div style="flex:2;min-width:320px">
+      <div class="section-title" style="font-size:10px;border-color:#d97706">PostgreSQL — Transactional Data (17 Prisma Models)</div>
+      <div class="row">
+        <div class="box box-amber" style="font-size:9px">Organisation<br>Plan/Tenant</div>
+        <div class="box box-amber" style="font-size:9px">User<br>Roles/Auth</div>
+        <div class="box box-amber" style="font-size:9px">Session<br>Token/TTL</div>
+        <div class="box box-amber" style="font-size:9px">UserConsent<br>LLM/Region</div>
+        <div class="box box-amber" style="font-size:9px">Client<br>Individual/Corp/Gov</div>
+        <div class="box box-amber" style="font-size:9px">Matter<br>Lifecycle/Risk</div>
+        <div class="box box-amber" style="font-size:9px">Contract<br>CLM/Obligations</div>
+        <div class="box box-amber" style="font-size:9px">MatterEvent<br>Filing/Hearing</div>
+        <div class="box box-amber" style="font-size:9px">LegalDocument<br>Versioned</div>
+        <div class="box box-amber" style="font-size:9px">DraftDocument<br>AI-Generated</div>
+        <div class="box box-amber" style="font-size:9px">DebateTranscript<br>Rounds/Winner</div>
+        <div class="box box-amber" style="font-size:9px">AuditLog<br>Hash-Chain</div>
+        <div class="box box-amber" style="font-size:9px">AgentAction<br>HITL Registry</div>
+        <div class="box box-amber" style="font-size:9px">RiskScore<br>Evidence-Based</div>
+        <div class="box box-amber" style="font-size:9px">Alert<br>Severity/Ack</div>
+        <div class="box box-amber" style="font-size:9px">AIGovernanceLog<br>Model/Cost/Halluc</div>
+        <div class="box box-amber" style="font-size:9px">IndexStats<br>Vector Freshness</div>
+      </div>
+    </div>
+    <div style="flex:1;min-width:200px">
+      <div class="section-title" style="font-size:10px;border-color:#d97706">pgVector — Semantic / Embedding Data</div>
+      <div class="box box-orange" style="margin-bottom:6px">
+        <div style="font-weight:700">VectorDoc</div>
+        <div class="small" style="color:#fed7aa">vector(1536) embeddings</div>
+        <div class="small" style="color:#fed7aa">court · jurisdiction · citation</div>
+        <div class="small" style="color:#fed7aa">data_class · org_id · checksum</div>
+        <div class="small" style="color:#fed7aa">mxbai-embed-large model</div>
+      </div>
+      <div class="box box-red box-BLOCK" style="font-size:9px">Tenant-scoped queries only<br>org_id filter ALWAYS applied</div>
+    </div>
+  </div>
+  <div class="note">REL-001: Temporary infrastructure failures shall not corrupt persistent data. Transactional consistency enforced for business-critical operations (ARCH-003).</div>
+</div>
+
+<!-- LAYER 6: RAG -->
+<div class="layer l6">
+  <div class="layer-label">Layer 6 — RAG / Legal Intelligence Pipeline (RAG-001–006)</div>
+  <div class="trust-boundary">
+    <div class="trust-boundary-label">⚠️ UNTRUSTED INPUT BOUNDARY — Retrieved documents are DATA, not trusted system instructions</div>
+    <div class="arrow-row" style="flex-wrap:wrap">
+      <div class="box box-blue" style="font-size:9px">📄 Document<br>Ingestion</div>
+      <span class="arr arr-blue">→</span>
+      <div class="box box-blue" style="font-size:9px">✂️ Chunking<br>&amp; Parsing</div>
+      <span class="arr arr-blue">→</span>
+      <div class="box box-blue" style="font-size:9px">🔢 Embedding<br>mxbai-embed</div>
+      <span class="arr arr-blue">→</span>
+      <div class="box box-blue" style="font-size:9px">🗄️ pgVector<br>Store</div>
+      <span class="arr arr-blue">→</span>
+      <div class="box box-purple" style="font-size:9px">🔍 Metadata<br>Filter</div>
+      <span class="arr arr-purple">→</span>
+      <div class="box box-purple" style="font-size:9px">🔐 Permission<br>Filter</div>
+      <span class="arr arr-purple">→</span>
+      <div class="box box-blue" style="font-size:9px">🎯 Semantic<br>Retrieval</div>
+      <span class="arr arr-blue">→</span>
+      <div class="box box-blue" style="font-size:9px">📊 Citation-Aware<br>Ranking</div>
+      <span class="arr arr-blue">→</span>
+      <div class="box box-green" style="font-size:9px">📋 Evidence<br>Context</div>
+      <span class="arr arr-green">→</span>
+      <div class="box box-teal" style="font-size:9px">🤖 LLM<br>Input</div>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <div class="box box-purple" style="font-size:9px">Org Isolation<br>org_id filter</div>
+      <div class="box box-purple" style="font-size:9px">RBAC Filter<br>role check</div>
+      <div class="box box-purple" style="font-size:9px">Data Class<br>Filter</div>
+      <div class="box box-purple" style="font-size:9px">Confidentiality<br>Check</div>
+      <div class="box box-purple" style="font-size:9px">Privilege<br>Restriction</div>
+      <div class="box box-purple" style="font-size:9px">Court/Jurisdiction<br>Filter</div>
+      <div class="box box-red box-BLOCK" style="font-size:9px">No Evidence →<br>"Insufficient Verified Evidence"</div>
+    </div>
+  </div>
+</div>
+
+<!-- LAYER 7: BULLMQ -->
+<div class="layer l2">
+  <div class="layer-label">Layer 7 — BullMQ + Redis Async Processing (ARCH-004)</div>
+  <div class="row">
+    <div style="flex:1;min-width:280px">
+      <div class="arrow-row">
+        <div class="box box-blue" style="font-size:9px">API Request<br>(long-running)</div>
+        <span class="arr arr-blue">→</span>
+        <div class="box box-indigo" style="font-size:9px">BullMQ<br>Job Create</div>
+        <span class="arr arr-blue">→</span>
+        <div class="box box-indigo" style="font-size:9px">Redis<br>Queue</div>
+        <span class="arr arr-blue">→</span>
+        <div class="box box-indigo" style="font-size:9px">Worker<br>Pickup</div>
+        <span class="arr arr-blue">→</span>
+        <div class="box box-green" style="font-size:9px">Job<br>Execute</div>
+      </div>
+    </div>
+    <div style="flex:1;min-width:280px">
+      <div class="row">
+        <div class="box box-indigo" style="font-size:9px">Job Status<br>Polling/SSE</div>
+        <div class="box box-amber" style="font-size:9px">Retry Policy<br><span class="tbd">count: TBD PO</span></div>
+        <div class="box box-amber" style="font-size:9px">Idempotency<br>REL-004/ORCH-006</div>
+        <div class="box box-red" style="font-size:9px">Dead-Letter<br><span class="tbd">retention: TBD PO</span></div>
+        <div class="box box-gray" style="font-size:9px">Worker Monitor<br>health endpoint</div>
+        <div class="box box-red box-BLOCK" style="font-size:9px">Duplicate Job →<br>Idempotency Check</div>
+      </div>
+    </div>
+  </div>
+  <div class="note">⚠️ TBD (PO): Queue retry count, dead-letter retention period. REL-004: Duplicate job execution shall not produce duplicate irreversible actions.</div>
+</div>
+
+<!-- LAYER 8: WORKERS -->
+<div class="layer l3">
+  <div class="layer-label">Layer 8 — 12 BullMQ Agent Workers — Independent Node.js Processes</div>
+  <div class="row" style="margin-bottom:8px">
+    <div class="box box-teal" style="font-size:9px">1. Legal Retrieval<br>pgVector semantic search<br>citation-aware ranking</div>
+    <div class="box box-teal" style="font-size:9px">2. Legal Analysis<br>IRAC reasoning<br>LLM cascade + confidence</div>
+    <div class="box box-teal" style="font-size:9px">3. Legal Drafting<br>Writ/Affidavit/Submission<br>document generation</div>
+    <div class="box box-teal" style="font-size:9px">4. Legal Validation<br>Citation verification<br>hallucination detection</div>
+    <div class="box box-teal" style="font-size:9px">5. Legal Audit<br>Hash-chain audit logs<br>legal hold / PDPA forget</div>
+    <div class="box box-teal" style="font-size:9px">6. Legal Orchestrator<br>Workflow DAG<br>parallel fan-out</div>
+    <div class="box box-teal" style="font-size:9px">7. Legal Privacy<br>PII redaction<br>consent management</div>
+    <div class="box box-teal" style="font-size:9px">8. Legal Debate<br>Multi-agent simulation<br>adjudication</div>
+    <div class="box box-teal" style="font-size:9px">9. Legal Monitoring<br>Regulatory change<br>alert dispatch</div>
+    <div class="box box-teal" style="font-size:9px">10. Legal Indexing<br>Document ingestion<br>embedding generation</div>
+    <div class="box box-teal" style="font-size:9px">11. Legal Testing<br>Gold eval dataset<br>adversarial vectors</div>
+    <div class="box box-teal" style="font-size:9px">12. AI Developer<br>Development utility<br>worker</div>
+  </div>
+  <div class="section-title" style="font-size:10px;border-color:#0d9488">Orchestrator Workflow — Fan-Out (ORCH-001–006)</div>
+  <div class="arrow-row" style="flex-wrap:wrap">
+    <div class="box box-blue" style="font-size:9px">Query</div>
+    <span class="arr arr-blue">→</span>
+    <div class="box box-teal" style="font-size:9px">Orchestrator<br>Worker</div>
+    <span class="arr arr-blue">→</span>
+    <div style="display:flex;flex-direction:column;gap:3px">
+      <div class="box box-indigo" style="font-size:9px">Retrieval: FEDERAL</div>
+      <div class="box box-indigo" style="font-size:9px">Retrieval: APPEAL</div>
+      <div class="box box-indigo" style="font-size:9px">Retrieval: HIGH</div>
+      <div class="box box-indigo" style="font-size:9px">Retrieval: Malay</div>
+      <div class="box box-indigo" style="font-size:9px">Retrieval: Broad</div>
+    </div>
+    <span class="arr arr-blue">→</span>
+    <div class="box box-teal" style="font-size:9px">Analysis<br>(IRAC + LLM)</div>
+    <span class="arr arr-blue">→</span>
+    <div style="display:flex;flex-direction:column;gap:3px">
+      <div class="box box-teal" style="font-size:9px">Drafting<br>(if docType)</div>
+      <div class="box box-teal" style="font-size:9px">Validation<br>(citation check)</div>
+    </div>
+    <span class="arr arr-red">→</span>
+    <div class="box box-red box-BLOCK" style="font-size:9px">Partial Failure →<br>No Silent Conclusion<br>ORCH-003/004</div>
+  </div>
+</div>
+
+<!-- LAYER 9: OLLAMA + AI SAFETY -->
+<div class="layer l7">
+  <div class="layer-label">Layer 9 — Ollama Local AI Inference + AI Safety Controls</div>
+  <div class="row">
+    <div style="flex:1;min-width:300px">
+      <div class="section-title" style="font-size:10px;border-color:#a855f7">Model Policy / Data Classification Gateway (DATA-001–003)</div>
+      <div class="arrow-row" style="flex-wrap:wrap">
+        <div class="box box-teal" style="font-size:9px">Agent Worker<br>Request</div>
+        <span class="arr arr-purple">→</span>
+        <div class="box box-purple" style="font-size:9px">🔐 Model Policy<br>Gateway</div>
+        <span class="arr arr-purple">→</span>
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <div class="box box-green" style="font-size:9px">Public → All approved models</div>
+          <div class="box box-amber" style="font-size:9px">Internal → Local/approved models</div>
+          <div class="box box-red" style="font-size:9px">Confidential → Local only</div>
+          <div class="box box-pink" style="font-size:9px">Privileged → Local embed only</div>
+        </div>
+        <span class="arr arr-purple">→</span>
+        <div class="box box-purple" style="font-size:9px">🦙 Ollama<br>Port 11434</div>
+        <span class="arr arr-purple">→</span>
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <div class="box box-purple" style="font-size:9px">llama3.1<br>LLM</div>
+          <div class="box box-purple" style="font-size:9px">mxbai-embed-large<br>Embeddings</div>
+        </div>
+      </div>
+      <div class="box box-red box-BLOCK" style="margin-top:6px;font-size:9px">Confidential/Privileged + External Model → BLOCK (DATA-003 fail-closed)</div>
+      <div class="note" style="margin-top:6px">⚠️ TBD (PO): Exact model fallback rules, LLM timeout, AI confidence-score thresholds.</div>
+    </div>
+    <div style="flex:1;min-width:280px">
+      <div class="sec-boundary">
+        <div class="sec-boundary-label">🛡️ AI SAFETY BOUNDARY (SAFETY-001–010, SEC-AI-001–004)</div>
+        <div class="row">
+          <div class="box box-red" style="font-size:9px">🚫 Prompt Injection<br>Detection</div>
+          <div class="box box-red" style="font-size:9px">📄 Untrusted Doc<br>Handling</div>
+          <div class="box box-red" style="font-size:9px">🎭 Hallucination<br>Controls</div>
+          <div class="box box-red" style="font-size:9px">📚 Citation<br>Validation</div>
+          <div class="box box-red" style="font-size:9px">✅ Evidence<br>Verification</div>
+          <div class="box box-red" style="font-size:9px">🔒 Data Exfil<br>Protection</div>
+          <div class="box box-red" style="font-size:9px">🔐 Model/Class<br>Enforcement</div>
+          <div class="box box-red" style="font-size:9px">☠️ AI Kill<br>Switch</div>
+          <div class="box box-red" style="font-size:9px">🚫 L5 Prohibited<br>Action Block</div>
+        </div>
+        <div class="note" style="margin-top:6px;font-size:9px">SAFETY-010: Uploaded documents are treated as potentially adversarial input. Document content is DATA — not trusted system instructions (SEC-AI-002).</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LAYER 10: HITL -->
+<div class="layer l9">
+  <div class="layer-label">Layer 10 — Human-in-the-Loop (HITL) Approval Gateway (HITL-001–006)</div>
+  <div class="row">
+    <div style="flex:1;min-width:320px">
+      <table class="hitl-table">
+        <tr><th>Level</th><th>Name</th><th>Behaviour</th><th>Approval</th></tr>
+        <tr><td><span class="badge badge-green">L0</span></td><td>Read</td><td>AI retrieves &amp; analyses</td><td style="color:#22c55e">Auto ✓</td></tr>
+        <tr><td><span class="badge badge-green">L1</span></td><td>Recommend</td><td>AI recommends, no execution</td><td style="color:#22c55e">Auto ✓</td></tr>
+        <tr><td><span class="badge badge-amber">L2</span></td><td>Draft</td><td>AI creates draft</td><td style="color:#f59e0b">Human Review Required</td></tr>
+        <tr><td><span class="badge badge-red">L3</span></td><td>Execute + Approval</td><td>AI prepares action</td><td style="color:#ef4444">Explicit Auth Required</td></tr>
+        <tr><td><span class="badge badge-blue">L4</span></td><td>Controlled Auto</td><td>Pre-approved low-risk</td><td class="tbd">Policy-Based (TBD PO)</td></tr>
+        <tr><td><span class="badge badge-red" style="background:#450a0a">L5</span></td><td>Prohibited</td><td>Never autonomous</td><td style="color:#ef4444;font-weight:700">ALWAYS BLOCKED</td></tr>
+      </table>
+    </div>
+    <div style="flex:1;min-width:280px">
+      <div class="section-title" style="font-size:10px;border-color:#ef4444">HITL Approval Flow</div>
+      <div class="arrow-row" style="flex-wrap:wrap">
+        <div class="box box-teal" style="font-size:9px">AI Proposal</div>
+        <span class="arr arr-amber">→</span>
+        <div class="box box-amber" style="font-size:9px">Risk<br>Classification</div>
+        <span class="arr arr-amber">→</span>
+        <div class="box box-red" style="font-size:9px;border:2px solid #ef4444">HITL<br>Gateway</div>
+        <span class="arr arr-green">→</span>
+        <div class="box box-green" style="font-size:9px">Authorised<br>Human Approval<br>(Admin/Lawyer)</div>
+        <span class="arr arr-green">→</span>
+        <div class="box box-green" style="font-size:9px">Validated<br>Execution</div>
+        <span class="arr arr-amber">→</span>
+        <div class="box box-AUDIT" style="font-size:9px">Audit<br>Record</div>
+      </div>
+      <div class="arrow-row" style="margin-top:6px">
+        <div class="box box-teal" style="font-size:9px">L5 Action</div>
+        <span class="arr arr-red">→</span>
+        <div class="box box-red box-BLOCK">⛔ ALWAYS BLOCKED — No execution path</div>
+        <span class="arr arr-amber">→</span>
+        <div class="box box-AUDIT" style="font-size:9px">Audit</div>
+      </div>
+      <div class="note" style="margin-top:6px;font-size:9px">HITL-003: Frontend cannot bypass HITL. HITL-004: Approval linked to correct action ID. HITL-005: Approval does not authorise unrelated actions. ⚠️ TBD (PO): Whether lawyers can approve own drafts. L4 permitted action catalogue. L5 prohibited action catalogue.</div>
+    </div>
+  </div>
+</div>
+
+<!-- AUDIT + GOVERNANCE -->
+<div class="layer l5">
+  <div class="layer-label">Layer 11 — Immutable Audit Trail + AI Governance (AUDIT-001–005, GOV-001–005)</div>
+  <div class="row">
+    <div style="flex:2;min-width:320px">
+      <div class="section-title" style="font-size:10px;border-color:#d97706">Immutable Audit Trail — Provenance Chain</div>
+      <div class="arrow-row" style="flex-wrap:wrap">
+        <div class="box box-AUDIT" style="font-size:9px">Who</div>
+        <span class="arr arr-amber">→</span>
+        <div class="box box-AUDIT" style="font-size:9px">What</div>
+        <span class="arr arr-amber">→</span>
+        <div class="box box-AUDIT" style="font-size:9px">Why</div>
+        <span class="arr arr-amber">→</span>
+        <div class="box box-AUDIT" style="font-size:9px">Data Used</div>
+        <span class="arr arr-amber">→</span>
+        <div class="box box-AUDIT" style="font-size:9px">AI Model</div>
+        <span class="arr arr-amber">→</span>
+        <div class="box box-AUDIT" style="font-size:9px">Tools</div>
+        <span class="arr arr-amber">→</span>
+        <div class="box box-AUDIT" style="font-size:9px">Result</div>
+        <span class="arr arr-amber">→</span>
+        <div class="box box-AUDIT" style="font-size:9px">Approval</div>
+        <span class="arr arr-amber">→</span>
+        <div class="box box-AUDIT" style="font-size:9px">Timestamp</div>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <div class="box box-amber" style="font-size:9px">Hash-Chain<br>Integrity</div>
+        <div class="box box-amber" style="font-size:9px">Immutability<br>AUDIT-003</div>
+        <div class="box box-amber" style="font-size:9px">Legal Hold<br>AUDIT-004 <span class="tbd">TBD PO</span></div>
+        <div class="box box-amber" style="font-size:9px">Integrity Failure<br>Detection AUDIT-005</div>
+        <div class="box box-red box-BLOCK" style="font-size:9px">Unauthorised Modify<br>→ REJECTED</div>
+      </div>
+    </div>
+    <div style="flex:1;min-width:220px">
+      <div class="section-title" style="font-size:10px;border-color:#d97706">AI Governance Log (GOV-001–005)</div>
+      <div class="row">
+        <div class="box box-amber" style="font-size:9px">Model Used</div>
+        <div class="box box-amber" style="font-size:9px">Data Class</div>
+        <div class="box box-amber" style="font-size:9px">Request/Result</div>
+        <div class="box box-amber" style="font-size:9px">Cost Tracking</div>
+        <div class="box box-red" style="font-size:9px">Hallucination<br>Events</div>
+        <div class="box box-red" style="font-size:9px">Security<br>Events</div>
+        <div class="box box-red" style="font-size:9px">Kill Switch<br>Events</div>
+        <div class="box box-amber" style="font-size:9px">Approval<br>Records</div>
+      </div>
+      <div class="box box-red box-BLOCK" style="margin-top:6px;font-size:9px">Kill Switch Active → All affected AI ops blocked/degraded safely (GOV-004)</div>
+      <div class="note" style="font-size:9px">⚠️ TBD (PO): Exact kill-switch scope and behaviour. Audit retention period. Legal-hold retention behaviour. PDPA deletion requirements per data class.</div>
+    </div>
+  </div>
+</div>
+
+<!-- OBSERVABILITY -->
+<div class="layer l10">
+  <div class="layer-label">Layer 12 — Cross-Cutting Observability Plane (§36)</div>
+  <div class="row">
+    <div class="box box-gray" style="font-size:9px">📊 Prometheus<br>/metrics</div>
+    <div class="box box-gray" style="font-size:9px">📝 Pino Structured<br>Logs</div>
+    <div class="box box-gray" style="font-size:9px">❤️ Health Check<br>/health</div>
+    <div class="box box-gray" style="font-size:9px">🔄 Queue Health<br>/health/queue</div>
+    <div class="box box-gray" style="font-size:9px">🦙 Ollama Health<br>/health/ollama</div>
+    <div class="box box-gray" style="font-size:9px">🗄️ DB Health<br>PostgreSQL</div>
+    <div class="box box-gray" style="font-size:9px">⚡ SSE Event<br>Stream</div>
+    <div class="box box-gray" style="font-size:9px">🤖 AI Execution<br>Metrics</div>
+    <div class="box box-gray" style="font-size:9px">🔒 Security<br>Events</div>
+    <div class="box box-gray" style="font-size:9px">👷 Worker<br>Monitoring</div>
+    <div class="box box-gray" style="font-size:9px">📈 API<br>Metrics</div>
+  </div>
+  <div class="note">Observability data shall not expose confidential client content unnecessarily (§36).</div>
+</div>
+
+<hr class="divider">
+<div class="section-title">Critical QA Flows — End-to-End Scenarios</div>
+
+<!-- FLOW 1 -->
+<div class="flow-card">
+  <div class="flow-title">Flow 1 — Normal Legal AI Query (Happy Path)</div>
+  <div class="flow-steps">
+    <div class="flow-step">User</div><span class="arr arr-blue">→</span>
+    <div class="flow-step">Frontend</div><span class="arr arr-blue">→</span>
+    <div class="flow-step">tRPC API</div><span class="arr arr-purple">→</span>
+    <div class="flow-step">Authentication ✓</div><span class="arr arr-purple">→</span>
+    <div class="flow-step">RBAC ✓</div><span class="arr arr-purple">→</span>
+    <div class="flow-step">Tenant Check ✓</div><span class="arr arr-blue">→</span>
+    <div class="flow-step">BullMQ Job</div><span class="arr arr-blue">→</span>
+    <div class="flow-step">Orchestrator Worker</div><span class="arr arr-blue">→</span>
+    <div class="flow-step">RAG Fan-Out</div><span class="arr arr-blue">→</span>
+    <div class="flow-step">pgVector</div><span class="arr arr-blue">→</span>
+    <div class="flow-step">Evidence Context</div><span class="arr arr-blue">→</span>
+    <div class="flow-step">Analysis Worker</div><span class="arr arr-teal">→</span>
+    <div class="flow-step">Model Policy Gateway</div><span class="arr arr-purple">→</span>
+    <div class="flow-step">Ollama</div><span class="arr arr-blue">→</span>
+    <div class="flow-step">Validation Worker</div><span class="arr arr-blue">→</span>
+    <div class="flow-step flow-step-green">IRAC Response</div><span class="arr arr-amber">→</span>
+    <div class="flow-step">Audit Record</div>
+  </div>
+</div>
+
+<!-- FLOW 2 -->
+<div class="flow-card">
+  <div class="flow-title">Flow 2 — Unauthorised Cross-Tenant Access (P0 Security)</div>
+  <div class="flow-steps">
+    <div class="flow-step">User Org-A</div><span class="arr arr-blue">→</span>
+    <div class="flow-step">tRPC API</div><span class="arr arr-purple">→</span>
+    <div class="flow-step">Authentication ✓</div><span class="arr arr-purple">→</span>
+    <div class="flow-step">Tenant Validation</div><span class="arr arr-red">→</span>
+    <div class="flow-step flow-step-red">Resource = Org-B → MISMATCH</div><span class="arr arr-red">→</span>
+    <div class="flow-step flow-step-red">⛔ BLOCK 403/404</div><span class="arr arr-red">→</span>
+    <div class="flow-step flow-step-red">No Org-B Data Disclosed</div><span class="arr arr-amber">→</span>
+    <div class="flow-step">Security Audit Log</div>
+  </div>
+</div>
+
+<!-- FLOW 3 -->
+<div class="flow-card">
+  <div class="flow-title">Flow 3 — Prompt Injection Attack (P0 Security)</div>
+  <div class="flow-steps">
+    <div class="flow-step flow-step-red">Malicious Document Upload</div><span class="arr arr-blue">→</span>
+    <div class="flow-step">File Validation</div><span class="arr arr-blue">→</span>
+    <div class="flow-step">Indexing Worker</div><span class="arr arr-blue">→</span>
+    <div class="flow-step">RAG Retrieval</div><span class="arr arr-red">→</span>
+    <div class="flow-step flow-step-red">Prompt Injection Detected</div><span class="arr arr-red">→</span>
+    <div class="flow-step flow-step-red">Treat as Untrusted DATA</div><span class="arr arr-red">→</span>
+    <div class="flow-step flow-step-red">⛔ Block Instruction Override</div><span class="arr arr-red">→</span>
+    <div class="flow-step">Permissions Unchanged</div><span class="arr arr-red">→</span>
+    <div class="flow-step">Tenant Context Unchanged</div><span class="arr arr-amber">→</span>
+    <div class="flow-step">Security Audit Log</div>
+  </div>
+</div>
+
+<!-- FLOW 4 -->
+<div class="flow-card">
+  <div class="flow-title">Flow 4 — High-Impact Agent Action L3 (HITL Required)</div>
+  <div class="flow-steps">
+    <div class="flow-step">User Request</div><span class="arr arr-blue">→</span>
+    <div class="flow-step">Agent Worker</div><span class="arr arr-amber">→</span>
+    <div class="flow-step flow-step-amber">Risk Classification: L3</div><span class="arr arr-amber">→</span>
+    <div class="flow-step flow-step-red">HITL Gateway</div><span class="arr arr-amber">→</span>
+    <div class="flow-step">Pending Approval</div><span class="arr arr-green">→</span>
+    <div class="flow-step flow-step-green">Authorised Human Approval (Admin/Lawyer)</div><span class="arr arr-blue">→</span>
+    <div class="flow-step">Validation Layer</div><span class="arr arr-blue">→</span>
+    <div class="flow-step flow-step-green">Execution</div><span class="arr arr-amber">→</span>
+    <div class="flow-step">Full Audit Record</div>
+  </div>
+</div>
+
+<!-- FLOW 5 -->
+<div class="flow-card">
+  <div class="flow-title">Flow 5 — Prohibited Action L5 (Always Blocked)</div>
+  <div class="flow-steps">
+    <div class="flow-step">Agent</div><span class="arr arr-red">→</span>
+    <div class="flow-step flow-step-red">L5 Classification</div><span class="arr arr-red">→</span>
+    <div class="flow-step flow-step-red">⛔ BLOCK — No execution path exists</div><span class="arr arr-red">→</span>
+    <div class="flow-step flow-step-red">No approval can override</div><span class="arr arr-amber">→</span>
+    <div class="flow-step">Audit Log</div>
+  </div>
+</div>
+
+<!-- FLOW 6 -->
+<div class="flow-card">
+  <div class="flow-title">Flow 6 — Unauthorised Model for Confidential Data (DATA-001–003)</div>
+  <div class="flow-steps">
+    <div class="flow-step flow-step-red">Confidential Data</div><span class="arr arr-purple">→</span>
+    <div class="flow-step">Model Policy Gateway</div><span class="arr arr-red">→</span>
+    <div class="flow-step flow-step-red">External/Unauthorised Model Requested</div><span class="arr arr-red">→</span>
+    <div class="flow-step flow-step-red">⛔ BLOCK — Fail Closed (DATA-003)</div><span class="arr arr-red">→</span>
+    <div class="flow-step flow-step-red">Data NOT sent to external provider</div><span class="arr arr-amber">→</span>
+    <div class="flow-step">Governance Log</div>
+  </div>
+</div>
+
+<!-- FLOW 7 -->
+<div class="flow-card">
+  <div class="flow-title">Flow 7 — AI Model Unavailable (Ollama Failure)</div>
+  <div class="flow-steps">
+    <div class="flow-step">Agent Worker</div><span class="arr arr-red">→</span>
+    <div class="flow-step flow-step-red">Ollama Unavailable</div><span class="arr arr-red">→</span>
+    <div class="flow-step flow-step-red">Controlled Failure Response</div><span class="arr arr-red">→</span>
+    <div class="flow-step flow-step-red">No Unsupported Legal Conclusion Generated</div><span class="arr arr-amber">→</span>
+    <div class="flow-step">Retry Policy (TBD PO)</div><span class="arr arr-amber">→</span>
+    <div class="flow-step">Dead-Letter if exhausted</div><span class="arr arr-amber">→</span>
+    <div class="flow-step">Audit Log</div>
+  </div>
+</div>
+
+<!-- FLOW 8 -->
+<div class="flow-card">
+  <div class="flow-title">Flow 8 — Duplicate Job / Idempotency (REL-004, ORCH-006)</div>
+  <div class="flow-steps">
+    <div class="flow-step">API Request</div><span class="arr arr-blue">→</span>
+    <div class="flow-step">BullMQ</div><span class="arr arr-blue">→</span>
+    <div class="flow-step flow-step-amber">Duplicate Job Detected</div><span class="arr arr-amber">→</span>
+    <div class="flow-step">Idempotency Check</div><span class="arr arr-red">→</span>
+    <div class="flow-step flow-step-red">⛔ Prevent Duplicate Irreversible Action</div><span class="arr arr-amber">→</span>
+    <div class="flow-step flow-step-green">Consistent Final State</div><span class="arr arr-amber">→</span>
+    <div class="flow-step">Audit Log</div>
+  </div>
+</div>
+
+<hr class="divider">
+<div class="section-title">QA / Test Automation Plane</div>
+
+<div class="qa-section">
+  <div class="qa-section-title">🧪 Functional Testing</div>
+  <div class="qa-grid">
+    <div class="qa-box">
+      <div class="qa-box-title">Frontend E2E</div>
+      <ul>
+        <li>All /legalai/* routes</li>
+        <li>Loading/error/empty states</li>
+        <li>Form validation</li>
+        <li>Session expiry handling</li>
+        <li>Permission gate UI</li>
+      </ul>
+    </div>
+    <div class="qa-box">
+      <div class="qa-box-title">API Testing</div>
+      <ul>
+        <li>All tRPC endpoints</li>
+        <li>Valid/invalid inputs</li>
+        <li>Boundary values</li>
+        <li>Null/empty/missing params</li>
+        <li>Response contracts</li>
+      </ul>
+    </div>
+    <div class="qa-box">
+      <div class="qa-box-title">Integration Testing</div>
+      <ul>
+        <li>API → DB round-trips</li>
+        <li>API → BullMQ → Worker</li>
+        <li>Worker → Ollama</li>
+        <li>RAG pipeline end-to-end</li>
+        <li>Audit event generation</li>
+      </ul>
+    </div>
+    <div class="qa-box">
+      <div class="qa-box-title">Database Testing</div>
+      <ul>
+        <li>Schema integrity</li>
+        <li>Constraint validation</li>
+        <li>Tenant isolation queries</li>
+        <li>Vector search accuracy</li>
+        <li>Transaction consistency</li>
+      </ul>
+    </div>
+    <div class="qa-box">
+      <div class="qa-box-title">Workflow Testing</div>
+      <ul>
+        <li>Matter lifecycle</li>
+        <li>Contract analysis flow</li>
+        <li>Drafting + approval</li>
+        <li>Debate simulation</li>
+        <li>Monitoring + alerts</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="qa-section">
+  <div class="qa-section-title">🔒 Security Testing</div>
+  <div class="qa-grid">
+    <div class="qa-box">
+      <div class="qa-box-title">Auth Security</div>
+      <ul>
+        <li>Token tampering</li>
+        <li>Session fixation</li>
+        <li>Brute force</li>
+        <li>Expired token reuse</li>
+        <li>Secret exposure check</li>
+      </ul>
+    </div>
+    <div class="qa-box">
+      <div class="qa-box-title">RBAC Testing</div>
+      <ul>
+        <li>All role/permission combos</li>
+        <li>Frontend bypass attempts</li>
+        <li>Self-elevation attempts</li>
+        <li>Role change audit</li>
+        <li>Cross-role resource access</li>
+      </ul>
+    </div>
+    <div class="qa-box">
+      <div class="qa-box-title">Tenant Isolation</div>
+      <ul>
+        <li>Cross-org data access</li>
+        <li>Client-supplied orgId</li>
+        <li>Direct object reference</li>
+        <li>Search result isolation</li>
+        <li>Worker tenant context</li>
+      </ul>
+    </div>
+    <div class="qa-box">
+      <div class="qa-box-title">Injection Testing</div>
+      <ul>
+        <li>SQL injection</li>
+        <li>XSS payloads</li>
+        <li>Command injection</li>
+        <li>SSRF attempts</li>
+        <li>Prompt injection (docs)</li>
+      </ul>
+    </div>
+    <div class="qa-box">
+      <div class="qa-box-title">File Upload Security</div>
+      <ul>
+        <li>Extension validation</li>
+        <li>MIME type mismatch</li>
+        <li>Oversized files</li>
+        <li>Executable content</li>
+        <li>Malicious content</li>
+      </ul>
+    </div>
+    <div class="qa-box">
+      <div class="qa-box-title">Data Exfiltration</div>
+      <ul>
+        <li>Cross-tenant via search</li>
+        <li>Analytics data leakage</li>
+        <li>Error message exposure</li>
+        <li>Audit log exposure</li>
+        <li>Observability leakage</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="qa-section">
+  <div class="qa-section-title">🤖 AI-Specific Testing</div>
+  <div class="qa-grid">
+    <div class="qa-box">
+      <div class="qa-box-title">RAG Accuracy</div>
+      <ul>
+        <li>Gold eval dataset</li>
+        <li>Retrieval precision/recall</li>
+        <li>Citation-aware ranking</li>
+        <li>Metadata filter accuracy</li>
+        <li>No-evidence fallback</li>
+      </ul>
+    </div>
+    <div class="qa-box">
+      <div class="qa-box-title">Hallucination Testing</div>
+      <ul>
+        <li>Fabricated case law</li>
+        <li>Invented statutes</li>
+        <li>Invented deadlines</li>
+        <li>Invented billing</li>
+        <li>Adversarial test vectors</li>
+      </ul>
+    </div>
+    <div class="qa-box">
+      <div class="qa-box-title">Citation Validation</div>
+      <ul>
+        <li>Verifiable citations</li>
+        <li>Unverifiable citations</li>
+        <li>LLM-only citations</li>
+        <li>Validation worker flow</li>
+        <li>User-visible flagging</li>
+      </ul>
+    </div>
+    <div class="qa-box">
+      <div class="qa-box-title">Prompt Injection</div>
+      <ul>
+        <li>Document-embedded injection</li>
+        <li>Contract text injection</li>
+        <li>RAG document injection</li>
+        <li>User prompt injection</li>
+        <li>Agent output injection</li>
+      </ul>
+    </div>
+    <div class="qa-box">
+      <div class="qa-box-title">HITL Testing</div>
+      <ul>
+        <li>L0–L5 classification</li>
+        <li>L5 always blocked</li>
+        <li>L3 approval required</li>
+        <li>Approval linkage</li>
+        <li>Frontend bypass attempt</li>
+      </ul>
+    </div>
+    <div class="qa-box">
+      <div class="qa-box-title">Model Policy Testing</div>
+      <ul>
+        <li>Confidential → local only</li>
+        <li>Privileged → embed only</li>
+        <li>External model block</li>
+        <li>Kill switch activation</li>
+        <li>Classification violation log</li>
+      </ul>
+    </div>
+    <div class="qa-box">
+      <div class="qa-box-title">Agent Orchestration</div>
+      <ul>
+        <li>Fan-out retrieval</li>
+        <li>Partial worker failure</li>
+        <li>No silent conclusion</li>
+        <li>Job status visibility</li>
+        <li>Idempotency</li>
+      </ul>
+    </div>
+    <div class="qa-box">
+      <div class="qa-box-title">AI Regression</div>
+      <ul>
+        <li>Gold eval baseline</li>
+        <li>Adversarial vectors</li>
+        <li>Evidence grounding</li>
+        <li>IRAC structure</li>
+        <li>Draft labelling</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="qa-section">
+  <div class="qa-section-title">⚡ Performance Testing</div>
+  <div class="qa-grid">
+    <div class="qa-box">
+      <div class="qa-box-title">Load Testing</div>
+      <ul>
+        <li>Baseline single user</li>
+        <li>Expected concurrent users</li>
+        <li>API response SLA <span class="tbd">(TBD PO)</span></li>
+        <li>DB query thresholds</li>
+        <li>Vector retrieval latency</li>
+      </ul>
+    </div>
+    <div class="qa-box">
+      <div class="qa-box-title">Stress / Spike</div>
+      <ul>
+        <li>Beyond expected load</li>
+        <li>Graceful degradation</li>
+        <li>Sudden traffic burst</li>
+        <li>Recovery behaviour</li>
+        <li>No data corruption</li>
+      </ul>
+    </div>
+    <div class="qa-box">
+      <div class="qa-box-title">Soak / Concurrency</div>
+      <ul>
+        <li>Sustained load (soak)</li>
+        <li>Concurrent write safety</li>
+        <li>Queue throughput</li>
+        <li>Worker scalability</li>
+        <li>AI latency under load</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="qa-section">
+  <div class="qa-section-title">🔁 Reliability Testing</div>
+  <div class="qa-grid">
+    <div class="qa-box">
+      <div class="qa-box-title">Infrastructure Failure</div>
+      <ul>
+        <li>PostgreSQL failure</li>
+        <li>Redis failure</li>
+        <li>Ollama failure</li>
+        <li>Network timeout</li>
+        <li>Worker crash</li>
+      </ul>
+    </div>
+    <div class="qa-box">
+      <div class="qa-box-title">Queue Reliability</div>
+      <ul>
+        <li>Retry policy</li>
+        <li>Dead-letter routing</li>
+        <li>Idempotency</li>
+        <li>Job status accuracy</li>
+        <li>No data loss on failure</li>
+      </ul>
+    </div>
+    <div class="qa-box">
+      <div class="qa-box-title">Recovery Testing</div>
+      <ul>
+        <li>Data integrity post-failure</li>
+        <li>Audit chain post-recovery</li>
+        <li>Session recovery</li>
+        <li>Worker restart</li>
+        <li>Health check accuracy</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+<div class="section-title">Enterprise QA Release Gate</div>
+
+<div class="gate-row">
+  <div class="gate-box gate-normal">🔨 Build</div>
+  <span class="arr arr-blue">→</span>
+  <div class="gate-box gate-normal">🧪 Unit Tests</div>
+  <span class="arr arr-blue">→</span>
+  <div class="gate-box gate-normal">🔌 API Tests</div>
+  <span class="arr arr-blue">→</span>
+  <div class="gate-box gate-normal">🔗 Integration Tests</div>
+  <span class="arr arr-blue">→</span>
+  <div class="gate-box gate-p0">🔒 Security Tests</div>
+  <span class="arr arr-blue">→</span>
+  <div class="gate-box gate-p0">🤖 AI Safety Tests</div>
+  <span class="arr arr-blue">→</span>
+  <div class="gate-box gate-normal">⚡ Performance Tests</div>
+  <span class="arr arr-blue">→</span>
+  <div class="gate-box gate-normal">🌐 E2E Tests</div>
+  <span class="arr arr-blue">→</span>
+  <div class="gate-box gate-normal">👤 UAT</div>
+  <span class="arr arr-green">→</span>
+  <div class="gate-box gate-pass">✅ Release Gate</div>
+</div>
+
+<div class="row" style="margin-top:12px;gap:12px">
+  <div style="flex:1;min-width:300px">
+    <div class="section-title" style="font-size:11px;border-color:#ef4444">P0 — Release Blockers (Must be zero unresolved)</div>
+    <div class="row">
+      <div class="gate-box gate-p0">Cross-tenant data exposure</div>
+      <div class="gate-box gate-p0">Authentication bypass</div>
+      <div class="gate-box gate-p0">Privilege escalation</div>
+      <div class="gate-box gate-p0">L5 action execution</div>
+      <div class="gate-box gate-p0">Unauthorised high-impact action</div>
+      <div class="gate-box gate-p0">Confidential/privileged data leakage</div>
+      <div class="gate-box gate-p0">Fabricated legal authority as verified</div>
+      <div class="gate-box gate-p0">Audit-chain compromise</div>
+      <div class="gate-box gate-p0">Legal document corruption/loss</div>
+      <div class="gate-box gate-p0">Data corruption</div>
+    </div>
+  </div>
+  <div style="flex:1;min-width:300px">
+    <div class="section-title" style="font-size:11px;border-color:#d97706">P1 — High Priority (Resolved or formally accepted)</div>
+    <div class="row">
+      <div class="gate-box gate-p1">Incorrect RBAC enforcement</div>
+      <div class="gate-box gate-p1">Incorrect HITL behaviour</div>
+      <div class="gate-box gate-p1">Incorrect citation validation</div>
+      <div class="gate-box gate-p1">Unauthorised RAG retrieval</div>
+      <div class="gate-box gate-p1">Broken agent orchestration</div>
+      <div class="gate-box gate-p1">Critical queue failures</div>
+      <div class="gate-box gate-p1">AI governance violations</div>
+      <div class="gate-box gate-p1">Major contract-analysis errors</div>
+      <div class="gate-box gate-p1">Duplicate agent execution (business impact)</div>
+      <div class="gate-box gate-p1">Critical production API failures</div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+<div class="section-title">Items Requiring Product Owner Confirmation (⚠️ Do Not Assume)</div>
+<div class="row" style="flex-wrap:wrap;gap:6px">
+  <span class="badge badge-amber">Max file upload size</span>
+  <span class="badge badge-amber">Supported document formats</span>
+  <span class="badge badge-amber">Citation verification source</span>
+  <span class="badge badge-amber">Queue retry count</span>
+  <span class="badge badge-amber">Dead-letter retention</span>
+  <span class="badge badge-amber">Audit retention period</span>
+  <span class="badge badge-amber">Legal-hold behaviour</span>
+  <span class="badge badge-amber">PDPA deletion per data class</span>
+  <span class="badge badge-amber">Kill-switch exact scope</span>
+  <span class="badge badge-amber">L4 permitted action catalogue</span>
+  <span class="badge badge-amber">L5 prohibited action catalogue</span>
+  <span class="badge badge-amber">Lawyer approving own drafts</span>
+  <span class="badge badge-amber">Delegated HITL approval rules</span>
+  <span class="badge badge-amber">LLM timeout</span>
+  <span class="badge badge-amber">AI confidence-score thresholds</span>
+  <span class="badge badge-amber">Model fallback rules</span>
+  <span class="badge badge-amber">RAG ranking algorithm</span>
+  <span class="badge badge-amber">Production SLA / RTO / RPO</span>
+  <span class="badge badge-amber">Analytics calculation definitions</span>
+  <span class="badge badge-amber">Billing intelligence rules</span>
+  <span class="badge badge-amber">Conflict-check enforcement</span>
+  <span class="badge badge-amber">Matter-level access restrictions</span>
+  <span class="badge badge-amber">Contract risk-scoring methodology</span>
+  <span class="badge badge-amber">Legal monitoring source authorities</span>
+  <span class="badge badge-amber">Notification channels</span>
+  <span class="badge badge-amber">SSO protocol</span>
+  <span class="badge badge-amber">Password/session policy</span>
+  <span class="badge badge-amber">Organisation subscription limits</span>
+  <span class="badge badge-amber">Browser/device support matrix</span>
+</div>
+
+<div style="text-align:center;padding:20px 0 10px;color:#334155;font-size:9px;border-top:1px solid #1e293b;margin-top:20px">
+  LAWMATE ⚖️🤖 — Enterprise QA &amp; AI Architecture Diagram &nbsp;|&nbsp; Based on LAWMATE SRS v1.0 &nbsp;|&nbsp;
+  <strong style="color:#475569">AI can assist → evidence supports → permissions constrain → humans approve → actions execute → everything important is audited</strong>
+</div>
+
+</div><!-- .page -->
+</body>
+</html>

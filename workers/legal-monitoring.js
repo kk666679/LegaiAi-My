@@ -4,7 +4,6 @@
  * - Personalised feeds, source verification, delay guarantee
  */
 import { Worker } from 'bullmq'
-import * as tf from '@tensorflow/tfjs-node'
 import ollama from 'ollama'
 import Redis from 'ioredis'
 import { randomUUID } from 'crypto'
@@ -18,11 +17,9 @@ const connection = { host: process.env.REDIS_HOST || 'localhost', port: parseInt
 const ALERT_DELAY_HOURS = parseFloat(process.env.ALERT_DELAY_HOURS || '4')
 const MIN_CONFIDENCE = 0.9
 
-// Simple LSTM-inspired trend detection using TF.js
 function detectTrend(series) {
   if (series.length < 5) return { trend: 'insufficient_data', score: 0 }
-  const t = tf.tensor1d(series)
-  const mean = t.mean().arraySync()
+  const mean = series.reduce((a, b) => a + b, 0) / series.length
   const last = series[series.length - 1]
   const trend = last > mean * 1.2 ? 'rising' : last < mean * 0.8 ? 'falling' : 'stable'
   const score = Math.abs(last - mean) / (mean || 1)

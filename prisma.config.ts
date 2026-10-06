@@ -6,11 +6,11 @@ config({ path: resolve(__dirname, '.env.local'), override: false });
 config({ path: resolve(__dirname, '.env'), override: false });
 
 export default defineConfig({
-  schema: './backend/prisma/schema.prisma',
+  schema: './prisma/schema.prisma',
   datasource: {
     url: process.env.DATABASE_URL,
   },
   migrations: {
-    path: './backend/prisma/migrations',
+    path: './prisma/migrations',
   },
 });

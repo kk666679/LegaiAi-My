@@ -188,23 +188,23 @@ export function TopBar({ onMenu }: TopBarProps) {
           <DropdownMenuLabel>Create new</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
-            <Link href="/legalai/draft" className="gap-2">
+            <Link href="/legalai/documents/new" className="gap-2">
               <Plus className="size-4" /> New document
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/legalai/matters" className="gap-2">
+            <Link href="/legalai/matters/new" className="gap-2">
               <Plus className="size-4" /> New matter
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/legalai/tasks" className="gap-2">
-              <Plus className="size-4" /> New task
+            <Link href="/legalai/contracts/new" className="gap-2">
+              <Plus className="size-4" /> New contract
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
-            <Link href="/legalai/documents" className="gap-2">
+            <Link href="/legalai/documents/new" className="gap-2">
               <Plus className="size-4" /> Upload document
             </Link>
           </DropdownMenuItem>
@@ -212,7 +212,7 @@ export function TopBar({ onMenu }: TopBarProps) {
       </DropdownMenu>
 
       <Button variant="ghost" size="icon" aria-label="Notifications" asChild>
-        <Link href="/legalai/notifications" className="relative">
+        <Link href="/legalai/hitl" className="relative">
           <Bell className="size-4" />
           {unread > 0 && (
             <span
@@ -255,7 +255,7 @@ export function TopBar({ onMenu }: TopBarProps) {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
-            <Link href="/legalai/settings" className="gap-2">
+            <Link href="/legalai/settings/profile" className="gap-2">
               <UserIcon className="size-4" /> Profile
             </Link>
           </DropdownMenuItem>
@@ -338,12 +338,12 @@ export function TopBar({ onMenu }: TopBarProps) {
           </DropdownMenuSub>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
-            <Link href="/legalai/docs" className="gap-2">
+            <Link href="/resources/documentation" className="gap-2">
               <Keyboard className="size-4" /> Keyboard shortcuts
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/legalai/docs" className="gap-2">
+            <Link href="/resources/documentation" className="gap-2">
               <HelpCircle className="size-4" /> Help &amp; docs
             </Link>
           </DropdownMenuItem>

@@ -36,7 +36,7 @@ export function useEventStream(options: UseEventStreamOptions = {}): UseEventStr
   const [events, setEvents] = React.useState<unknown[]>([]);
   const [reconnectCount, setReconnectCount] = React.useState(0);
   const sourceRef = React.useRef<EventSource | null>(null);
-  const reconnectTimerRef = React.useRef<ReturnType<typeof setTimeout>>();
+  const reconnectTimerRef = React.useRef<ReturnType<typeof setTimeout>>(null);
 
   React.useEffect(() => {
     if (!enabled) {

@@ -23,6 +23,7 @@ export type HITLStatus =
   | "changes-requested"
   | "approved"
   | "rejected"
+  | "executed"
   | "deferred"
   | "expired"
   | "cancelled";

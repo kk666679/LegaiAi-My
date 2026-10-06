@@ -42,6 +42,7 @@ export type MatterTaskStatus =
   | "cancelled";
 
 export type MatterDeadlineKind =
+  | "deadline"
   | "limitation"
   | "filing"
   | "hearing"

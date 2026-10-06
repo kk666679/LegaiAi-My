@@ -6,7 +6,6 @@
  */
 import { Worker } from 'bullmq'
 import ollama from 'ollama'
-import * as tf from '@tensorflow/tfjs-node'
 import { randomUUID } from 'crypto'
 import { agentLogger } from '@/backend/src/lib/logger.js'
 import { writeAuditLog } from '@/backend/src/lib/audit.js'
@@ -45,10 +44,9 @@ function classifySentences(text) {
     const lower = s.toLowerCase()
     const ratioScore = ratioKeywords.filter(k => lower.includes(k)).length
     const obiterScore = obiterKeywords.filter(k => lower.includes(k)).length
+    const total = ratioScore + obiterScore || 1
     const label = ratioScore > obiterScore ? 'ratio' : obiterScore > 0 ? 'obiter' : 'dicta'
-    // TF.js: normalize scores as a tensor
-    const scores = tf.tensor1d([ratioScore, obiterScore]).softmax().arraySync()
-    return { sentence: s.slice(0, 120), label, confidence: Math.max(...scores) }
+    return { sentence: s.slice(0, 120), label, confidence: parseFloat((Math.max(ratioScore, obiterScore) / total).toFixed(3)) }
   })
 }
 

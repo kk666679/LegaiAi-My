@@ -130,7 +130,7 @@ app.get('/api/drafting/jobs/:id/events', async (req: Request, res: Response) => 
   const evidence = await prisma.evidenceReference.findMany({ where: { draftId: job.draftId } })
   send('snapshot', { citations, evidence })
 
-  // Poll the job state — bounded duration, no setInterval storms.
+   // Poll the job state — bounded duration, no setInterval storms.
   const startedAt = Date.now()
   const interval = setInterval(async () => {
     try {
@@ -156,12 +156,15 @@ app.get('/api/drafting/jobs/:id/events', async (req: Request, res: Response) => 
         clearInterval(interval)
         return res.end()
       }
+      return undefined
     } catch (err) {
       send('job.error', { error: sanitizeError(err) })
+      return undefined
     }
   }, 2000)
 
   req.on('close', () => clearInterval(interval))
+  return
 })
 
 // LOM autocomplete (server-side, public source, mirrors tRPC procedure).
@@ -289,6 +292,7 @@ app.post('/api/providers/playground', providerPlaygroundLimiter, async (req: Req
   })
 
   res.end()
+  return
 })
 
 
@@ -343,6 +347,7 @@ app.post('/api/agent/query', async (req: Request, res: Response) => {
     metrics.errors++
     res.status(500).json({ error: String(err) })
   }
+  return
 })
 
 // ── RLHF Feedback ─────────────────────────────────────────────────────────
@@ -365,6 +370,7 @@ app.post('/api/feedback', async (req: Request, res: Response) => {
   } catch (err) {
     res.status(500).json({ error: String(err) })
   }
+  return
 })
 
 // ── Circuit breaker status ─────────────────────────────────────────────────

@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Shield, ShieldCheck, ShieldAlert, ShieldX } from 'lucide-react';
 
-interface ConfidenceIndicatorProps {
+export interface ConfidenceIndicatorProps {
   level: 'high' | 'medium' | 'low' | 'insufficient';
   evidenceQuality?: string;
   sourcesVerified?: number;

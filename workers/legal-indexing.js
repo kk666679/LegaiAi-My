@@ -6,7 +6,6 @@
  */
 import { Worker } from 'bullmq'
 import ollama from 'ollama'
-import { pipeline } from '@xenova/transformers'
 import { prisma } from '@/backend/src/db/index.js'
 import { randomUUID } from 'crypto'
 import { agentLogger } from '@/backend/src/lib/logger.js'
@@ -15,12 +14,6 @@ import { sha256 } from '@/backend/src/lib/crypto.js'
 
 const log = agentLogger('legal-indexing')
 const connection = { host: process.env.REDIS_HOST || 'localhost', port: parseInt(process.env.REDIS_PORT || '6379') }
-
-let nerPipeline = null
-async function getNER() {
-  if (!nerPipeline) nerPipeline = await pipeline('token-classification', 'Xenova/bert-base-NER')
-  return nerPipeline
-}
 
 // Legal-aware chunking: split on legal section boundaries
 const LEGAL_BOUNDARIES = /(?=\b(?:HELD|RATIO|OBITER|FACTS|ISSUES?|DECISION|JUDGMENT|GROUNDS?|ORDERS?)\b[:\s])/i
