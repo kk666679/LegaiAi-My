@@ -355,8 +355,15 @@ export function toDashboardQueryResult(
   const citations = toDashboardCitations(authorities);
 
   return {
-    queryId: session.id,
-    queryText: session.query.text,
+    query: {
+      id: session.id,
+      text: session.query.text,
+      status: toDashboardQueryStatus(session.status),
+      createdAt: session.createdAt,
+      completedAt:
+        session.status === "complete" || session.status === "failed" ? session.updatedAt : undefined,
+      artifactIds: session.memoId ? [session.memoId] : undefined,
+    },
     answer:
       findings.length > 0
         ? findings.map((f) => `${f.title}: ${f.summary}`).join("\n\n")

@@ -1,15 +1,19 @@
 "use client";
 // app/legalai/research/_components/research-compare.tsx
 import * as React from "react";
+import { useResearch } from "./use-research";
+import { SourceCard } from "@/components/dashboard/SourceCard";
+import { DashboardStateBoundary } from "@/components/dashboard/DashboardState";
+import { toDashboardStatus } from "./legalai-dashboard-adapters";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, GitCompare, Minus } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useResearch } from "./use-research";
+import { Check, Minus } from "lucide-react";
 import { AuthorityKindBadge } from "./authority-badges";
+import { cn } from "@/lib/utils";
 
 export function ResearchComparePage() {
-  const { sessionAuthorities } = useResearch({});
+  const { activeSession, sessionAuthorities } = useResearch({});
+  const status = activeSession ? toDashboardStatus(activeSession.status) : "success";
   const [leftId, setLeftId] = React.useState<string>(sessionAuthorities[0]?.id ?? "");
   const [rightId, setRightId] = React.useState<string>(sessionAuthorities[1]?.id ?? "");
 
@@ -19,13 +23,9 @@ export function ResearchComparePage() {
   if (sessionAuthorities.length < 2) {
     return (
       <div className="p-6">
-        <Card className="p-8 text-center">
-          <GitCompare className="mx-auto size-6 text-muted-foreground" />
-          <p className="mt-3 text-sm font-medium">Not enough authorities to compare</p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Open a research session with at least two authorities.
-          </p>
-        </Card>
+        <DashboardStateBoundary status="empty" data={null} label="authorities to compare">
+          {null}
+        </DashboardStateBoundary>
       </div>
     );
   }

@@ -249,7 +249,7 @@ function createMockData(): {
       relevance: 0.94,
       confidence: 0.91,
       rationale: "Directly addresses the domestic inquiry requirement under s.14(1)(a) Employment Act 1955.",
-      url: "https://www.lom.agc.gov.my/",
+      url: "https://lom.agc.gov.my/",
       tags: ["employment", "misconduct", "domestic-inquiry"],
     },
     {
@@ -275,7 +275,7 @@ function createMockData(): {
       ],
       relevance: 0.98,
       confidence: 0.99,
-      url: "https://www.lom.agc.gov.my/",
+      url: "https://lom.agc.gov.my/",
       tags: ["employment", "statute", "misconduct"],
     },
     {
@@ -295,7 +295,7 @@ function createMockData(): {
         "Provides the statutory remedy for unfair dismissal. An employee who considers himself dismissed without just cause may make a representation to the Director-General for reinstatement.",
       relevance: 0.85,
       confidence: 0.96,
-      url: "https://www.lom.agc.gov.my/",
+      url: "https://lom.agc.gov.my/",
       tags: ["employment", "unfair-dismissal"],
     },
     {
@@ -316,7 +316,7 @@ function createMockData(): {
         "The Industrial Court has jurisdiction to review the procedural fairness of a domestic inquiry but must not substitute its own decision for that of the employer.",
       relevance: 0.72,
       confidence: 0.88,
-      url: "https://www.lom.agc.gov.my/",
+      url: "https://lom.agc.gov.my/",
       tags: ["employment", "industrial-court"],
     },
     {
@@ -337,7 +337,7 @@ function createMockData(): {
         "The Industrial Court's award of reinstatement is discretionary. Backwages should be capped at 24 months in ordinary cases.",
       relevance: 0.68,
       confidence: 0.92,
-      url: "https://www.lom.agc.gov.my/",
+      url: "https://lom.agc.gov.my/",
       tags: ["employment", "reinstatement", "backwages"],
     },
     {
