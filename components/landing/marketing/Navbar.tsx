@@ -47,8 +47,8 @@ export function Navbar() {
         aria-label="Primary"
         className="mx-auto flex h-16 max-w-[1400px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-10"
       >
-        <Link href="/" className="flex items-center" aria-label="Lawmate AI home">
-          <Logo size="md" />
+        <Link href="/" className="flex items-center" aria-label={`${BRAND.name} home`}>
+          <Logo variant="wordmark" size="md" />
         </Link>
 
         <ul className="hidden items-center gap-1 lg:flex">

@@ -4,21 +4,20 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import {
-ChevronDown,
-ChevronLeft,
-PanelLeftClose,
-PanelLeftOpen,
-Scale,
-Sparkles,
-type LucideIcon,
+  ChevronDown,
+  ChevronLeft,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Sparkles,
+  type LucideIcon,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { BRAND } from "@/lib/brand";
 import {
-NAVIGATION_GROUPS,
-isItemActive,
-type NavGroup,
+  NAVIGATION_GROUPS,
+  isItemActive,
+  type NavGroup,
 } from "@/lib/navigation";
 import { useTranslation } from "@/lib/i18n/I18nProvider";
 
@@ -26,10 +25,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
-Tooltip,
-TooltipContent,
-TooltipTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { LawMateMark } from "@/components/navigation/Logo";
 
 const STORAGE_KEY = "lawmate:sidebar:collapsed";
 const GROUP_STORAGE_KEY = "lawmate:sidebar:groups";
@@ -208,6 +208,7 @@ tagline={t("brandTagline", { defaultValue: "Legal AI OS" })}
 
               const link = (
                 <Link
+                  key={item.href}
                   href={item.href}
                   onClick={onNavigate}
                   aria-current={activeItem ? "page" : undefined}
@@ -291,44 +292,35 @@ tagline: string;
 }
 
 function SidebarBrand({
-collapsed,
-onNavigate,
-brandName,
-tagline,
+  collapsed,
+  onNavigate,
+  brandName,
+  tagline,
 }: SidebarBrandProps) {
-return (
-<div
-className={cn(
-"flex items-center gap-2 border-b border-border/60 px-4 py-4",
-collapsed && "justify-center px-2",
-)}
->
-<Link href="/legalai" onClick={onNavigate} aria-label={brandName} className="group flex min-w-0 items-center gap-2" >
-<span
-className={cn(
-"flex size-8 shrink-0 items-center justify-center rounded-lg",
-"bg-primary/10 text-primary transition-colors",
-"group-hover:bg-primary/15",
-)}
->
-<Scale className="size-4" aria-hidden />
-</span>
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-2 border-b border-border/60 px-4 py-4",
+        collapsed && "justify-center px-2",
+      )}
+    >
+      <Link href="/legalai" onClick={onNavigate} aria-label={brandName} className="group flex min-w-0 items-center gap-2" >
+        <LawMateMark size="md" className="shrink-0" aria-hidden="true" />
 
-    {!collapsed && (
-      <div className="flex min-w-0 flex-col leading-tight">
-        <span className="truncate text-sm font-semibold tracking-tight">
-          {brandName}
-        </span>
+        {!collapsed && (
+          <div className="flex min-w-0 flex-col leading-tight">
+            <span className="truncate text-sm font-semibold tracking-tight text-foreground">
+              {brandName}
+            </span>
 
-        <span className="truncate text-[10px] text-muted-foreground">
-          {tagline}
-        </span>
-      </div>
-    )}
-  </Link>
-</div>
-
-);
+            <span className="truncate text-[10px] text-muted-foreground">
+              {tagline}
+            </span>
+          </div>
+        )}
+      </Link>
+    </div>
+  );
 }
 
 interface SidebarFooterProps {

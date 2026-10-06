@@ -4,6 +4,7 @@ import { ArrowRight, Play, Sparkles } from "lucide-react";
 import { AgentNetwork } from "./AgentNetwork";
 import { useReveal } from "./use-reveal";
 import { BRAND } from "@/lib/brand";
+import { Logo } from "@/components/navigation/Logo";
 
 const TRUST = ["Enterprise-ready", "Secure by design", "Human-in-the-loop", "Audit-ready"];
 
@@ -23,14 +24,17 @@ export function Hero() {
       <div className="mx-auto grid max-w-[1400px] items-center gap-14 lg:grid-cols-[1.05fr_1fr]">
         {/* Left copy */}
         <div className="max-w-2xl">
-          <span className="reveal inline-flex items-center gap-2 rounded-full border border-border/70 bg-muted/40 px-3 py-1 text-xs font-medium text-muted-foreground">
+          <div className="reveal" style={{ transitionDelay: "0ms" }}>
+            <Logo variant="full" size="lg" aria-label={`${BRAND.name} — ${BRAND.tagline}`} />
+          </div>
+          <span className="reveal inline-flex items-center gap-2 rounded-full border border-border/70 bg-muted/40 px-3 py-1 text-xs font-medium text-muted-foreground mt-6">
             <Sparkles className="size-3.5 text-[hsl(var(--brand-cyan))]" aria-hidden="true" />
             Autonomous legal agents · Built for 2026
           </span>
 
           <h1
             className="reveal mt-6 font-heading text-[2.75rem] font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-6xl lg:text-[5rem]"
-            style={{ transitionDelay: "80ms" }}
+            style={{ transitionDelay: "140ms" }}
           >
             {BRAND.tagline}
             <br />
@@ -39,14 +43,14 @@ export function Hero() {
 
           <p
             className="reveal mt-6 max-w-xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg"
-            style={{ transitionDelay: "160ms" }}
+            style={{ transitionDelay: "220ms" }}
           >
             {BRAND.description}
           </p>
 
           <div
             className="reveal mt-8 flex flex-col gap-3 sm:flex-row"
-            style={{ transitionDelay: "240ms" }}
+            style={{ transitionDelay: "300ms" }}
           >
             <a
               href="/request-access"
@@ -66,7 +70,7 @@ export function Hero() {
 
           <div
             className="reveal mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm"
-            style={{ transitionDelay: "280ms" }}
+            style={{ transitionDelay: "340ms" }}
           >
             <span className="text-muted-foreground">Or jump straight in:</span>
             <a
@@ -91,7 +95,7 @@ export function Hero() {
             </a>
           </div>
 
-          <div className="reveal mt-10" style={{ transitionDelay: "320ms" }}>
+          <div className="reveal mt-10" style={{ transitionDelay: "380ms" }}>
             <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Built for modern legal teams
             </p>

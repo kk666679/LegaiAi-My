@@ -23,6 +23,8 @@ const config: Config = {
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
+          hover: 'hsl(var(--primary-hover))',
+          light: 'hsl(var(--primary-light))',
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
@@ -43,6 +45,15 @@ const config: Config = {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
+        brand: {
+          blue: 'hsl(var(--brand-blue))',
+          'blue-dark': 'hsl(var(--brand-blue-dark))',
+          'blue-light': 'hsl(var(--brand-blue-light))',
+          cyan: 'hsl(var(--brand-cyan))',
+          'cyan-light': 'hsl(var(--brand-cyan-light))',
+          indigo: 'hsl(var(--brand-indigo))',
+          'indigo-light': 'hsl(var(--brand-indigo-light))',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',

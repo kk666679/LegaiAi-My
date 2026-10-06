@@ -47,8 +47,8 @@ export function SiteFooter() {
       <div className="mx-auto max-w-[1400px]">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-5">
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="inline-flex" aria-label="{BRAND.name} home">
-              <Logo size="md" />
+            <Link href="/" className="inline-flex" aria-label={`${BRAND.name} home`}>
+              <Logo variant="wordmark" size="md" />
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
               Legal AI that works for the real world. Specialised agents, human oversight, built for
@@ -76,7 +76,7 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border/70 pt-8 sm:flex-row">
-          <p className="text-sm text-muted-foreground">© 2026 LegalAi-My. All rights reserved.</p>
+          <p className="text-sm text-muted-foreground">© 2026 {BRAND.legalName}. All rights reserved.</p>
           <ul className="flex items-center gap-6">
             {["Privacy", "Terms", "Security"].map((item) => (
               <li key={item}>

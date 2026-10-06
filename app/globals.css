@@ -2,78 +2,115 @@
 @import "tailwindcss";
 
 /* ============================================================
-   Design tokens — Enterprise Legal AI
+   Design tokens — LawMate Legal AI
+   Color palette derived from official logo assets
    Light theme by default; dark theme via `.dark` class
-   (next-themes toggles the class on <html>).
    ============================================================ */
 :root {
+  /* Core neutrals */
   --background: 0 0% 100%;
-  --foreground: 220 20% 8%;
+  --foreground: 220 25% 6%;
 
   --card: 0 0% 100%;
-  --card-foreground: 220 20% 8%;
+  --card-foreground: 220 25% 6%;
 
   --popover: 0 0% 100%;
-  --popover-foreground: 220 20% 8%;
+  --popover-foreground: 220 25% 6%;
 
-  --primary: 205 90% 42%;
+  /* Brand colors derived from logo gradients */
+  /* Logo gradient: #0B4CA8 (213 85% 35%) → #0E6FC4 (206 89% 41%) → #14A0DF (200 85% 47%) */
+  --primary: 206 89% 41%;
   --primary-foreground: 0 0% 100%;
+  --primary-hover: 206 89% 35%;
+  --primary-light: 200 85% 52%;
 
-  --secondary: 250 45% 45%;
+  /* Secondary brand - indigo accent from logo */
+  --secondary: 250 55% 42%;
   --secondary-foreground: 0 0% 100%;
 
-  --muted: 220 16% 95%;
-  --muted-foreground: 220 12% 42%;
+  /* Cyan accent from logo glyph highlight */
+  --accent: 190 95% 45%;
+  --accent-foreground: 220 25% 6%;
 
-  --accent: 220 16% 95%;
-  --accent-foreground: 220 20% 8%;
+  /* Muted tones */
+  --muted: 220 15% 96%;
+  --muted-foreground: 220 12% 40%;
 
+  /* Destructive */
   --destructive: 0 72% 50%;
   --destructive-foreground: 0 0% 100%;
 
-  --border: 220 16% 88%;
-  --input: 220 16% 88%;
-  --ring: 205 90% 42%;
+  /* Borders & inputs */
+  --border: 220 15% 88%;
+  --input: 220 15% 88%;
+  --ring: 206 89% 41%;
 
+  /* Radius */
   --radius: 0.75rem;
 
+  /* Brand aliases for semantic usage */
+  --brand-blue: 206 89% 41%;
+  --brand-blue-dark: 213 85% 35%;
+  --brand-blue-light: 200 85% 52%;
   --brand-cyan: 190 95% 45%;
-  --brand-blue: 205 90% 42%;
-  --brand-indigo: 250 45% 45%;
+  --brand-cyan-light: 190 95% 55%;
+  --brand-indigo: 250 55% 42%;
+  --brand-indigo-light: 250 65% 52%;
+
+  /* Logo-specific colors */
+  --logo-gradient-start: 213 85% 35%;
+  --logo-gradient-mid: 206 89% 41%;
+  --logo-gradient-end: 200 85% 47%;
+  --logo-glyph-start: 0 0% 100%;
+  --logo-glyph-end: 195 75% 90%;
+  --logo-border: 195 85% 75%;
 }
 
 .dark {
-  --background: 220 20% 4%;
+  --background: 220 25% 4%;
   --foreground: 210 20% 98%;
 
-  --card: 222 22% 7%;
+  --card: 220 25% 5%;
   --card-foreground: 210 20% 98%;
 
-  --popover: 222 24% 6%;
+  --popover: 220 25% 5%;
   --popover-foreground: 210 20% 98%;
 
-  --primary: 205 100% 60%;
-  --primary-foreground: 222 47% 6%;
+  --primary: 200 95% 55%;
+  --primary-foreground: 220 25% 4%;
+  --primary-hover: 200 95% 60%;
+  --primary-light: 200 95% 65%;
 
-  --secondary: 250 60% 62%;
+  --secondary: 250 65% 55%;
   --secondary-foreground: 210 20% 98%;
 
-  --muted: 220 16% 14%;
-  --muted-foreground: 217 12% 62%;
+  --accent: 190 95% 55%;
+  --accent-foreground: 220 25% 4%;
 
-  --accent: 250 60% 62%;
-  --accent-foreground: 210 20% 98%;
+  --muted: 220 15% 12%;
+  --muted-foreground: 220 10% 55%;
 
   --destructive: 0 72% 55%;
   --destructive-foreground: 210 20% 98%;
 
-  --border: 216 20% 16%;
-  --input: 216 20% 16%;
-  --ring: 205 100% 60%;
+  --border: 220 15% 16%;
+  --input: 220 15% 16%;
+  --ring: 200 95% 55%;
 
+  --brand-blue: 200 95% 55%;
+  --brand-blue-dark: 206 89% 48%;
+  --brand-blue-light: 200 95% 65%;
   --brand-cyan: 190 95% 55%;
-  --brand-blue: 205 100% 60%;
-  --brand-indigo: 250 60% 62%;
+  --brand-cyan-light: 190 95% 65%;
+  --brand-indigo: 250 65% 55%;
+  --brand-indigo-light: 250 75% 62%;
+
+  --logo-gradient-start: 206 89% 48%;
+  --logo-gradient-mid: 200 95% 55%;
+  --logo-gradient-end: 195 95% 60%;
+  --logo-glyph-start: 0 0% 100%;
+  --logo-glyph-end: 195 75% 90%;
+  --logo-border: 195 85% 65%;
 }
 
 /* Remove @layer base and @layer components, use @theme instead for v4 */
@@ -102,6 +139,9 @@
   --color-brand-cyan: hsl(var(--brand-cyan));
   --color-brand-blue: hsl(var(--brand-blue));
   --color-brand-indigo: hsl(var(--brand-indigo));
+  --font-heading: var(--font-outfit), var(--font-space-grotesk), ui-sans-serif, sans-serif;
+  --font-body: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, monospace;
 }
 
 /* Base styles */
@@ -133,8 +173,10 @@ body {
   --glass-shadow: var(--shadow-glass);
   --glass-blur: var(--effect-glass-blur);
   --glass-backdrop: blur(var(--glass-blur));
-  --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(280 73% 50%));
+  --gradient-primary: linear-gradient(135deg, hsl(var(--logo-gradient-start)), hsl(var(--logo-gradient-end)));
+  --gradient-brand: linear-gradient(135deg, hsl(var(--logo-gradient-start)), hsl(var(--logo-gradient-mid)), hsl(var(--logo-gradient-end)));
   --gradient-glass: linear-gradient(135deg, rgb(255 255 255 / 0.15), transparent);
+  --gradient-logo: linear-gradient(135deg, hsl(var(--logo-gradient-start)), hsl(var(--logo-gradient-mid)) 55%, hsl(var(--logo-gradient-end)));
   --spacing-card-padding: 2rem;
   --spacing-section-gap: 2rem;
   --font-size-base: 1rem;
@@ -200,6 +242,26 @@ body {
     --spacing-card-padding: 2rem;
     --spacing-section-gap: 2.5rem;
   }
+}
+
+/* Brand gradient utilities */
+.gradient-brand {
+  background: var(--gradient-brand);
+  background-size: 200% 200%;
+  animation: gradShift 6s ease-in-out infinite;
+}
+
+.text-gradient-brand {
+  background-image: linear-gradient(
+    100deg,
+    hsl(var(--brand-cyan)),
+    hsl(var(--brand-blue)) 45%,
+    hsl(var(--brand-indigo))
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 /* Component classes */
@@ -418,8 +480,8 @@ body {
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(34, 211, 238, 0.3); }
-  50%       { box-shadow: 0 0 40px rgba(34, 211, 238, 0.6); }
+  0%, 100% { box-shadow: 0 0 20px hsl(var(--brand-cyan) / 0.3); }
+  50%       { box-shadow: 0 0 40px hsl(var(--brand-cyan) / 0.6); }
 }
 
 @keyframes dashFlow {
@@ -486,19 +548,6 @@ html, body {
   );
 }
 
-.text-gradient-brand {
-  background-image: linear-gradient(
-    100deg,
-    hsl(var(--brand-cyan)),
-    hsl(var(--brand-blue)) 45%,
-    hsl(var(--brand-indigo))
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-}
-
 .surface-glass {
   background: linear-gradient(180deg, hsl(220 20% 10% / 0.7), hsl(220 20% 6% / 0.6));
   border: 1px solid hsl(var(--border) / 0.8);
@@ -546,4 +595,58 @@ html, body {
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
   .animate-dash, .animate-soft-pulse, .animate-floaty { animation: none !important; }
+}
+
+/* Branded focus states */
+.focus-brand:focus-visible {
+  outline: none;
+  ring: 2px;
+  ring-color: hsl(var(--ring));
+  ring-offset: 2px;
+  ring-offset-color: hsl(var(--background));
+}
+
+/* Empty state branding */
+.empty-state {
+  @apply flex flex-col items-center justify-center gap-4 p-8 text-center;
+}
+.empty-state-icon {
+  @apply text-muted-foreground/50;
+}
+.empty-state-title {
+  @apply font-heading text-lg font-semibold text-foreground;
+}
+.empty-state-description {
+  @apply text-sm text-muted-foreground max-w-sm;
+}
+.empty-state-action {
+  @apply mt-2;
+}
+
+/* Loading state branding */
+.loading-brand {
+  @apply flex items-center justify-center gap-2;
+}
+.loading-brand-spinner {
+  @apply animate-spin text-primary;
+}
+.loading-brand-text {
+  @apply text-sm font-medium text-muted-foreground;
+}
+
+/* Error state branding */
+.error-state {
+  @apply flex flex-col items-center justify-center gap-3 p-6 text-center;
+}
+.error-state-icon {
+  @apply text-destructive;
+}
+.error-state-title {
+  @apply font-heading text-lg font-semibold text-foreground;
+}
+.error-state-description {
+  @apply text-sm text-muted-foreground max-w-sm;
+}
+.error-state-action {
+  @apply mt-2;
 }
