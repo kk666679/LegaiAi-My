@@ -46,6 +46,11 @@ import { LegalDisclaimer } from "@/components/lawmate/LegalDisclaimer";
 import { CreateMatterDialog } from "@/components/lawmate/CreateMatterDialog";
 import { UploadDialog } from "@/components/lawmate/UploadDialog";
 import { QuickPromptSheet } from "@/components/lawmate/QuickPromptSheet";
+import { CreditUsageDashboard } from "@/components/dashboard/CreditUsageDashboard";
+import { RecentActivityFeed } from "@/components/dashboard/RecentActivityFeed";
+import type { UsageSummary, ActivityItem, SavedResearchItem } from "@/components/dashboard/types";
+import { toDashboardSavedItems, toDashboardActivity } from "@/app/legalai/research/_components/legalai-dashboard-adapters";
+import { DashboardStateBoundary } from "@/components/dashboard/DashboardState";
 import { trpcReact } from "@/clients";
 import { useAuth } from "@/components/auth-provider";
 import { PermissionGate } from "@/components/shared/PermissionGate";
@@ -53,7 +58,9 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { DashboardSkeleton, ListSkeleton } from "@/components/shared/PageSkeleton";
 import { StatusBadge } from "@/components/shared/StatusBadge";
+import { LawMateMark } from "@/components/navigation/Logo";
 import { PROMPT_SUGGESTIONS, DRAFT_TEMPLATES } from "@/lib/lawmate/data";
+import { CREDIT_VALUE_PER_UNIT } from "@/lib/pricing-client";
 import { greeting, relativeTime } from "@/lib/lawmate/utils";
 import { cn } from "@/lib/utils";
 import { DOC_TYPES } from "@/hooks/useDocuments";
@@ -201,6 +208,66 @@ function humaniseKey(value: string) {
   return value.replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());
 }
 
+interface CreditUsageData {
+  currentBalance: number;
+  totalAllocated: number;
+  totalConsumed: number;
+  planCredits: number;
+  usagePercentage: number;
+  remainingCredits: number;
+  recentTransactions: Array<{
+    id: string;
+    type: string;
+    amount: number;
+    balanceAfter: number;
+    description: string | null;
+    createdAt: Date;
+  }> | [];
+}
+
+function toUsageSummary(data: CreditUsageData | null | undefined): UsageSummary | null {
+  if (!data) return null;
+  const used = data.totalConsumed;
+  const total = data.totalAllocated || data.planCredits;
+  const remaining = data.remainingCredits;
+  const percent = data.usagePercentage ?? 0;
+  const daily = data.recentTransactions
+    ?.slice(0, 7)
+    .map((tx) => ({
+      label: new Date(tx.createdAt).toLocaleDateString("en-MY", { weekday: "short" }),
+      value: Math.abs(tx.amount),
+    })) ?? [];
+  return {
+    totalAllocated: total,
+    used,
+    remaining,
+    percentConsumed: percent,
+    daily,
+    period: "day",
+    valuePerCredit: CREDIT_VALUE_PER_UNIT,
+    currency: "MYR",
+  };
+}
+
+interface AuditLogEntry {
+  id: string;
+  agentName: string;
+  action: string;
+  durationMs?: number | null;
+  confidence?: number | null;
+  createdAt?: string;
+}
+
+function toActivityItems(logs: readonly AuditLogEntry[]): ActivityItem[] {
+  return logs.map((entry) => ({
+    id: entry.id,
+    kind: "artifact_generated" as const,
+    title: entry.action.replace(/_/g, " "),
+    detail: `${entry.agentName}${entry.durationMs != null ? ` · ${entry.durationMs}ms` : ""}${entry.confidence != null ? ` · ${Math.round(entry.confidence * 100)}% confidence` : ""}`,
+    at: entry.createdAt ?? new Date().toISOString(),
+  }));
+}
+
 export default function DashboardHomePage() {
   const router = useRouter();
   const { user } = useAuth();
@@ -245,6 +312,14 @@ export default function DashboardHomePage() {
     staleTime: 60_000,
     refetchInterval: 120_000,
   });
+  const creditUsage = trpcReact.subscription.getCreditUsage.useQuery(undefined, {
+    staleTime: 60_000,
+    refetchInterval: 120_000,
+  });
+  const logs = trpcReact.agents.getAuditLogs.useQuery(
+    { limit: 8 },
+    { staleTime: 30_000 },
+  );
 
   const displayName =
     user?.name ?? me.data?.name ?? user?.email?.split("@")[0] ?? "there";
@@ -258,6 +333,10 @@ export default function DashboardHomePage() {
   const pending = ((pendingActions.data ?? []) as PendingAction[]).slice(0, 5);
   const openAlerts = ((alerts.data ?? []) as AlertSummary[]).slice(0, 4);
   const health = (queueHealth.data ?? null) as QueueHealth | null;
+  const usageSummary = toUsageSummary(creditUsage.data ?? null);
+  const auditItems = useMemo(() => toActivityItems((logs.data ?? []) as AuditLogEntry[]), [logs.data]);
+  const auditStatus = logs.isLoading ? "loading" : logs.isError ? "error" : "success";
+  const logsError = logs.error ?? null;
 
   const activeMatters =
     (mStats?.byStatus.active ?? 0) + (mStats?.byStatus.open ?? 0);
@@ -802,9 +881,15 @@ export default function DashboardHomePage() {
               </CardContent>
             </Card>
 
-            <PermissionGate permission="view_audit_log">
-              <AuditActivityCard />
-            </PermissionGate>
+             <PermissionGate permission="view_audit_log">
+               <RecentActivityFeed
+                 heading="AI activity"
+                 items={auditItems}
+                 status={auditStatus}
+                 error={logsError}
+                 onRetry={logs.refetch}
+               />
+             </PermissionGate>
           </div>
 
           {/* ── Deadlines · workload · analysis · drafting ──── */}
@@ -974,66 +1059,69 @@ export default function DashboardHomePage() {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Server className="size-4 text-primary" /> System status
-                </CardTitle>
-                <CardDescription>Agent queue health.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {queueHealth.isLoading ? (
-                  <ListSkeleton rows={3} />
-                ) : !health ? (
-                  <EmptyState
-                    icon={Server}
-                    title="Status unavailable"
-                    description="Could not reach the queue health endpoint."
-                  />
-                ) : (
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={cn(
-                          "size-2 rounded-full",
-                          health.status === "healthy"
-                            ? "bg-emerald-500"
-                            : "bg-amber-500",
-                        )}
-                        aria-hidden
-                      />
-                      <p className="text-sm font-medium capitalize">
-                        {health.status === "healthy" ? "All systems operational" : "Degraded performance"}
-                      </p>
-                    </div>
-                    <ScrollArea className="h-36">
-                      <div className="space-y-1.5">
-                        {Object.entries(health.queues).map(([name, counts]) => (
-                          <div
-                            key={name}
-                            className="flex items-center justify-between rounded-md border bg-card/40 px-2.5 py-1.5 text-xs"
-                          >
-                            <span className="font-medium text-muted-foreground">
-                              {name}
-                            </span>
-                            <span className="flex items-center gap-2 tabular-nums">
-                              {counts.waiting ? (
-                                <span className="text-amber-500">{counts.waiting} waiting</span>
-                              ) : (
-                                <span className="text-muted-foreground">idle</span>
-                              )}
-                              {counts.failed ? (
-                                <span className="text-destructive">{counts.failed} failed</span>
-                              ) : null}
-                            </span>
-                          </div>
-                        ))}
+            <DashboardStateBoundary
+              status={creditUsage.isError ? "error" : creditUsage.data ? "success" : "loading"}
+              isEmpty={false}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Server className="size-4 text-primary" /> System status
+                  </CardTitle>
+                  <CardDescription>Agent queue health and credit balance.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <CreditUsageDashboard
+                      summary={usageSummary ?? { totalAllocated: 0, used: 0, remaining: 0, percentConsumed: 0, daily: [], period: "day", valuePerCredit: CREDIT_VALUE_PER_UNIT, currency: "MYR" }}
+                      status={creditUsage.isError ? "error" : creditUsage.data ? "success" : "loading"}
+                      onRetry={() => creditUsage.refetch()}
+                      error={creditUsage.error ?? null}
+                    />
+                    {health && (
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={cn(
+                              "size-2 rounded-full",
+                              health.status === "healthy"
+                                ? "bg-emerald-500"
+                                : "bg-amber-500",
+                            )}
+                            aria-hidden
+                          />
+                          <p className="text-sm font-medium capitalize">
+                            {health.status === "healthy" ? "All systems operational" : "Degraded performance"}
+                          </p>
+                        </div>
+                        <div className="space-y-1.5">
+                          {Object.entries(health.queues).map(([name, counts]) => (
+                            <div
+                              key={name}
+                              className="flex items-center justify-between rounded-md border bg-card/40 px-2.5 py-1.5 text-xs"
+                            >
+                              <span className="font-medium text-muted-foreground">
+                                {name}
+                              </span>
+                              <span className="flex items-center gap-2 tabular-nums">
+                                {counts.waiting ? (
+                                  <span className="text-amber-500">{counts.waiting} waiting</span>
+                                ) : (
+                                  <span className="text-muted-foreground">idle</span>
+                                )}
+                                {counts.failed ? (
+                                  <span className="text-destructive">{counts.failed} failed</span>
+                                ) : null}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </ScrollArea>
+                    )}
                   </div>
-                )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </DashboardStateBoundary>
           </div>
 
           {/* ── Open alerts (real, unacknowledged) ──────────── */}
@@ -1093,13 +1181,16 @@ export default function DashboardHomePage() {
             recentDocs.length === 0 &&
             (pendingActions.data?.length ?? 0) === 0 && (
               <Card>
-                <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                  <h3 className="text-lg font-semibold">Welcome to your workspace</h3>
-                  <p className="mt-1 max-w-md text-sm text-muted-foreground">
-                    Ask a question, upload a document or research Malaysian law
-                    to get started. Everything stays inside your organisation.
-                  </p>
-                  <div className="mt-4 flex flex-wrap gap-2 justify-center">
+                <CardContent className="flex flex-col items-center justify-center py-12 text-center gap-4">
+                  <LawMateMark size="lg" className="text-muted-foreground/40" aria-hidden="true" />
+                  <div>
+                    <h3 className="text-lg font-semibold">Welcome to your workspace</h3>
+                    <p className="mt-1 max-w-md text-sm text-muted-foreground">
+                      Ask a question, upload a document or research Malaysian law
+                      to get started. Everything stays inside your organisation.
+                    </p>
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-2 justify-center">
                     <Button onClick={() => setAskOpen(true)} className="gap-2">
                       <Bot className="size-4" /> Ask a legal question
                     </Button>
@@ -1308,78 +1399,6 @@ function DraftingLauncher() {
           Drafts are generated at HITL level 2 — a lawyer must review before the work product is
           used.
         </p>
-      </CardContent>
-    </Card>
-  );
-}
-
-function AuditActivityCard() {
-  const logs = trpcReact.agents.getAuditLogs.useQuery(
-    { limit: 8 },
-    { staleTime: 30_000 },
-  );
-  const entries = (logs.data ?? []) as AuditEntry[];
-
-  return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Activity className="size-4 text-primary" /> AI activity
-            </CardTitle>
-            <CardDescription>
-              Recent agent actions from the audit trail.
-            </CardDescription>
-          </div>
-          <Button asChild variant="ghost" size="sm" className="gap-1 shrink-0">
-            <Link href="/legalai/audit">
-              <ArrowUpRight className="size-3" />
-              <span className="sr-only">Open audit trail</span>
-            </Link>
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {logs.isLoading ? (
-          <ListSkeleton rows={5} />
-        ) : entries.length === 0 ? (
-          <EmptyState
-            icon={Activity}
-            title="No AI activity yet"
-            description="Agent actions will appear here as your team uses AI tools."
-          />
-        ) : (
-          <ScrollArea className="h-[280px]">
-            <div className="space-y-1">
-              {entries.map((entry) => (
-                <div
-                  key={entry.id}
-                  className="flex items-start gap-3 rounded-md px-2 py-2 text-sm hover:bg-accent/40"
-                >
-                  <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-muted">
-                    <Bot className="size-3.5 text-muted-foreground" aria-hidden />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium">
-                      {entry.action.replace(/_/g, " ")}
-                    </p>
-                    <p className="truncate text-xs text-muted-foreground">
-                      {entry.agentName}
-                      {entry.durationMs != null &&
-                        ` · ${entry.durationMs}ms`}
-                      {entry.confidence != null &&
-                        ` · ${Math.round(entry.confidence * 100)}% confidence`}
-                    </p>
-                  </div>
-                  <span className="mt-0.5 shrink-0 text-[11px] text-muted-foreground">
-                    {entry.createdAt ? relativeTime(entry.createdAt) : ""}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </ScrollArea>
-        )}
       </CardContent>
     </Card>
   );

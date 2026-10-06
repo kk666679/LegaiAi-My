@@ -39,10 +39,10 @@ export function DocumentsSidebar() {
       <ScrollArea className="flex-1 px-2 py-3">
         <nav aria-label="Documents">
           <ul className="space-y-0.5">
-            {LINKS.map((l) => {
+            {LINKS.map((l, i) => {
               const active = l.exact ? pathname === l.href : pathname.startsWith(l.href);
               return (
-                <li key={l.href}>
+                <li key={`${l.href}-${i}`}>
                   <Button
                     asChild
                     variant={active ? "secondary" : "ghost"}
