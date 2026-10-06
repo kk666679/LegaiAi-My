@@ -2,8 +2,7 @@
 // app/legalai/settings/integrations/integrations-client.tsx
 import * as React from "react";
 import {
-  Cloud, Database, FileText, MessageSquare, Search, Send,
-  Webhook, Zap, BookOpen, Video, Calendar, CreditCard,
+  BookOpen, Search,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -19,22 +18,23 @@ interface Integration {
   description: string;
   category: "productivity" | "legal" | "storage" | "communication" | "payments";
   connected: boolean;
-  icon: React.ReactNode;
+  logo?: string;
+  icon?: React.ReactNode;
 }
 
 const INTEGRATIONS: Integration[] = [
-  { id: "slack", name: "Slack", description: "Send notifications and review updates to channels.", category: "communication", connected: true, icon: <MessageSquare className="size-4" /> },
-  { id: "gmail", name: "Gmail", description: "Send and read email directly in matters.", category: "communication", connected: false, icon: <Send className="size-4" /> },
-  { id: "gdrive", name: "Google Drive", description: "Sync documents and folders bidirectionally.", category: "storage", connected: true, icon: <Cloud className="size-4" /> },
-  { id: "dropbox", name: "Dropbox", description: "Access and sync your Dropbox files.", category: "storage", connected: false, icon: <Database className="size-4" /> },
-  { id: "notion", name: "Notion", description: "Embed matters and notes into Notion pages.", category: "productivity", connected: false, icon: <FileText className="size-4" /> },
-  { id: "calendar", name: "Google Calendar", description: "Sync deadlines and hearings to your calendar.", category: "productivity", connected: true, icon: <Calendar className="size-4" /> },
-  { id: "zoom", name: "Zoom", description: "Auto-create meeting links for hearings and calls.", category: "communication", connected: false, icon: <Video className="size-4" /> },
+  { id: "slack", name: "Slack", description: "Send notifications and review updates to channels.", category: "communication", connected: true, logo: "/svg/slack.svg" },
+  { id: "gmail", name: "Gmail", description: "Send and read email directly in matters.", category: "communication", connected: false, logo: "/svg/gmail-2026.svg" },
+  { id: "gdrive", name: "Google Drive", description: "Sync documents and folders bidirectionally.", category: "storage", connected: true, logo: "/svg/google-drive-2026.svg" },
+  { id: "dropbox", name: "Dropbox", description: "Access and sync your Dropbox files.", category: "storage", connected: false, logo: "/svg/dropbox.svg" },
+  { id: "notion", name: "Notion", description: "Embed matters and notes into Notion pages.", category: "productivity", connected: false, logo: "/svg/notion.svg" },
+  { id: "calendar", name: "Google Calendar", description: "Sync deadlines and hearings to your calendar.", category: "productivity", connected: true, logo: "/svg/google-calendar-2026.svg" },
+  { id: "zoom", name: "Zoom", description: "Auto-create meeting links for hearings and calls.", category: "communication", connected: false, logo: "/svg/zoom.svg" },
   { id: "lom", name: "LOM Malaysia", description: "Search Malaysian legislation and case law in-line.", category: "legal", connected: true, icon: <BookOpen className="size-4" /> },
   { id: "clj", name: "CLJ Law", description: "Access Current Law Journal reports and digests.", category: "legal", connected: false, icon: <Search className="size-4" /> },
-  { id: "stripe", name: "Stripe", description: "Accept client payments directly on invoices.", category: "payments", connected: false, icon: <CreditCard className="size-4" /> },
-  { id: "zapier", name: "Zapier", description: "Trigger 6,000+ app workflows from LegAI events.", category: "productivity", connected: false, icon: <Zap className="size-4" /> },
-  { id: "webhook", name: "Custom webhook", description: "Send LegAI events to any HTTP endpoint.", category: "productivity", connected: true, icon: <Webhook className="size-4" /> },
+  { id: "stripe", name: "Stripe", description: "Accept client payments directly on invoices.", category: "payments", connected: false, logo: "/svg/stripe.svg" },
+  { id: "zapier", name: "Zapier", description: "Trigger 6,000+ app workflows from LegAI events.", category: "productivity", connected: false, logo: "/svg/zapier.svg" },
+  { id: "webhook", name: "Custom webhook", description: "Send LegAI events to any HTTP endpoint.", category: "productivity", connected: true, logo: "/svg/webhooks-svgrepo-com.svg" },
 ];
 
 const CATEGORIES = ["all", "productivity", "legal", "storage", "communication", "payments"] as const;
@@ -92,9 +92,20 @@ export function IntegrationsSettings() {
           {filtered.map((i) => (
             <Card key={i.id} className="flex flex-col gap-3 p-4">
               <div className="flex items-start gap-3">
-                <div className="rounded-md bg-muted p-2 text-muted-foreground">
-                  {i.icon}
-                </div>
+                {i.logo ? (
+                  <div className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-md bg-muted p-1.5">
+                    <img
+                      src={i.logo}
+                      alt={`${i.name} logo`}
+                      className="size-full object-contain"
+                      loading="lazy"
+                    />
+                  </div>
+                ) : (
+                  <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted p-2 text-muted-foreground">
+                    {i.icon}
+                  </div>
+                )}
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <p className="truncate text-sm font-medium">{i.name}</p>
