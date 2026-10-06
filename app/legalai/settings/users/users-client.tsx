@@ -20,29 +20,12 @@ import { SettingsPage } from "../_components/settings-page";
 import { SettingsSection } from "../_components/settings-section";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { trpcReact } from "@/clients";
+import { useAuth } from "@/components/auth-provider";
 
-type Role = "owner" | "admin" | "lawyer" | "paralegal" | "viewer";
-
-interface Member {
-  id: string;
-  name: string;
-  email: string;
-  role: Role;
-  avatarUrl?: string;
-  status: "active" | "invited" | "suspended";
-  lastActive?: string;
-}
-
-const INITIAL: Member[] = [
-  { id: "u1", name: "Aisyah Rahman", email: "aisyah@technova.my", role: "owner", status: "active", lastActive: "Active now" },
-  { id: "u2", name: "Lim Wei Jian", email: "wei.jian@technova.my", role: "admin", status: "active", lastActive: "5 min ago" },
-  { id: "u3", name: "Priya Sundaram", email: "priya@technova.my", role: "lawyer", status: "active", lastActive: "1 hour ago" },
-  { id: "u4", name: "Daniel Tan", email: "daniel@technova.my", role: "paralegal", status: "active", lastActive: "Yesterday" },
-  { id: "u5", name: "Nadia Ibrahim", email: "nadia@technova.my", role: "viewer", status: "invited" },
-];
+type Role = "admin" | "lawyer" | "paralegal" | "viewer";
 
 const ROLE_LABEL: Record<Role, string> = {
-  owner: "Owner",
   admin: "Admin",
   lawyer: "Lawyer",
   paralegal: "Paralegal",
@@ -50,7 +33,6 @@ const ROLE_LABEL: Record<Role, string> = {
 };
 
 const ROLE_TONE: Record<Role, string> = {
-  owner: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
   admin: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
   lawyer: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
   paralegal: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
@@ -58,11 +40,30 @@ const ROLE_TONE: Record<Role, string> = {
 };
 
 export function UsersSettings() {
-  const [members, setMembers] = React.useState<Member[]>(INITIAL);
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
+
+  const { data: backendUsers = [], isLoading, refetch } = trpcReact.auth.listUsers.useQuery(
+    { limit: 50 },
+    { enabled: isAdmin, staleTime: 10_000 },
+  );
+  const setRole = trpcReact.auth.setRole.useMutation();
+  const utils = trpcReact.useUtils();
+
   const [query, setQuery] = React.useState("");
   const [inviteOpen, setInviteOpen] = React.useState(false);
   const [inviteEmail, setInviteEmail] = React.useState("");
   const [inviteRole, setInviteRole] = React.useState<Role>("lawyer");
+
+  const members = (backendUsers as any[]).map((u) => ({
+    id: u.id,
+    name: u.name ?? u.email.split("@")[0],
+    email: u.email,
+    role: u.role as Role,
+    status: u.lastLoginAt ? "active" : "invited" as const,
+    lastActive: u.lastLoginAt ? `${Math.round((Date.now() - new Date(u.lastLoginAt).getTime()) / 60000)}m ago` : "Never",
+    avatarUrl: u.avatarUrl ?? null,
+  }));
 
   const filtered = React.useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -72,23 +73,25 @@ export function UsersSettings() {
     );
   }, [members, query]);
 
+  const onChangeRole = async (userId: string, role: Role) => {
+    try {
+      await setRole.mutateAsync({ userId, role });
+      await utils.auth.listUsers.invalidate();
+      toast.success(`Role changed to ${ROLE_LABEL[role]}`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to change role");
+    }
+  };
+
   const onInvite = () => {
     if (!inviteEmail.trim()) {
       toast.error("Enter an email address");
       return;
     }
-    const member: Member = {
-      id: `u-${Date.now()}`,
-      name: inviteEmail.split("@")[0]?.replace(/[._]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) ?? "",
-      email: inviteEmail,
-      role: inviteRole,
-      status: "invited",
-    };
-    setMembers((prev) => [...prev, member]);
+    // Invitations require an email service — not yet wired to backend.
+    toast.info("Invitations are not yet supported by the backend. The user must sign up manually.");
     setInviteEmail("");
-    setInviteRole("lawyer");
     setInviteOpen(false);
-    toast.success(`Invitation sent to ${member.email}`);
   };
 
   return (
@@ -165,11 +168,18 @@ export function UsersSettings() {
           </div>
         }
       >
+        {!isAdmin && isLoading ? (
+          <p className="py-6 text-center text-xs text-muted-foreground">Loading members…</p>
+        ) : filtered.length === 0 ? (
+          <p className="py-6 text-center text-xs text-muted-foreground">
+            {members.length === 0 ? "No members yet" : `No members match "${query}".`}
+          </p>
+        ) : (
         <ul className="divide-y divide-border/60">
           {filtered.map((m) => {
             const initials = m.name
               .split(" ")
-              .map((s) => s[0])
+              .map((s: string) => s[0])
               .slice(0, 2)
               .join("")
               .toUpperCase();
@@ -217,13 +227,8 @@ export function UsersSettings() {
                     {(["admin", "lawyer", "paralegal", "viewer"] as Role[]).map((role) => (
                       <DropdownMenuItem
                         key={role}
-                        disabled={m.role === role || m.role === "owner"}
-                        onSelect={() => {
-                          setMembers((prev) =>
-                            prev.map((x) => (x.id === m.id ? { ...x, role } : x)),
-                          );
-                          toast.success(`${m.name} is now ${ROLE_LABEL[role]}`);
-                        }}
+                        disabled={m.role === role}
+                        onSelect={() => void onChangeRole(m.id, role)}
                       >
                         {ROLE_LABEL[role]}
                       </DropdownMenuItem>
@@ -231,11 +236,7 @@ export function UsersSettings() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       className="text-destructive focus:text-destructive"
-                      disabled={m.role === "owner"}
-                      onSelect={() => {
-                        setMembers((prev) => prev.filter((x) => x.id !== m.id));
-                        toast.success(`${m.name} removed from workspace`);
-                      }}
+                      disabled={true}
                     >
                       Remove from workspace
                     </DropdownMenuItem>
@@ -245,18 +246,16 @@ export function UsersSettings() {
             );
           })}
         </ul>
-        {filtered.length === 0 ? (
-          <p className="py-6 text-center text-xs text-muted-foreground">
-            No members match &ldquo;{query}&rdquo;.
-          </p>
-        ) : null}
+        )}
       </SettingsSection>
 
       <SettingsSection title="Roles" description="What each role can do in your workspace.">
+        {!isAdmin && (
+          <p className="text-sm text-muted-foreground py-2">Only workspace admins can manage members.</p>
+        )}
         <div className="space-y-2">
           {(
             [
-              { role: "owner", desc: "Full control including billing and workspace deletion." },
               { role: "admin", desc: "Manage members, settings, and all matters and documents." },
               { role: "lawyer", desc: "Create and edit matters, documents, and contracts." },
               { role: "paralegal", desc: "Edit assigned matters and prepare drafts." },

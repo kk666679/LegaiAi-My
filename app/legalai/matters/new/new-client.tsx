@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import Link from "next/link";
 import { ConflictCard, type MatterConflict } from "@/components/matters";
+import { trpcReact } from "@/clients";
 
 const PRACTICE_AREAS = ["Corporate", "Commercial", "Employment", "Litigation", "Property", "Family", "Criminal", "IP", "Tax"];
 const BILLING_ARRANGEMENTS = ["hourly", "fixed", "contingency", "retainer", "pro-bono"];
@@ -24,23 +25,84 @@ export function NewMatterPage() {
   const [billing, setBilling] = React.useState("hourly");
   const [conflict, setConflict] = React.useState<MatterConflict | null>(null);
   const [checkingConflicts, setCheckingConflicts] = React.useState(false);
+  const conflictQuery = trpcReact.clients.conflictCheck.useQuery(
+    { name: clientName },
+    { enabled: false, retry: false },
+  );
+  const createClient = trpcReact.clients.create.useMutation();
+  const createMatter = trpcReact.matters.create.useMutation();
+  const listClients = trpcReact.clients.list.useQuery(
+    { search: clientName, limit: 5 },
+    { enabled: false, retry: false },
+  );
+  const utils = trpcReact.useUtils();
 
   const runConflictCheck = async () => {
     if (!clientName.trim()) { toast.error("Enter a client name first"); return; }
     setCheckingConflicts(true);
-    // POST /api/matters/conflicts/check { query: clientName }
-    setTimeout(() => {
+    try {
+      const result = await utils.clients.conflictCheck.fetch({ name: clientName.trim() });
+      const hasConflict = result.hasConflict;
+      setConflict({
+        id: "c1",
+        query: clientName,
+        severity: hasConflict ? "high" : "none",
+        matches: (result.conflicts ?? []).map((c: any) => ({
+          id: c.id,
+          name: c.name,
+          email: c.email ?? "",
+          matterCount: c._count?.matters ?? 0,
+        })),
+      });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Conflict check failed");
       setConflict({ id: "c1", query: clientName, severity: "none", matches: [] });
+    } finally {
       setCheckingConflicts(false);
-    }, 700);
+    }
   };
 
-  const handleCreate = () => {
+  const PRACTICE_TO_MATTER_TYPE: Record<string, string> = {
+    Corporate: "CORPORATE",
+    Commercial: "ADVISORY",
+    Employment: "EMPLOYMENT",
+    Litigation: "LITIGATION",
+    Property: "CONVEYANCING",
+    Family: "FAMILY",
+    Criminal: "CRIMINAL",
+    IP: "IP",
+    Tax: "ADVISORY",
+  };
+
+  const handleCreate = async () => {
     if (!name.trim()) { toast.error("Name is required"); return; }
     if (!clientName.trim()) { toast.error("Client name is required"); return; }
     if (conflict && conflict.severity !== "none") { toast.error("Resolve conflicts before opening matter"); return; }
-    toast.success("Matter created");
-    router.push(`/legalai/matters/new-${Date.now()}/overview`);
+
+    try {
+      // Find or create client
+      let clientId: string;
+      const existing = await utils.clients.list.fetch({ search: clientName.trim(), limit: 1 });
+      if (existing.clients && existing.clients.length > 0) {
+        clientId = existing.clients[0].id;
+      } else {
+        const created = await createClient.mutateAsync({ name: clientName.trim() });
+        clientId = created.id;
+      }
+
+      const matter = await createMatter.mutateAsync({
+        clientId,
+        title: name.trim(),
+        matterType: (PRACTICE_TO_MATTER_TYPE[practiceArea] ?? "ADVISORY") as any,
+        priority: "medium",
+        jurisdiction: "MY",
+        description: description.trim() ? `${description.trim()}\nBilling: ${billing}` : undefined,
+      });
+      toast.success("Matter created");
+      router.push(`/legalai/matters/${matter.id}/overview`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to create matter");
+    }
   };
 
   return (

@@ -66,43 +66,59 @@ export function UploadDialog({ trigger, onUploaded, open: controlledOpen, onOpen
       id: `up-${Date.now()}-${Math.random()}`,
       file: f,
       progress: 0,
-      status: "uploading",
+      status: "uploading" as const,
     }));
     setFiles((cur) => [...cur, ...newFiles]);
 
     newFiles.forEach((uf) => {
-      const interval = setInterval(() => {
-        setFiles((cur) =>
-          cur.map((x) => {
-            if (x.id !== uf.id) return x;
-            const next = Math.min(100, x.progress + 12);
-            if (next >= 100) {
-              clearInterval(interval);
-              return { ...x, progress: 100, status: "processing" };
-            }
-            return { ...x, progress: next };
-          }),
-        );
-      }, 120);
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", "/api/blob/upload");
 
-      setTimeout(() => {
-        clearInterval(interval);
-        setFiles((cur) =>
-          cur.map((x) =>
-            x.id === uf.id ? { ...x, progress: 100, status: "ready" } : x,
-          ),
-        );
-        const doc: Document = {
-          id: uf.id,
-          name: uf.file.name,
-          type: uf.file.type || "application/octet-stream",
-          size: uf.file.size,
-          uploadedAt: new Date().toISOString(),
-          status: "ready",
-          classification: "internal",
-        };
-        onUploaded?.(doc);
-      }, 1400);
+      xhr.upload.addEventListener("progress", (e) => {
+        if (e.lengthComputable) {
+          const pct = Math.round((e.loaded / e.total) * 100);
+          setFiles((cur) =>
+            cur.map((x) => (x.id === uf.id ? { ...x, progress: pct, status: "uploading" } : x)),
+          );
+        }
+      });
+
+      xhr.addEventListener("load", async () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            const blob = JSON.parse(xhr.responseText) as { pathname?: string; size?: number; contentType?: string };
+            setFiles((cur) => cur.map((x) => (x.id === uf.id ? { ...x, progress: 100, status: "ready" } : x)));
+            const doc: Document = {
+              id: uf.id,
+              name: uf.file.name,
+              type: uf.file.type || "application/octet-stream",
+              size: blob.size ?? uf.file.size,
+              uploadedAt: new Date().toISOString(),
+              status: "ready",
+              classification: "internal",
+              url: blob.pathname ? `/api/blob/file?pathname=${encodeURIComponent(blob.pathname)}` : undefined,
+            };
+            onUploaded?.(doc);
+          } catch {
+            setFiles((cur) => cur.map((x) => (x.id === uf.id ? { ...x, status: "failed", error: "Invalid response" } : x)));
+          }
+        } else {
+          let errMsg = `Upload failed (${xhr.status})`;
+          try {
+            const e = JSON.parse(xhr.responseText);
+            errMsg = e.error || errMsg;
+          } catch {}
+          setFiles((cur) => cur.map((x) => (x.id === uf.id ? { ...x, status: "failed", error: errMsg } : x)));
+        }
+      });
+
+      xhr.addEventListener("error", () => {
+        setFiles((cur) => cur.map((x) => (x.id === uf.id ? { ...x, status: "failed", error: "Network error" } : x)));
+      });
+
+      const fd = new FormData();
+      fd.append("file", uf.file);
+      xhr.send(fd);
     });
   };
 

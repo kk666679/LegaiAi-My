@@ -3,6 +3,7 @@ import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Plus, Upload } from "lucide-react";
+import { toast } from "sonner";
 import {
   DocumentActions,
   DocumentLibrary,
@@ -13,11 +14,13 @@ import {
   DocumentsHeader,
   NewDocumentDialog,
   useDocumentsList,
+  type DocumentCreationFormValues,
   type DocumentFilters,
   type DocumentSort,
   type DocumentViewMode,
   type LegalDocument,
 } from "@/components/documents";
+import { useDocumentMutations } from "@/hooks/useDocuments";
 import { DocumentUploadDialog } from "@/components/documents/upload/document-upload-dialog";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -36,6 +39,53 @@ export function DocumentsRootPage() {
     sort,
     scope: "all",
   });
+
+  const docMutations = useDocumentMutations((docId?: string) => {
+    if (docId) router.push(`/legalai/documents/${docId}/preview`);
+  });
+
+  const handleCreateDocument = async (v: DocumentCreationFormValues & { templateId?: string; typeId?: string }) => {
+    const content = v.description?.trim() ?? "New document";
+    const docType = (v.typeId?.toUpperCase() ?? "MEMORANDUM") as Parameters<typeof docMutations.create>[0]["docType"];
+    try {
+      const created = await docMutations.create({
+        title: v.name.trim(),
+        content,
+        docType,
+        ...(v.jurisdiction ? { jurisdiction: v.jurisdiction } : {}),
+      });
+      toast.success("Document created");
+      setNewOpen(false);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to create document");
+    }
+  };
+
+  const handleUploadFiles = async (files: File[]) => {
+    for (const file of files) {
+      try {
+        const fd = new FormData();
+        fd.append("file", file);
+        const res = await fetch("/api/blob/upload", { method: "POST", body: fd });
+        if (!res.ok) throw new Error(`Upload failed (${res.status})`);
+        const blob = await res.json() as { pathname?: string; size?: number; contentType?: string };
+        if (!blob.pathname) throw new Error("Upload returned no pathname");
+        const fileUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/api/blob/file?pathname=${encodeURIComponent(blob.pathname)}`;
+        await docMutations.create({
+          title: file.name,
+          content: `Uploaded file: ${file.name}`,
+          docType: "OTHER",
+          fileUrl,
+          fileSize: blob.size ?? file.size,
+          mimeType: blob.contentType ?? file.type,
+        });
+        toast.success(`Uploaded ${file.name}`);
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : `Failed to upload ${file.name}`);
+      }
+    }
+    setUploadOpen(false);
+  };
 
   const filtered = React.useMemo(() => {
     const q = (filters.query ?? "").trim().toLowerCase();
@@ -115,8 +165,7 @@ export function DocumentsRootPage() {
         open={newOpen}
         onOpenChange={setNewOpen}
         onSubmit={(v) => {
-          // POST /api/documents
-          router.push(`/legalai/documents/${encodeURIComponent(v.name)}/preview`);
+          void handleCreateDocument(v);
         }}
       />
 
@@ -124,7 +173,7 @@ export function DocumentsRootPage() {
         open={uploadOpen}
         onOpenChange={setUploadOpen}
         onUpload={(files) => {
-          // POST /api/documents/upload
+          void handleUploadFiles(files);
         }}
       />
     </DocumentsProvider>

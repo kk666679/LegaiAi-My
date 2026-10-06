@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { trpcReact } from "@/clients";
+import { toast } from "sonner";
 import {
   HITLProvider,
   HITLReviewSurface,
@@ -60,6 +61,44 @@ export function HITLDetailClient({ id }: { id: string }) {
     };
   }, [data]);
 
+  const utils = trpcReact.useUtils();
+
+  const approveMut = trpcReact.hitl.approve.useMutation();
+  const rejectMut = trpcReact.hitl.reject.useMutation();
+
+  const handleDecide = async (kind: string, comments?: string) => {
+    try {
+      if (kind === 'approve') {
+        await approveMut.mutateAsync({ id, notes: comments });
+        toast.success('Request approved');
+      } else {
+        await rejectMut.mutateAsync({ id, reason: kind === 'request-changes' ? `Changes requested: ${comments ?? ''}` : (comments ?? 'Rejected') });
+        toast.success(kind === 'request-changes' ? 'Changes requested' : 'Request rejected');
+      }
+      await utils.hitl.getById.invalidate(id);
+      await utils.hitl.listAll.invalidate();
+      await utils.hitl.listPending.invalidate();
+      await utils.hitl.stats.invalidate();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Action failed');
+    }
+  };
+
+  const handleFeedback = async (fb: { score: 1 | 2 | 3 | 4 | 5; category?: string; notes?: string }) => {
+    try {
+      // Backend REST endpoint for RLHF feedback — relayed via /api/feedback (port 3001)
+      await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ traceId: id, rating: fb.score, comment: fb.notes ?? '' }),
+      });
+      toast.success('Feedback submitted');
+      await utils.hitl.getById.invalidate(id);
+    } catch {
+      toast.error('Failed to submit feedback');
+    }
+  };
+
   const user: HITLActor = { id: "u-1", name: "You" };
 
   if (error) return <div className="p-6"><HITLError description={error.message} /></div>;
@@ -82,9 +121,15 @@ export function HITLDetailClient({ id }: { id: string }) {
             <HITLSourcePanel request={request} />
             <HITLDecisionPanel
               request={request}
-              onClaim={() => { /* POST /api/hitl/:id/claim */ }}
-              onDecide={(kind, comments) => { /* POST /api/hitl/:id/decide */ }}
-              onEscalate={() => { /* POST /api/hitl/:id/escalate */ }}
+              onClaim={() => {
+                toast.info("Claiming a request is not yet supported by the backend.");
+              }}
+              onDecide={(kind, comments) => {
+                void handleDecide(kind, comments);
+              }}
+              onEscalate={() => {
+                toast.info("Escalation is not yet supported by the backend.");
+              }}
             />
             {request.feedback ? (
               <Card className="p-4">
@@ -94,12 +139,17 @@ export function HITLDetailClient({ id }: { id: string }) {
               </Card>
             ) : (
               <HITLFeedbackForm
-                onSubmit={(fb) => { /* POST /api/hitl/:id/feedback */ }}
+                onSubmit={(fb) => {
+                  void handleFeedback(fb);
+                }}
               />
             )}
           </div>
         }
-        onAddComment={(body, internal) => { /* POST /api/hitl/:id/comments */ }}
+        onAddComment={(body, internal) => {
+          // Comments on HITL actions are not yet supported by the backend.
+          toast.info("Comments are not yet supported by the backend.");
+        }}
       >
         <Tabs defaultValue="preview">
           <TabsList>

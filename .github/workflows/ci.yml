@@ -32,6 +32,9 @@ frontend:
           NEXT_PUBLIC_TRPC_URL: /api/trpc
         continue-on-error: true
         run: npm run build
+        # .github/workflows/ci.yml — add to the frontend job
+      - name: i18n detection accuracy
+        run: npx tsx scripts/eval-detect.mjs
 
   backend:
     name: Backend (Express/tRPC)

@@ -8,17 +8,37 @@ import { Textarea } from "@/components/ui/textarea";
 import { ContractTemplateLibrary, DEFAULT_CONTRACT_TEMPLATES, type ContractTemplate } from "@/components/contracts";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { trpcReact } from "@/clients";
 
 export function NewContractClient() {
+  const router = useRouter();
   const [name, setName] = React.useState("");
   const [counterparty, setCounterparty] = React.useState("");
   const [description, setDescription] = React.useState("");
   const [template, setTemplate] = React.useState<ContractTemplate | null>(null);
+  const createContract = trpcReact.contracts.create.useMutation();
+  const utils = trpcReact.useUtils();
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!name.trim()) { toast.error("Name is required"); return; }
-    toast.success("Contract created");
-    window.location.href = `/legalai/contracts/new-${Date.now()}/overview`;
+
+    const contractType = (template?.contractType?.toUpperCase() ?? "OTHER") as
+      | "NDA" | "SERVICE" | "EMPLOYMENT" | "LEASE" | "SALE" | "LOAN" | "PARTNERSHIP" | "OTHER";
+
+    try {
+      const created = await createContract.mutateAsync({
+        title: name.trim(),
+        contractType,
+        counterparty: counterparty.trim() || undefined,
+        content: description.trim() || undefined,
+      });
+      await utils.contracts.list.invalidate();
+      toast.success("Contract created");
+      router.push(`/legalai/contracts/${created.id}`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to create contract");
+    }
   };
 
   return (
@@ -38,7 +58,9 @@ export function NewContractClient() {
           <ContractTemplateLibrary templates={DEFAULT_CONTRACT_TEMPLATES} onUse={(t) => setTemplate(template?.id === t.id ? null : t)} />
         </section>
         <div className="flex gap-2">
-          <Button onClick={handleCreate} disabled={!name.trim()}>Create contract</Button>
+          <Button onClick={() => void handleCreate()} disabled={!name.trim() || createContract.isPending}>
+            {createContract.isPending ? "Creating…" : "Create contract"}
+          </Button>
           <Button asChild variant="ghost"><Link href="/legalai/contracts">Cancel</Link></Button>
         </div>
       </div>

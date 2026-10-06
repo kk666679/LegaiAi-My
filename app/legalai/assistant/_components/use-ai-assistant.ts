@@ -1,6 +1,7 @@
 "use client";
 // app/ai/_components/use-ai-assistant.ts
 import * as React from "react";
+import { getToken } from "@/lib/auth";
 
 export type MessageRole = "user" | "assistant" | "system";
 
@@ -174,39 +175,71 @@ export function useAIAssistant(options: AIAssistantOptions = {}): AIAssistantApi
       abortRef.current = new AbortController();
 
       try {
-        // ── Real integration ─────────────────────────────────
-        // Replace this block with a fetch to your endpoint,
-        // reading a `text/event-stream` body and appending deltas.
-        //
-        //   const res = await fetch(options.endpoint ?? "/api/ai/chat", {
-        //     method: "POST",
-        //     signal: abortRef.current.signal,
-        //     headers: { "Content-Type": "application/json" },
-        //     body: JSON.stringify({ conversationId: activeConversationId, message: text }),
-        //   });
-        //   const reader = res.body?.getReader();
-        //   ...stream into updateMessage(assistantId, { content: acc })
-        //
-        // ── Mock streaming so the UI is testable today ────────
-        await mockStream(text, (delta, i) => {
-          updateMessage(assistantId, { content: delta });
-          if (i === 0) updateMessage(assistantId, { streaming: true });
+        // ── Real SSE streaming via /api/chat ──────────────────────
+        const chatMessages = messages
+          .filter((m) => m.content.trim() || m.role === 'user')
+          .map((m) => ({
+            role: m.role as 'user' | 'assistant' | 'system',
+            content: m.content.slice(0, 12_000),
+          }))
+          .slice(-40);
+
+        if (chatMessages.length === 0 || chatMessages[chatMessages.length - 1]?.role === 'assistant') {
+          chatMessages.push({ role: 'user' as const, content: text });
+        }
+
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          signal: abortRef.current.signal,
+          headers: {
+            'Content-Type': 'application/json',
+            ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
+          },
+          body: JSON.stringify({ messages: chatMessages }),
         });
 
-        // Attach mock citations and finish
-        updateMessage(assistantId, {
-          streaming: false,
-          citations: [
-            {
-              id: "c1",
-              title: "Employment Act 1955 — s.14",
-              href: "https://lom.agc.gov.my/",
-              excerpt:
-                "The contract of service may be terminated by either party on grounds of misconduct.",
-              source: "LOM Malaysia",
-            },
-          ],
-        });
+        if (!res.ok) {
+          const body = await res.text().catch(() => '');
+          throw new Error(res.status === 429 ? 'Rate limited — please try again shortly.' : body || `Chat failed (${res.status})`);
+        }
+
+        const reader = res.body?.getReader();
+        if (!reader) throw new Error('Streaming not supported');
+
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let accumulated = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() ?? '';
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed.startsWith('data:')) continue;
+            try {
+              const event = JSON.parse(trimmed.slice(5).trim()) as Record<string, unknown>;
+              const type = event.type as string | undefined;
+              if (type === 'TEXT_MESSAGE_CONTENT') {
+                const delta = (event.delta as string) ?? '';
+                accumulated += delta;
+                updateMessage(assistantId, { content: accumulated });
+              } else if (type === 'RUN_ERROR') {
+                const errMsg = (event.error as string) ?? (event.message as string) ?? 'Streaming error';
+                throw new Error(errMsg);
+              }
+            } catch (parseErr) {
+              if ((parseErr as Error).name !== 'SyntaxError') throw parseErr;
+              // ignore malformed SSE data lines
+            }
+          }
+        }
+
+        updateMessage(assistantId, { streaming: false });
       } catch (err) {
         if ((err as Error).name === "AbortError") {
           updateMessage(assistantId, { streaming: false });
@@ -305,38 +338,4 @@ export function useAIAssistant(options: AIAssistantOptions = {}): AIAssistantApi
   };
 }
 
-// ─────────────────────────────────────────────────────────────
-// Mock streaming helper — replace with real SSE when backend is ready
-// ─────────────────────────────────────────────────────────────
-const MOCK_RESPONSES: Record<string, string> = {
-  default:
-    "Under the **Employment Act 1955 (Act 265)**, an employer's statutory duties include paying wages within 7 days of the wage period (s.19), providing a written contract of service (s.10), and complying with the working-hour limits in s.60A. Termination for misconduct requires a fair inquiry — see **s.14(1)(a)** — and the Industrial Court has consistently required a domestic inquiry before dismissal (see *Wong Yuen Foo v Soon Hing* [1973] 1 MLJ 225).\n\nIf you'd like, I can draft a warning letter or walk through the domestic inquiry checklist.",
-  contract:
-    "I scanned the contract for material risks. The three areas of highest concern:\n\n1. **Unlimited liability** — Clause 12.3 imposes uncapped liability on your side only. Standard position is a cap at 100% of fees paid in the preceding 12 months.\n2. **Indemnity for indirect losses** — Clause 14 covers consequential and indirect losses, which is unusual and typically excluded.\n3. **Termination without notice** — Clause 18 permits termination for convenience with 7 days' notice. Our playbook prefers 60 days.\n\nWant me to draft redlines for these?",
-  deadline:
-    "For a simple contract claim in Malaysia, the limitation period is **6 years** from the date the cause of action accrues (Limitation Act 1953, s.6). For claims based on a deed it is 12 years (s.20). Some exceptions apply — fraud, mistake, or concealed damage can extend the clock.",
-};
-
-async function mockStream(
-  prompt: string,
-  onDelta: (acc: string, index: number) => void,
-): Promise<void> {
-  const lower = prompt.toLowerCase();
-  let full: string;
-  if (lower.includes("contract") || lower.includes("risk")) {
-    full = MOCK_RESPONSES.contract ?? "";
-  } else if (lower.includes("limitation") || lower.includes("deadline")) {
-    full = MOCK_RESPONSES.deadline ?? "";
-  } else {
-    full = MOCK_RESPONSES.default ?? "";
-  }
-
-  // Simulate token-by-token streaming
-  const tokens = full.split(/(\s+)/);
-  let acc = "";
-  for (let i = 0; i < tokens.length; i++) {
-    acc += tokens[i];
-    onDelta(acc, i);
-    await new Promise((r) => setTimeout(r, 12));
-  }
-}
+// (Mock streaming removed — assistant now streams from /api/chat.)

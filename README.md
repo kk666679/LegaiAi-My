@@ -1,4 +1,4 @@
-# LAW MATE ⚖️🤖
+# LAWMATE ⚖️🤖
 
 ![Version](https://img.shields.io/badge/version-1.0.9-blue?style=flat)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat&logo=next.js)
@@ -7,7 +7,7 @@
 ![Prisma](https://img.shields.io/badge/Prisma-7-2D3748?style=flat&logo=prisma)
 ![License](https://img.shields.io/badge/License-MIT-yellow?style=flat)
 
-**The Legal AI Operating Platform for Malaysian law firms and legal departments.**
+**The Legal AI Operating Platform for your legal team.**
 
 Combines pgVector RAG, a 12-worker BullMQ agent swarm, tRPC, Ollama, and Next.js 16 into a single production-ready platform covering matter management, contract intelligence, legal research, HITL agent control, AI governance, and executive analytics.
 

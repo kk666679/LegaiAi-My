@@ -5,6 +5,9 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
+    "i18n:eval": "tsx scripts/eval-detect.mjs",
+    "i18n:eval:confusion": "tsx scripts/eval-detect.mjs --confusion",
+    "i18n:eval:failures": "tsx scripts/eval-detect.mjs --failures",
     "redis": "docker compose up -d || echo Redis container not started - install Docker or run Redis manually",
     "worker": "tsx workers/ai-developer.js",
     "worker:retrieval": "tsx workers/legal-retrieval.js",
@@ -123,7 +126,7 @@
     "@wrksz/themes": "^2.0.3",
     "@xenova/transformers": "^2.17.2",
     "@xyflow/react": "^12.12.0",
-    "ai": "^7.0.127",
+    "ai": "^7.0.128",
     "ansi-to-react": "^6.2.6",
     "bullet": "^0.0.7",
     "bullmq": "^6.3.11",

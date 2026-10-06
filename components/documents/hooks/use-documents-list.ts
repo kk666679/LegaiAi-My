@@ -1,5 +1,6 @@
 "use client";
 import * as React from "react";
+import { trpcReact } from "@/clients";
 import type {
   DocumentFilters,
   DocumentSort,
@@ -22,8 +23,49 @@ export interface UseDocumentsListResult {
   reload: () => void;
 }
 
+function toLegalDocument(row: Record<string, unknown>): LegalDocument {
+  const tags = (row.tags as string[] | undefined | null) ?? [];
+  return {
+    id: row.id as string,
+    name: (row.title as string) ?? "",
+    type: (row.docType as string) ?? "OTHER",
+    category: undefined,
+    status: (row.status as string) as LegalDocument["status"],
+    ownerId: row.createdBy as string | undefined,
+    ownerName: undefined,
+    folderId: null,
+    size: (row.fileSize as number | undefined) ?? undefined,
+    pageCount: undefined,
+    language: undefined,
+    jurisdiction: (row.jurisdiction as string | null | undefined) ?? undefined,
+    parties: undefined,
+    tags: tags.map((t, i) => ({ id: `${row.id as string}-t${i}`, label: t })),
+    favorite: false,
+    aiStatus: undefined,
+    createdAt: (row.createdAt as Date)?.toISOString() ?? new Date().toISOString(),
+    updatedAt: (row.updatedAt as Date)?.toISOString() ?? new Date().toISOString(),
+    thumbnailUrl: undefined,
+    url: (row.fileUrl as string | undefined) ?? undefined,
+  };
+}
+
+function toStats(statsData: unknown): DocumentsStats {
+  const s = statsData as { total?: number; byStatus?: Record<string, number>; byType?: Record<string, number> } | undefined;
+  return {
+    total: s?.total ?? 0,
+    ready: s?.byStatus?.draft ?? 0,
+    processing: 0,
+    review: s?.byStatus?.review ?? 0,
+    pendingApproval: 0,
+    analysed: s?.byStatus?.approved ?? 0,
+    favorites: 0,
+  };
+}
+
 export function useDocumentsList(options: UseDocumentsListOptions = {}): UseDocumentsListResult {
   const { filters, sort, scope = "all" } = options;
+  const pageSize = options.pageSize ?? 25;
+
   const [documents, setDocuments] = React.useState<LegalDocument[]>([]);
   const [stats, setStats] = React.useState<DocumentsStats | null>(null);
   const [loading, setLoading] = React.useState(true);
@@ -32,68 +74,43 @@ export function useDocumentsList(options: UseDocumentsListOptions = {}): UseDocu
 
   const reload = React.useCallback(() => setTick((t) => t + 1), []);
 
+  const search = filters?.query?.trim() ?? "";
+  const sortBy = sort?.key === "name" ? "title" : (sort?.key ?? "updatedAt") as "createdAt" | "updatedAt" | "title";
+  const sortOrder = sort?.direction ?? "desc";
+
+  const { data: listData, isLoading: listLoading, error: listError } = trpcReact.documents.list.useQuery(
+    {
+      ...(search ? { search } : {}),
+      ...(filters?.status?.[0] ? { status: filters.status[0] } : {}),
+      ...(filters?.type?.[0] ? { docType: filters.type[0] } : {}),
+      limit: pageSize,
+      sortBy,
+      sortOrder,
+    },
+    { staleTime: 30_000 },
+  );
+
+  const { data: statsData, isLoading: statsLoading } = trpcReact.documents.stats.useQuery(undefined, { staleTime: 30_000 });
+
   React.useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
+    if (listLoading || statsLoading) {
+      setLoading(true);
+      return;
+    }
+
+    if (listError) {
+      setError(listError.message);
+      setLoading(false);
+      return;
+    }
+
+    const rows = ((listData as { documents?: unknown[] } | undefined)?.documents ?? []) as Record<string, unknown>[];
+    const mapped = rows.map(toLegalDocument);
+    setDocuments(mapped);
+    setStats(statsData ? toStats(statsData) : null);
+    setLoading(false);
     setError(undefined);
-
-    // Replace with real fetch:
-    // const params = new URLSearchParams();
-    // if (filters?.query) params.set("q", filters.query);
-    // ...
-    // const res = await fetch(`/api/documents?scope=${scope}&${params}`);
-    // const json = await res.json();
-
-    const run = async () => {
-      try {
-        const mock: { documents: LegalDocument[]; stats: DocumentsStats } = {
-          documents: [],
-          stats: { total: 0, ready: 0, processing: 0, review: 0, pendingApproval: 0, analysed: 0, favorites: 0 },
-        };
-
-        let docs = mock.documents;
-        // Client-side filter as a placeholder for server-side filtering
-        if (filters?.query) {
-          const q = filters.query.toLowerCase();
-          docs = docs.filter((d) => d.name.toLowerCase().includes(q));
-        }
-        if (filters?.status?.length) {
-          docs = docs.filter((d) => filters.status!.includes(d.status));
-        }
-        if (filters?.type?.length) {
-          docs = docs.filter((d) => filters.type!.includes(d.type));
-        }
-
-        // Client-side sort
-        if (sort) {
-          docs = [...docs].sort((a, b) => {
-            const dir = sort.direction === "asc" ? 1 : -1;
-            switch (sort.key) {
-              case "name": return a.name.localeCompare(b.name) * dir;
-              case "type": return a.type.localeCompare(b.type) * dir;
-              case "status": return a.status.localeCompare(b.status) * dir;
-              case "createdAt": return (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) * dir;
-              case "updatedAt":
-              default:
-                return (new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()) * dir;
-            }
-          });
-        }
-
-        if (!cancelled) {
-          setDocuments(docs);
-          setStats(mock.stats);
-        }
-      } catch (e) {
-        if (!cancelled) setError(e instanceof Error ? e.message : String(e));
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-
-    void run();
-    return () => { cancelled = true; };
-  }, [filters, sort, scope, tick]);
+  }, [listData, listLoading, listError, statsData, statsLoading, tick]);
 
   return { documents, stats, loading, error, reload };
 }
