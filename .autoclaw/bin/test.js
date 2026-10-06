@@ -21,7 +21,7 @@ if (!fs.existsSync(testDir)) {
 }
 
 const files = fs.readdirSync(testDir)
-  .filter(f => f.endsWith('.test.js'))
+  .filter(f => f.endsWith('.test.js') || f.endsWith('.test.mjs'))
   .sort()
   .map(f => path.join('test', f));
 

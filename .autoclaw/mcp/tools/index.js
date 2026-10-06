@@ -1,5 +1,8 @@
+import { createRequire } from 'node:module';
 import { ToolRegistry } from './registry.js';
 import { fromSkillId, isValidName, inferInputSchema } from './schema.js';
+
+const require = createRequire(import.meta.url);
 
 /**
  * buildDefaultTools(deps) — assembles every tool group.

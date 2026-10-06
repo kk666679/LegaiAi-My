@@ -3,7 +3,15 @@ import { createMemory } from '../memory/index.js';
 import { skillRegistry } from '../skills/registry.js';
 import { evalTracer } from '../eval/traces/store.js';
 
-import { toolRegistry } from '../tools/registry.js;
+import { toolRegistry } from '../tools/registry.js';
+
+class ChainEmptyError extends Error {
+  constructor(agentId) {
+    super(`Agent "${agentId}" has no chain`);
+    this.name = 'ChainEmptyError';
+    this.agentId = agentId;
+  }
+}
 
 /**
  * agents/base-agent.js — Enhanced base agent with skills and eval hooks.
@@ -11,8 +19,6 @@ import { toolRegistry } from '../tools/registry.js;
  * Extends the existing BaseAgent with skill loading, eval tracing,
  * approval gates, and reflection capabilities.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-
 class BaseAgent extends EventEmitter {
   constructor({
     id,
@@ -23,6 +29,9 @@ class BaseAgent extends EventEmitter {
     tools = [],
     memoryConfig = {},
     evalConfig = {},
+    meta = {},
+    runtime = null,
+    chain = null,
   } = {}) {
     super();
     this.id = id;
@@ -31,6 +40,9 @@ class BaseAgent extends EventEmitter {
     this.capabilities = capabilities;
     this.skillNames = skills;
     this.tools = tools;
+    this.meta = meta;
+    this.runtime = runtime;
+    this.chain = chain || { skills: [...skills] };
     this.memory = createMemory({
       agentId: id,
       namespace: `agent:${id}`,
@@ -38,7 +50,7 @@ class BaseAgent extends EventEmitter {
     });
     this.evalConfig = evalConfig;
     this.skills = new Map();
-    this.loaded = false';
+    this.loaded = false;
     this.status = 'idle';
   }
 
@@ -121,7 +133,7 @@ class BaseAgent extends EventEmitter {
           return { status: 'cancelled', step, results };
         }
       }
-      const stepResult = await this.invoke(step, trace);
+      const stepResult = await this.invokeStep(step, trace);
       results.push(stepResult);
     }
     return { status: 'completed', results };
@@ -137,7 +149,7 @@ class BaseAgent extends EventEmitter {
     return new Promise((resolve) => this.once('approval_response', resolve));
   }
 
-  async invoke(step, trace) {
+  async invokeStep(step, trace) {
     const start = Date.now();
     try {
       let output;
@@ -158,6 +170,43 @@ class BaseAgent extends EventEmitter {
       trace.record('error', { step: step.skill ?? step.tool ?? 'step', error: error.message });
       return { step: step.skill ?? step.tool ?? 'step', error: error.message, status: 'error' };
     }
+  }
+
+  async invoke(input = {}) {
+    if (!this.chain || !Array.isArray(this.chain.skills) || this.chain.skills.length === 0) {
+      throw new ChainEmptyError(this.id);
+    }
+
+    let combined = { ...(input || {}) };
+    let output = {};
+    const steps = [];
+    for (const skillName of this.chain.skills) {
+      const impl = this.runtime?.skills?.[skillName];
+      if (!impl || typeof impl !== 'function') {
+        steps.push({ skill: skillName, ok: false, reason: 'no-implementation' });
+        continue;
+      }
+      try {
+        const result = await impl(combined, {
+          prev: output,
+          outputs: { ...output, ...steps.reduce((acc, step) => Object.assign(acc, step.output || {}), {}) },
+          input: combined,
+        });
+        combined = { ...combined, ...(result || {}) };
+        output = { ...output, ...(result || {}) };
+        steps.push({ skill: skillName, ok: true, output: result });
+      } catch (error) {
+        steps.push({ skill: skillName, ok: false, reason: error.message, error: error.message });
+        return { agent: this.id, outcome: 'failed', reason: error.message, output, steps };
+      }
+    }
+
+    const hasMissing = steps.some((s) => s.reason === 'no-implementation');
+    if (hasMissing) {
+      return { agent: this.id, outcome: 'escalate', reason: 'empty-output', output, steps };
+    }
+
+    return { agent: this.id, outcome: 'ok', output, steps };
   }
 
   async invokeTool(tool, input) {
@@ -187,4 +236,4 @@ class BaseAgent extends EventEmitter {
   }
 }
 
-export { BaseAgent as BaseAgent };
+export { BaseAgent, ChainEmptyError };

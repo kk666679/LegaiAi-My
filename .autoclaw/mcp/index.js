@@ -1,3 +1,4 @@
+import { createRequire } from 'node:module';
 import * as protocol from './protocol.js';
 import { McpServer } from './server.js';
 import { StdioTransport } from './transport/stdio.js';
@@ -10,6 +11,8 @@ import path from 'path';
 import fs from 'fs';
 
 import { createKG } from '../kg/index.js';
+
+const require = createRequire(import.meta.url);
 
 /**
  * createServer — assemble a server, resolving default deps from siblings.
@@ -46,8 +49,6 @@ function createServer(deps = {}) {
   }
   if (!resolved.kg) {
     try {
-      const path = path;
-      const fs = fs;
       const dbPath = path.resolve(import.meta.dirname, '..', 'kg', 'kg.db');
 
       resolved.kg = fs.existsSync(dbPath) ? createKG({ dbPath }) : createKG({ memory: true });

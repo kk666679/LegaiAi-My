@@ -9,7 +9,7 @@ import { ApprovalGate } from './approval/approval-gate.js';
 import { SafetyAudit } from './audit/safety-audit.js';
 import { safetyTracer } from './observability/tracer.js';
 import { safetyMetrics } from './observability/metrics.js';
-import fs from 'fs';
+import fsModule from 'fs';
 
 /**
  * .autoclaw/safety/index.js
@@ -17,7 +17,7 @@ import fs from 'fs';
  * Policy engine, adversarial guards, PII redaction, approval gates, kill switch, cost ceiling
  */
 
-const fs = fs.promises;
+const fs = fsModule.promises;
 
 // Safety modes
 const MODES = {
@@ -64,9 +64,9 @@ class Safety {
    * @param {Object} [config.guards] - Guard configurations
    */
   constructor({
-    modePath = '.autoclaw/safety/mode.json',
-    auditPath = '.autoclaw/safety/audit.jsonl',
-    killSwitchPath = '.autoclaw/safety/kill-switch.json',
+    modePath = path.join(import.meta.dirname, 'mode.json'),
+    auditPath = path.join(import.meta.dirname, 'audit.jsonl'),
+    killSwitchPath = path.join(import.meta.dirname, 'kill-switch.json'),
     guards = {},
   } = {}) {
     this.mode = 'normal';
@@ -183,25 +183,22 @@ class Safety {
         );
 
         // 6. Approval gate if flagged
-        const requiresApproval = results.some((r) => r.requiresApproval);
+        const policyApproval = await this.approval.check({ action, target, params, actor });
+        const requiresApproval = results.some((r) => r.requiresApproval) || policyApproval.required;
 
         if (requiresApproval) {
-          const { required } = await this.approval.check({ action, target, params, actor });
+          const approval = await this.approval.request({
+            action,
+            target,
+            params,
+            actor,
+            timeoutMs: context.approvalTimeoutMs,
+          });
 
-          if (required) {
-            const approval = await this.approval.request({
-              action,
-              target,
-              params,
-              actor,
-              timeoutMs: context.approvalTimeoutMs,
-            });
+          results.push({ guard: 'approval', ...approval });
 
-            results.push({ guard: 'approval', ...approval });
-
-            if (!approval.allowed) {
-              return this.deny(span, results, 'approval');
-            }
+          if (!approval.allowed) {
+            return this.deny(span, results, 'approval');
           }
         }
 
@@ -280,7 +277,11 @@ class Safety {
       };
     }
 
-    return { allowed: true };
+    const requiresApproval = this.mode === 'cautious'
+      ? isWrite
+      : this.mode === 'normal' && isDestructive;
+
+    return { allowed: true, requiresApproval };
   }
 
   /**

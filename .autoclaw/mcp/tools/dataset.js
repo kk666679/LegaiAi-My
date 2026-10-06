@@ -1,10 +1,8 @@
 import { toolResult, toolError } from '../protocol.js';
 
-import * as ds from '../../dataset.js;
+import * as ds from '../../dataset.js';
 
 function build() {
-  let ds';
-
   return [
     {
       name: 'dataset_list',

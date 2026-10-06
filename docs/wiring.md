@@ -37,7 +37,7 @@ Browser
   ▼
 Next.js :3000
   ├── app/api/trpc/[trpc]/route.ts   ← HTTP bridge
-  │     uses TRPC_BACKEND_URL ?? NEXT_PUBLIC_TRPC_URL ?? http://localhost:3001/trpc
+  │     uses BACKEND_URL ?? TRPC_BACKEND_URL ?? http://localhost:3001
   ▼
 Express :3001  /trpc  (createExpressMiddleware)
   ▼
@@ -59,13 +59,16 @@ Browser
   │
   ▼
 POST /api/chat  →  app/api/chat/route.ts
+                     validates the request and relays the stream
+  ▼
+Express :3001 /api/ai-chat
                      uses @tanstack/ai + ollamaText adapter
-                     talks to OLLAMA_URL
+                     talks to Ollama
   ▼
 SSE response back to browser
 ```
 
-No tRPC or queue involvement — direct Ollama streaming. See [ai-chat.md](ai-chat.md).
+No tRPC or queue involvement — the Next.js route relays the backend SSE stream. See [ai-chat.md](ai-chat.md).
 
 ### 3. OpenClaw gateway (Telegram / WhatsApp / HTTP)
 
@@ -102,13 +105,14 @@ The frontend imports backend types directly to keep inputs/outputs in sync:
 
 | Var | Frontend read? | Backend read? | Notes |
 |-----|----------------|----------------|-------|
-| `NEXT_PUBLIC_TRPC_URL` | yes (build-time) | no | Browser-visible; defaults `/trpc` in Docker, `http://localhost:3001/trpc` in dev |
-| `TRPC_BACKEND_URL` | yes (server-side) | no | Used by `app/api/trpc/[trpc]/route.ts`; falls back to `NEXT_PUBLIC_TRPC_URL` |
-| `OLLAMA_URL` | yes (`/api/chat`) | yes | Single source of truth for Ollama |
-| `LLM_MODEL` / `LLM_MODEL_FALLBACK` | yes (`/api/chat`) | yes | Used everywhere Ollama is called |
+| `NEXT_PUBLIC_TRPC_URL` | yes (build-time) | no | Browser-facing tRPC URL; defaults to same-origin `/api/trpc` |
+| `BACKEND_URL` | server-side only | no | Preferred Express origin for Next.js API relays; defaults to `http://localhost:3001` |
+| `TRPC_BACKEND_URL` | server-side only | no | Alternate backend URL; a trailing `/trpc` is removed before use |
+| `OLLAMA_URL` | no | yes | Read by backend services that connect to Ollama |
+| `LLM_MODEL` / `LLM_MODEL_FALLBACK` | no | yes | Backend model configuration |
 | `DATABASE_URL` | no | yes | Postgres + pgVector |
 | `REDIS_URL` (or `REDIS_HOST`+`REDIS_PORT`) | no | yes | BullMQ + cache + event bus |
-| `SESSION_SECRET` / `NEXTAUTH_SECRET` | yes | yes | Required in production |
+| `SESSION_SECRET` | no | yes | Backend session signing/validation secret |
 
 Full list and defaults: [environment-variables.md](environment-variables.md).
 
@@ -116,10 +120,10 @@ Full list and defaults: [environment-variables.md](environment-variables.md).
 
 ## Auth + session
 
-- NextAuth.js handles browser sessions (`NEXTAUTH_SECRET`).
-- tRPC context (`backend/src/trpc/context.ts`) attaches the session to every request; protected procedures use `protectedProcedure`.
-- Backend `/auth` REST endpoints (see [agent-api.md](agent-api.md)) back the NextAuth credentials provider for passwordless / SSO flows.
-- OpenClaw reuses the same `/auth` endpoints for Telegram/WhatsApp-bound users.
+- The frontend `AuthProvider` calls the tRPC `auth.login`, `auth.signup`, `auth.register`, `auth.me`, and `auth.logout` procedures.
+- The browser stores the returned session token and sends it as a Bearer `Authorization` header on tRPC requests.
+- The Next.js tRPC relay forwards that header; `backend/src/trpc/context.ts` validates the session and attaches the user to the request context.
+- Protected procedures use `protectedProcedure`; role- and permission-scoped operations use the corresponding backend guards.
 
 ---
 

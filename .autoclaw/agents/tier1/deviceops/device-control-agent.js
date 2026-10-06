@@ -1,11 +1,11 @@
 import { BaseAgent } from '../../base-agent.js';
 
-import { toolRegistry } from '../../../tools/registry.js;
+import { toolRegistry } from '../../../tools/registry.js';
 
 /**
- * agents/tier1/deviceops/device-control-agent.js — Tier 1: Device control operations.
+ * agents/tier1/deviceops/device-control-agent.js — Tier 1: Device control.
  */
-Object.defineProperty(exports, "__esModule", { value: true })';
+Object.defineProperty(exports, "__esModule", { value: true });
 
 class DeviceControlAgent extends BaseAgent {
   constructor(deps = {}) {

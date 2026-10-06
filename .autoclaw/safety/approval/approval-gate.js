@@ -141,20 +141,11 @@ class ApprovalGate {
       /export.*data|backup|archive/i,
     ];
 
-    const reason = requiresApproval
-      .map((p) => p.toString())
-      .find((p) => {
-        try {
-          const regex = new RegExp(p);
-          return regex.test(action);
-        } catch {
-          return false;
-        }
-      });
+    const pattern = requiresApproval.find((rule) => rule.test(action));
 
     return {
-      required: !!reason,
-      reason: reason ? `Action "${action}" requires approval` : null,
+      required: Boolean(pattern),
+      reason: pattern ? `Action "${action}" requires approval` : null,
     };
   }
 

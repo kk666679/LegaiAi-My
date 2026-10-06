@@ -3,19 +3,17 @@
  * OpenTelemetry tracing for safety subsystem
  */
 
-let trace;
+let traceApi;
 let context;
 
 try {
-  await import('@opentelemetry/api');
-  trace = otel.trace;
-  context = otel.context;
+  ({ trace: traceApi, context } = await import('@opentelemetry/api'));
 } catch {
-  trace = null;
+  traceApi = null;
   context = null;
 }
 
-const tracer = trace ? trace.getTracer('autoclaw-safety', '1.0.0') : null;
+const tracer = traceApi ? traceApi.getTracer('autoclaw-safety', '1.0.0') : null;
 
 class SafetyTracer {
   async startSpan(spanName, fn) {
@@ -58,6 +56,6 @@ class SafetyTracer {
   }
 }
 
-;
+const safetyTracer = new SafetyTracer();
 
-export { tracer, context };
+export { SafetyTracer, safetyTracer, tracer, context };

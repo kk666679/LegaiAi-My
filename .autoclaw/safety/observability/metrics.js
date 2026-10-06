@@ -3,15 +3,13 @@
  * OpenTelemetry metrics for safety subsystem
  */
 
-let metrics;
+let meter;
 
 try {
-  await import('@opentelemetry/api').metrics;
-  if (otelMetrics) {
-    metrics = otelMetrics.getMeter('autoclaw-safety', '1.0.0');
-  }
+  const { metrics } = await import('@opentelemetry/api');
+  meter = metrics.getMeter('autoclaw-safety', '1.0.0');
 } catch {
-  metrics = null;
+  meter = null;
 }
 
 const counters = new Map();
@@ -20,8 +18,8 @@ const gauges = new Map();
 
 function getCounter(name) {
   if (!counters.has(name)) {
-    if (metrics && metrics.createCounter) {
-      counters.set(name, metrics.createCounter(name));
+    if (meter && meter.createCounter) {
+      counters.set(name, meter.createCounter(name));
     } else {
       counters.set(name, { add: () => {} });
     }
@@ -31,8 +29,8 @@ function getCounter(name) {
 
 function getHistogram(name) {
   if (!histograms.has(name)) {
-    if (metrics && metrics.createHistogram) {
-      histograms.set(name, metrics.createHistogram(name));
+    if (meter && meter.createHistogram) {
+      histograms.set(name, meter.createHistogram(name));
     } else {
       histograms.set(name, { record: () => {} });
     }
@@ -42,8 +40,8 @@ function getHistogram(name) {
 
 function getGauge(name) {
   if (!gauges.has(name)) {
-    if (metrics && metrics.createObservableGauge) {
-      gauges.set(name, metrics.createObservableGauge(name));
+    if (meter && meter.createObservableGauge) {
+      gauges.set(name, meter.createObservableGauge(name));
     } else {
       gauges.set(name, { observe: () => {} });
     }
@@ -68,6 +66,6 @@ class SafetyMetrics {
   }
 }
 
-;
+const safetyMetrics = new SafetyMetrics();
 
-export { metrics };
+export { SafetyMetrics, safetyMetrics };

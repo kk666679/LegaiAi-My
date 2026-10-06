@@ -1,5 +1,5 @@
 import path from 'path';
-import fs from 'fs';
+import fsModule from 'fs';
 
 /**
  * .autoclaw/safety/kill-switch/kill-switch.js
@@ -7,14 +7,14 @@ import fs from 'fs';
  * Scopes: global, agent:id, tool:name
  */
 
-const fs = fs.promises;
+const fs = fsModule.promises;
 
 class KillSwitch {
   /**
    * @param {Object} config
    * @param {string} [config.path] - Path to kill-switch state file
    */
-  constructor({ path: killSwitchPath = '.autoclaw/safety/kill-switch.json' } = {}) {
+  constructor({ path: killSwitchPath = path.resolve(import.meta.dirname, '..', 'kill-switch.json') } = {}) {
     this.path = killSwitchPath;
     this.active = false;
     this.scope = null; // 'global', 'agent:id', 'tool:name'

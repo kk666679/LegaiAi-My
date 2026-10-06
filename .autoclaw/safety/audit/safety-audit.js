@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import path from 'path';
-import fs from 'fs';
+import fsModule from 'fs';
 
 /**
  * .autoclaw/safety/audit/safety-audit.js
@@ -8,14 +8,14 @@ import fs from 'fs';
  * Integrates with evidence chain for compliance
  */
 
-const fs = fs.promises;
+const fs = fsModule.promises;
 
 class SafetyAudit {
   /**
    * @param {Object} config
    * @param {string} [config.path] - Path to audit log (JSONL)
    */
-  constructor({ path: auditPath = '.autoclaw/safety/audit.jsonl' } = {}) {
+  constructor({ path: auditPath = path.resolve(import.meta.dirname, '..', 'audit.jsonl') } = {}) {
     this.path = auditPath;
     this.entries = [];
     this.hash = null;

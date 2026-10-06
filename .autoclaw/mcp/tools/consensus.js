@@ -1,4 +1,7 @@
+import { createRequire } from 'node:module';
 import { toolResult, toolError } from '../protocol.js';
+
+const require = createRequire(import.meta.url);
 
 function build({ consensus } = {}) {
   return [

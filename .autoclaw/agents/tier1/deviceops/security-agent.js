@@ -1,11 +1,11 @@
 import { BaseAgent } from '../../base-agent.js';
 
-import { toolRegistry } from '../../../tools/registry.js;
+import { toolRegistry } from '../../../tools/registry.js';
 
 /**
- * agents/tier1/deviceops/security-agent.js — Tier 1: Security monitoring.
+ * agents/tier1/deviceops/security-agent.js — Tier 1: Security and policy enforcement.
  */
-Object.defineProperty(exports, "__esModule", { value: true })';
+Object.defineProperty(exports, "__esModule", { value: true });
 
 class SecurityAgent extends BaseAgent {
   constructor(deps = {}) {

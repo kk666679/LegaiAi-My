@@ -7,7 +7,7 @@ on:
     branches: [main, develop]
 
 jobs:
-frontend:
+  frontend:
     name: Frontend (Next.js)
     runs-on: ubuntu-latest
     steps:
@@ -20,21 +20,17 @@ frontend:
       - name: Prisma generate (root + backend)
         run: npm run db:generate
       - name: Lint
-        continue-on-error: true
         run: npm run lint
       - name: Type-check
-        continue-on-error: true
         run: npm run type-check
       - name: Test
         run: npm run test:autoclaw
       - name: Build
         env:
           NEXT_PUBLIC_TRPC_URL: /api/trpc
-        continue-on-error: true
         run: npm run build
-        # .github/workflows/ci.yml — add to the frontend job
       - name: i18n detection accuracy
-        run: npx tsx scripts/eval-detect.mjs
+        run: npm run i18n:eval
 
   backend:
     name: Backend (Express/tRPC)

@@ -10,7 +10,7 @@ import { compositeScorer } from './composite.js';
  */
 
 
-const scorerRegistry = new Map([
+const registryMap = new Map([
   ['exact-match', exactMatchScorer],
   ['fuzzy-match', fuzzyMatchScorer],
   ['json-schema', jsonSchemaScorer],
@@ -19,16 +19,16 @@ const scorerRegistry = new Map([
   ['composite', compositeScorer],
 ]);
 
-function register(name, scorer) {
-  scorerRegistry.set(name, scorer);
-}
+const scorerRegistry = {
+  register(name, scorer) {
+    registryMap.set(name, scorer);
+  },
+  get(name) {
+    return registryMap.get(name);
+  },
+  list() {
+    return [...registryMap.keys()];
+  },
+};
 
-function get(name) {
-  return scorerRegistry.get(name);
-}
-
-function list() {
-  return [...scorerRegistry.keys()];
-}
-
-scorerRegistry = { register, get, list };
+export { scorerRegistry, registryMap };

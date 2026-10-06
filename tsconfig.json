@@ -59,8 +59,8 @@
       "@/config/*": ["./config/*"],
       "@/constants/*": ["./constants/*"],
       "@/services/*": ["./services/*"],
-      "@/workers/*": ["./workers/*"],
-      "@/queues/*": ["./queues/*"],
+  "@/workers/*": ["./workers/*"],
+      "@/queues/*": ["./src/queues/*"],
       "@/prisma/*": ["./prisma/*"],
       "@/validators/*": ["./validators/*"],
       "@/public/*": ["./public/*"],
@@ -100,7 +100,6 @@
   "exclude": [
     "node_modules",
     ".openclaw/**",
-    "backend/**",
     "dist",
     "build",
     ".next",

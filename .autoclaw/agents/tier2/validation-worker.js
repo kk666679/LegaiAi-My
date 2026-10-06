@@ -1,11 +1,11 @@
 import { BaseAgent } from '../base-agent.js';
 
-import { toolRegistry } from '../../tools/registry.js;
+import { toolRegistry } from '../../tools/registry.js';
 
 /**
- * agents/tier2/validation-worker.js — Tier 2: Validation worker.
+ * agents/tier2/validation-worker.js — Tier 2: Validation and policy checks.
  */
-Object.defineProperty(exports, "__esModule", { value: true })';
+Object.defineProperty(exports, "__esModule", { value: true });
 
 class ValidationWorker extends BaseAgent {
   constructor(deps = {}) {

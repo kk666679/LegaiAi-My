@@ -1,11 +1,11 @@
 import { BaseAgent } from '../../base-agent.js';
 
-import { toolRegistry } from '../../../tools/registry.js;
+import { toolRegistry } from '../../../tools/registry.js';
 
 /**
  * agents/tier1/content/content-agent.js — Tier 1: Content generation.
  */
-Object.defineProperty(exports, "__esModule", { value: true })';
+Object.defineProperty(exports, "__esModule", { value: true });
 
 class ContentAgent extends BaseAgent {
   constructor(deps = {}) {

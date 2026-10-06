@@ -1,30 +1,58 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Cap webpack parallelism and enable its memory optimisations. This build has
-  // ~90 routes and runs on small containers; without these caps the build worker
-  // peaks high enough to be OOM-killed (it dies with SIGTERM, not a real error).
+  /*
+   * Build stability
+   *
+   * The application has ~90 routes and may be built in small containers.
+   * Limit webpack parallelism to reduce peak memory usage and avoid
+   * SIGTERM/OOM failures during production builds.
+   */
   experimental: {
     cpus: 1,
     webpackMemoryOptimizations: true,
   },
-  turbopack: {
-    // Disable Turbopack for now due to build instability
-    resolveAlias: {
-      // Ensure proper module resolution
-    },
-  },
+
+  /*
+   * TypeScript
+   *
+   * Use the dedicated Next.js TypeScript configuration rather than the
+   * repository-wide tsconfig.
+   */
   typescript: {
     tsconfigPath: './tsconfig.next.json',
   },
-  allowedDevOrigins: ['127.0.0.1', '*.daytonaproxy01.net'],
+
+  /*
+   * Development origins
+   *
+   * Restrict cross-origin development requests to known development
+   * hosts. Production behavior should not depend on this setting.
+   */
+  allowedDevOrigins: [
+    '127.0.0.1',
+    '*.daytonaproxy01.net',
+  ],
+
+  /*
+   * Security headers
+   */
   async headers() {
     return [
       {
         source: '/:path*',
         headers: [
-          { key: 'X-Frame-Options', value: 'DENY' },
-          { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
           {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()',
@@ -35,8 +63,6 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            // Moderate policy: tighten before public launch. Keeps inline
-            // scripts/styles (Next.js) and data:/blob: (Rive/WebGL) working.
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
@@ -52,7 +78,7 @@ const nextConfig = {
           },
         ],
       },
-    ]
+    ];
   },
 };
 

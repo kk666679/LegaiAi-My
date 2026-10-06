@@ -1,11 +1,11 @@
 import { BaseAgent } from '../../base-agent.js';
 
-import { toolRegistry } from '../../../tools/registry.js;
+import { toolRegistry } from '../../../tools/registry.js';
 
 /**
- * agents/tier1/deviceops/profile-agent.js — Tier 1: Device profile management.
+ * agents/tier1/deviceops/profile-agent.js — Tier 1: Profile and policy management.
  */
-Object.defineProperty(exports, "__esModule", { value: true })';
+Object.defineProperty(exports, "__esModule", { value: true });
 
 class ProfileAgent extends BaseAgent {
   constructor(deps = {}) {

@@ -10,7 +10,7 @@ test.before(async () => {
 const deps = resolveDeps();
 server = createServer(deps);
 await new Promise(res => server.listen(0, res));
-base = http://127.0.0.1:${server.address().port};
+base = `http://127.0.0.1:${server.address().port}`;
 });
 
 test.after(() => new Promise(res => server.close(res)));
@@ -53,7 +53,7 @@ assert.ok(r.json.checks.registry);
 test('api: GET /api/metrics returns text/plain', async () => {
 const r = await req('GET', '/api/metrics');
 assert.equal(r.status, 200);
-assert.match(r.headers['content-type'], /text/plain/);
+assert.ok(String(r.headers['content-type']).includes('text/plain'));
 });
 
 test('api: GET /api/metrics/snapshot returns JSON', async () => {
@@ -135,7 +135,7 @@ assert.ok(r.json.length >= 3);
 test('api: GET /api/skills/:name/reference as markdown', async () => {
 const r = await req('GET', '/api/skills/hermes/reference');
 assert.equal(r.status, 200);
-assert.match(r.headers['content-type'], /text/markdown/);
+assert.ok(String(r.headers['content-type']).includes('text/markdown'));
 assert.ok(r.text.includes('# Hermes'));
 });
 
@@ -162,7 +162,7 @@ test('api: POST /api/kg/upsert + GET node roundtrip', async () => {
 const id = 'test:api-node-' + Date.now();
 const up = await req('POST', '/api/kg/upsert', { node: { id, type: 'concept', title: 'API Test Node', canonical: 'api test node' } });
 assert.equal(up.status, 200);
-const got = await req('GET', /api/kg/node/${id});
+const got = await req('GET', `/api/kg/node/${id}`);
 assert.equal(got.status, 200);
 assert.equal(got.json.id, id);
 });
@@ -221,14 +221,14 @@ assert.equal(r.json.kind, 'eval.run');
 test('api: POST /api/export/irac returns markdown', async () => {
 const r = await req('POST', '/api/export/irac', { result: { issue: 'I', rule: 'R', application: 'A', conclusion: 'C' } });
 assert.equal(r.status, 200);
-assert.match(r.headers['content-type'], /text/markdown/);
+assert.ok(String(r.headers['content-type']).includes('text/markdown'));
 assert.ok(r.text.includes('# IRAC Analysis'));
 });
 
 test('api: POST /api/export/html', async () => {
 const r = await req('POST', '/api/export/html', { result: { issue: 'I', rule: 'R', application: 'A', conclusion: 'C' } });
 assert.equal(r.status, 200);
-assert.match(r.headers['content-type'], /text/html/);
+assert.ok(String(r.headers['content-type']).includes('text/html'));
 assert.ok(r.text.includes('<article'));
 });
 

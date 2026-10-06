@@ -1,11 +1,11 @@
 import { BaseAgent } from '../../base-agent.js';
 
-import { toolRegistry } from '../../../tools/registry.js;
+import { toolRegistry } from '../../../tools/registry.js';
 
 /**
  * agents/tier1/deviceops/workflow-agent.js — Tier 1: Workflow orchestration.
  */
-Object.defineProperty(exports, "__esModule", { value: true })';
+Object.defineProperty(exports, "__esModule", { value: true });
 
 class WorkflowAgent extends BaseAgent {
   constructor(deps = {}) {

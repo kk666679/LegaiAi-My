@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import pkg from '../package.json';
+import pkg from '../package.json' with { type: 'json' };
 
 'use strict';
 

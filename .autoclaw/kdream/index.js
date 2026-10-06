@@ -21,7 +21,7 @@ function createDreamer(opts = {}) {
   const root = path.resolve(import.meta.dirname, '..');
   const { memoryPath, learningsDir, ...rest } = opts;
   return new Dreamer({
-    memoryPath: memoryPath || path.join(root, 'kdream', './memory.js', 'MEMORY.md'),
+    memoryPath: memoryPath || path.join(root, 'kdream', 'memory', 'MEMORY.md'),
     learningsDir: learningsDir || path.join(root, 'learnings'),
     ...rest
   });

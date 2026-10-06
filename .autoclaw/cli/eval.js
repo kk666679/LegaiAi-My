@@ -5,7 +5,7 @@ import { agentRegistry } from '../agents/registry.js';
 import { skillRegistry } from '../skills/registry.js';
 
 import { registerAllAgents } from '../agents/index.js';
-import { Leaderboard } from '../eval/leaderboard.js;
+import { Leaderboard } from '../eval/leaderboard.js';
 
 "use strict";
 /**

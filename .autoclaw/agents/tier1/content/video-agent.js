@@ -1,11 +1,11 @@
 import { BaseAgent } from '../../base-agent.js';
 
-import { toolRegistry } from '../../../tools/registry.js;
+import { toolRegistry } from '../../../tools/registry.js';
 
 /**
- * agents/tier1/content/video-agent.js — Tier 1: Video content generation.
+ * agents/tier1/content/video-agent.js — Tier 1: Video asset ops.
  */
-Object.defineProperty(exports, "__esModule", { value: true })';
+Object.defineProperty(exports, "__esModule", { value: true });
 
 class VideoAgent extends BaseAgent {
   constructor(deps = {}) {

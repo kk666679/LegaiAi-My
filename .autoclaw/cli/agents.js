@@ -3,7 +3,7 @@ import { agentRegistry } from '../agents/registry.js';
 
 import { registerAllAgents } from '../agents/index.js';
 import { registerAllAgents } from '../agents/index.js';
-import { registerAllAgents } from '../agents/index.js;
+import { registerAllAgents } from '../agents/index.js';
 
 "use strict";
 /**

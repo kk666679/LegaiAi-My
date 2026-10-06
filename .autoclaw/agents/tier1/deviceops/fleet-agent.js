@@ -1,11 +1,11 @@
 import { BaseAgent } from '../../base-agent.js';
 
-import { toolRegistry } from '../../../tools/registry.js;
+import { toolRegistry } from '../../../tools/registry.js';
 
 /**
  * agents/tier1/deviceops/fleet-agent.js — Tier 1: Fleet monitoring and management.
  */
-Object.defineProperty(exports, "__esModule", { value: true })';
+Object.defineProperty(exports, "__esModule", { value: true });
 
 class FleetAgent extends BaseAgent {
   constructor(deps = {}) {

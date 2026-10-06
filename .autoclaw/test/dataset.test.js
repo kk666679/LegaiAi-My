@@ -1,6 +1,7 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
-import { loadAll, validate, counts, GROUPS } from '../dataset.js';
+'use strict';
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const { loadAll, validate, counts, GROUPS } = require('../dataset');
 
 test('dataset: loadAll returns non-empty groups', () => {
   const all = loadAll();

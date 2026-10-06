@@ -1,11 +1,11 @@
 import { BaseAgent } from '../../base-agent.js';
 
-import { toolRegistry } from '../../../tools/registry.js;
+import { toolRegistry } from '../../../tools/registry.js';
 
 /**
- * agents/tier1/content/scheduling-agent.js — Tier 1: Content scheduling.
+ * agents/tier1/content/scheduling-agent.js — Tier 1: Scheduling workflow.
  */
-Object.defineProperty(exports, "__esModule", { value: true })';
+Object.defineProperty(exports, "__esModule", { value: true });
 
 class SchedulingAgent extends BaseAgent {
   constructor(deps = {}) {

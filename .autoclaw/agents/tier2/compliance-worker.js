@@ -1,11 +1,11 @@
 import { BaseAgent } from '../base-agent.js';
 
-import { toolRegistry } from '../../tools/registry.js;
+import { toolRegistry } from '../../tools/registry.js';
 
 /**
- * agents/tier2/compliance-worker.js — Tier 2: Compliance worker.
+ * agents/tier2/compliance-worker.js — Tier 2: Compliance automation.
  */
-Object.defineProperty(exports, "__esModule", { value: true })';
+Object.defineProperty(exports, "__esModule", { value: true });
 
 class ComplianceWorker extends BaseAgent {
   constructor(deps = {}) {

@@ -33,7 +33,7 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-white/5 py-6 text-center text-xs text-slate-500">
-        © 2026 LAW MATE. All rights reserved.
+        © 2026 LAWMATE by Kurnia Kadir. All rights reserved.
       </div>
     </footer>
   );
