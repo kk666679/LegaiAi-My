@@ -1,9 +1,10 @@
 #!/usr/bin/env node
+import fs from 'fs';
+import path from 'path';
+import { execFileSync } from 'child_process';
+import { ROOT, readJson } from './_util.js';
+
 'use strict';
-const fs = require('fs');
-const path = require('path');
-const { execFileSync } = require('child_process');
-const { ROOT, readJson } = require('./_util');
 
 const db = path.join(ROOT, 'vector', 'db.sqlite');
 const config = readJson('vector/config.json');

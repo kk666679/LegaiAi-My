@@ -1,4 +1,8 @@
-"use strict";
+import fs from 'fs';
+import path from 'path';
+import * as seatAudition_1 from '../fleet/seatAudition.js'; // MISSING TARGET
+import * as seatAuditionFixtures_1 from '../fleet/seatAuditionFixtures.js'; // MISSING TARGET
+
 /**
  * seat-audition.ts — CP-5.4 shadow-audition CLI runner.
  *
@@ -23,18 +27,7 @@
  * NO LLM calls, NO network, NO entitlement check — this is the free/public floor.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findSeatAuditionFixture = findSeatAuditionFixture;
-exports.validateSeatAuditionSubmissionShape = validateSeatAuditionSubmissionShape;
-exports.isSeatAuditionSubmission = isSeatAuditionSubmission;
-exports.buildShadowAuditionLease = buildShadowAuditionLease;
-exports.runSeatAudition = runSeatAudition;
-exports.formatSeatAuditionReport = formatSeatAuditionReport;
-exports.parseSeatAuditionArgs = parseSeatAuditionArgs;
-exports.main = main;
-const fs = require("fs");
-const path = require("path");
-const seatAudition_1 = require("../fleet/seatAudition");
-const seatAuditionFixtures_1 = require("../fleet/seatAuditionFixtures");
+
 /* -------------------------------------------------------------------------- */
 /*  Fixture lookup + submission validation (pure)                             */
 /* -------------------------------------------------------------------------- */
@@ -212,3 +205,5 @@ if (require.main === module) {
     });
 }
 //# sourceMappingURL=seat-audition.js.map
+
+export { findSeatAuditionFixture as findSeatAuditionFixture, validateSeatAuditionSubmissionShape as validateSeatAuditionSubmissionShape, isSeatAuditionSubmission as isSeatAuditionSubmission, buildShadowAuditionLease as buildShadowAuditionLease, runSeatAudition as runSeatAudition, formatSeatAuditionReport as formatSeatAuditionReport, parseSeatAuditionArgs as parseSeatAuditionArgs, main as main };

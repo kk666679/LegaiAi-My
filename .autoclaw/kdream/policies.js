@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * policies — the guardrails a dream cycle runs under.
  *
@@ -39,4 +37,6 @@ class KdreamPolicy {
   }
 }
 
-module.exports = { KdreamPolicy, DEFAULT_POLICY };
+;
+
+export { KdreamPolicy, DEFAULT_POLICY };

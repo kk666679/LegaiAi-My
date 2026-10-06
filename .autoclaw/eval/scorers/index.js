@@ -1,14 +1,14 @@
-"use strict";
+import { exactMatchScorer } from './exact-match.js';
+import { fuzzyMatchScorer } from './fuzzy-match.js';
+import { jsonSchemaScorer } from './json-schema.js';
+import { toolCallScorer } from './tool-call.js';
+import { llmJudgeScorer } from './llm-judge.js';
+import { compositeScorer } from './composite.js';
+
 /**
  * eval/scorers/index.js — Scorer registry.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-const { exactMatchScorer } = require('./exact-match');
-const { fuzzyMatchScorer } = require('./fuzzy-match');
-const { jsonSchemaScorer } = require('./json-schema');
-const { toolCallScorer } = require('./tool-call');
-const { llmJudgeScorer } = require('./llm-judge');
-const { compositeScorer } = require('./composite');
+
 
 const scorerRegistry = new Map([
   ['exact-match', exactMatchScorer],
@@ -31,4 +31,4 @@ function list() {
   return [...scorerRegistry.keys()];
 }
 
-exports.scorerRegistry = { register, get, list };
+scorerRegistry = { register, get, list };

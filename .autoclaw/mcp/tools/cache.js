@@ -1,5 +1,5 @@
-'use strict';
-const { toolResult, toolError } = require('../protocol');
+import { toolResult, toolError } from '../protocol.js';
+
 
 function build({ cache } = {}) {
   return [
@@ -21,4 +21,6 @@ function build({ cache } = {}) {
     }
   ];
 }
-module.exports = { build };
+;
+
+export { build };

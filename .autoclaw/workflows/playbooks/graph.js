@@ -1,4 +1,5 @@
-"use strict";
+import * as state_1 from '../state.js';
+
 /**
  * graph.ts — scaffold-driven workflow-graph construction (PB-GRAPH-1).
  *
@@ -26,8 +27,7 @@
  * Ledger rows produced by the run join back to the playbook.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.buildPlaybookWorkflow = buildPlaybookWorkflow;
-const state_1 = require("../state");
+
 /** Derive a runnable workflow definition from a playbook. Pure. */
 function buildPlaybookWorkflow(scaffold, opts = {}) {
     const nodes = [];
@@ -109,3 +109,5 @@ function buildPlaybookWorkflow(scaffold, opts = {}) {
     };
 }
 //# sourceMappingURL=graph.js.map
+
+export { buildPlaybookWorkflow as buildPlaybookWorkflow };

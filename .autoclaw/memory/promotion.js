@@ -1,6 +1,4 @@
-'use strict';
-
-const { KIND } = require('./constants');
+import { KIND } from './constants.js';
 
 function textKey(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().slice(0, 160); }
 
@@ -80,4 +78,4 @@ function promoteRecent(stm, ltm, opts) {
   return { promoted, count: promoted.length };
 }
 
-module.exports = { promoteEntry, promoteByRepetition, promoteRecent, countOccurrences, textKey };
+export { promoteEntry, promoteByRepetition, promoteRecent, countOccurrences, textKey };

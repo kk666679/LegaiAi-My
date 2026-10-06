@@ -168,6 +168,6 @@ class CostCeiling {
   }
 }
 
-module.exports = {
-  CostCeiling,
-};
+;
+
+export { CostCeiling };

@@ -1,4 +1,5 @@
-"use strict";
+import * as rooms_1 from './rooms.js';
+
 /**
  * wakeAdapters.ts - Host-specific wake profile table for roomed messages.
  *
@@ -7,11 +8,7 @@
  * external connectors need explicit trust ceilings before they can steer work.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.normalizeWakeAdapterId = normalizeWakeAdapterId;
-exports.wakeProfileForAdapter = wakeProfileForAdapter;
-exports.listWakeAdapterProfiles = listWakeAdapterProfiles;
-exports.planParticipantWakes = planParticipantWakes;
-const rooms_1 = require("./rooms");
+
 const PROFILES = [
     {
         adapter_id: 'claude-code',
@@ -335,3 +332,5 @@ function blockedReasonFor(wake, messageType, profile) {
     return undefined;
 }
 //# sourceMappingURL=wakeAdapters.js.map
+
+export { normalizeWakeAdapterId as normalizeWakeAdapterId, wakeProfileForAdapter as wakeProfileForAdapter, listWakeAdapterProfiles as listWakeAdapterProfiles, planParticipantWakes as planParticipantWakes };

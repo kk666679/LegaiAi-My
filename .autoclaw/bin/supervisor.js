@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+import fs from 'fs';
+import path from 'path';
+import { ROOT, readJson, writeJson, appendJsonl, nowIso } from './_util.js';
+
 'use strict';
 /**
  * supervisor — the orchestration loop, in pure Node.
@@ -7,9 +11,6 @@
  *
  * Invoke from cron / systemd / your own scheduler; there is no shell wrapper.
  */
-const fs = require('fs');
-const path = require('path');
-const { ROOT, readJson, writeJson, appendJsonl, nowIso } = require('./_util');
 
 const board = readJson('orchestrator/board.json');
 const state = readJson('orchestrator/comms/loop-state.json');

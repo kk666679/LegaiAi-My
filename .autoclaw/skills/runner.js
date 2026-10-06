@@ -1,5 +1,4 @@
-'use strict';
-
+import * as skills from './index.js';
 /**
  * runner — golden-case executor.
  *
@@ -11,8 +10,6 @@
  * With no `impl`, every case reports `skipped` — the suite is inspectable and
  * green-able before a single skill is wired.
  */
-
-const skills = require('./index');
 
 /**
  * Assert `actual` against a golden `expect`. Recognised keys:
@@ -112,4 +109,6 @@ async function runAll({ impls = {} } = {}) {
   return out;
 }
 
-module.exports = { assertExpect, summarize, runGolden, runAll };
+;
+
+export { assertExpect, summarize, runGolden, runAll };

@@ -1,6 +1,5 @@
-'use strict';
+import { EventEmitter } from 'events';
 
-const { EventEmitter } = require('events');
 
 /**
  * DreamJournal — bounded ring of cycle events.
@@ -43,4 +42,6 @@ class DreamJournal extends EventEmitter {
   clear() { this.events.length = 0; }
 }
 
-module.exports = { DreamJournal };
+;
+
+export { DreamJournal };

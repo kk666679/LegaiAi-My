@@ -1,4 +1,9 @@
-"use strict";
+import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
+import zlib from 'zlib';
+import auth_1 from './auth.js';
+
 /**
  * relay.ts — Cloud relay client (Workstream D.2).
  *
@@ -30,28 +35,15 @@
  *
  * Sprint 4 — D2 (WA-4).
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CloudRelay = exports.CLOUD_HEARTBEAT_INTERVAL_MS = void 0;
-exports.defaultRelayConfig = defaultRelayConfig;
-exports.endpointIsSecure = endpointIsSecure;
-exports.cloudDir = cloudDir;
-exports.readRelayConfig = readRelayConfig;
-exports.writeRelayConfig = writeRelayConfig;
-exports.relayIsActive = relayIsActive;
-exports.encryptPayload = encryptPayload;
-exports.decryptPayload = decryptPayload;
-exports.queueDepth = queueDepth;
-const crypto = require("crypto");
-const fs = require("fs");
-const path = require("path");
-const zlib = require("zlib");
-const auth_1 = require("./auth");
+
+CloudRelay = exports.CLOUD_HEARTBEAT_INTERVAL_MS = void 0;
+
 const fsp = fs.promises;
 // ---------------------------------------------------------------------------
 // Relay configuration — defaults to DISABLED
 // ---------------------------------------------------------------------------
 /** Cloud heartbeat cadence — 60s, deliberately slower than the 30s local tick. */
-exports.CLOUD_HEARTBEAT_INTERVAL_MS = 60000;
+export let CLOUD_HEARTBEAT_INTERVAL_MS = 60000;
 /** Max retry attempts for a single batch before it is dropped from the queue. */
 const MAX_RETRIES = 6;
 /** Hard cap on queued items, so a long offline period cannot grow unbounded. */
@@ -572,7 +564,7 @@ class CloudRelay {
         return { ok: true, status: res.status, heartbeats, detail: `${heartbeats.length} heartbeat(s) fetched`, localInstallationId: cred.installationId };
     }
 }
-exports.CloudRelay = CloudRelay;
+
 /** Delete a file, ignoring "already gone". */
 async function safeUnlink(file) {
     try {
@@ -583,3 +575,5 @@ async function safeUnlink(file) {
     }
 }
 //# sourceMappingURL=relay.js.map
+
+export { defaultRelayConfig as defaultRelayConfig, endpointIsSecure as endpointIsSecure, cloudDir as cloudDir, readRelayConfig as readRelayConfig, writeRelayConfig as writeRelayConfig, relayIsActive as relayIsActive, encryptPayload as encryptPayload, decryptPayload as decryptPayload, queueDepth as queueDepth, CloudRelay as CloudRelay };

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-'use strict';
+import { createMemory } from '../memory.js';
 
-const { createMemory } = require('../memory');
+'use strict';
 
 const cmd = process.argv[2] || 'status';
 const mem = createMemory({});

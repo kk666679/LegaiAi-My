@@ -14,7 +14,7 @@ export { premiumDelegate as premiumDelegate };
 export { zmlrDelegate as zmlrDelegate };
 export { buildRoutingContext as buildRoutingContext };
 export { resolveAllModelRoutes as resolveAllModelRoutes };
-import modelRoutes_1 from "./modelRoutes";
+import * as modelRoutes_1 from './modelRoutes.js';
 /** Providers treated as local capacity when building candidates. */
 const LOCAL_PROVIDERS = new Set(['ollama', 'lmstudio', 'llamacpp']);
 /** True for locally-hosted providers — nothing leaves the machine. */

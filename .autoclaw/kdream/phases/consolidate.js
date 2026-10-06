@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * consolidate — merge nodes sharing a canonical key.
  *
@@ -52,4 +50,6 @@ async function consolidate({ store, policy, dreamSet = [] } = {}) {
   return { name: 'consolidate', ok: true, merges };
 }
 
-module.exports = { consolidate };
+;
+
+export { consolidate };

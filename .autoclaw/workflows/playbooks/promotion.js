@@ -1,4 +1,3 @@
-"use strict";
 /**
  * promotion.ts — Playbook Promotion Policy (AWL-3, adaptive-workflow-learning).
  *
@@ -21,9 +20,7 @@
  * why a playbook rose or fell.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.summarizeScores = summarizeScores;
-exports.decidePromotion = decidePromotion;
-exports.evaluatePromotions = evaluatePromotions;
+
 const DEFAULTS = {
     minSamples: 5,
     minAvgReward: 0.6,
@@ -130,3 +127,5 @@ function evaluatePromotions(scores, opts = {}, baselines = {}) {
     return ids.map((id) => decidePromotion(id, scores, opts, baselines[id]));
 }
 //# sourceMappingURL=promotion.js.map
+
+export { summarizeScores as summarizeScores, decidePromotion as decidePromotion, evaluatePromotions as evaluatePromotions };

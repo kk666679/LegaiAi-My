@@ -1,7 +1,7 @@
-"use strict";
+import * as types_1 from './types.js';
+
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.evaluatePremiumEscalation = evaluatePremiumEscalation;
-const types_1 = require("./types");
+
 function evaluatePremiumEscalation(input) {
     const policy = input.policy;
     if (!policy) {
@@ -84,3 +84,5 @@ function deny(reason, remediation) {
     };
 }
 //# sourceMappingURL=escalationPolicy.js.map
+
+export { evaluatePremiumEscalation as evaluatePremiumEscalation };

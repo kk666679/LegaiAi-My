@@ -1,4 +1,5 @@
-"use strict";
+import * as rooms_1 from './rooms.js';
+
 /**
  * connectorContract.ts - Local room connector manifest and write policy.
  *
@@ -7,9 +8,7 @@
  * any bridge/webhook endpoint accepts writes on its behalf.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateRoomConnectorManifest = validateRoomConnectorManifest;
-exports.connectorMayWriteRoomMessage = connectorMayWriteRoomMessage;
-const rooms_1 = require("./rooms");
+
 const CONNECTOR_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
 const KINDS = new Set(['discord', 'slack', 'telegram', 'webhook', 'file']);
 const DIRECTIONS = new Set(['inbound', 'outbound', 'bidirectional']);
@@ -229,3 +228,5 @@ function issue(severity, path, code, message) {
     return { severity, path, code, message };
 }
 //# sourceMappingURL=connectorContract.js.map
+
+export { validateRoomConnectorManifest as validateRoomConnectorManifest, connectorMayWriteRoomMessage as connectorMayWriteRoomMessage };

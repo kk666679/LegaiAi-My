@@ -1,5 +1,3 @@
-'use strict';
-
 /** CycleMetrics — per-phase runs, total ms, ok/failed counts, plus free counters. */
 class CycleMetrics {
   constructor() { this.cycles = 0; this.phases = new Map(); this.counters = new Map(); }
@@ -25,4 +23,6 @@ class CycleMetrics {
   reset() { this.cycles = 0; this.phases.clear(); this.counters.clear(); }
 }
 
-module.exports = { CycleMetrics };
+;
+
+export { CycleMetrics };

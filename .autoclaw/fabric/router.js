@@ -1,4 +1,5 @@
-"use strict";
+import * as agentTypes_1 from './agentTypes.js';
+
 /**
  * router.ts — AF-9: capability-aware, score-based task router.
  *
@@ -27,17 +28,7 @@
  * routing (e.g. reviewer selection).
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.capabilityMatch = capabilityMatch;
-exports.languageMatch = languageMatch;
-exports.trustScore = trustScore;
-exports.idleFactor = idleFactor;
-exports.costFactor = costFactor;
-exports.phaseFactor = phaseFactor;
-exports.scoreAgent = scoreAgent;
-exports.routeTask = routeTask;
-exports.routeTasks = routeTasks;
-exports.agentsFromOffers = agentsFromOffers;
-const agentTypes_1 = require("./agentTypes");
+
 /* -------------------------------------------------------------------------- */
 /*  Scoring primitives                                                        */
 /* -------------------------------------------------------------------------- */
@@ -235,3 +226,5 @@ function agentsFromOffers(offers) {
     return [...byId.values()];
 }
 //# sourceMappingURL=router.js.map
+
+export { capabilityMatch as capabilityMatch, languageMatch as languageMatch, trustScore as trustScore, idleFactor as idleFactor, costFactor as costFactor, phaseFactor as phaseFactor, scoreAgent as scoreAgent, routeTask as routeTask, routeTasks as routeTasks, agentsFromOffers as agentsFromOffers };

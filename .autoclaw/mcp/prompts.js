@@ -1,5 +1,3 @@
-'use strict';
-
 class PromptRegistry {
   constructor() { this.prompts = new Map(); }
 
@@ -121,4 +119,6 @@ function buildDefaultPrompts(_deps = {}) {
   return pr;
 }
 
-module.exports = { PromptRegistry, buildDefaultPrompts };
+;
+
+export { PromptRegistry, buildDefaultPrompts };

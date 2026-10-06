@@ -1,7 +1,7 @@
-"use strict";
+import * as select_1 from './scaffolds/select.js';
+
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.routeWorkflowIntent = routeWorkflowIntent;
-const select_1 = require("./scaffolds/select");
+
 function routeWorkflowIntent(request) {
     const rejected = [];
     const requiredCapabilities = capabilitiesForIntent(request.intent, request.requirements?.capabilities ?? []);
@@ -182,3 +182,5 @@ function selectionReason(candidate, request, escalationActive, fallback) {
     return parts.join('; ');
 }
 //# sourceMappingURL=intentRouter.js.map
+
+export { routeWorkflowIntent as routeWorkflowIntent };

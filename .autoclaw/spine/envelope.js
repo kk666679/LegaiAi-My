@@ -1,4 +1,3 @@
-"use strict";
 /**
  * spine/envelope.ts — Event envelope helpers for the AutoClaw spine.
  *
@@ -9,23 +8,23 @@
  * The schema version is a single source of truth so that producers and
  * consumers can evolve in lock-step.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+
 
 /** Current spine event schema version. Increment on breaking changes. */
-exports.SPINE_SCHEMA = "1.0.0";
+export let SPINE_SCHEMA = "1.0.0";
 
 /** Valid seat state transitions. */
-exports.SEAT_TRANSITIONS = Object.freeze([
+export let SEAT_TRANSITIONS = Object.freeze([
   "created", "granted", "renewed", "revoked", "expired", "released",
 ]);
 
 /** Valid control command states. */
-exports.CONTROL_STATES = Object.freeze([
+export let CONTROL_STATES = Object.freeze([
   "pending", "assigned", "running", "completed", "failed", "cancelled",
 ]);
 
 /** Valid control acknowledgment outcomes. */
-exports.CONTROL_ACK_OUTCOMES = Object.freeze([
+export let CONTROL_ACK_OUTCOMES = Object.freeze([
   "accepted", "rejected", "completed", "failed", "timeout",
 ]);
 
@@ -154,7 +153,4 @@ function validateControlAckEvent(event, errors) {
   }
 }
 
-exports.seatEventId = seatEventId;
-exports.controlCommandEventId = controlCommandEventId;
-exports.controlAckEventId = controlAckEventId;
-exports.validateSpineEvent = validateSpineEvent;
+export { seatEventId as seatEventId, controlCommandEventId as controlCommandEventId, controlAckEventId as controlAckEventId, validateSpineEvent as validateSpineEvent };

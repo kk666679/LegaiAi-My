@@ -1,15 +1,19 @@
 #!/usr/bin/env node
+import fs from 'fs/promises';
+import { EvalHarness } from '../eval/harness.js';
+import { agentRegistry } from '../agents/registry.js';
+import { skillRegistry } from '../skills/registry.js';
+
+import { registerAllAgents } from '../agents/index.js';
+import { Leaderboard } from '../eval/leaderboard.js;
+
 "use strict";
 /**
  * cli/eval.js — Eval CLI commands.
  */
-const { EvalHarness } = require('../eval/harness');
-const { agentRegistry } = require('../agents/registry');
-const { skillRegistry } = require('../skills/registry');
-const fs = require('fs/promises');
 
 async function main() {
-  const command = process.argv[2];
+  const command = process.argv[2]';
 
   switch (command) {
     case 'run': {
@@ -24,7 +28,7 @@ async function main() {
         await skillRegistry.discover();
         target = await skillRegistry.load(targetName);
       } else if (targetType === 'agent') {
-        const { registerAllAgents } = require('../agents/index');
+
         await registerAllAgents();
         target = agentRegistry.get(targetName);
       }
@@ -50,7 +54,7 @@ async function main() {
       process.exit(summary.failed > 0 ? 1 : 0);
     }
     case 'leaderboard': {
-      const { Leaderboard } = require('../eval/leaderboard');
+
       const lb = new Leaderboard({ path: '.autoclaw/eval/leaderboard.json' });
       await lb.load();
       console.table(lb.rankBy({ suite: process.argv[3] }));

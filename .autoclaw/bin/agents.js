@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+import { createRuntime, route, TYPE_MAP } from '../agents/index.js';
+import { Registry } from '../registry/index.js';
+import { Logger } from '../observability/index.js';
+
 'use strict';
 
 /**
@@ -8,10 +12,6 @@
  * chains, the router and the report shape can be exercised without a model.
  * `node bin/agents.js invoke` prints the report any agent returns.
  */
-
-const { createRuntime, route, TYPE_MAP } = require('../agents');
-const { Registry } = require('../registry');
-const { Logger } = require('../observability');
 
 function pad(s, n) { return String(s).padEnd(n, ' '); }
 

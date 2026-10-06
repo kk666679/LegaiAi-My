@@ -1,4 +1,4 @@
-'use strict';
+import { Translator, detect } from '../i18n/index.js';
 
 /**
  * export — render an IRAC analysis into 5 delivery formats.
@@ -8,8 +8,6 @@
  * numbering is identical across all of them — a `[1]` in the HTML must be the
  * same authority as `[1]` in the memo.
  */
-
-const { Translator, detect } = require('../i18n');
 
 const FORMATS = Object.freeze(['irac', 'memo', 'json', 'html', 'citations']);
 
@@ -272,14 +270,6 @@ function resolveRefs(refs, pool) {
   return { resolved, unresolved };
 }
 
-module.exports = {
-  FORMATS,
-  MIMES,
-  UnknownFormatError,
-  format,
-  renderAll,
-  citationsOf,
-  extractRefs,
-  resolveRefs,
-  esc
-};
+;
+
+export { FORMATS, MIMES, UnknownFormatError, format, renderAll, citationsOf, extractRefs, resolveRefs, esc };

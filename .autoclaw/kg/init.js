@@ -1,10 +1,11 @@
 #!/usr/bin/env node
-'use strict';
-const fs = require('fs');
-const path = require('path');
-const { execFileSync } = require('child_process');
+import fs from 'fs';
+import path from 'path';
+import { execFileSync } from 'child_process';
 
-const dir = __dirname;
+'use strict';
+
+const dir = import.meta.dirname;
 const dbPath = path.join(dir, 'kg.db');
 const schema = fs.readFileSync(path.join(dir, 'schema.sql'), 'utf8');
 

@@ -1,4 +1,7 @@
-"use strict";
+import fs from 'fs';
+import path from 'path';
+import * as orchestrate_1 from '../orchestrate.js'; // MISSING TARGET
+
 /**
  * capsule.ts — Evidence capsules: stable run handles for review cycles.
  *
@@ -16,26 +19,14 @@
  * failed gates without re-running the whole review. Local-first: capsules are
  * files in the comms tree, same as the reputation ledger.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ACTIVE_SUBDIR = exports.RESULTS_SUBDIR = void 0;
-exports.newRunId = newRunId;
-exports.buildCapsule = buildCapsule;
-exports.buildLoopConsensusCapsule = buildLoopConsensusCapsule;
-exports.captureCapsule = captureCapsule;
-exports.captureFromChecks = captureFromChecks;
-exports.writeCapsule = writeCapsule;
-exports.readCapsule = readCapsule;
-exports.listCapsules = listCapsules;
-exports.replayFailedGates = replayFailedGates;
-exports.summarizeCapsule = summarizeCapsule;
-const fs = require("fs");
-const path = require("path");
-const orchestrate_1 = require("../orchestrate");
+
+export let ACTIVE_SUBDIR = exports.RESULTS_SUBDIR = void 0;
+
 const fsPromises = fs.promises;
 /** Capsule store, relative to the comms-tree root — beside `consensus/active`. */
-exports.RESULTS_SUBDIR = path.join('consensus', 'results');
+export let RESULTS_SUBDIR = path.join('consensus', 'results');
 /** The active-votes dir, relative to the comms-tree root (for artifact pointers). */
-exports.ACTIVE_SUBDIR = path.join('consensus', 'active');
+ACTIVE_SUBDIR = path.join('consensus', 'active');
 /**
  * Mint a stable, sortable run handle. Compact ISO timestamp + 6 hex of entropy,
  * so two evaluations in the same second don't collide. crabbox-style `run-` prefix.
@@ -274,3 +265,5 @@ function summarizeCapsule(c) {
     return `${c.run_id} ${c.task_id} → ${c.final_verdict} [${gate}, ${c.votes_count} votes]`;
 }
 //# sourceMappingURL=capsule.js.map
+
+export { newRunId as newRunId, buildCapsule as buildCapsule, buildLoopConsensusCapsule as buildLoopConsensusCapsule, captureCapsule as captureCapsule, captureFromChecks as captureFromChecks, writeCapsule as writeCapsule, readCapsule as readCapsule, listCapsules as listCapsules, replayFailedGates as replayFailedGates, summarizeCapsule as summarizeCapsule };

@@ -1,4 +1,6 @@
-"use strict";
+import * as agent_card_1 from '../agent-card.js'; // MISSING TARGET
+import * as agentTypes_1 from './agentTypes.js';
+
 /**
  * agentCardPublisher.ts — write A2A Agent Cards to disk for the whole fleet.
  *
@@ -11,21 +13,19 @@
  * Pure + IO-injected (the file writer is a parameter) so it unit-tests without
  * touching a real disk or importing `vscode`.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.A2A_CARD_FILENAME = exports.CARD_FILENAME = exports.WELL_KNOWN_DIR = void 0;
-exports.publishAgentCards = publishAgentCards;
-const agent_card_1 = require("../agent-card");
-const agentTypes_1 = require("./agentTypes");
+
+export let A2A_CARD_FILENAME = exports.CARD_FILENAME = exports.WELL_KNOWN_DIR = void 0;
+
 /** A2A convention: the card lives at `<root>/.well-known/agent-card.json`. */
-exports.WELL_KNOWN_DIR = '.well-known';
+export let WELL_KNOWN_DIR = '.well-known';
 /** AutoClaw's historical card filename (kept for back-compat). */
-exports.CARD_FILENAME = 'agent-card.json';
+export let CARD_FILENAME = 'agent-card.json';
 /**
  * A2A-canonical card filename. The spec's well-known path is
  * `/.well-known/agent.json`; strict-A2A peers fetch that exact name. We publish
  * it as an alias next to `agent-card.json` (acp/1 §2.1) so both resolve.
  */
-exports.A2A_CARD_FILENAME = 'agent.json';
+A2A_CARD_FILENAME = 'agent.json';
 /** Map a RegisteredAgent's fields into the buildAgentCard `autoclaw` block. */
 function autoclawFieldsFor(agent) {
     const fields = {
@@ -109,3 +109,5 @@ async function publishAgentCards(opts) {
     };
 }
 //# sourceMappingURL=agentCardPublisher.js.map
+
+export { publishAgentCards as publishAgentCards };

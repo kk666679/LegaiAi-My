@@ -120,6 +120,6 @@ class PIIGuard {
   }
 }
 
-module.exports = {
-  PIIGuard,
-};
+;
+
+export { PIIGuard };

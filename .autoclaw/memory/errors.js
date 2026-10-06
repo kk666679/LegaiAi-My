@@ -1,5 +1,3 @@
-'use strict';
-
 class MemoryError extends Error {
   constructor(m, meta) { super(m); this.name = 'MemoryError'; this.code = 'MEMORY_ERROR'; this.meta = meta || {}; }
 }
@@ -16,4 +14,4 @@ class PersistenceError extends MemoryError {
   constructor(m, meta) { super(m, meta); this.code = 'PERSISTENCE_ERROR'; }
 }
 
-module.exports = { MemoryError, UnknownSessionError, CapacityError, UnknownEntryError, PersistenceError };
+export { MemoryError, UnknownSessionError, CapacityError, UnknownEntryError, PersistenceError };

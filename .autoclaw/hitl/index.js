@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * hitl — human-in-the-loop gate.
  *
@@ -213,13 +211,6 @@ function createHITL({ policy = {}, queue = null, timers = null, timeoutMs = 0 } 
   return { gate, queue: q, policy: pol };
 }
 
-module.exports = {
-  createHITL,
-  Policy,
-  ReviewQueue,
-  DECISION,
-  REASON,
-  STATUS,
-  DEFAULT_RISK_KEYWORDS,
-  UnknownItemError
-};
+;
+
+export { createHITL, Policy, ReviewQueue, DECISION, REASON, STATUS, DEFAULT_RISK_KEYWORDS, UnknownItemError };

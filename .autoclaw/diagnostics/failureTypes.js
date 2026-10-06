@@ -1,14 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.WORKFLOW_FAILURE_TYPES = void 0;
-exports.normalizeFailureType = normalizeFailureType;
-exports.isKnownFailureType = isKnownFailureType;
-exports.isRetryableFailure = isRetryableFailure;
-exports.isEscalationCandidate = isEscalationCandidate;
-exports.isHumanRequired = isHumanRequired;
-exports.failureTypeFromGateResult = failureTypeFromGateResult;
-exports.failureTypeFromToolError = failureTypeFromToolError;
-exports.WORKFLOW_FAILURE_TYPES = [
+
+export let WORKFLOW_FAILURE_TYPES = void 0;
+
+WORKFLOW_FAILURE_TYPES = [
     'context_missing',
     'context_noisy',
     'query_too_broad',
@@ -150,3 +143,5 @@ function failureTypeFromToolError(error) {
     };
 }
 //# sourceMappingURL=failureTypes.js.map
+
+export { normalizeFailureType as normalizeFailureType, isKnownFailureType as isKnownFailureType, isRetryableFailure as isRetryableFailure, isEscalationCandidate as isEscalationCandidate, isHumanRequired as isHumanRequired, failureTypeFromGateResult as failureTypeFromGateResult, failureTypeFromToolError as failureTypeFromToolError };

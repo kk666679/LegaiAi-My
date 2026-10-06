@@ -1,4 +1,7 @@
-"use strict";
+import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
+
 /**
  * daemon/viewerAuth.ts — CP-3.5: viewer/operator session auth for the AutoClaw
  * Control web UI, so the review queue can be READ (and reviews APPROVED) from a
@@ -21,20 +24,12 @@
  * Pure + filesystem-only (no vscode, no bridge import) so autoclawd and the unit
  * tests can exercise it headless.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.SESSION_TOUCH_INTERVAL_MS = exports.SESSION_TTL_MS = exports.PAIRING_CODE_TTL_MS = void 0;
-exports.mintPairingCode = mintPairingCode;
-exports.redeemPairingCode = redeemPairingCode;
-exports.validateSession = validateSession;
-exports.revokeSession = revokeSession;
-exports.listSessions = listSessions;
-exports.sessionTokenFromCookie = sessionTokenFromCookie;
-const crypto = require("crypto");
-const fs = require("fs");
-const path = require("path");
-exports.PAIRING_CODE_TTL_MS = 3 * 60000; // 3 minutes — long enough to scan, short enough to be safe.
-exports.SESSION_TTL_MS = 30 * 24 * 60 * 60000; // 30 days — a paired phone stays paired until revoked/expired.
-exports.SESSION_TOUCH_INTERVAL_MS = 5 * 60000; // throttle last_seen_at writes to ≤ once / 5 min per session.
+
+export let SESSION_TOUCH_INTERVAL_MS = exports.SESSION_TTL_MS = exports.PAIRING_CODE_TTL_MS = void 0;
+
+export let PAIRING_CODE_TTL_MS = 3 * 60000; // 3 minutes — long enough to scan, short enough to be safe.
+export let SESSION_TTL_MS = 30 * 24 * 60 * 60000; // 30 days — a paired phone stays paired until revoked/expired.
+SESSION_TOUCH_INTERVAL_MS = 5 * 60000; // throttle last_seen_at writes to ≤ once / 5 min per session.
 function controlDir(workspaceRoot) {
     return path.join(workspaceRoot, '.autoclaw', 'control');
 }
@@ -206,3 +201,5 @@ function sessionTokenFromCookie(cookieHeader, cookieName = 'ac_session') {
     return undefined;
 }
 //# sourceMappingURL=viewerAuth.js.map
+
+export { mintPairingCode as mintPairingCode, redeemPairingCode as redeemPairingCode, validateSession as validateSession, revokeSession as revokeSession, listSessions as listSessions, sessionTokenFromCookie as sessionTokenFromCookie };

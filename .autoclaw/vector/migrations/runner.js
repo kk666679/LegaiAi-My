@@ -1,7 +1,9 @@
-const fs = require('fs/promises');
-const path = require('path');
-const { DatabaseSync } = require('node:sqlite');
-const { createHash } = require('crypto');
+import fs from 'fs/promises';
+import path from 'path';
+import { DatabaseSync } from 'node:sqlite';
+import { createHash } from 'crypto';
+
+
 
 class VectorMigrator {
   constructor({ dbPath, schemaDir }) {
@@ -53,4 +55,6 @@ class VectorMigrator {
   }
 }
 
-module.exports = { VectorMigrator };
+;
+
+export { VectorMigrator };

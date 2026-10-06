@@ -1,4 +1,6 @@
-"use strict";
+import scaffolds_1 from '../scaffolds/index.js';
+import * as promotion_1 from './promotion.js';
+
 /**
  * experiment.ts — Playbook Experiment Runner (AWL-2, adaptive-workflow-learning).
  *
@@ -23,26 +25,24 @@
  * scored and traced, but not selectable.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.runPlaybookExperiment = runPlaybookExperiment;
-const scaffolds_1 = require("../scaffolds");
-const promotion_1 = require("./promotion");
+
 const DEFAULT_MIN_REWARD = 0.5;
 /* -------------------------------------------------------------------------- */
 /*  Default store/ledger wiring (lazy — tests never touch it)                 */
 /* -------------------------------------------------------------------------- */
 function defaultDeps(workspaceRoot) {
     return {
-        readVariants: async () => (await Promise.resolve().then(() => require('../scaffolds/store'))).readScaffoldVariants(workspaceRoot).then((r) => r.records),
-        readScores: async () => (await Promise.resolve().then(() => require('../scaffolds/store'))).readScaffoldScores(workspaceRoot).then((r) => r.records),
-        readHarnesses: async () => (await Promise.resolve().then(() => require('../scaffolds/store'))).readPromptHarnessContracts(workspaceRoot).then((r) => r.records),
+        readVariants: async () => (await import('../scaffolds/store.js)).readScaffoldVariants(workspaceRoot).then((r) => r.records),
+        readScores: async (') => (await import('../scaffolds/store.js)).readScaffoldScores(workspaceRoot).then((r) => r.records),
+        readHarnesses: async (') => (await import('../scaffolds/store.js)).readPromptHarnessContracts(workspaceRoot).then((r) => r.records),
         monitor: scaffolds_1.evaluateScaffoldMonitor,
-        appendScore: async (score) => (await Promise.resolve().then(() => require('../scaffolds/store'))).appendScaffoldScore(workspaceRoot, score),
-        appendVariant: async (variant) => (await Promise.resolve().then(() => require('../scaffolds/store'))).appendScaffoldVariant(workspaceRoot, variant),
-        appendTrace: async (row) => {
-            await (await Promise.resolve().then(() => require('../traces/ledger'))).appendTraceRow(workspaceRoot, row);
+        appendScore: async (score') => (await import('../scaffolds/store.js)).appendScaffoldScore(workspaceRoot, score),
+        appendVariant: async (variant') => (await import('../scaffolds/store.js)).appendScaffoldVariant(workspaceRoot, variant),
+        appendTrace: async (row') => {
+            await (await import('../traces/ledger.js)).appendTraceRow(workspaceRoot, row);
         },
-        publishGuardFindings: async (findings) => {
-            await (await Promise.resolve().then(() => require('../../orchestrator/findings'))).writeRewardGuardFindings(findings, { workspaceRoot });
+        publishGuardFindings: async (findings') => {
+            await (await import('../../orchestrator/findings')).writeRewardGuardFindings(findings, { workspaceRoot });
         },
     };
 }
@@ -154,7 +154,7 @@ async function runPlaybookExperiment(opts) {
         }
     }
     // ── 5. Score ─────────────────────────────────────────────────────────────
-    const { buildScaffoldScore } = await Promise.resolve().then(() => require('../scaffolds/score'));
+    const { buildScaffoldScore } = await import('../scaffolds/score.js);
     const scored = buildScaffoldScore({
         scaffold: executed,
         run,
@@ -170,10 +170,10 @@ async function runPlaybookExperiment(opts) {
         catch (err) {
             warnings.push(`score append failed: ${err.message}`);
         }
-        reasons.push(`scored reward ${scored.score.reward} (pass=${scored.score.pass})`);
+        reasons.push(`scored reward ${scored.score.reward} (pass=${scored.score.pass})`');
     }
     // ── 6. Trace ─────────────────────────────────────────────────────────────
-    const { buildTraceRow } = await Promise.resolve().then(() => require('../traces/ledger'));
+    const { buildTraceRow } = await import('../traces/ledger.js');
     let traced = false;
     try {
         await d.appendTrace(buildTraceRow({
@@ -239,3 +239,5 @@ async function runPlaybookExperiment(opts) {
     return { decision, executed, child, guard, score: scored.score, traced, promoted, reasons, warnings };
 }
 //# sourceMappingURL=experiment.js.map
+
+export { runPlaybookExperiment as runPlaybookExperiment };

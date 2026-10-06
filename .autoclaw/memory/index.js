@@ -1,20 +1,17 @@
-'use strict';
-
-const path = require('path');
-const fs = require('fs');
-const { EventEmitter } = require('events');
-const { ShortTermMemory } = require('./stm');
-const { LongTermMemory } = require('./ltm');
-const { JSONLStore } = require('./persistence');
-const promotion = require('./promotion');
-const retrieval = require('./retrieval');
-const { TIER, KIND, DEFAULT_STM, DEFAULT_LTM } = require('./constants');
-const errors = require('./errors');
+import path from 'path';
+import fs from 'fs';
+import { EventEmitter } from 'events';
+import { ShortTermMemory } from './stm.js';
+import { LongTermMemory } from './ltm.js';
+import { JSONLStore } from './persistence.js';
+import * as promotion from './promotion.js';
+import * as retrieval from './retrieval.js';
+import { TIER, KIND, DEFAULT_STM, DEFAULT_LTM } from './constants.js';
 
 // createMemory — the unified facade.
 function createMemory(opts) {
   opts = opts || {};
-  const root = opts.root || path.resolve(__dirname, '..');
+  const root = opts.root || path.resolve(import.meta.dirname, '..');
   const ltmFile = opts.ltmFile || path.join(root, 'memory', 'ltm.jsonl');
 
   const stm = new ShortTermMemory(Object.assign({}, opts.stm || {}));
@@ -81,10 +78,10 @@ function createMemory(opts) {
   };
 }
 
-module.exports = {
+export {
   createMemory,
   ShortTermMemory, LongTermMemory, JSONLStore,
   promotion, retrieval,
-  TIER, KIND, DEFAULT_STM, DEFAULT_LTM,
-  ...errors
+  TIER, KIND, DEFAULT_STM, DEFAULT_LTM
 };
+export * from './errors.js';

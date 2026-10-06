@@ -1,4 +1,3 @@
-"use strict";
 /**
  * eval/scorers/fuzzy-match.js — Fuzzy string match scorer.
  */
@@ -35,4 +34,4 @@ const fuzzyMatchScorer = {
   },
 };
 
-exports.fuzzyMatchScorer = fuzzyMatchScorer;
+export { fuzzyMatchScorer as fuzzyMatchScorer };

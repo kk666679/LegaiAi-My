@@ -1,4 +1,5 @@
-"use strict";
+import { performance } from 'perf_hooks';
+
 /**
  * eval/runner.js — Execute a single eval case against a target.
  *
@@ -6,7 +7,6 @@
  * AgentGym2, SQBench, and MultiCAT-Bench dimensions.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const { performance } = require('perf_hooks');
 
 // Default evaluation dimensions from 2026 benchmarks
 const DEFAULT_DIMENSIONS = {
@@ -84,5 +84,4 @@ async function runEval({ testCase, target, targetType, scorers, dimensions = DEF
   };
 }
 
-exports.runEval = runEval;
-exports.DEFAULT_DIMENSIONS = DEFAULT_DIMENSIONS;
+export { runEval as runEval, DEFAULT_DIMENSIONS as DEFAULT_DIMENSIONS };

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-'use strict';
+import * as mcp from '../mcp/index.js';
+import http from 'http';
 
-const mcp = require('../mcp');
+'use strict';
 
 const mode = process.argv[2] || 'stdio';
 
@@ -11,7 +12,7 @@ if (mode === 'stdio') {
 } else if (mode === 'http') {
   const port = Number(process.argv[3]) || 7331;
   const { handler } = mcp.serveHttp({});
-  const http = require('http');
+  const http = http;
   http.createServer(handler).listen(port, () => {
     process.stdout.write(`mcp http listening on :${port}\n`);
   });

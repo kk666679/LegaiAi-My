@@ -1,4 +1,4 @@
-'use strict';
+import { EventEmitter } from 'events';
 
 /**
  * tasks — in-process async job runner with a concurrency ceiling.
@@ -6,8 +6,6 @@
  * Not a durable queue. Anything that must survive a crash belongs in the
  * BullMQ workers (`src/workers/`) or the spine (`spine/spine.db`).
  */
-
-const { EventEmitter } = require('events');
 
 const STATUS = Object.freeze({
   QUEUED: 'queued',
@@ -178,4 +176,6 @@ function defaultHandlers({ logger = null, spine = null, dataset = null } = {}) {
   };
 }
 
-module.exports = { TaskRunner, UnknownTaskKindError, defaultHandlers, STATUS };
+;
+
+export { TaskRunner, UnknownTaskKindError, defaultHandlers, STATUS };

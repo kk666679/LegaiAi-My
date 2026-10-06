@@ -1,4 +1,8 @@
-'use strict';
+import path from 'path';
+import * as canonical from './canonical.js';
+import { openStore, SQLiteStore, MemoryStore } from './store.js';
+import { KGQuery } from './query.js';
+import { KGIngest } from './ingest.js';
 
 /**
  * kg — one-call facade over the knowledge graph.
@@ -13,14 +17,8 @@
  *   await createDreamer({ store: kg.store }).runCycle({ mode: 'light' });
  */
 
-const path = require('path');
-const { openStore, SQLiteStore, MemoryStore } = require('./store');
-const { KGQuery } = require('./query');
-const { KGIngest } = require('./ingest');
-const canonical = require('./canonical');
-
 function createKG({ dbPath, memory, logger, dense, sparse } = {}) {
-  const resolved = dbPath || path.resolve(__dirname, 'kg.db');
+  const resolved = dbPath || path.resolve(import.meta.dirname, 'kg.db');
   const store = openStore({ dbPath: resolved, memory, logger });
   const query = new KGQuery(store, { dense, sparse });
   const ingest = new KGIngest(store);
@@ -44,12 +42,7 @@ function createKG({ dbPath, memory, logger, dense, sparse } = {}) {
   };
 }
 
-module.exports = {
-  createKG,
-  SQLiteStore,
-  MemoryStore,
-  openStore,
-  KGQuery,
-  KGIngest,
-  ...canonical
-};
+;
+
+export { createKG, SQLiteStore, MemoryStore, openStore, KGQuery, KGIngest };
+export * from './canonical.js';

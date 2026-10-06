@@ -1,4 +1,3 @@
-"use strict";
 /**
  * agentTypes.ts — the agent-TYPE taxonomy for the multi-platform fabric.
  *
@@ -14,14 +13,10 @@
  * it is consistent with the existing review controls in
  * `src/orchestrator/reviewSla.ts` (auditor ⇒ unanimous).
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AGENT_TYPES = void 0;
-exports.agentTypeProfile = agentTypeProfile;
-exports.consensusRuleForAgentType = consensusRuleForAgentType;
-exports.requiresHumanApproval = requiresHumanApproval;
-exports.agentTypeForPersona = agentTypeForPersona;
-exports.defaultAgentTypeForRunner = defaultAgentTypeForRunner;
-exports.AGENT_TYPES = ['coder', 'runner', 'auditor', 'supervisor', 'assistant', 'governance'];
+
+export let AGENT_TYPES = void 0;
+
+AGENT_TYPES = ['coder', 'runner', 'auditor', 'supervisor', 'assistant', 'governance'];
 const PROFILES = {
     coder: {
         type: 'coder',
@@ -126,3 +121,5 @@ function defaultAgentTypeForRunner(runnerId) {
     return RUNNER_DEFAULT_TYPE[runnerId] ?? 'coder';
 }
 //# sourceMappingURL=agentTypes.js.map
+
+export { agentTypeProfile as agentTypeProfile, consensusRuleForAgentType as consensusRuleForAgentType, requiresHumanApproval as requiresHumanApproval, agentTypeForPersona as agentTypeForPersona, defaultAgentTypeForRunner as defaultAgentTypeForRunner };

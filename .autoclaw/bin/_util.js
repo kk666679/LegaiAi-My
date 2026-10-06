@@ -1,8 +1,9 @@
-'use strict';
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
-const ROOT = path.resolve(__dirname, '..');
+
+
+const ROOT = path.resolve(import.meta.dirname, '..');
 
 function readJson(rel) {
   return JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8'));
@@ -25,4 +26,6 @@ function appendJsonl(rel, obj) {
 function nowIso() { return new Date().toISOString(); }
 function today() { return new Date().toISOString().slice(0, 10); }
 
-module.exports = { ROOT, readJson, writeJson, writeText, appendJsonl, nowIso, today };
+;
+
+export { ROOT, readJson, writeJson, writeText, appendJsonl, nowIso, today };

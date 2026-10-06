@@ -1,4 +1,3 @@
-"use strict";
 /**
  * modelNode.ts — Model/agent node executor for the WL-1 headless runner.
  *
@@ -14,7 +13,7 @@
  * text (privacy: prompts/responses must not land in cost-oriented ledgers).
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.runModelNode = runModelNode;
+
 async function runModelNode(ctx) {
     const cfg = (ctx.node.config ?? {});
     const iteration = ctx.iteration ?? 0;
@@ -46,3 +45,5 @@ async function runModelNode(ctx) {
     };
 }
 //# sourceMappingURL=modelNode.js.map
+
+export { runModelNode as runModelNode };

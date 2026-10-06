@@ -54,6 +54,4 @@
  * @property {number} timestamp
  */
 
-module.exports = {
-  // Re-exported for typing purposes
-};
+;

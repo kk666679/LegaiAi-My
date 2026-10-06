@@ -1,9 +1,10 @@
-'use strict';
-const { toolResult, toolError } = require('../protocol');
+import { toolResult, toolError } from '../protocol.js';
+import path from 'path';
+
+import * as kdream from '../../kdream/index.js';
 
 function build() {
   let kdream;
-  try { kdream = require('../../kdream'); } catch (_) { kdream = null; }
 
   return [
     {
@@ -41,8 +42,8 @@ function build() {
       handler: async () => {
         if (!kdream) return toolError('kdream unavailable');
         try {
-          const path = require('path');
-          const dir = path.resolve(__dirname, '..', '..', 'learnings');
+          const path = path;
+          const dir = path.resolve(import.meta.dirname, '..', '..', 'learnings');
           const list = kdream.listInsights(dir).map(i => ({ file: i.file, title: i.title, front: i.front }));
           return toolResult([{ type: 'text', text: JSON.stringify(list, null, 2) }]);
         } catch (e) { return toolError(e.message); }
@@ -50,4 +51,6 @@ function build() {
     }
   ];
 }
-module.exports = { build };
+;
+
+export { build };

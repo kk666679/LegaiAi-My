@@ -1,11 +1,13 @@
+import path from 'path';
+import fs from 'fs';
+
 /**
  * .autoclaw/safety/kill-switch/kill-switch.js
  * Emergency halt mechanism with scoped shutdowns
  * Scopes: global, agent:id, tool:name
  */
 
-const fs = require('fs').promises;
-const path = require('path');
+const fs = fs.promises;
 
 class KillSwitch {
   /**
@@ -225,6 +227,6 @@ class KillSwitch {
   }
 }
 
-module.exports = {
-  KillSwitch,
-};
+;
+
+export { KillSwitch };

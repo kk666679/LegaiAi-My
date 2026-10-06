@@ -1,14 +1,10 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.WORKFLOW_PLAYBOOK_SCHEMA = exports.SCAFFOLD_SCORE_SCHEMA = exports.PROMPT_HARNESS_SCHEMA = exports.SCAFFOLD_SCHEMA = void 0;
-exports.parseScaffoldVariant = parseScaffoldVariant;
-exports.parseWorkflowPlaybook = parseWorkflowPlaybook;
-exports.parsePromptHarnessContract = parsePromptHarnessContract;
-exports.parseScaffoldScore = parseScaffoldScore;
-exports.SCAFFOLD_SCHEMA = 'autoclaw.scaffold.v1';
-exports.PROMPT_HARNESS_SCHEMA = 'autoclaw.promptHarness.v1';
-exports.SCAFFOLD_SCORE_SCHEMA = 'autoclaw.scaffoldScore.v1';
-exports.WORKFLOW_PLAYBOOK_SCHEMA = exports.SCAFFOLD_SCHEMA;
+
+export let WORKFLOW_PLAYBOOK_SCHEMA = exports.SCAFFOLD_SCORE_SCHEMA = exports.PROMPT_HARNESS_SCHEMA = exports.SCAFFOLD_SCHEMA = void 0;
+
+export let SCAFFOLD_SCHEMA = 'autoclaw.scaffold.v1';
+export let PROMPT_HARNESS_SCHEMA = 'autoclaw.promptHarness.v1';
+export let SCAFFOLD_SCORE_SCHEMA = 'autoclaw.scaffoldScore.v1';
+WORKFLOW_PLAYBOOK_SCHEMA = exports.SCAFFOLD_SCHEMA;
 function parseScaffoldVariant(input) {
     const value = parseRecord(input, 'Scaffold variant');
     requireSchema(value, exports.SCAFFOLD_SCHEMA, 'Scaffold variant');
@@ -88,3 +84,5 @@ function requireNumber(value, key, label) {
     }
 }
 //# sourceMappingURL=types.js.map
+
+export { parseScaffoldVariant as parseScaffoldVariant, parseWorkflowPlaybook as parseWorkflowPlaybook, parsePromptHarnessContract as parsePromptHarnessContract, parseScaffoldScore as parseScaffoldScore };

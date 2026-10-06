@@ -1,5 +1,3 @@
-'use strict';
-
 function scoreSTM(entry, q, now) {
   let s = 0;
   const text = ((entry.text || '') + ' ' + (entry.query || '') + ' ' + (entry.observation || '')).toLowerCase();
@@ -71,4 +69,4 @@ function unifiedQuery(stm, ltm, opts) {
   return deduped.slice(0, limit);
 }
 
-module.exports = { unifiedQuery, scoreSTM };
+export { unifiedQuery, scoreSTM };

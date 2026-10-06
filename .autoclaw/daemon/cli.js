@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import * as autoclawd_1 from './autoclawd.js';
+
 "use strict";
 /**
  * daemon/cli.ts — the `autoclawd` executable (CP-3.1). Starts the headless
@@ -7,7 +9,7 @@
  * `npx autoclawd` / a global install runs the fleet with no IDE open.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const autoclawd_1 = require("./autoclawd");
+
 async function main() {
     const nv = (0, autoclawd_1.checkNodeVersion)();
     if (!nv.ok) {

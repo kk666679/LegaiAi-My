@@ -1,29 +1,16 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.WORKFLOW_RUN_CONTEXT_FILE = exports.WORKFLOW_EVENTS_FILE = exports.WORKFLOW_RUN_FILE = exports.WORKFLOW_RUNS_DIR = void 0;
-exports.runDir = runDir;
-exports.runMetadataPath = runMetadataPath;
-exports.runEventsPath = runEventsPath;
-exports.writeRunMetadata = writeRunMetadata;
-exports.appendRunEvent = appendRunEvent;
-exports.readRun = readRun;
-exports.listRuns = listRuns;
-exports.summarizeRun = summarizeRun;
-exports.summarizeRunRecords = summarizeRunRecords;
-exports.runContextWindowsPath = runContextWindowsPath;
-exports.readRunContextWindows = readRunContextWindows;
-exports.appendRunContextWindow = appendRunContextWindow;
-exports.appendWholeRunWindow = appendWholeRunWindow;
-exports.collectRunContextWindows = collectRunContextWindows;
-const fs = require("fs");
-const path = require("path");
-const contextSpine_1 = require("../intelligence/contextSpine");
-const types_1 = require("./types");
-exports.WORKFLOW_RUNS_DIR = path.join('.autoclaw', 'workflows', 'runs');
-exports.WORKFLOW_RUN_FILE = 'run.json';
-exports.WORKFLOW_EVENTS_FILE = 'events.jsonl';
+import fs from 'fs';
+import path from 'path';
+import * as contextSpine_1 from '../intelligence/contextSpine.js'; // MISSING TARGET
+import * as types_1 from './types.js';
+
+
+export let WORKFLOW_RUN_CONTEXT_FILE = exports.WORKFLOW_EVENTS_FILE = exports.WORKFLOW_RUN_FILE = exports.WORKFLOW_RUNS_DIR = void 0;
+
+export let WORKFLOW_RUNS_DIR = path.join('.autoclaw', 'workflows', 'runs');
+export let WORKFLOW_RUN_FILE = 'run.json';
+export let WORKFLOW_EVENTS_FILE = 'events.jsonl';
 /** CS-3: per-run contiguous context windows, cached for later replay. */
-exports.WORKFLOW_RUN_CONTEXT_FILE = 'context-windows.jsonl';
+WORKFLOW_RUN_CONTEXT_FILE = 'context-windows.jsonl';
 function runDir(workspaceRoot, runId) {
     return path.join(workspaceRoot, exports.WORKFLOW_RUNS_DIR, runId);
 }
@@ -341,3 +328,5 @@ async function collectRunContextWindows(workspaceRoot) {
     return out;
 }
 //# sourceMappingURL=runLedger.js.map
+
+export { runDir as runDir, runMetadataPath as runMetadataPath, runEventsPath as runEventsPath, writeRunMetadata as writeRunMetadata, appendRunEvent as appendRunEvent, readRun as readRun, listRuns as listRuns, summarizeRun as summarizeRun, summarizeRunRecords as summarizeRunRecords, runContextWindowsPath as runContextWindowsPath, readRunContextWindows as readRunContextWindows, appendRunContextWindow as appendRunContextWindow, appendWholeRunWindow as appendWholeRunWindow, collectRunContextWindows as collectRunContextWindows };

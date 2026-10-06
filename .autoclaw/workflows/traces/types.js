@@ -1,4 +1,3 @@
-"use strict";
 /**
  * types.ts — Trace Ledger row contracts (TL-1, adaptive-workflow-learning).
  *
@@ -19,7 +18,7 @@
  * Field naming is snake_case to match the comms/JSONL conventions the rest of
  * the coordination plane uses (heartbeats, votes, handoffs).
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.TRACE_SCHEMA = void 0;
-exports.TRACE_SCHEMA = 'autoclaw.trace.v1';
+
+export let TRACE_SCHEMA = void 0;
+TRACE_SCHEMA = 'autoclaw.trace.v1';
 //# sourceMappingURL=types.js.map

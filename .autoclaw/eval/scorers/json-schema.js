@@ -1,9 +1,9 @@
-"use strict";
+import Ajv from 'ajv';
+
 /**
  * eval/scorers/json-schema.js — JSON schema validation scorer.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const Ajv = require('ajv');
 
 const ajv = new Ajv();
 
@@ -21,4 +21,4 @@ const jsonSchemaScorer = {
   }
 };
 
-exports.jsonSchemaScorer = jsonSchemaScorer;
+export { jsonSchemaScorer as jsonSchemaScorer };

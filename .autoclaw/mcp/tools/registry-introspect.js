@@ -1,5 +1,5 @@
-'use strict';
-const { toolResult, toolError } = require('../protocol');
+import { toolResult, toolError } from '../protocol.js';
+
 
 function build({ registry } = {}) {
   return [
@@ -24,4 +24,6 @@ function build({ registry } = {}) {
     }
   ];
 }
-module.exports = { build };
+;
+
+export { build };

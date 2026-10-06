@@ -1,4 +1,8 @@
-"use strict";
+import fs from 'fs';
+import path from 'path';
+import * as runner_1 from './runner.js';
+import * as runLedger_1 from './runLedger.js';
+
 /**
  * replay.ts — Run replay and rerun-from-node for the WL-1 headless runner (WL-1.5).
  *
@@ -13,14 +17,7 @@
  * so no model or command calls happen unless explicitly injected.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.replayRun = replayRun;
-exports.rerunFullWorkflow = rerunFullWorkflow;
-exports.rerunFromNode = rerunFromNode;
-exports.compareRuns = compareRuns;
-const fs = require("fs");
-const path = require("path");
-const runner_1 = require("./runner");
-const runLedger_1 = require("./runLedger");
+
 function readRunEvents(workspaceRoot, runId) {
     const p = (0, runLedger_1.runEventsPath)(workspaceRoot, runId);
     let raw;
@@ -163,3 +160,5 @@ function compareRuns(a, b) {
     };
 }
 //# sourceMappingURL=replay.js.map
+
+export { replayRun as replayRun, rerunFullWorkflow as rerunFullWorkflow, rerunFromNode as rerunFromNode, compareRuns as compareRuns };

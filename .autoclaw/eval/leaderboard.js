@@ -1,9 +1,9 @@
-"use strict";
+import fs from 'fs/promises';
+
 /**
  * eval/leaderboard.js — Rank agents and skills by eval scores.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs = require('fs/promises');
 
 class Leaderboard {
   constructor({ path }) {
@@ -36,4 +36,4 @@ class Leaderboard {
   }
 }
 
-exports.Leaderboard = Leaderboard;
+export { Leaderboard as Leaderboard };

@@ -6,7 +6,7 @@
 let metrics;
 
 try {
-  const otelMetrics = require('@opentelemetry/api').metrics;
+  await import('@opentelemetry/api').metrics;
   if (otelMetrics) {
     metrics = otelMetrics.getMeter('autoclaw-safety', '1.0.0');
   }
@@ -68,7 +68,6 @@ class SafetyMetrics {
   }
 }
 
-module.exports = {
-  safetyMetrics: new SafetyMetrics(),
-  metrics,
-};
+;
+
+export { metrics };

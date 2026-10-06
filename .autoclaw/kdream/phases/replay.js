@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * replay — choose the dream set: which nodes this cycle is allowed to touch.
  *
@@ -58,4 +56,6 @@ async function replay({ store, policy, dreamSetIn = [], input = {} } = {}) {
   return { name: 'replay', ok: true, dreamSet };
 }
 
-module.exports = { replay, canonical };
+;
+
+export { replay, canonical };

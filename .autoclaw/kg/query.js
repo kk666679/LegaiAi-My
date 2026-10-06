@@ -1,4 +1,4 @@
-'use strict';
+import { canonicalKey } from './canonical.js';
 
 /**
  * query — the read API over a store.
@@ -9,8 +9,6 @@
  * the same deterministic search. Never invents an id — it only ever returns
  * rows that exist.
  */
-
-const { canonicalKey } = require('./canonical');
 
 class KGQuery {
   constructor(store, { dense, sparse } = {}) {
@@ -92,4 +90,6 @@ class KGQuery {
   }
 }
 
-module.exports = { KGQuery };
+;
+
+export { KGQuery };

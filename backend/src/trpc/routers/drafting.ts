@@ -277,6 +277,16 @@ export const draftingRouter = router({
       return ref
     }),
 
+  // List citation references for a draft.
+  listCitations: protectedProcedure
+    .input(z.object({ draftId: z.string().cuid() }))
+    .query(async ({ input }) => {
+      return prisma.citationReference.findMany({
+        where: { draftId: input.draftId },
+        orderBy: { createdAt: 'desc' },
+      })
+    }),
+
   // Validate a citation: real MLJ/AM regex + LOM match if applicable.
   validateCitation: protectedProcedure
     .input(z.object({ id: z.string().cuid() }))

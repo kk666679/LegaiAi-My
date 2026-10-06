@@ -1,4 +1,16 @@
-"use strict";
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import * as orchestratorLoop_1 from '../orchestratorLoop.js'; // MISSING TARGET
+import * as bridge_1 from '../bridge/index.js';
+import * as webui_1 from './webui.js';
+import * as push_1 from './push.js';
+import * as fleetData_1 from '../panel/fleetData.js'; // MISSING TARGET
+import * as fleetDigest_1 from '../fleet/fleetDigest.js'; // MISSING TARGET
+import * as read_1 from '../spine/read.js'; // MISSING TARGET
+import * as proof_1 from '../spine/proof.js'; // MISSING TARGET
+import * as logRotation_1 from './logRotation.js';
+
 /**
  * daemon/autoclawd.ts — the AutoClaw Control headless daemon (CP-3.1).
  *
@@ -19,32 +31,15 @@
  * {@link produceDigestOnce}, {@link isProcessAlive}. The `startAutoclawd`
  * composition wires them to the real loop + bridge.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.DEFAULT_DIGEST_INTERVAL_MS = exports.DEFAULT_TICK_MS = exports.DAEMON_BRIDGE_PORT_DEFAULT = exports.MIN_NODE_MINOR = exports.MIN_NODE_MAJOR = void 0;
-exports.checkNodeVersion = checkNodeVersion;
-exports.resolveDaemonConfig = resolveDaemonConfig;
-exports.produceDigestOnce = produceDigestOnce;
-exports.isProcessAlive = isProcessAlive;
-exports.acquirePidLock = acquirePidLock;
-exports.startAutoclawd = startAutoclawd;
-const fs = require("fs");
-const os = require("os");
-const path = require("path");
-const orchestratorLoop_1 = require("../orchestratorLoop");
-const bridge_1 = require("../bridge");
-const webui_1 = require("./webui");
-const push_1 = require("./push");
-const fleetData_1 = require("../panel/fleetData");
-const fleetDigest_1 = require("../fleet/fleetDigest");
-const read_1 = require("../spine/read");
-const proof_1 = require("../spine/proof");
-const logRotation_1 = require("./logRotation");
+
+export let DEFAULT_DIGEST_INTERVAL_MS = exports.DEFAULT_TICK_MS = exports.DAEMON_BRIDGE_PORT_DEFAULT = exports.MIN_NODE_MINOR = exports.MIN_NODE_MAJOR = void 0;
+
 /* -------------------------------------------------------------------------- */
 /*  Node version gate                                                          */
 /* -------------------------------------------------------------------------- */
 /** node:sqlite (the spine + KG backend) needs Node ≥ 22.5. */
-exports.MIN_NODE_MAJOR = 22;
-exports.MIN_NODE_MINOR = 5;
+export let MIN_NODE_MAJOR = 22;
+export let MIN_NODE_MINOR = 5;
 /**
  * Parse `process.version`-style strings and decide whether node:sqlite is
  * available. Below the floor the daemon still RUNS (the loop + bridge are fine);
@@ -70,9 +65,9 @@ function checkNodeVersion(version = process.version) {
 /*  Config                                                                     */
 /* -------------------------------------------------------------------------- */
 /** Reserved daemon bridge-port band — distinct from the per-IDE bands (9876+). */
-exports.DAEMON_BRIDGE_PORT_DEFAULT = 9979;
-exports.DEFAULT_TICK_MS = 30000;
-exports.DEFAULT_DIGEST_INTERVAL_MS = 15000;
+export let DAEMON_BRIDGE_PORT_DEFAULT = 9979;
+export let DEFAULT_TICK_MS = 30000;
+DEFAULT_DIGEST_INTERVAL_MS = 15000;
 /** Resolve the daemon config from options + env (pure). Env overrides:
  *  AUTOCLAW_WORKSPACE, AUTOCLAW_TICK_MS, AUTOCLAW_BRIDGE_PORT. */
 function resolveDaemonConfig(opts = {}, env = process.env) {
@@ -286,3 +281,5 @@ async function startAutoclawd(opts = {}) {
     return { config, loop, bridge, webui, stop };
 }
 //# sourceMappingURL=autoclawd.js.map
+
+export { checkNodeVersion as checkNodeVersion, resolveDaemonConfig as resolveDaemonConfig, produceDigestOnce as produceDigestOnce, isProcessAlive as isProcessAlive, acquirePidLock as acquirePidLock, startAutoclawd as startAutoclawd };

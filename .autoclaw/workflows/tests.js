@@ -1,9 +1,8 @@
-"use strict";
+import contracts_1 from './contracts.js';
+import * as validate_1 from './validate.js';
+
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.runWorkflowTestCase = runWorkflowTestCase;
-exports.formatWorkflowTestFailures = formatWorkflowTestFailures;
-const contracts_1 = require("./contracts");
-const validate_1 = require("./validate");
+
 function runWorkflowTestCase(testCase) {
     const validation = (0, validate_1.validateWorkflow)(testCase.workflow);
     const contract = (0, contracts_1.validateWorkflowContract)(testCase.workflow, testCase.contractContext ?? {});
@@ -175,3 +174,5 @@ function expectationResult(expectation, passed, expected, actual, path) {
     };
 }
 //# sourceMappingURL=tests.js.map
+
+export { runWorkflowTestCase as runWorkflowTestCase, formatWorkflowTestFailures as formatWorkflowTestFailures };

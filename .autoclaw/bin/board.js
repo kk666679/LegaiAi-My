@@ -1,6 +1,7 @@
 #!/usr/bin/env node
+import { readJson, writeText } from './_util.js';
+
 'use strict';
-const { readJson, writeText } = require('./_util');
 
 const board = readJson('orchestrator/board.json');
 const lines = [];

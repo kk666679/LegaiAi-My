@@ -1,5 +1,3 @@
-'use strict';
-
 function buildCapabilities({ tools, resources, prompts } = {}) {
   const caps = {};
   if (tools && typeof tools.size === 'function' && tools.size() > 0) {
@@ -15,4 +13,6 @@ function buildCapabilities({ tools, resources, prompts } = {}) {
   return caps;
 }
 
-module.exports = { buildCapabilities };
+;
+
+export { buildCapabilities };

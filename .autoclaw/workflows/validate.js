@@ -1,7 +1,7 @@
-"use strict";
+import * as types_1 from './types.js';
+
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateWorkflow = validateWorkflow;
-const types_1 = require("./types");
+
 function validateWorkflow(workflow) {
     const diagnostics = [];
     const fail = (code, message, path, failureType) => {
@@ -291,3 +291,5 @@ function validateNonNegativeNumber(value, path, code, diagnostics) {
     }
 }
 //# sourceMappingURL=validate.js.map
+
+export { validateWorkflow as validateWorkflow };

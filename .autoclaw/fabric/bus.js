@@ -1,4 +1,4 @@
-"use strict";
+import * as bridge_1 from '../bridge/index.js';
 /**
  * fabric.ts — Cross-agent message bus abstraction.
  *
@@ -30,9 +30,7 @@
  * plain Mocha. Anything VS Code-specific lives in extension.ts.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.compileTopicMatcher = compileTopicMatcher;
-exports.createFabricBus = createFabricBus;
-const bridge_1 = require("../bridge");
+
 // ---------------------------------------------------------------------------
 // `fs` driver — no-op
 // ---------------------------------------------------------------------------
@@ -282,7 +280,7 @@ async function createFabricBus(opts) {
     // driver === 'nats'
     // The cast to `string` defeats tsc's static module resolution so this file
     // compiles cleanly when the optional `nats` package is not installed.
-    const importer = opts._mockImport ?? (() => Promise.resolve(`${'nats'}`).then(s => require(s)));
+    const importer = opts._mockImport ?? (() => Promise.resolve(`${'nats'}`).then(s => import(s)));
     let mod;
     try {
         mod = await importer();
@@ -306,3 +304,5 @@ async function createFabricBus(opts) {
     }
 }
 //# sourceMappingURL=bus.js.map
+
+export { compileTopicMatcher as compileTopicMatcher, createFabricBus as createFabricBus };

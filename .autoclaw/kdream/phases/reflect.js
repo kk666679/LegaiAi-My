@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * reflect — collapse connected subgraphs into durable reflection nodes.
  *
@@ -82,4 +80,6 @@ async function reflect({ store, policy, dreamSet = [] } = {}) {
   return { name: 'reflect', ok: true, reflections };
 }
 
-module.exports = { reflect, stableHash };
+;
+
+export { reflect, stableHash };

@@ -1,4 +1,8 @@
-"use strict";
+import { runEval, DEFAULT_DIMENSIONS } from './runner.js';
+import { scorerRegistry } from './scorers/index.js';
+import { consoleReporter } from './reporters/console.js';
+import { jsonReporter } from './reporters/json.js';
+
 /**
  * eval/harness.js — Evaluation harness for running test suites.
  *
@@ -6,10 +10,6 @@
  * SQBench, and MultiCAT-Bench dimensions.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const { runEval, DEFAULT_DIMENSIONS } = require('./runner');
-const { scorerRegistry } = require('./scorers/index');
-const { consoleReporter } = require('./reporters/console');
-const { jsonReporter } = require('./reporters/json');
 
 class EvalHarness {
   constructor({ scorers = ['exact-match'], reporters = ['console'], dimensions = DEFAULT_DIMENSIONS } = {}) {
@@ -70,4 +70,4 @@ class EvalHarness {
   }
 }
 
-exports.EvalHarness = EvalHarness;
+export { EvalHarness as EvalHarness };

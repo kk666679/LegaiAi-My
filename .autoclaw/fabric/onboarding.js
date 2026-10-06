@@ -1,4 +1,5 @@
-"use strict";
+import * as agentTypes_1 from './agentTypes.js';
+
 /**
  * onboarding.ts — AF-4: make an existing platform runner a usable fabric worker.
  *
@@ -10,8 +11,7 @@
  * Priority platforms: OpenClaw + Hermes (personal-assistant / service tier).
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.onboardPlatform = onboardPlatform;
-const agentTypes_1 = require("./agentTypes");
+
 /**
  * Onboard one platform. A not-detected platform is reported but NOT registered
  * (so the registry never advertises an absent worker). A detected-but-unhealthy
@@ -66,3 +66,5 @@ async function onboardPlatform(opts) {
     };
 }
 //# sourceMappingURL=onboarding.js.map
+
+export { onboardPlatform as onboardPlatform };

@@ -1,4 +1,7 @@
-"use strict";
+import * as runner_1 from '../runner.js';
+import * as runLedger_1 from '../runLedger.js';
+import graph_1 from './graph.js';
+
 /**
  * workflowExecutor.ts — the bridge from Workflow Lab runs to the Playbook
  * Experiment Runner (AWL-WIRE-3).
@@ -16,12 +19,7 @@
  * so wiring this bridge cannot by itself cause a paid call.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.runResultToExecution = runResultToExecution;
-exports.buildWorkflowExecutor = buildWorkflowExecutor;
-exports.buildAutoWorkflowExecutor = buildAutoWorkflowExecutor;
-const runner_1 = require("../runner");
-const runLedger_1 = require("../runLedger");
-const graph_1 = require("./graph");
+
 /** Translate a finished workflow run into experiment evidence. Pure. */
 function runResultToExecution(result) {
     // Two WorkflowRunEvent flavors exist (runner-state vs ledger); they are
@@ -76,3 +74,5 @@ function buildAutoWorkflowExecutor(deps, opts = {}) {
     return async (scaffold) => runResultToExecution(await (0, runner_1.runWorkflow)((0, graph_1.buildPlaybookWorkflow)(scaffold, opts), deps));
 }
 //# sourceMappingURL=workflowExecutor.js.map
+
+export { runResultToExecution as runResultToExecution, buildWorkflowExecutor as buildWorkflowExecutor, buildAutoWorkflowExecutor as buildAutoWorkflowExecutor };

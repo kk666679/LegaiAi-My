@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-'use strict';
+import { serve, createRouter } from '../api.js';
 
-const { serve, createRouter } = require('../api');
+'use strict';
 
 const cmd = process.argv[2] || 'serve';
 

@@ -1,17 +1,7 @@
-'use strict';
+import fs from 'fs';
+import path from 'path';
 
-/**
- * skills — envelope loader.
- *
- * Every folder under `skills/` that carries a `skill.json` is a skill. The
- * loader is read-only: it never writes to `skills/`, it only reports what the
- * envelopes declare. `validate()` is the gate the CLI and the test suite use.
- */
-
-const fs = require('fs');
-const path = require('path');
-
-const ROOT = __dirname;
+const ROOT = import.meta.dirname;
 
 /** Every skill folder, sorted. Files (index.js, runner.js, README.md) are skipped. */
 function listSkills() {
@@ -121,4 +111,4 @@ function counts() {
   return out;
 }
 
-module.exports = { ROOT, listSkills, loadSkill, loadAll, validate, counts, readJsonl };
+export { ROOT, listSkills, loadSkill, loadAll, validate, counts, readJsonl };

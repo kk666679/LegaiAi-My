@@ -1,4 +1,12 @@
-"use strict";
+import fs from 'fs';
+import path from 'path';
+import * as experiment_1 from './playbooks/experiment.js';
+import * as promotion_1 from './playbooks/promotion.js';
+import * as workflowExecutor_1 from './playbooks/workflowExecutor.js';
+import * as runner_1 from './runner.js';
+import scaffolds_1 from './scaffolds/index.js';
+import * as ledger_1 from './traces/ledger.js';
+
 /**
  * awlService.ts — Adaptive Workflow Learning cycle service (AWL-RUN-1).
  *
@@ -31,30 +39,16 @@
  * ./awlCommand.ts and the orchestrator hook takes its config gate as a value.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AWL_AUTO_EXPERIMENT_SETTING = exports.AWL_AUTO_MARKER_FILE = exports.AWL_REPORTS_DIR = void 0;
-exports.timestampFragment = timestampFragment;
-exports.awlCycleReportPath = awlCycleReportPath;
-exports.awlAutoMarkerPath = awlAutoMarkerPath;
-exports.runAwlExperimentCycle = runAwlExperimentCycle;
-exports.renderAwlCycleMarkdown = renderAwlCycleMarkdown;
-exports.maybeRunAwlAfterDispatch = maybeRunAwlAfterDispatch;
-const fs = require("fs");
-const path = require("path");
-const experiment_1 = require("./playbooks/experiment");
-const promotion_1 = require("./playbooks/promotion");
-const workflowExecutor_1 = require("./playbooks/workflowExecutor");
-const runner_1 = require("./runner");
-const scaffolds_1 = require("./scaffolds");
-const ledger_1 = require("./traces/ledger");
+export const AWL_AUTO_EXPERIMENT_SETTING = exports.AWL_AUTO_MARKER_FILE = exports.AWL_REPORTS_DIR = void 0;
 /* -------------------------------------------------------------------------- */
 /*  Paths & constants                                                         */
 /* -------------------------------------------------------------------------- */
 /** Where cycle reports land (shared with other orchestrator report surfaces). */
-exports.AWL_REPORTS_DIR = path.join('.autoclaw', 'orchestrator', 'reports');
+export const AWL_REPORTS_DIR = path.join('.autoclaw', 'orchestrator', 'reports');
 /** Marker file the auto-hook uses to rate-limit cycles. */
-exports.AWL_AUTO_MARKER_FILE = 'awl-last-cycle.json';
+export const AWL_AUTO_MARKER_FILE = 'awl-last-cycle.json';
 /** Settings key gating the auto-hook (read by the CALLER; default false). */
-exports.AWL_AUTO_EXPERIMENT_SETTING = 'autoclaw.workflows.autoExperiment';
+export const AWL_AUTO_EXPERIMENT_SETTING = 'autoclaw.workflows.autoExperiment';
 /** Filesystem-safe fragment of an ISO timestamp (mirrors comms conventions). */
 function timestampFragment(iso) {
     return iso.replace(/[:.]/g, '-');
@@ -136,7 +130,7 @@ async function runAwlExperimentCycle(opts) {
     const appendVariantSink = io.appendVariant ?? ((v) => (0, scaffolds_1.appendScaffoldVariant)(opts.workspaceRoot, v));
     const appendTraceSink = io.appendTrace ?? (async (row) => { await (0, ledger_1.appendTraceRow)(opts.workspaceRoot, row); });
     const publishSink = io.publishGuardFindings ?? (async (findings) => {
-        await (await Promise.resolve().then(() => require('../orchestrator/findings'))).writeRewardGuardFindings(findings, { workspaceRoot: opts.workspaceRoot });
+        await (await import('../orchestrator/findings')).writeRewardGuardFindings(findings, { workspaceRoot: opts.workspaceRoot });
     });
     const persistedCounts = { scores: 0, variants: 0, traces: 0 };
     const newScores = [];
@@ -433,3 +427,5 @@ async function maybeRunAwlAfterDispatch(opts) {
     }
 }
 //# sourceMappingURL=awlService.js.map
+
+export { timestampFragment as timestampFragment, awlCycleReportPath as awlCycleReportPath, awlAutoMarkerPath as awlAutoMarkerPath, runAwlExperimentCycle as runAwlExperimentCycle, renderAwlCycleMarkdown as renderAwlCycleMarkdown, maybeRunAwlAfterDispatch as maybeRunAwlAfterDispatch };

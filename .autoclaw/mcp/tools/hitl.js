@@ -1,5 +1,5 @@
-'use strict';
-const { toolResult, toolError } = require('../protocol');
+import { toolResult, toolError } from '../protocol.js';
+
 
 function build({ hitl } = {}) {
   return [
@@ -55,4 +55,6 @@ function build({ hitl } = {}) {
     }
   ];
 }
-module.exports = { build };
+;
+
+export { build };

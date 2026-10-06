@@ -1,5 +1,5 @@
-'use strict';
-const { EventEmitter } = require('events');
+import { EventEmitter } from 'events';
+
 
 class HttpTransport extends EventEmitter {
   constructor({ path = '/mcp', corsOrigin = '*' } = {}) {
@@ -60,4 +60,6 @@ class HttpTransport extends EventEmitter {
     };
   }
 }
-module.exports = { HttpTransport };
+;
+
+export { HttpTransport };

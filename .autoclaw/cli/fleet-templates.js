@@ -1,4 +1,7 @@
-"use strict";
+import fs from 'fs';
+import path from 'path';
+import fleet_start_1 from './fleet-start.js';
+
 /**
  * fleet-templates.ts — Quick-config fleet templates + VS Code "Start Fleet"
  * command (H2).
@@ -20,22 +23,11 @@
  *
  * H2 — Sprint-3 / WA-4 (Fleet VS Code command + templates).
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.FLEET_TEMPLATE_ORDER = exports.FLEET_TEMPLATES = void 0;
-exports.templateToYaml = templateToYaml;
-exports.parseTemplateYaml = parseTemplateYaml;
-exports.templatesDir = templatesDir;
-exports.writeFleetTemplates = writeFleetTemplates;
-exports.loadFleetTemplate = loadFleetTemplate;
-exports.buildTemplatePickItems = buildTemplatePickItems;
-exports.shouldShowTemplatePicker = shouldShowTemplatePicker;
-exports.applyTemplateToRegistry = applyTemplateToRegistry;
-exports.startFleetCommand = startFleetCommand;
-const fs = require("fs");
-const path = require("path");
-const fleet_start_1 = require("./fleet-start");
+
+export let FLEET_TEMPLATE_ORDER = exports.FLEET_TEMPLATES = void 0;
+
 /** Every built-in template, in picker display order. */
-exports.FLEET_TEMPLATES = {
+export let FLEET_TEMPLATES = {
     'solo-sprint': {
         id: 'solo-sprint',
         label: 'Solo Sprint',
@@ -62,7 +54,7 @@ exports.FLEET_TEMPLATES = {
     },
 };
 /** Ordered list of template ids, for picker UIs. */
-exports.FLEET_TEMPLATE_ORDER = [
+FLEET_TEMPLATE_ORDER = [
     'solo-sprint',
     'full-fleet',
     'voidspec-sync',
@@ -289,3 +281,5 @@ async function startFleetCommand(opts) {
     return { started: true, template, fleet, summary };
 }
 //# sourceMappingURL=fleet-templates.js.map
+
+export { templateToYaml as templateToYaml, parseTemplateYaml as parseTemplateYaml, templatesDir as templatesDir, writeFleetTemplates as writeFleetTemplates, loadFleetTemplate as loadFleetTemplate, buildTemplatePickItems as buildTemplatePickItems, shouldShowTemplatePicker as shouldShowTemplatePicker, applyTemplateToRegistry as applyTemplateToRegistry, startFleetCommand as startFleetCommand };

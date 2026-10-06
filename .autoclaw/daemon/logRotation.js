@@ -1,4 +1,6 @@
-"use strict";
+import fs from 'fs';
+import path from 'path';
+
 /**
  * daemon/logRotation.ts — CP-3.2: a tiny size-based rotating file logger for the
  * headless daemon.
@@ -14,9 +16,7 @@
  * daemon. `now` is injectable so rotation + timestamps are deterministic in tests.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createRotatingLogger = createRotatingLogger;
-const fs = require("fs");
-const path = require("path");
+
 const DEFAULT_MAX_BYTES = 5 * 1024 * 1024;
 const DEFAULT_MAX_FILES = 5;
 function createRotatingLogger(file, opts = {}) {
@@ -76,3 +76,5 @@ function createRotatingLogger(file, opts = {}) {
     };
 }
 //# sourceMappingURL=logRotation.js.map
+
+export { createRotatingLogger as createRotatingLogger };

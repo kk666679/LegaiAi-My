@@ -1,6 +1,6 @@
-'use strict';
-const { EventEmitter } = require('events');
-const readline = require('readline');
+import readline from 'readline';
+import { EventEmitter } from 'events';
+
 
 class StdioTransport extends EventEmitter {
   constructor({ stdin = process.stdin, stdout = process.stdout } = {}) {
@@ -24,4 +24,6 @@ class StdioTransport extends EventEmitter {
   }
   close() { if (this.closed) return; this.closed = true; try { this._rl.close(); } catch (_) {} this.emit('close'); }
 }
-module.exports = { StdioTransport };
+;
+
+export { StdioTransport };

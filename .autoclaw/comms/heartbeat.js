@@ -1,4 +1,7 @@
-"use strict";
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+
 /**
  * heartbeat.ts — Session-level heartbeat writer for the AutoClaw comms layer.
  *
@@ -19,13 +22,7 @@
  * Sprint 1 — A5 (WA-3)
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.writeSessionHeartbeat = writeSessionHeartbeat;
-exports.readSessionHeartbeats = readSessionHeartbeats;
-exports.resolveClaudeCodeTranscript = resolveClaudeCodeTranscript;
-exports.checkStall = checkStall;
-const fs = require("fs");
-const os = require("os");
-const path = require("path");
+
 const fsPromises = fs.promises;
 // ---------------------------------------------------------------------------
 // Session heartbeat writer
@@ -180,3 +177,5 @@ async function checkStall(commsDir, agentId, options = {}) {
     return { stalled, primaryAge, sessions };
 }
 //# sourceMappingURL=heartbeat.js.map
+
+export { writeSessionHeartbeat as writeSessionHeartbeat, readSessionHeartbeats as readSessionHeartbeats, resolveClaudeCodeTranscript as resolveClaudeCodeTranscript, checkStall as checkStall };

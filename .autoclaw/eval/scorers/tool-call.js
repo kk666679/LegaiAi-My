@@ -1,4 +1,3 @@
-"use strict";
 /**
  * eval/scorers/tool-call.js — Tool call presence scorer.
  */
@@ -22,4 +21,4 @@ const toolCallScorer = {
   }
 };
 
-exports.toolCallScorer = toolCallScorer;
+export { toolCallScorer as toolCallScorer };

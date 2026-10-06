@@ -1,9 +1,9 @@
-"use strict";
+import fs from 'fs/promises';
+
 /**
  * eval/regression.js — Regression detection against baselines.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs = require('fs/promises');
 
 async function runRegression({ suite, baselinePath, currentResults }) {
   const baseline = JSON.parse(await fs.readFile(baselinePath, 'utf8'));
@@ -34,5 +34,4 @@ async function saveBaseline({ suite, results, path }) {
   await fs.writeFile(path, JSON.stringify({ suite, ...results }, null, 2));
 }
 
-exports.runRegression = runRegression;
-exports.saveBaseline = saveBaseline;
+export { runRegression as runRegression, saveBaseline as saveBaseline };

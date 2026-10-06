@@ -1,5 +1,4 @@
-'use strict';
-const { toolResult, toolError } = require('../protocol');
+import { toolResult, toolError } from '../protocol.js';
 
 function build({ agents } = {}) {
   return [
@@ -54,4 +53,6 @@ function build({ agents } = {}) {
     }
   ];
 }
-module.exports = { build };
+;
+
+export { build };

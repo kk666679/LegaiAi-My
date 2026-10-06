@@ -1,8 +1,6 @@
-'use strict';
-
-const { EventEmitter } = require('events');
-const { DEFAULT_LTM, KIND } = require('./constants');
-const { UnknownEntryError } = require('./errors');
+import { EventEmitter } from 'events';
+import { DEFAULT_LTM, KIND } from './constants.js';
+import { UnknownEntryError } from './errors.js';
 
 function uniq(arr) { return Array.from(new Set(arr || [])); }
 
@@ -219,4 +217,4 @@ class LongTermMemory extends EventEmitter {
   }
 }
 
-module.exports = { LongTermMemory };
+export { LongTermMemory };

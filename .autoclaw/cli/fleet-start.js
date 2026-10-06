@@ -1,4 +1,12 @@
-"use strict";
+import child_process_1 from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import * as registry_1 from '../runners/registry.js'; // MISSING TARGET
+import * as codex_1 from '../runners/codex.js'; // MISSING TARGET
+import * as hermes_1 from '../runners/hermes.js'; // MISSING TARGET
+import * as openclaw_1 from '../runners/openclaw.js'; // MISSING TARGET
+import * as heartbeatReader_1 from '../lmd/heartbeatReader.js'; // MISSING TARGET
+
 /**
  * fleet-start.ts — `autoclaw fleet start` CLI (Sprint 2 / WA-4 task H1).
  *
@@ -20,16 +28,7 @@
  * and process supervision.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fleetStart = fleetStart;
-exports.main = main;
-const child_process_1 = require("child_process");
-const fs = require("fs");
-const path = require("path");
-const registry_1 = require("../runners/registry");
-const codex_1 = require("../runners/codex");
-const hermes_1 = require("../runners/hermes");
-const openclaw_1 = require("../runners/openclaw");
-const heartbeatReader_1 = require("../lmd/heartbeatReader");
+
 /* -------------------------------------------------------------------------- */
 /*  Known runners                                                             */
 /* -------------------------------------------------------------------------- */
@@ -212,3 +211,5 @@ if (require.main === module) {
     });
 }
 //# sourceMappingURL=fleet-start.js.map
+
+export { fleetStart as fleetStart, main as main };

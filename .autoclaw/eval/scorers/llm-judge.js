@@ -1,9 +1,9 @@
-"use strict";
+import { llm } from '../../llm.js';
+
 /**
  * eval/scorers/llm-judge.js — LLM-based judge scorer.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const { llm } = require('../../llm');
 
 const llmJudgeScorer = {
   name: 'llm-judge',
@@ -37,4 +37,4 @@ Respond with JSON: {"score": <0-1>, "reasoning": "<explanation>"}
   }
 };
 
-exports.llmJudgeScorer = llmJudgeScorer;
+export { llmJudgeScorer as llmJudgeScorer };

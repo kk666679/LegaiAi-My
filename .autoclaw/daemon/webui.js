@@ -1,4 +1,13 @@
-"use strict";
+import crypto from 'crypto';
+import fs from 'fs';
+import http from 'http';
+import path from 'path';
+import * as controlState_1 from '../fleet/controlState.js'; // MISSING TARGET
+import * as controlHandler_1 from '../fleet/controlHandler.js'; // MISSING TARGET
+import * as viewerAuth_1 from './viewerAuth.js';
+import qr_1 from './qr.js';
+import * as push_1 from './push.js';
+
 /**
  * daemon/webui.ts — the AutoClaw Control read-only web UI (CP-3.4).
  *
@@ -16,30 +25,10 @@
  *
  * `renderWebUiPage` is pure/testable; `createWebUiServer` wires the routes.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.PROXY_INDICATOR_HEADERS = exports.DAEMON_WEBUI_PORT_DEFAULT = void 0;
-exports.requestPrincipal = requestPrincipal;
-exports.readControlStates = readControlStates;
-exports.writeReviewDecisionCommand = writeReviewDecisionCommand;
-exports.readReviewView = readReviewView;
-exports.renderWebUiPage = renderWebUiPage;
-exports.renderWebManifest = renderWebManifest;
-exports.renderIconSvg = renderIconSvg;
-exports.renderServiceWorker = renderServiceWorker;
-exports.renderPairPage = renderPairPage;
-exports.renderLocalBootstrapPage = renderLocalBootstrapPage;
-exports.createWebUiServer = createWebUiServer;
-exports.startWebUi = startWebUi;
-const crypto = require("crypto");
-const fs = require("fs");
-const http = require("http");
-const path = require("path");
-const controlState_1 = require("../fleet/controlState");
-const controlHandler_1 = require("../fleet/controlHandler");
-const viewerAuth_1 = require("./viewerAuth");
-const qr_1 = require("./qr");
-const push_1 = require("./push");
-exports.DAEMON_WEBUI_PORT_DEFAULT = 9980;
+
+export let PROXY_INDICATOR_HEADERS = exports.DAEMON_WEBUI_PORT_DEFAULT = void 0;
+
+export let DAEMON_WEBUI_PORT_DEFAULT = 9980;
 /**
  * Any header whose presence means the request was RELAYED through a proxy (i.e.
  * did NOT originate as a direct loopback connection). Tailscale Serve sets
@@ -53,7 +42,7 @@ exports.DAEMON_WEBUI_PORT_DEFAULT = 9980;
  * — that would let relayed traffic look local. If you must, run in strict mode
  * (`requireAuth`), which drops the loopback-operator trust entirely.
  */
-exports.PROXY_INDICATOR_HEADERS = [
+PROXY_INDICATOR_HEADERS = [
     'x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'forwarded',
     'x-real-ip', 'via', 'tailscale-user-login', 'tailscale-user-name',
 ];
@@ -669,3 +658,5 @@ async function startWebUi(opts) {
     return { server, port, stop };
 }
 //# sourceMappingURL=webui.js.map
+
+export { requestPrincipal as requestPrincipal, readControlStates as readControlStates, writeReviewDecisionCommand as writeReviewDecisionCommand, readReviewView as readReviewView, renderWebUiPage as renderWebUiPage, renderWebManifest as renderWebManifest, renderIconSvg as renderIconSvg, renderServiceWorker as renderServiceWorker, renderPairPage as renderPairPage, renderLocalBootstrapPage as renderLocalBootstrapPage, createWebUiServer as createWebUiServer, startWebUi as startWebUi };

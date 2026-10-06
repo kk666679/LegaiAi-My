@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * registry — the agent/model/skill catalogue.
  *
@@ -282,20 +280,6 @@ class Registry {
 /** Process-wide default registry. */
 const defaultRegistry = new Registry();
 
-module.exports = {
-  Registry,
-  AgentHandle,
-  defaultRegistry,
-  DEFAULT_CATALOG,
-  MODELS,
-  SKILLS,
-  AGENTS,
-  RegistryError,
-  UnknownAgentError,
-  UnknownModelError,
-  UnknownSkillError,
-  DuplicateError,
-  NotImplementedError,
-  SchemaError,
-  validateShape
-};
+;
+
+export { Registry, AgentHandle, defaultRegistry, DEFAULT_CATALOG, MODELS, SKILLS, AGENTS, RegistryError, UnknownAgentError, UnknownModelError, UnknownSkillError, DuplicateError, NotImplementedError, SchemaError, validateShape };

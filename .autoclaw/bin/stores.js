@@ -1,8 +1,9 @@
 #!/usr/bin/env node
+import fs from 'fs';
+import path from 'path';
+import { ROOT } from './_util.js';
+
 'use strict';
-const fs = require('fs');
-const path = require('path');
-const { ROOT } = require('./_util');
 
 const stores = [
   { name: 'kg',     db: 'kg/kg.db',       schema: 'kg/schema.sql' },

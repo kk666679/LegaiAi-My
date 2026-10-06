@@ -1,6 +1,7 @@
 #!/usr/bin/env node
+import { readJson, writeJson, nowIso } from './_util.js';
+
 'use strict';
-const { readJson, writeJson, nowIso } = require('./_util');
 
 const hb = readJson('autobuild/scheduler-heartbeat.json');
 hb.lastBeat = nowIso();

@@ -1,4 +1,5 @@
-"use strict";
+import { evalTracer } from './traces/store.js';
+
 /**
  * eval/replay.js — Deterministic replay of eval traces with divergence detection.
  *
@@ -7,7 +8,6 @@
  * that must be tracked for production reliability.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const { evalTracer } = require('./traces/store');
 
 async function replay({ traceId, mockLLM = true, detectDivergence = true, mockFn = null }) {
   const trace = await evalTracer.load(traceId);
@@ -139,5 +139,4 @@ function diffPrompts(orig, replay) {
   return { similarity: union > 0 ? intersection / union : 0 };
 }
 
-exports.replay = replay;
-exports.detectDivergence = detectDivergence;
+export { replay as replay, detectDivergence as detectDivergence };

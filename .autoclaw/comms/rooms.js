@@ -1,4 +1,3 @@
-"use strict";
 /**
  * rooms.ts - Pure room/read/activity model for the comms layer.
  *
@@ -7,18 +6,7 @@
  * deterministically assigned to general, sprint, task, or DM rooms.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sanitizeRoomComponent = sanitizeRoomComponent;
-exports.assertValidRoomId = assertValidRoomId;
-exports.roomIdToPathSegment = roomIdToPathSegment;
-exports.defineGeneralRoom = defineGeneralRoom;
-exports.roomIdForTask = roomIdForTask;
-exports.roomIdForSprint = roomIdForSprint;
-exports.roomIdForDm = roomIdForDm;
-exports.roomIdForMessage = roomIdForMessage;
-exports.defaultRoomForMessage = defaultRoomForMessage;
-exports.activityExpiresAt = activityExpiresAt;
-exports.shouldWakeParticipant = shouldWakeParticipant;
-exports.buildRoomSummaries = buildRoomSummaries;
+
 const ROOM_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:+-]{0,127}$/;
 function sanitizeRoomComponent(value, fallback = 'unknown') {
     const raw = String(value ?? '').trim();
@@ -252,3 +240,5 @@ function toTime(value) {
     return ms;
 }
 //# sourceMappingURL=rooms.js.map
+
+export { sanitizeRoomComponent as sanitizeRoomComponent, assertValidRoomId as assertValidRoomId, roomIdToPathSegment as roomIdToPathSegment, defineGeneralRoom as defineGeneralRoom, roomIdForTask as roomIdForTask, roomIdForSprint as roomIdForSprint, roomIdForDm as roomIdForDm, roomIdForMessage as roomIdForMessage, defaultRoomForMessage as defaultRoomForMessage, activityExpiresAt as activityExpiresAt, shouldWakeParticipant as shouldWakeParticipant, buildRoomSummaries as buildRoomSummaries };

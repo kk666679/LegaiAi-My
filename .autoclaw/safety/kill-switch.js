@@ -1,4 +1,5 @@
-"use strict";
+import EventEmitter from 'events';
+
 /**
  * safety/kill-switch.js — Fleet-wide emergency halt.
  *
@@ -6,7 +7,6 @@
  * Supports graded shutdown: pause → drain → halt.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const EventEmitter = require('events');
 
 class KillSwitch extends EventEmitter {
   constructor(config = {}) {
@@ -206,4 +206,4 @@ class KillSwitch extends EventEmitter {
   }
 }
 
-exports.KillSwitch = KillSwitch;
+export { KillSwitch as KillSwitch };

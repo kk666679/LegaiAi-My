@@ -1,4 +1,10 @@
-"use strict";
+import fs from 'fs';
+import path from 'path';
+import vscode from 'vscode';
+import * as runner_1 from './runner.js';
+import * as types_1 from './types.js';
+import * as validate_1 from './validate.js';
+
 /**
  * command.ts — VS Code command surface for the Workflow Lab runner (WL-1.4).
  *
@@ -10,13 +16,7 @@
  * calls unless the user has configured a CommandRunner / ModelProvider.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.registerWorkflowLabCommands = registerWorkflowLabCommands;
-const fs = require("fs");
-const path = require("path");
-const vscode = require("vscode");
-const runner_1 = require("./runner");
-const types_1 = require("./types");
-const validate_1 = require("./validate");
+
 const WORKFLOW_GLOB = '**/*.workflow.json';
 // ---------------------------------------------------------------------------
 // Command: autoclaw.workflowLab.run
@@ -111,3 +111,5 @@ function registerWorkflowLabCommands(context, getWorkspaceRoot) {
     }));
 }
 //# sourceMappingURL=command.js.map
+
+export { registerWorkflowLabCommands as registerWorkflowLabCommands };

@@ -175,6 +175,6 @@ class ToolGuard {
   }
 }
 
-module.exports = {
-  ToolGuard,
-};
+;
+
+export { ToolGuard };

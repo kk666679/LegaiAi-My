@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import { createDreamer, MODES } from '../kdream/index.js';
+
 'use strict';
 
 /**
@@ -10,8 +12,6 @@
  *
  * `bin/dream.js` is the alias for the default light cycle.
  */
-
-const { createDreamer, MODES } = require('../kdream');
 
 function parseArgs(argv) {
   const args = { mode: 'light', dryRun: false, json: false, reason: 'cli' };

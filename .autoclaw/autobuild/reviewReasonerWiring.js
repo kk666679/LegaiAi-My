@@ -23,7 +23,7 @@
 // (Ollama etc.) declines to flags-only, same as an unconfigured route does.
 export { chatFnFromRegistry as chatFnFromRegistry };
 export { createRealReviewReasoner as createRealReviewReasoner };
-import routesService_1 from "./routesService";
+import routesService_1 from "./routesService.js";
 import reviewReasoner_1 from "../orchestrator/reviewReasoner";
 /**
  * Adapt an `LlmRegistry`-shaped chat function into the reasoner's

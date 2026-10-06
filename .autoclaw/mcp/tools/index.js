@@ -1,7 +1,5 @@
-'use strict';
-
-const { ToolRegistry } = require('./registry');
-const { fromSkillId, isValidName, inferInputSchema } = require('./schema');
+import { ToolRegistry } from './registry.js';
+import { fromSkillId, isValidName, inferInputSchema } from './schema.js';
 
 /**
  * buildDefaultTools(deps) — assembles every tool group.
@@ -30,4 +28,6 @@ function buildDefaultTools(deps = {}) {
   return tr;
 }
 
-module.exports = { ToolRegistry, buildDefaultTools, fromSkillId, isValidName, inferInputSchema };
+;
+
+export { ToolRegistry, buildDefaultTools, fromSkillId, isValidName, inferInputSchema };

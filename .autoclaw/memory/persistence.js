@@ -1,4 +1,5 @@
-'use strict';
+import fs from 'fs';
+import path from 'path';
 
 // Append-only JSONL store. Every op is written as one line.
 // load() replays the log and returns the last-write-wins set of entries.
@@ -7,7 +8,7 @@ class JSONLStore {
     opts = opts || {};
     if (!opts.file) throw new Error('JSONLStore requires { file }');
     this.file = opts.file;
-    this.fs = opts.fs || require('fs');
+    this.fs = opts.fs || fs;
     this.buffer = [];
     this.written = 0;
   }
@@ -20,7 +21,7 @@ class JSONLStore {
   flush() {
     if (!this.buffer.length) return 0;
     const lines = this.buffer.map(x => JSON.stringify(x)).join('\n') + '\n';
-    const dir = require('path').dirname(this.file);
+    const dir = path.dirname(this.file);
     this.fs.mkdirSync(dir, { recursive: true });
     this.fs.appendFileSync(this.file, lines, 'utf8');
     const n = this.buffer.length;
@@ -58,7 +59,7 @@ class JSONLStore {
     const tmp = this.file + '.tmp';
     const lines = [];
     for (const e of ltm.entries.values()) lines.push(JSON.stringify({ op: 'commit', entry: e }));
-    this.fs.mkdirSync(require('path').dirname(this.file), { recursive: true });
+    this.fs.mkdirSync(path.dirname(this.file), { recursive: true });
     this.fs.writeFileSync(tmp, lines.join('\n') + (lines.length ? '\n' : ''), 'utf8');
     this.fs.renameSync(tmp, this.file);
     return { entries: lines.length };
@@ -73,4 +74,4 @@ class JSONLStore {
   }
 }
 
-module.exports = { JSONLStore };
+export { JSONLStore };

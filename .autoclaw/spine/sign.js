@@ -1,4 +1,5 @@
-"use strict";
+import crypto from 'crypto';
+
 /**
  * spine/sign.ts — Cryptographic signature verification for the AutoClaw spine.
  *
@@ -6,8 +7,6 @@
  * This module is vscode-free and depends only on Node's built-in crypto module.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-
-const crypto = require("crypto");
 
 /**
  * Verify an Ed25519 signature over a canonical envelope.
@@ -169,7 +168,4 @@ function signEnvelope(carrier, privateKeyB64) {
   return signature.toString("base64url");
 }
 
-exports.verifyEnvelope = verifyEnvelope;
-exports.canonicalize = canonicalize;
-exports.generateKeyPair = generateKeyPair;
-exports.signEnvelope = signEnvelope;
+export { verifyEnvelope as verifyEnvelope, canonicalize as canonicalize, generateKeyPair as generateKeyPair, signEnvelope as signEnvelope };

@@ -1,5 +1,3 @@
-'use strict';
-
 const JSONRPC_VERSION = '2.0';
 const MCP_VERSION     = '2024-11-05';
 const SERVER_NAME     = 'autoclaw-mcp';
@@ -37,8 +35,6 @@ function mcpError(code, message, data) {
   return e;
 }
 
-module.exports = {
-  JSONRPC_VERSION, MCP_VERSION, SERVER_NAME, SERVER_VERSION,
-  ERROR_CODES, successResponse, errorResponse, textContent, jsonContent,
-  toolResult, toolError, mcpError
-};
+;
+
+export { JSONRPC_VERSION, MCP_VERSION, SERVER_NAME, SERVER_VERSION, ERROR_CODES, successResponse, errorResponse, textContent, jsonContent, toolResult, toolError, mcpError };

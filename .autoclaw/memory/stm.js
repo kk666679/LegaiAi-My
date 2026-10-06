@@ -1,7 +1,5 @@
-'use strict';
-
-const { EventEmitter } = require('events');
-const { DEFAULT_STM } = require('./constants');
+import { EventEmitter } from 'events';
+import { DEFAULT_STM } from './constants.js';
 
 // ShortTermMemory — per-session bounded ring buffer with TTL eviction.
 class ShortTermMemory extends EventEmitter {
@@ -77,4 +75,4 @@ class ShortTermMemory extends EventEmitter {
   }
 }
 
-module.exports = { ShortTermMemory };
+export { ShortTermMemory };

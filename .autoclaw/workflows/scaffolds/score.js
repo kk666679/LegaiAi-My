@@ -1,9 +1,8 @@
-"use strict";
+import * as types_1 from './types.js';
+import * as store_1 from './store.js';
+
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.scoreAndAppendScaffoldRun = scoreAndAppendScaffoldRun;
-exports.buildScaffoldScore = buildScaffoldScore;
-const types_1 = require("./types");
-const store_1 = require("./store");
+
 async function scoreAndAppendScaffoldRun(workspaceRoot, input) {
     const result = buildScaffoldScore(input);
     if (result.score) {
@@ -179,3 +178,5 @@ function roundReward(value) {
     return Math.round(value * 1000) / 1000;
 }
 //# sourceMappingURL=score.js.map
+
+export { scoreAndAppendScaffoldRun as scoreAndAppendScaffoldRun, buildScaffoldScore as buildScaffoldScore };

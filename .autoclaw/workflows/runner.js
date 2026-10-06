@@ -1,4 +1,8 @@
-"use strict";
+import * as state_1 from './state.js';
+import * as validate_1 from './validate.js';
+import gateNode_1 from './nodes/gateNode.js';
+import loops_1 from './loops.js';
+
 /**
  * runner.ts — Headless workflow execution engine (WL-1.1).
  *
@@ -16,12 +20,7 @@
  *   6. Write run.json summary to the ledger.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.defaultDeps = defaultDeps;
-exports.runWorkflow = runWorkflow;
-const state_1 = require("./state");
-const validate_1 = require("./validate");
-const gateNode_1 = require("./nodes/gateNode");
-const loops_1 = require("./loops");
+
 // ---------------------------------------------------------------------------
 // Node executor dispatch
 // ---------------------------------------------------------------------------
@@ -446,7 +445,7 @@ async function runWorkflow(wf, deps) {
     // replay. Best-effort — a cache failure never fails the run.
     if (deps.persistLedger) {
         try {
-            const { appendWholeRunWindow } = await Promise.resolve().then(() => require('./runLedger'));
+            const { appendWholeRunWindow } = await import('./runLedger.js);
             // Runner-state events are wire-compatible with the ledger flavor for
             // every field the window builder reads (failureType, gateResults).
             await appendWholeRunWindow(deps.workspaceRoot, {
@@ -470,9 +469,11 @@ function buildResult(run, status, stopReason, failureType, startedAt, endedAt) {
         nodeStates: run.nodeStates,
         events: run.events,
         costCents: run.costCents,
-        ledgerDir: run.ledgerDir(),
+        ledgerDir: run.ledgerDir('),
         startedAt,
         endedAt,
     };
 }
 //# sourceMappingURL=runner.js.map
+
+export { defaultDeps as defaultDeps, runWorkflow as runWorkflow };

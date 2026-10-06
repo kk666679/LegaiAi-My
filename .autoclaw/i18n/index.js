@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * i18n — EN/MS catalogue and language detection.
  *
@@ -114,4 +112,6 @@ class Translator {
   }
 }
 
-module.exports = { CATALOG, LANGS, Translator, detect, normalise };
+;
+
+export { CATALOG, LANGS, Translator, detect, normalise };

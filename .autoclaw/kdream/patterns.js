@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * patterns — recurring structure across insights.
  *
@@ -44,4 +42,6 @@ function rankInsights(insights = []) {
   });
 }
 
-module.exports = { detectPatterns, rankInsights };
+;
+
+export { detectPatterns, rankInsights };

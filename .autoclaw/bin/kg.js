@@ -1,9 +1,10 @@
 #!/usr/bin/env node
+import fs from 'fs';
+import path from 'path';
+import { execFileSync } from 'child_process';
+import { ROOT, nowIso } from './_util.js';
+
 'use strict';
-const fs = require('fs');
-const path = require('path');
-const { execFileSync } = require('child_process');
-const { ROOT, nowIso } = require('./_util');
 
 const db = path.join(ROOT, 'kg', 'kg.db');
 const [, , cmd, ...rest] = process.argv;

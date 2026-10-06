@@ -1,9 +1,9 @@
-'use strict';
-const { toolResult, toolError } = require('../protocol');
+import { toolResult, toolError } from '../protocol.js';
+
+import * as sk from '../../skills/index.js';
 
 function build() {
   let sk;
-  try { sk = require('../../skills'); } catch (_) { sk = null; }
 
   const available = sk && typeof sk.listSkills === 'function';
   const guard = () => available ? null : toolError('skills module unavailable');
@@ -57,4 +57,6 @@ function build() {
     }
   ];
 }
-module.exports = { build };
+;
+
+export { build };

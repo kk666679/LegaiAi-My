@@ -1,4 +1,8 @@
-"use strict";
+import fs from 'fs';
+import path from 'path';
+import comms_1 from '../comms/index.js';
+import * as rooms_1 from './rooms.js';
+
 /**
  * roomFiles.ts - Read-only room projection over the existing filesystem inbox.
  *
@@ -7,12 +11,7 @@
  * JSON plus the existing per-agent _state files into room records/summaries.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.readRoomMessageRecords = readRoomMessageRecords;
-exports.readRoomSummariesFromComms = readRoomSummariesFromComms;
-const fs = require("fs");
-const path = require("path");
-const comms_1 = require("../comms");
-const rooms_1 = require("./rooms");
+
 const fsPromises = fs.promises;
 const DEFAULT_HISTORY_LIMIT = 100;
 const DEFAULT_SUMMARY_LIMIT = 500;
@@ -170,3 +169,5 @@ function compareRecords(a, b, order) {
         || a.filename.localeCompare(b.filename);
 }
 //# sourceMappingURL=roomFiles.js.map
+
+export { readRoomMessageRecords as readRoomMessageRecords, readRoomSummariesFromComms as readRoomSummariesFromComms };

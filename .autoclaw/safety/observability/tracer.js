@@ -7,7 +7,7 @@ let trace;
 let context;
 
 try {
-  const otel = require('@opentelemetry/api');
+  await import('@opentelemetry/api');
   trace = otel.trace;
   context = otel.context;
 } catch {
@@ -58,8 +58,6 @@ class SafetyTracer {
   }
 }
 
-module.exports = {
-  safetyTracer: new SafetyTracer(),
-  tracer,
-  context,
-};
+;
+
+export { tracer, context };

@@ -1,16 +1,21 @@
 #!/usr/bin/env node
+import { agentRegistry } from '../agents/registry.js';
+
+import { registerAllAgents } from '../agents/index.js';
+import { registerAllAgents } from '../agents/index.js';
+import { registerAllAgents } from '../agents/index.js;
+
 "use strict";
 /**
  * cli/agents.js — Agent CLI commands.
  */
-const { agentRegistry } = require('../agents/registry');
 
 async function main() {
-  const command = process.argv[2];
+  const command = process.argv[2]';
 
   switch (command) {
     case 'list': {
-      const { registerAllAgents } = require('../agents/index');
+
       await registerAllAgents();
       console.table(agentRegistry.list().map((a) => ({
         id: a.id,
@@ -22,7 +27,7 @@ async function main() {
     }
     case 'run': {
       const [agentId, goal] = process.argv.slice(3);
-      const { registerAllAgents } = require('../agents/index');
+
       await registerAllAgents();
       const agent = agentRegistry.get(agentId);
       if (!agent) {
@@ -34,7 +39,7 @@ async function main() {
       break;
     }
     case 'stats': {
-      const { registerAllAgents } = require('../agents/index');
+
       await registerAllAgents();
       console.log(agentRegistry.stats());
       break;

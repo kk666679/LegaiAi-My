@@ -1,4 +1,3 @@
-"use strict";
 /**
  * eval/reporters/console.js — Console reporter.
  */
@@ -22,4 +21,4 @@ const consoleReporter = {
   },
 };
 
-exports.consoleReporter = consoleReporter;
+export { consoleReporter as consoleReporter };

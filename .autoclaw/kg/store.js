@@ -1,4 +1,6 @@
-'use strict';
+import fs from 'fs';
+import { execFileSync } from 'child_process';
+import { KGQuery } from './query.js';
 
 /**
  * store — two interchangeable backends behind one interface.
@@ -15,10 +17,6 @@
  * shells out to the `sqlite3` CLI. `openStore` degrades to MemoryStore rather
  * than throwing, so a missing binary costs persistence, not availability.
  */
-
-const fs = require('fs');
-const { execFileSync } = require('child_process');
-const { KGQuery } = require('./query');
 
 /* ── SQL inlining ──
  * Values are inlined rather than bound because the `sqlite3` CLI has no bind
@@ -336,4 +334,6 @@ function openStore({ dbPath, memory, logger } = {}) {
   return new MemoryStore();
 }
 
-module.exports = { SQLiteStore, MemoryStore, openStore, quote, substitute };
+;
+
+export { SQLiteStore, MemoryStore, openStore, quote, substitute };

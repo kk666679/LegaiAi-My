@@ -1,4 +1,7 @@
-"use strict";
+import fs from 'fs';
+import path from 'path';
+import * as failureTypes_1 from '../diagnostics/failureTypes.js';
+
 /**
  * state.ts — Workflow run state, the minimal local DSL contract, and the
  * JSONL run ledger for the WL-1 headless runner.
@@ -29,18 +32,15 @@
  * assigns to it without change. Unknown future fields are preserved.
  * ────────────────────────────────────────────────────────────────────────────
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.refusingCommandRunner = exports.defaultMockModelProvider = exports.WorkflowRunLedger = exports.RunState = exports.RUN_EVENT_SCHEMA = exports.WORKFLOW_SCHEMA = exports.normalizeFailureType = exports.isHumanRequired = exports.isEscalationCandidate = exports.isRetryableFailure = void 0;
-exports.readRunEvents = readRunEvents;
-const fs = require("fs");
-const path = require("path");
-var failureTypes_1 = require("../diagnostics/failureTypes");
-Object.defineProperty(exports, "isRetryableFailure", { enumerable: true, get: function () { return failureTypes_1.isRetryableFailure; } });
-Object.defineProperty(exports, "isEscalationCandidate", { enumerable: true, get: function () { return failureTypes_1.isEscalationCandidate; } });
-Object.defineProperty(exports, "isHumanRequired", { enumerable: true, get: function () { return failureTypes_1.isHumanRequired; } });
-Object.defineProperty(exports, "normalizeFailureType", { enumerable: true, get: function () { return failureTypes_1.normalizeFailureType; } });
-exports.WORKFLOW_SCHEMA = 'autoclaw.workflow.v1';
-exports.RUN_EVENT_SCHEMA = 'autoclaw.workflowRunEvent.v1';
+
+refusingCommandRunner = exports.defaultMockModelProvider = exports.WorkflowRunLedger = exports.RunState = exports.RUN_EVENT_SCHEMA = exports.WORKFLOW_SCHEMA = exports.normalizeFailureType = exports.isHumanRequired = exports.isEscalationCandidate = exports.isRetryableFailure = void 0;
+
+
+
+
+
+export let WORKFLOW_SCHEMA = 'autoclaw.workflow.v1';
+export let RUN_EVENT_SCHEMA = 'autoclaw.workflowRunEvent.v1';
 /**
  * Mutable run state threaded through node execution. The runner owns one of
  * these per run; node executors read/write outputs and append events.
@@ -83,7 +83,7 @@ class RunState {
         return this.ledger ? this.ledger.dir : '';
     }
 }
-exports.RunState = RunState;
+
 // ===========================================================================
 // JSONL run ledger (local shim of WL-0.4 src/workflows/runLedger.ts)
 // ===========================================================================
@@ -108,13 +108,13 @@ class WorkflowRunLedger {
         fs.writeFileSync(this.runPath, JSON.stringify(meta, null, 2), 'utf8');
     }
 }
-exports.WorkflowRunLedger = WorkflowRunLedger;
+
 /**
  * Default model provider: deterministic, offline, zero-cost. Returns a stable
  * stub completion and reports as a local provider. Replace via RunnerDeps to
  * route to real providers.
  */
-exports.defaultMockModelProvider = {
+export let defaultMockModelProvider = {
     async complete(req) {
         const iter = req.iteration ?? 0;
         return {
@@ -140,7 +140,7 @@ const refusingCommandRunner = async () => ({
     stderr: 'no CommandRunner configured: tool/gate command execution is disabled',
     durationMs: 0,
 });
-exports.refusingCommandRunner = refusingCommandRunner;
+
 /**
  * Read a run's events back from its JSONL ledger. Corrupt lines are skipped
  * with a console warning rather than throwing (WL-0.4 acceptance criterion).
@@ -171,3 +171,5 @@ function readRunEvents(workspaceRoot, runId) {
     return out;
 }
 //# sourceMappingURL=state.js.map
+
+export { readRunEvents as readRunEvents, RunState as RunState, WorkflowRunLedger as WorkflowRunLedger, refusingCommandRunner as refusingCommandRunner };

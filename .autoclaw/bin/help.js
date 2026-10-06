@@ -1,6 +1,8 @@
 #!/usr/bin/env node
+import pkg from '../package.json';
+
 'use strict';
-const pkg = require('../package.json');
+
 const lines = [
   `${pkg.name} v${pkg.version}`,
   '',

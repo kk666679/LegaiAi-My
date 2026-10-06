@@ -1,6 +1,9 @@
 #!/usr/bin/env node
+import { Dreamer, Policy } from '../kgdream.js';
+
+import * as ds from '../dataset.js';
+
 'use strict';
-const { Dreamer, Policy } = require('../kgdream');
 
 /**
  * In-memory mock store seeded from dataset/seed/*.
@@ -10,7 +13,7 @@ const { Dreamer, Policy } = require('../kgdream');
  * in kgdream/README.md.
  */
 function mockStore() {
-  const ds = require('../dataset');
+
   const seed = ds.loadAll().seed;
   const nodes = new Map((seed['kg-nodes'] || []).map(n => [n.id, { ...n }]));
   const edges = new Map((seed['kg-edges'] || []).map(e => [e.id, { ...e }]));

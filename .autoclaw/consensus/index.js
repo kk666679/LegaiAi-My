@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * consensus — aggregate votes from independent validators into one outcome.
  *
@@ -180,17 +178,6 @@ function listStrategies() {
   return Object.keys(STRATEGIES).map(name => ({ name }));
 }
 
-module.exports = {
-  Consensus,
-  ConsensusError,
-  UnknownStrategyError,
-  NoVotersError,
-  STRATEGIES,
-  OUTCOME,
-  VOTE,
-  alwaysYes,
-  alwaysNo,
-  alwaysAbstain,
-  tallyBallots,
-  listStrategies
-};
+;
+
+export { Consensus, ConsensusError, UnknownStrategyError, NoVotersError, STRATEGIES, OUTCOME, VOTE, alwaysYes, alwaysNo, alwaysAbstain, tallyBallots, listStrategies };

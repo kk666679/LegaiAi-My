@@ -1,12 +1,14 @@
+import crypto from 'crypto';
+import path from 'path';
+import fs from 'fs';
+
 /**
  * .autoclaw/safety/audit/safety-audit.js
  * Immutable append-only audit log for safety decisions
  * Integrates with evidence chain for compliance
  */
 
-const fs = require('fs').promises;
-const crypto = require('crypto');
-const path = require('path');
+const fs = fs.promises;
 
 class SafetyAudit {
   /**
@@ -296,6 +298,6 @@ class SafetyAudit {
   }
 }
 
-module.exports = {
-  SafetyAudit,
-};
+;
+
+export { SafetyAudit };

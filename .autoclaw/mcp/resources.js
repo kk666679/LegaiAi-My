@@ -1,5 +1,3 @@
-'use strict';
-
 class ResourceRegistry {
   constructor() { this.static = new Map(); this.templates = []; }
 
@@ -102,4 +100,6 @@ function buildDefaultResources(deps = {}) {
   return rr;
 }
 
-module.exports = { ResourceRegistry, buildDefaultResources };
+;
+
+export { ResourceRegistry, buildDefaultResources };

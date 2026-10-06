@@ -1,4 +1,9 @@
 #!/usr/bin/env node
+import fs from 'fs';
+import path from 'path';
+import { ROOT } from './_util.js';
+import { createKG } from '../kg/index.js';
+
 'use strict';
 
 /**
@@ -9,11 +14,6 @@
  * back to the memory backend and says so, so a missing `kg.db` is visible in
  * the output rather than silent.
  */
-
-const fs = require('fs');
-const path = require('path');
-const { ROOT } = require('./_util');
-const { createKG } = require('../kg');
 
 const dbPath = path.join(ROOT, 'kg', 'kg.db');
 const forceMemory = process.argv.includes('--memory');

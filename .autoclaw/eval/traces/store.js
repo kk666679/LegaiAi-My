@@ -1,11 +1,11 @@
-"use strict";
+import fs from 'fs/promises';
+import path from 'path';
+import crypto from 'crypto';
+
 /**
  * eval/traces/store.js — Trace store for eval replay.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-const fs = require('fs/promises');
-const path = require('path');
-const crypto = require('crypto');
+
 
 class EvalTracer {
   constructor({ dir = '.autoclaw/eval/traces/data' } = {}) {
@@ -43,5 +43,6 @@ class EvalTracer {
   }
 }
 
-exports.EvalTracer = EvalTracer;
-exports.evalTracer = new EvalTracer();
+export let evalTracer = new EvalTracer();
+
+export { EvalTracer as EvalTracer };

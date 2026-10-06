@@ -1,8 +1,8 @@
-"use strict";
+import contracts_1 from './contracts.js';
+import * as validate_1 from './validate.js';
+
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.simulateWorkflow = simulateWorkflow;
-const contracts_1 = require("./contracts");
-const validate_1 = require("./validate");
+
 function simulateWorkflow(workflow, options = {}) {
     const validation = (0, validate_1.validateWorkflow)(workflow);
     const contract = (0, contracts_1.validateWorkflowContract)(workflow, options);
@@ -186,3 +186,5 @@ function writeTarget(node) {
     return undefined;
 }
 //# sourceMappingURL=simulate.js.map
+
+export { simulateWorkflow as simulateWorkflow };

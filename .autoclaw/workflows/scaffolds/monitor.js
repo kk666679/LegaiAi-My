@@ -1,6 +1,5 @@
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.evaluateScaffoldMonitor = evaluateScaffoldMonitor;
+
 /** Kind-specific remediation guidance. Deterministic — same kind, same text. */
 const REMEDIATIONS = {
     hidden_verifier_read: 'Remove the read. Verifier internals are out of bounds for scaffold runs; request a public fixture from the orchestrator instead.',
@@ -184,3 +183,5 @@ function normalizePath(value) {
     return (escapes > 0 ? '__escape__/' : '') + out.join('/');
 }
 //# sourceMappingURL=monitor.js.map
+
+export { evaluateScaffoldMonitor as evaluateScaffoldMonitor };

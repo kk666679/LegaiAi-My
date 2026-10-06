@@ -1,4 +1,3 @@
-"use strict";
 /**
  * eval/scorers/exact-match.js — Exact match scorer.
  */
@@ -12,4 +11,4 @@ const exactMatchScorer = {
   },
 };
 
-exports.exactMatchScorer = exactMatchScorer;
+export { exactMatchScorer as exactMatchScorer };

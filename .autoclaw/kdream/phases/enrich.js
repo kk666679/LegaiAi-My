@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * enrich — add inferred edges between nodes that are frequently co-accessed.
  *
@@ -73,4 +71,6 @@ async function enrich({ store, policy, dreamSet = [] } = {}) {
   return { name: 'enrich', ok: true, added };
 }
 
-module.exports = { enrich, edgeKey, stableHash };
+;
+
+export { enrich, edgeKey, stableHash };

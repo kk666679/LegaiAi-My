@@ -1,4 +1,8 @@
-"use strict";
+import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
+import * as types_1 from './types.js';
+
 /**
  * ledger.ts — Trace Ledger writer/reader (TL-1, adaptive-workflow-learning).
  *
@@ -15,24 +19,12 @@
  * @see ./types (row contracts)
  * @see ../runLedger (per-run event ledger this joins with via run_id)
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.MAX_TRACE_STRING_LENGTH = exports.WORKFLOW_TRACES_DIR = void 0;
-exports.tracesDir = tracesDir;
-exports.traceShardPath = traceShardPath;
-exports.sanitizeTraceRow = sanitizeTraceRow;
-exports.buildTraceRow = buildTraceRow;
-exports.buildContextPackTraceRow = buildContextPackTraceRow;
-exports.appendTraceRow = appendTraceRow;
-exports.readTraces = readTraces;
-exports.aggregateSessionUsage = aggregateSessionUsage;
-exports.readSessionUsage = readSessionUsage;
-const crypto = require("crypto");
-const fs = require("fs");
-const path = require("path");
-const types_1 = require("./types");
-exports.WORKFLOW_TRACES_DIR = path.join('.autoclaw', 'workflows', 'traces');
+
+export let MAX_TRACE_STRING_LENGTH = exports.WORKFLOW_TRACES_DIR = void 0;
+
+export let WORKFLOW_TRACES_DIR = path.join('.autoclaw', 'workflows', 'traces');
 /** Longest string value allowed in a row — beyond this it's a body, not a summary. */
-exports.MAX_TRACE_STRING_LENGTH = 2000;
+MAX_TRACE_STRING_LENGTH = 2000;
 /** Keys that indicate prompt/response/CoT content. Dropped wherever they appear. */
 const FORBIDDEN_KEY_PATTERN = /prompt|response_body|raw_response|completion|messages|chain_of_thought|thought|transcript|system_prompt/i;
 function tracesDir(workspaceRoot) {
@@ -266,3 +258,5 @@ async function readSessionUsage(workspaceRoot, filter = {}) {
     return aggregateSessionUsage(await readTraces(workspaceRoot, filter));
 }
 //# sourceMappingURL=ledger.js.map
+
+export { tracesDir as tracesDir, traceShardPath as traceShardPath, sanitizeTraceRow as sanitizeTraceRow, buildTraceRow as buildTraceRow, buildContextPackTraceRow as buildContextPackTraceRow, appendTraceRow as appendTraceRow, readTraces as readTraces, aggregateSessionUsage as aggregateSessionUsage, readSessionUsage as readSessionUsage };

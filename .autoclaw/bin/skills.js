@@ -1,4 +1,9 @@
 #!/usr/bin/env node
+import * as skills from '../skills/index.js';
+import { ROOT } from './_util.js';
+
+import { runGolden } from '../skills/runner.js';
+
 'use strict';
 
 /**
@@ -8,9 +13,6 @@
  * every case reports `skipped`; pass an impl through the runner API when one
  * exists (see README.md).
  */
-
-const skills = require('../skills');
-const { ROOT } = require('./_util');
 
 const [, , cmd, ...rest] = process.argv;
 
@@ -86,7 +88,7 @@ async function main() {
 
     case 'eval': {
       const name = need(rest[0]);
-      const { runGolden } = require('../skills/runner');
+
       const r = await runGolden(name, {});
       console.log(JSON.stringify({ skill: name, summary: r.summary, results: r.results }, null, 2));
       process.exit(r.summary.failed || r.summary.error ? 1 : 0);

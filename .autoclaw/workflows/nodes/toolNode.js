@@ -1,4 +1,3 @@
-"use strict";
 /**
  * toolNode.ts — Tool node executor for the WL-1 headless runner.
  *
@@ -12,7 +11,7 @@
  * routing seam lives in modelNode.ts.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.runToolNode = runToolNode;
+
 /**
  * Execute a tool node. Returns a typed NodeExecResult; never throws for an
  * expected tool failure (those become `status:'failed'` with a failureType).
@@ -70,3 +69,5 @@ async function runToolNode(ctx) {
     };
 }
 //# sourceMappingURL=toolNode.js.map
+
+export { runToolNode as runToolNode };

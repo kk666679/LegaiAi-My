@@ -1,4 +1,3 @@
-"use strict";
 /**
  * safety/cost-ceiling.js — Cost ceiling enforcement for agents.
  *
@@ -124,5 +123,4 @@ class CostCeilingExceeded extends Error {
   }
 }
 
-exports.CostCeiling = CostCeiling;
-exports.CostCeilingExceeded = CostCeilingExceeded;
+export { CostCeiling as CostCeiling, CostCeilingExceeded as CostCeilingExceeded };

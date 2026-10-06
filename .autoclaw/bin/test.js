@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+import fs from 'fs';
+import path from 'path';
+import { spawnSync } from 'child_process';
+
 'use strict';
 /**
  * Portable test entrypoint.
@@ -7,11 +11,8 @@
  * (it resolves as a module path on Node 24), so expand the glob here and pass
  * explicit files.
  */
-const { spawnSync } = require('child_process');
-const fs = require('fs');
-const path = require('path');
 
-const root = path.resolve(__dirname, '..');
+const root = path.resolve(import.meta.dirname, '..');
 const testDir = path.join(root, 'test');
 
 if (!fs.existsSync(testDir)) {

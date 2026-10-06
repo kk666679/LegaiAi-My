@@ -1,11 +1,11 @@
-'use strict';
+import * as protocol from './protocol.js';
+import { EventEmitter } from 'events';
+import { buildCapabilities } from './capabilities.js';
+import { ToolRegistry, buildDefaultTools } from './tools/index.js';
+import { ResourceRegistry, buildDefaultResources } from './resources.js';
+import { PromptRegistry, buildDefaultPrompts } from './prompts.js';
 
-const { EventEmitter } = require('events');
-const protocol = require('./protocol');
-const { buildCapabilities } = require('./capabilities');
-const { ToolRegistry, buildDefaultTools } = require('./tools');
-const { ResourceRegistry, buildDefaultResources } = require('./resources');
-const { PromptRegistry, buildDefaultPrompts } = require('./prompts');
+
 
 class McpServer extends EventEmitter {
   constructor(deps = {}) {
@@ -118,4 +118,6 @@ class McpServer extends EventEmitter {
   }
 }
 
-module.exports = { McpServer };
+;
+
+export { McpServer };

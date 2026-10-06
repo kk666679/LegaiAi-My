@@ -1,6 +1,5 @@
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.selectScaffoldVariant = selectScaffoldVariant;
+
 const DEFAULT_LOCALITIES = ['local', 'lan', 'cloud'];
 const SCORE_WINDOW = 12;
 function selectScaffoldVariant(request) {
@@ -297,3 +296,5 @@ function roundScore(value) {
     return Math.round(value * 1000) / 1000;
 }
 //# sourceMappingURL=select.js.map
+
+export { selectScaffoldVariant as selectScaffoldVariant };

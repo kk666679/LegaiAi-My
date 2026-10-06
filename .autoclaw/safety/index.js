@@ -1,21 +1,23 @@
+import path from 'path';
+import { AdversarialGuard } from './guards/adversarial-guard.js';
+import { PIIGuard } from './guards/pii-guard.js';
+import { ContentGuard } from './guards/content-guard.js';
+import { ToolGuard } from './guards/tool-guard.js';
+import { KillSwitch } from './kill-switch/kill-switch.js';
+import { CostCeiling } from './cost/cost-ceiling.js';
+import { ApprovalGate } from './approval/approval-gate.js';
+import { SafetyAudit } from './audit/safety-audit.js';
+import { safetyTracer } from './observability/tracer.js';
+import { safetyMetrics } from './observability/metrics.js';
+import fs from 'fs';
+
 /**
  * .autoclaw/safety/index.js
  * Public API for safety subsystem (August 2026 standards)
  * Policy engine, adversarial guards, PII redaction, approval gates, kill switch, cost ceiling
  */
 
-const { AdversarialGuard } = require('./guards/adversarial-guard.js');
-const { PIIGuard } = require('./guards/pii-guard.js');
-const { ContentGuard } = require('./guards/content-guard.js');
-const { ToolGuard } = require('./guards/tool-guard.js');
-const { KillSwitch } = require('./kill-switch/kill-switch.js');
-const { CostCeiling } = require('./cost/cost-ceiling.js');
-const { ApprovalGate } = require('./approval/approval-gate.js');
-const { SafetyAudit } = require('./audit/safety-audit.js');
-const { safetyTracer } = require('./observability/tracer.js');
-const { safetyMetrics } = require('./observability/metrics.js');
-const fs = require('fs').promises;
-const path = require('path');
+const fs = fs.promises;
 
 // Safety modes
 const MODES = {
@@ -427,7 +429,6 @@ class Safety {
   }
 }
 
-module.exports = {
-  Safety,
-  MODES,
-};
+;
+
+export { Safety, MODES };

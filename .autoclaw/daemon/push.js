@@ -1,4 +1,8 @@
-"use strict";
+import crypto from 'crypto';
+import fs from 'fs';
+import https from 'https';
+import path from 'path';
+
 /**
  * daemon/push.ts — CP-4.4: local VAPID web push from autoclawd, free tier.
  *
@@ -27,26 +31,9 @@
  * and the crypto helpers are exported so the test can decrypt what we encrypt.
  * No vscode imports — autoclawd + unit tests run this headless.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.MAX_CONSECUTIVE_FAILURES = void 0;
-exports.b64url = b64url;
-exports.b64urlDecode = b64urlDecode;
-exports.ensureVapidKeys = ensureVapidKeys;
-exports.vapidPublicKey = vapidPublicKey;
-exports.vapidAuthorizationHeader = vapidAuthorizationHeader;
-exports.encryptWebPushPayload = encryptWebPushPayload;
-exports.decryptWebPushPayload = decryptWebPushPayload;
-exports.listSubscriptions = listSubscriptions;
-exports.summarizeSubscriptions = summarizeSubscriptions;
-exports.addSubscription = addSubscription;
-exports.removeSubscription = removeSubscription;
-exports.sendWebPush = sendWebPush;
-exports.broadcastPush = broadcastPush;
-exports.runPushTick = runPushTick;
-const crypto = require("crypto");
-const fs = require("fs");
-const https = require("https");
-const path = require("path");
+
+export let MAX_CONSECUTIVE_FAILURES = void 0;
+
 /* -------------------------------------------------------------------------- */
 /*  Small shared helpers (same idioms as viewerAuth)                           */
 /* -------------------------------------------------------------------------- */
@@ -204,7 +191,7 @@ function decryptWebPushPayload(body, uaKeyPair, authSecretB64) {
     }
     return padded.subarray(0, end - 1);
 }
-exports.MAX_CONSECUTIVE_FAILURES = 8;
+MAX_CONSECUTIVE_FAILURES = 8;
 function listSubscriptions(workspaceRoot) {
     const arr = readJson(subsPath(workspaceRoot));
     return Array.isArray(arr) ? arr : [];
@@ -381,3 +368,5 @@ async function runPushTick(workspaceRoot, opts = {}) {
     return { pushed };
 }
 //# sourceMappingURL=push.js.map
+
+export { b64url as b64url, b64urlDecode as b64urlDecode, ensureVapidKeys as ensureVapidKeys, vapidPublicKey as vapidPublicKey, vapidAuthorizationHeader as vapidAuthorizationHeader, encryptWebPushPayload as encryptWebPushPayload, decryptWebPushPayload as decryptWebPushPayload, listSubscriptions as listSubscriptions, summarizeSubscriptions as summarizeSubscriptions, addSubscription as addSubscription, removeSubscription as removeSubscription, sendWebPush as sendWebPush, broadcastPush as broadcastPush, runPushTick as runPushTick };

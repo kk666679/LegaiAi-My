@@ -1,4 +1,7 @@
-"use strict";
+import fs from 'fs';
+import path from 'path';
+import * as inboxState_1 from '../comms/inboxState.js';
+
 /**
  * forwarding.ts — wires the (otherwise dormant) cloud relay into live data.
  *
@@ -11,17 +14,7 @@
  * endpoint / no token / not entitled) — the relay client enforces that.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.gatherHeartbeatsForRelay = gatherHeartbeatsForRelay;
-exports.forwardHeartbeats = forwardHeartbeats;
-exports.gatherInboxForRelay = gatherInboxForRelay;
-exports.forwardInbox = forwardInbox;
-exports.applyFetchedHeartbeats = applyFetchedHeartbeats;
-exports.readRemoteHeartbeats = readRemoteHeartbeats;
-exports.fetchAndCacheHeartbeats = fetchAndCacheHeartbeats;
-exports.applyFetchedToInboxes = applyFetchedToInboxes;
-const fs = require("fs");
-const path = require("path");
-const inboxState_1 = require("../comms/inboxState");
+
 const fsp = fs.promises;
 function heartbeatsDir(autoclawDir) {
     return path.join(autoclawDir, 'orchestrator', 'comms', 'heartbeats');
@@ -250,3 +243,5 @@ async function applyFetchedToInboxes(autoclawDir, messages) {
     return { written, skipped };
 }
 //# sourceMappingURL=forwarding.js.map
+
+export { gatherHeartbeatsForRelay as gatherHeartbeatsForRelay, forwardHeartbeats as forwardHeartbeats, gatherInboxForRelay as gatherInboxForRelay, forwardInbox as forwardInbox, applyFetchedHeartbeats as applyFetchedHeartbeats, readRemoteHeartbeats as readRemoteHeartbeats, fetchAndCacheHeartbeats as fetchAndCacheHeartbeats, applyFetchedToInboxes as applyFetchedToInboxes };

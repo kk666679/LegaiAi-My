@@ -1,5 +1,3 @@
-'use strict';
-
 const MCP_TOOL_NAME_RE = /^[a-zA-Z0-9_-]{1,64}$/;
 
 function fromSkillId(id) {
@@ -38,4 +36,6 @@ function inferInputSchema(inputs = []) {
   return { type: 'object', properties, required, additionalProperties: true };
 }
 
-module.exports = { MCP_TOOL_NAME_RE, fromSkillId, isValidName, inferInputSchema, schemaForName };
+;
+
+export { MCP_TOOL_NAME_RE, fromSkillId, isValidName, inferInputSchema, schemaForName };

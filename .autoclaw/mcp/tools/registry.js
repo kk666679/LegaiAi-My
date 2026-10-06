@@ -1,6 +1,5 @@
-'use strict';
+import { isValidName, inferInputSchema } from './schema.js';
 
-const { isValidName, inferInputSchema } = require('./schema');
 
 class ToolRegistry {
   constructor() { this.tools = new Map(); }
@@ -37,4 +36,6 @@ class ToolRegistry {
   }
 }
 
-module.exports = { ToolRegistry };
+;
+
+export { ToolRegistry };

@@ -1,4 +1,3 @@
-"use strict";
 /**
  * eval/scorers/composite.js — Composite scorer combining multiple scorers.
  */
@@ -16,4 +15,4 @@ function compositeScorer({ scorers, weights }) {
   };
 }
 
-exports.compositeScorer = compositeScorer;
+export { compositeScorer as compositeScorer };

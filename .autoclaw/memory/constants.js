@@ -1,5 +1,3 @@
-'use strict';
-
 const TIER = Object.freeze({ STM: 'stm', LTM: 'ltm' });
 
 const KIND = Object.freeze({
@@ -8,7 +6,8 @@ const KIND = Object.freeze({
   INSIGHT:     'insight',
   FACT:        'fact',
   NOTE:        'note',
-  REFLECTION:  'reflection'
+  REFLECTION:  'reflection',
+  LEGISLATION: 'legislation'
 });
 
 const DEFAULT_STM = Object.freeze({
@@ -22,4 +21,4 @@ const DEFAULT_LTM = Object.freeze({
   maxEntries: 10000
 });
 
-module.exports = { TIER, KIND, DEFAULT_STM, DEFAULT_LTM };
+export { TIER, KIND, DEFAULT_STM, DEFAULT_LTM };

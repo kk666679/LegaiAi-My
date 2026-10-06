@@ -1,4 +1,5 @@
-'use strict';
+import { EventEmitter } from 'events';
+import { canonicalKey, edgeKey, stableHash } from './canonical.js';
 
 /**
  * ingest — batch writer with retries and a dead-letter queue.
@@ -7,9 +8,6 @@
  * they never abort the batch. Nothing is invented here — an item without an id
  * goes to the DLQ, it does not get one.
  */
-
-const { EventEmitter } = require('events');
-const { canonicalKey, edgeKey, stableHash } = require('./canonical');
 
 class KGIngest extends EventEmitter {
   constructor(store, { maxRetries = 2, backoffMs = 250, dlq } = {}) {
@@ -84,4 +82,6 @@ class KGIngest extends EventEmitter {
   }
 }
 
-module.exports = { KGIngest };
+;
+
+export { KGIngest };

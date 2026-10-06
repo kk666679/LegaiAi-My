@@ -1,5 +1,7 @@
-'use strict';
-const { toolResult, toolError } = require('../protocol');
+import { toolResult, toolError } from '../protocol.js';
+
+import { format } from '../../export/index.js';
+import { renderAll } from '../../export/index.js';
 
 function build() {
   return [
@@ -17,7 +19,7 @@ function build() {
       },
       handler: async ({ result, kind = 'irac', opts = {} } = {}) => {
         try {
-          const { format } = require('../../export');
+
           const text = format(result, kind, opts);
           return toolResult([{ type: 'text', text: typeof text === 'string' ? text : JSON.stringify(text, null, 2) }]);
         } catch (e) { return toolError(e.message); }
@@ -33,7 +35,7 @@ function build() {
       },
       handler: async ({ result, opts = {} } = {}) => {
         try {
-          const { renderAll } = require('../../export');
+
           const all = renderAll(result, opts);
           const summary = {};
           for (const [name, { mime, text }] of Object.entries(all)) summary[name] = { mime, bytes: text.length };
@@ -43,4 +45,6 @@ function build() {
     }
   ];
 }
-module.exports = { build };
+;
+
+export { build };

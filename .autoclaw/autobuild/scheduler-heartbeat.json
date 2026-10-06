@@ -1,5 +1,8 @@
 {
   "at": "2026-09-20T17:34:27.821Z",
   "pid": 13076,
-  "intervalSeconds": 30
+  "intervalSeconds": 30,
+  "lastBeat": "2026-10-06T09:25:56.763Z",
+  "consecutiveMisses": 0,
+  "state": "healthy"
 }

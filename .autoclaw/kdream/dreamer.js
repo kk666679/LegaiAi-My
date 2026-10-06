@@ -1,4 +1,9 @@
-'use strict';
+import * as memory from './memory.js';
+import { EventEmitter } from 'events';
+import { KdreamPolicy } from './policies.js';
+import { DreamJournal } from './buffer.js';
+import { CycleMetrics } from './metrics.js';
+import { detectPatterns, rankInsights } from './patterns.js';
 
 /**
  * Dreamer — the memory consolidation cycle.
@@ -19,13 +24,6 @@
  * This module touches no knowledge-graph edge. Graph consolidation lives in
  * `kgdream/`, which runs independently.
  */
-
-const { EventEmitter } = require('events');
-const { KdreamPolicy } = require('./policies');
-const { DreamJournal } = require('./buffer');
-const { CycleMetrics } = require('./metrics');
-const memory = require('./memory');
-const { detectPatterns, rankInsights } = require('./patterns');
 
 const MODES = Object.freeze(['light', 'deep', 'full']);
 const DAY_MS = 86400000;
@@ -191,4 +189,6 @@ class Dreamer extends EventEmitter {
   metricsSnapshot() { return this.metrics.snapshot(); }
 }
 
-module.exports = { Dreamer, MODES };
+;
+
+export { Dreamer, MODES };

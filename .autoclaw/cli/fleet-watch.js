@@ -1,4 +1,8 @@
-"use strict";
+import fs from 'fs';
+import path from 'path';
+import * as heartbeatReader_1 from '../lmd/heartbeatReader.js'; // MISSING TARGET
+import * as strategyChain_1 from '../keepalive/strategyChain.js'; // MISSING TARGET
+
 /**
  * fleet-watch.ts — `autoclaw fleet watch` cron-style keep-alive loop
  * (Sprint 4 / WA-3 I3).
@@ -20,22 +24,14 @@
  *
  * *** NO LLM CALLS. Pure file I/O + scheduling + child-process strategies. ***
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.FleetWatcher = exports.DEFAULT_WATCH_INTERVAL_MS = void 0;
-exports.parseInterval = parseInterval;
-exports.fleetWatchStatusBarText = fleetWatchStatusBarText;
-exports.watchFleetCommand = watchFleetCommand;
-exports.currentWatcher = currentWatcher;
-exports.main = main;
-const fs = require("fs");
-const path = require("path");
-const heartbeatReader_1 = require("../lmd/heartbeatReader");
-const strategyChain_1 = require("../keepalive/strategyChain");
+
+FleetWatcher = exports.DEFAULT_WATCH_INTERVAL_MS = void 0;
+
 /* -------------------------------------------------------------------------- */
 /*  Interval parsing                                                          */
 /* -------------------------------------------------------------------------- */
 /** Default watch interval: 5 minutes. */
-exports.DEFAULT_WATCH_INTERVAL_MS = 5 * 60 * 1000;
+export let DEFAULT_WATCH_INTERVAL_MS = 5 * 60 * 1000;
 /**
  * Parse a human interval string (`"5m"`, `"30s"`, `"1h"`, or a bare number of
  * milliseconds) into milliseconds. Falls back to {@link DEFAULT_WATCH_INTERVAL_MS}
@@ -175,7 +171,7 @@ class FleetWatcher {
         return { at, health, stalled: stalledAgents.map((a) => a.agentId), chains };
     }
 }
-exports.FleetWatcher = FleetWatcher;
+
 /* -------------------------------------------------------------------------- */
 /*  VS Code command (toggle)                                                  */
 /* -------------------------------------------------------------------------- */
@@ -253,3 +249,5 @@ if (require.main === module) {
     });
 }
 //# sourceMappingURL=fleet-watch.js.map
+
+export { parseInterval as parseInterval, fleetWatchStatusBarText as fleetWatchStatusBarText, watchFleetCommand as watchFleetCommand, currentWatcher as currentWatcher, main as main, FleetWatcher as FleetWatcher };

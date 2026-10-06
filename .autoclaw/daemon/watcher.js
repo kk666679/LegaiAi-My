@@ -1,4 +1,7 @@
-"use strict";
+import fs from 'fs';
+import path from 'path';
+import events_1 from 'events';
+
 /**
  * watcher.ts — Chokidar-based inbox filesystem watcher.
  *
@@ -13,10 +16,7 @@
  * A3 — Part of Sprint-1 / WA-2 (Watchdog & Reconciliation).
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createInboxWatcher = createInboxWatcher;
-const fs = require("fs");
-const path = require("path");
-const events_1 = require("events");
+
 const fsPromises = fs.promises;
 // ---------------------------------------------------------------------------
 // Internal helpers
@@ -109,7 +109,7 @@ function createInboxWatcher(opts) {
             // Dynamic require so the module can be unit-tested in environments where
             // chokidar is replaced with a mock via require.cache manipulation.
             // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const chokidar = require('chokidar');
+            await import('chokidar');
             const watcher = chokidar.watch(inboxesDir, {
                 persistent: true,
                 ignoreInitial: true,
@@ -185,3 +185,5 @@ function createInboxWatcher(opts) {
     };
 }
 //# sourceMappingURL=watcher.js.map
+
+export { createInboxWatcher as createInboxWatcher };

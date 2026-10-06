@@ -1,4 +1,7 @@
-"use strict";
+import fs from 'fs';
+import path from 'path';
+import * as agentTypes_1 from './agentTypes.js';
+
 /**
  * governance.ts — AF-5: org-level controls — an approval gate + an audit log.
  *
@@ -12,12 +15,7 @@
  *     IO is small + append-only.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.gateDispatch = gateDispatch;
-exports.appendAuditLog = appendAuditLog;
-exports.readAuditLog = readAuditLog;
-const fs = require("fs");
-const path = require("path");
-const agentTypes_1 = require("./agentTypes");
+
 const fsp = fs.promises;
 /**
  * Decide whether an action may proceed without prior approval.
@@ -72,3 +70,5 @@ async function readAuditLog(autoclawDir, date = new Date()) {
     return out;
 }
 //# sourceMappingURL=governance.js.map
+
+export { gateDispatch as gateDispatch, appendAuditLog as appendAuditLog, readAuditLog as readAuditLog };

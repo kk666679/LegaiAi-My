@@ -1,23 +1,14 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.SCAFFOLD_SCORES_FILE = exports.PROMPT_HARNESSES_FILE = exports.SCAFFOLD_VARIANTS_FILE = exports.SCAFFOLDS_DIR = void 0;
-exports.scaffoldDir = scaffoldDir;
-exports.scaffoldVariantsPath = scaffoldVariantsPath;
-exports.promptHarnessesPath = promptHarnessesPath;
-exports.scaffoldScoresPath = scaffoldScoresPath;
-exports.appendScaffoldVariant = appendScaffoldVariant;
-exports.readScaffoldVariants = readScaffoldVariants;
-exports.appendPromptHarnessContract = appendPromptHarnessContract;
-exports.readPromptHarnessContracts = readPromptHarnessContracts;
-exports.appendScaffoldScore = appendScaffoldScore;
-exports.readScaffoldScores = readScaffoldScores;
-const fs = require("fs");
-const path = require("path");
-const types_1 = require("./types");
-exports.SCAFFOLDS_DIR = path.join('.autoclaw', 'workflows', 'scaffolds');
-exports.SCAFFOLD_VARIANTS_FILE = 'variants.jsonl';
-exports.PROMPT_HARNESSES_FILE = 'prompt-harnesses.jsonl';
-exports.SCAFFOLD_SCORES_FILE = 'scores.jsonl';
+import fs from 'fs';
+import path from 'path';
+import * as types_1 from './types.js';
+
+
+export let SCAFFOLD_SCORES_FILE = exports.PROMPT_HARNESSES_FILE = exports.SCAFFOLD_VARIANTS_FILE = exports.SCAFFOLDS_DIR = void 0;
+
+export let SCAFFOLDS_DIR = path.join('.autoclaw', 'workflows', 'scaffolds');
+export let SCAFFOLD_VARIANTS_FILE = 'variants.jsonl';
+export let PROMPT_HARNESSES_FILE = 'prompt-harnesses.jsonl';
+SCAFFOLD_SCORES_FILE = 'scores.jsonl';
 function scaffoldDir(workspaceRoot) {
     return path.join(workspaceRoot, exports.SCAFFOLDS_DIR);
 }
@@ -115,3 +106,5 @@ function isSensitiveLedgerKey(key) {
     ].includes(normalized);
 }
 //# sourceMappingURL=store.js.map
+
+export { scaffoldDir as scaffoldDir, scaffoldVariantsPath as scaffoldVariantsPath, promptHarnessesPath as promptHarnessesPath, scaffoldScoresPath as scaffoldScoresPath, appendScaffoldVariant as appendScaffoldVariant, readScaffoldVariants as readScaffoldVariants, appendPromptHarnessContract as appendPromptHarnessContract, readPromptHarnessContracts as readPromptHarnessContracts, appendScaffoldScore as appendScaffoldScore, readScaffoldScores as readScaffoldScores };

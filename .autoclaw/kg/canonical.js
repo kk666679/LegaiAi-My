@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * canonical — pure key helpers shared by the store, the ingest path and the
  * dream cycle. Nothing here touches the filesystem or the database.
@@ -37,4 +35,6 @@ function slugify(s) {
     .slice(0, 64);
 }
 
-module.exports = { canonicalKey, edgeKey, stableHash, slugify };
+;
+
+export { canonicalKey, edgeKey, stableHash, slugify };

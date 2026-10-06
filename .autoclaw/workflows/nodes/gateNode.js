@@ -1,4 +1,3 @@
-"use strict";
 /**
  * gateNode.ts — Gate node adapter for the WL-1 headless runner (WL-1.3).
  *
@@ -12,7 +11,7 @@
  * CommandRunner, so they are fully mockable and never shell out by default.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.runGateNode = runGateNode;
+
 /** Map a failed command gate to the right taxonomy entry. */
 function failureForGate(kind, timedOut) {
     if (timedOut) {
@@ -125,3 +124,5 @@ function nearestUpstreamObject(ctx) {
     return null;
 }
 //# sourceMappingURL=gateNode.js.map
+
+export { runGateNode as runGateNode };

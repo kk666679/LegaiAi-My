@@ -116,6 +116,6 @@ class AdversarialGuard {
   }
 }
 
-module.exports = {
-  AdversarialGuard,
-};
+;
+
+export { AdversarialGuard };

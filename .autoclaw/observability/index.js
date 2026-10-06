@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * observability — structured logging, metric aggregation, distributed tracing.
  *
@@ -263,4 +261,6 @@ function createStack(opts = {}) {
   };
 }
 
-module.exports = { LEVELS, Logger, Metrics, Tracer, Span, createStack, percentile };
+;
+
+export { LEVELS, Logger, Metrics, Tracer, Span, createStack, percentile };

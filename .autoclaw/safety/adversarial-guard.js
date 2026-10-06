@@ -1,4 +1,3 @@
-"use strict";
 /**
  * safety/adversarial-guard.js — Prompt injection and adversarial input detection.
  *
@@ -172,4 +171,4 @@ class AdversarialGuard {
   }
 }
 
-exports.AdversarialGuard = AdversarialGuard;
+export { AdversarialGuard as AdversarialGuard };

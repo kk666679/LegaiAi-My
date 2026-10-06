@@ -1,4 +1,5 @@
-'use strict';
+import fs from 'fs';
+import path from 'path';
 
 /**
  * memory — read `learnings/insight-*.md`, render `MEMORY.md`.
@@ -8,9 +9,6 @@
  * this directory owns, and a lenient parser that silently mis-reads a tag list
  * is worse than a strict one that drops the file.
  */
-
-const fs = require('fs');
-const path = require('path');
 
 const HEADER = `# Consolidated Memory
 
@@ -94,4 +92,6 @@ function writeMemory(file, content) {
   return content.length;
 }
 
-module.exports = { parseInsight, listInsights, renderMemory, readMemory, writeMemory, HEADER };
+;
+
+export { parseInsight, listInsights, renderMemory, readMemory, writeMemory, HEADER };

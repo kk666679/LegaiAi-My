@@ -1,13 +1,15 @@
-'use strict';
+import * as protocol from './protocol.js';
+import { McpServer } from './server.js';
+import { StdioTransport } from './transport/stdio.js';
+import { HttpTransport } from './transport/http.js';
+import { ToolRegistry, buildDefaultTools, fromSkillId, isValidName, inferInputSchema } from './tools/index.js';
+import { ResourceRegistry, buildDefaultResources } from './resources.js';
+import { PromptRegistry, buildDefaultPrompts } from './prompts.js';
+import { buildCapabilities } from './capabilities.js';
+import path from 'path';
+import fs from 'fs';
 
-const { McpServer } = require('./server');
-const { StdioTransport } = require('./transport/stdio');
-const { HttpTransport } = require('./transport/http');
-const { ToolRegistry, buildDefaultTools, fromSkillId, isValidName, inferInputSchema } = require('./tools');
-const { ResourceRegistry, buildDefaultResources } = require('./resources');
-const { PromptRegistry, buildDefaultPrompts } = require('./prompts');
-const protocol = require('./protocol');
-const { buildCapabilities } = require('./capabilities');
+import { createKG } from '../kg/index.js';
 
 /**
  * createServer — assemble a server, resolving default deps from siblings.
@@ -44,10 +46,10 @@ function createServer(deps = {}) {
   }
   if (!resolved.kg) {
     try {
-      const path = require('path');
-      const fs = require('fs');
-      const dbPath = path.resolve(__dirname, '..', 'kg', 'kg.db');
-      const { createKG } = require('../kg');
+      const path = path;
+      const fs = fs;
+      const dbPath = path.resolve(import.meta.dirname, '..', 'kg', 'kg.db');
+
       resolved.kg = fs.existsSync(dbPath) ? createKG({ dbPath }) : createKG({ memory: true });
     } catch (_) {}
   }
@@ -72,13 +74,6 @@ function serveHttp(deps = {}, opts = {}) {
   return { server, transport, handler: transport.handler() };
 }
 
-module.exports = {
-  McpServer,
-  StdioTransport, HttpTransport,
-  ToolRegistry, buildDefaultTools, fromSkillId, isValidName, inferInputSchema,
-  ResourceRegistry, buildDefaultResources,
-  PromptRegistry, buildDefaultPrompts,
-  buildCapabilities,
-  createServer, serveStdio, serveHttp,
-  protocol
-};
+;
+
+export { McpServer, StdioTransport, HttpTransport, ToolRegistry, buildDefaultTools, fromSkillId, isValidName, inferInputSchema, ResourceRegistry, buildDefaultResources, PromptRegistry, buildDefaultPrompts, buildCapabilities, createServer, serveStdio, serveHttp, protocol };

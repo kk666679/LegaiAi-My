@@ -1,4 +1,3 @@
-"use strict";
 /**
  * safety/governance.js — Policy engine for agent actions.
  *
@@ -100,4 +99,4 @@ class GovernanceEngine {
   }
 }
 
-exports.GovernanceEngine = GovernanceEngine;
+export { GovernanceEngine as GovernanceEngine };

@@ -1,4 +1,3 @@
-"use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -14,10 +13,10 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-__exportStar(require("./types"), exports);
-__exportStar(require("./store"), exports);
-__exportStar(require("./score"), exports);
-__exportStar(require("./select"), exports);
-__exportStar(require("./monitor"), exports);
-__exportStar(require("./mutate"), exports);
+export * from './types.js';
+export * from './store.js';
+export * from './score.js';
+export * from './select.js';
+export * from './monitor.js';
+export * from './mutate.js';
 //# sourceMappingURL=index.js.map

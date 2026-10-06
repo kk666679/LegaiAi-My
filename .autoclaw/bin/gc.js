@@ -1,8 +1,9 @@
 #!/usr/bin/env node
+import fs from 'fs';
+import path from 'path';
+import { ROOT, writeJson, nowIso } from './_util.js';
+
 'use strict';
-const fs = require('fs');
-const path = require('path');
-const { ROOT, writeJson, nowIso } = require('./_util');
 
 const archiveDir = path.join(ROOT, 'orchestrator', 'comms', 'inboxes', '_archive');
 const sharedDir  = path.join(ROOT, 'orchestrator', 'comms', 'inboxes', 'shared');

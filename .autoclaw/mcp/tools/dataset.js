@@ -3,7 +3,7 @@ import { toolResult, toolError } from '../protocol.js';
 import * as ds from '../../dataset.js;
 
 function build() {
-  let ds;
+  let ds';
 
   return [
     {

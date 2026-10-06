@@ -1,4 +1,5 @@
-"use strict";
+import * as state_1 from './state.js';
+
 /**
  * loops.ts — Bounded loop execution for the WL-1 headless runner (WL-1.2).
  *
@@ -17,10 +18,7 @@
  * or cost/time ceiling approaching.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.resolveLoopBodyNodes = resolveLoopBodyNodes;
-exports.runLoopNode = runLoopNode;
-exports.loopStopReason = loopStopReason;
-const state_1 = require("./state");
+
 // ---------------------------------------------------------------------------
 // Body node resolution (graph-derived)
 // ---------------------------------------------------------------------------
@@ -287,3 +285,5 @@ function loopStopReason(iteration, policy, reason) {
     }
 }
 //# sourceMappingURL=loops.js.map
+
+export { resolveLoopBodyNodes as resolveLoopBodyNodes, runLoopNode as runLoopNode, loopStopReason as loopStopReason };

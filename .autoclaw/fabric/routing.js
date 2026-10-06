@@ -1,4 +1,5 @@
-"use strict";
+import * as agentTypes_1 from './agentTypes.js';
+
 /**
  * routing.ts — AF-3: route work + reviews by agent TYPE, not just capabilities.
  *
@@ -9,10 +10,7 @@
  * Pure + `vscode`-free.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.rankAgentsForCapabilities = rankAgentsForCapabilities;
-exports.selectReviewers = selectReviewers;
-exports.reviewConsensusRuleFor = reviewConsensusRuleFor;
-const agentTypes_1 = require("./agentTypes");
+
 function effectiveTags(agent) {
     const type = agent.agent_type ?? 'coder';
     return new Set([...(agent.capabilities ?? []), ...(0, agentTypes_1.agentTypeProfile)(type).capabilityTags]);
@@ -44,3 +42,5 @@ function reviewConsensusRuleFor(requiredType) {
     return (0, agentTypes_1.consensusRuleForAgentType)(requiredType);
 }
 //# sourceMappingURL=routing.js.map
+
+export { rankAgentsForCapabilities as rankAgentsForCapabilities, selectReviewers as selectReviewers, reviewConsensusRuleFor as reviewConsensusRuleFor };

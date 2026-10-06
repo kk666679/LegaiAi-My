@@ -1,4 +1,9 @@
-"use strict";
+import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
+import * as ledger_1 from './ledger.js';
+import * as types_1 from './types.js';
+
 /**
  * export.ts — Trace dataset export for evals and opt-in distillation (TL-2).
  *
@@ -21,14 +26,7 @@
  *     what it is and where it came from.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TRACE_DATASET_SCHEMA = void 0;
-exports.exportTraces = exportTraces;
-const crypto = require("crypto");
-const fs = require("fs");
-const path = require("path");
-const ledger_1 = require("./ledger");
-const types_1 = require("./types");
-exports.TRACE_DATASET_SCHEMA = 'autoclaw.traceDataset.v1';
+export const TRACE_DATASET_SCHEMA = void 0;export const TRACE_DATASET_SCHEMA = 'autoclaw.traceDataset.v1';
 /* -------------------------------------------------------------------------- */
 /*  Redaction helpers                                                         */
 /* -------------------------------------------------------------------------- */
@@ -111,7 +109,7 @@ async function exportTraces(opts) {
     const projectNames = [path.basename(opts.workspaceRoot)];
     let redactSecretsFn = (s) => s;
     try {
-        const { redactSecrets } = await Promise.resolve().then(() => require('../../intelligence/redact'));
+        const { redactSecrets } = await import('../../intelligence/redact');
         redactSecretsFn = (s) => redactSecrets(s);
     }
     catch {
@@ -166,3 +164,5 @@ async function exportTraces(opts) {
     return { ok: true, exported: exportedRows.length, datasetPath, manifestPath, warnings };
 }
 //# sourceMappingURL=export.js.map
+
+export { exportTraces as exportTraces };

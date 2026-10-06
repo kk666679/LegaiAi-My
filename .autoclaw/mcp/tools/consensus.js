@@ -1,5 +1,4 @@
-'use strict';
-const { toolResult, toolError } = require('../protocol');
+import { toolResult, toolError } from '../protocol.js';
 
 function build({ consensus } = {}) {
   return [
@@ -32,4 +31,6 @@ function build({ consensus } = {}) {
     }
   ];
 }
-module.exports = { build };
+;
+
+export { build };

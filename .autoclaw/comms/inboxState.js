@@ -1,4 +1,6 @@
-"use strict";
+import fs from 'fs';
+import path from 'path';
+
 /**
  * inboxState.ts — Inbox state machine for the AutoClaw cross-agent comms layer.
  *
@@ -15,15 +17,7 @@
  * Sprint 1 — A4 (WA-3)
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.markRead = markRead;
-exports.markReplied = markReplied;
-exports.archive = archive;
-exports.markForwarded = markForwarded;
-exports.getState = getState;
-exports.listUnread = listUnread;
-exports.listAwaitingMe = listAwaitingMe;
-const fs = require("fs");
-const path = require("path");
+
 const fsPromises = fs.promises;
 // ---------------------------------------------------------------------------
 // Internal helpers
@@ -227,3 +221,5 @@ async function listAwaitingMe(inboxPath) {
     return awaiting.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 }
 //# sourceMappingURL=inboxState.js.map
+
+export { markRead as markRead, markReplied as markReplied, archive as archive, markForwarded as markForwarded, getState as getState, listUnread as listUnread, listAwaitingMe as listAwaitingMe };

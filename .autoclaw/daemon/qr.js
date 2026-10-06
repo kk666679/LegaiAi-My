@@ -1,4 +1,3 @@
-"use strict";
 /**
  * qr.ts — a pure, dependency-free QR Code encoder (CP-3.5).
  *
@@ -19,9 +18,7 @@
  * 0x537 / 0x1f25 generators with the 0x5412 format mask.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.encodeQr = encodeQr;
-exports.encodeQrForTest = encodeQrForTest;
-exports.qrToSvg = qrToSvg;
+
 // ---------------------------------------------------------------------------
 // GF(256) arithmetic — primitive polynomial 0x11d (QR field).
 // ---------------------------------------------------------------------------
@@ -581,3 +578,5 @@ function qrToSvg(text, opts) {
         `</svg>`);
 }
 //# sourceMappingURL=qr.js.map
+
+export { encodeQr as encodeQr, encodeQrForTest as encodeQrForTest, qrToSvg as qrToSvg };

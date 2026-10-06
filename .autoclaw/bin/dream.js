@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import { createDreamer, MODES } from '../kdream/index.js';
+
 'use strict';
 
 /**
@@ -12,8 +14,6 @@
  *   node bin/dream.js deep         # + pattern detection
  *   node bin/dream.js full --dry-run
  */
-
-const { createDreamer, MODES } = require('../kdream');
 
 const STABLE_FACTS = [
   'KG store lives in `kg/kg.db`; edges decay at 0.95 per dream cycle.',

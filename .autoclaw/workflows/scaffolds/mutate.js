@@ -1,8 +1,7 @@
-"use strict";
+import * as types_1 from './types.js';
+
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mutateScaffoldVariant = mutateScaffoldVariant;
-exports.validateScaffoldMutationRequest = validateScaffoldMutationRequest;
-const types_1 = require("./types");
+
 const ROUTER_PROFILES = [
     'cheap',
     'balanced',
@@ -317,3 +316,5 @@ function error(code, reason) {
     return { code, severity: 'error', reason };
 }
 //# sourceMappingURL=mutate.js.map
+
+export { mutateScaffoldVariant as mutateScaffoldVariant, validateScaffoldMutationRequest as validateScaffoldMutationRequest };

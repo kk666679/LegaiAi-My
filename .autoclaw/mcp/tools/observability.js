@@ -1,5 +1,5 @@
-'use strict';
-const { toolResult, toolError } = require('../protocol');
+import { toolResult, toolError } from '../protocol.js';
+
 
 function build({ obs } = {}) {
   return [
@@ -22,4 +22,6 @@ function build({ obs } = {}) {
     }
   ];
 }
-module.exports = { build };
+;
+
+export { build };

@@ -1,9 +1,10 @@
 #!/usr/bin/env node
+import { skillRegistry } from '../skills/registry.js';
+
 "use strict";
 /**
  * cli/skills.js — Skill CLI commands.
  */
-const { skillRegistry } = require('../skills/registry');
 
 async function main() {
   const command = process.argv[2];

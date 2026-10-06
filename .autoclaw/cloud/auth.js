@@ -1,4 +1,9 @@
-"use strict";
+import crypto from 'crypto';
+import child_process_1 from 'child_process';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+
 /**
  * auth.ts — `autoclaw cloud login`: cloud-relay authentication (Workstream D.1).
  *
@@ -33,19 +38,7 @@
  * Sprint 4 — D1 (WA-4).
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.resolveInstallationId = resolveInstallationId;
-exports.resolveSecretStore = resolveSecretStore;
-exports.redactToken = redactToken;
-exports.cloudLogin = cloudLogin;
-exports.getCloudToken = getCloudToken;
-exports.isTokenExpired = isTokenExpired;
-exports.rotateToken = rotateToken;
-exports.cloudLogout = cloudLogout;
-const crypto = require("crypto");
-const child_process_1 = require("child_process");
-const fs = require("fs");
-const os = require("os");
-const path = require("path");
+
 const fsp = fs.promises;
 // ---------------------------------------------------------------------------
 // installation_id — stable per-install fleet identity (V3_PLAN §4)
@@ -563,3 +556,5 @@ function errMsg(err) {
     return err instanceof Error ? err.message : String(err);
 }
 //# sourceMappingURL=auth.js.map
+
+export { resolveInstallationId as resolveInstallationId, resolveSecretStore as resolveSecretStore, redactToken as redactToken, cloudLogin as cloudLogin, getCloudToken as getCloudToken, isTokenExpired as isTokenExpired, rotateToken as rotateToken, cloudLogout as cloudLogout };

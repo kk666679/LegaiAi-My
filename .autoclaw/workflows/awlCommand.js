@@ -1,4 +1,6 @@
-"use strict";
+import vscode from 'vscode';
+import * as awlService_1 from './awlService.js';
+
 /**
  * awlCommand.ts — VS Code glue for the AWL experiment cycle (AWL-RUN-1).
  *
@@ -13,13 +15,10 @@
  *
  * which binds `autoclaw.workflows.runAwlExperiment`.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AWL_RUN_EXPERIMENT_COMMAND = void 0;
-exports.awlRunExperimentCommandHandler = awlRunExperimentCommandHandler;
-exports.registerAwlCommands = registerAwlCommands;
-const vscode = require("vscode");
-const awlService_1 = require("./awlService");
-exports.AWL_RUN_EXPERIMENT_COMMAND = 'autoclaw.workflows.runAwlExperiment';
+
+export let AWL_RUN_EXPERIMENT_COMMAND = void 0;
+
+AWL_RUN_EXPERIMENT_COMMAND = 'autoclaw.workflows.runAwlExperiment';
 let channel;
 function getChannel() {
     if (!channel) {
@@ -86,3 +85,5 @@ function registerAwlCommands(context, getWorkspaceRoot) {
     context.subscriptions.push(vscode.commands.registerCommand(exports.AWL_RUN_EXPERIMENT_COMMAND, awlRunExperimentCommandHandler({ getWorkspaceRoot })));
 }
 //# sourceMappingURL=awlCommand.js.map
+
+export { awlRunExperimentCommandHandler as awlRunExperimentCommandHandler, registerAwlCommands as registerAwlCommands };

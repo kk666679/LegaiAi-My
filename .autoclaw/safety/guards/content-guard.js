@@ -133,6 +133,6 @@ class ContentGuard {
   }
 }
 
-module.exports = {
-  ContentGuard,
-};
+;
+
+export { ContentGuard };

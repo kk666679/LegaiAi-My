@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * prune — decay every edge in the dream set and drop the ones that fall below
  * the threshold.
@@ -58,4 +56,6 @@ async function prune({ store, policy, dreamSet = [] } = {}) {
   return { name: 'prune', ok: true, pruned, decayed: decayedIds.length, decayedIds };
 }
 
-module.exports = { prune };
+;
+
+export { prune };

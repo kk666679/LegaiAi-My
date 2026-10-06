@@ -1,9 +1,9 @@
+import crypto from 'crypto';
+
 /**
  * .autoclaw/safety/approval/approval-gate.js
  * Human approval workflow for high-risk actions
  */
-
-const crypto = require('crypto');
 
 class ApprovalGate {
   /**
@@ -208,6 +208,6 @@ class ApprovalGate {
   }
 }
 
-module.exports = {
-  ApprovalGate,
-};
+;
+
+export { ApprovalGate };
