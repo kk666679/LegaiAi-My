@@ -1,297 +1,284 @@
 "use client";
 
-import { useState } from "react";
+import * as React from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { CheckCircle2, XCircle, Clock, Filter, X, AlertTriangle } from "lucide-react";
 import Link from "next/link";
-import { toast } from "sonner";
-import {
-  Play,
-  Pause,
-  CheckCircle2,
-  XCircle,
-  Activity,
-  Eye,
-  Bot,
-  Sparkles,
-  ArrowRight,
-} from "lucide-react";
+import { trpcReact } from "@/clients";
 import { DashboardShell } from "@/components/lawmate/DashboardShell";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Agent, AgentHeader } from "@/components/ai-elements/agent";
-import { AIMetricCard } from "@/components/ai/aimetric-card";
-import { AIStatusIndicator } from "@/components/ai/aistatus-indicator";
-import { ApprovalRequest, AgentTimeline as AgentTimelineView } from "@/components/ai/legal";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { cn } from "@/lib/utils";
 
-type AgentStatus = "running" | "paused" | "awaiting_approval" | "completed" | "failed";
-type StepStatus = "complete" | "active" | "pending" | "failed";
+const AUTH_LEVELS = [0, 1, 2, 3, 4, 5] as const;
+const ACTION_TYPES = ["RETRIEVE", "RECOMMEND", "DRAFT", "EXECUTE", "AUTOMATE"] as const;
+const STATUSES = ["pending", "approved", "rejected", "executed", "cancelled"] as const;
 
-interface AgentRun {
-  id: string;
-  name: string;
-  goal: string;
-  status: AgentStatus;
-  startedAt: string;
-  progress: number;
-  steps: Array<{ id: string; label: string; status: StepStatus; detail?: string }>;
-  matterName?: string;
-}
-
-const MOCK_RUNS: AgentRun[] = [
-  {
-    id: "run-1",
-    name: "PDPA Compliance Audit",
-    goal: "Audit all matter documents for PDPA Section 7 compliance.",
-    status: "awaiting_approval",
-    startedAt: "2026-09-01T14:30:00Z",
-    progress: 75,
-    matterName: "DataShield — PDPA Audit",
-    steps: [
-      { id: "s1", label: "Retrieve matter documents", status: "complete", detail: "18 documents indexed" },
-      { id: "s2", label: "Extract personal data references", status: "complete", detail: "42 references found" },
-      { id: "s3", label: "Cross-reference PDPA s.7", status: "complete", detail: "7 potential gaps identified" },
-      { id: "s4", label: "Draft remediation plan", status: "active", detail: "In progress…" },
-      { id: "s5", label: "Submit for human review", status: "pending" },
-    ],
-  },
-  {
-    id: "run-2",
-    name: "Employment Contract Review",
-    goal: "Review 3 employment agreements for non-compete enforceability.",
-    status: "running",
-    startedAt: "2026-09-01T13:00:00Z",
-    progress: 45,
-    matterName: "TechNova Sdn Bhd — Employment Disputes",
-    steps: [
-      { id: "s1", label: "Identify employment clauses", status: "complete" },
-      { id: "s2", label: "Analyse non-compete terms", status: "complete" },
-      { id: "s3", label: "Cross-reference Industrial Court awards", status: "active" },
-      { id: "s4", label: "Generate risk report", status: "pending" },
-    ],
-  },
-  {
-    id: "run-3",
-    name: "Force Majeure Gap Analysis",
-    goal: "Identify gaps in force majeure clauses across SPA documents.",
-    status: "completed",
-    startedAt: "2026-09-01T10:00:00Z",
-    progress: 100,
-    matterName: "Acquisition: Valley Foods Sdn Bhd",
-    steps: [
-      { id: "s1", label: "Compare to industry standard", status: "complete" },
-      { id: "s2", label: "Identify missing trigger events", status: "complete" },
-      { id: "s3", label: "Draft alternative language", status: "complete" },
-    ],
-  },
-  {
-    id: "run-4",
-    name: "Citation Validation Batch",
-    goal: "Validate 12 citations across recent drafts.",
-    status: "failed",
-    startedAt: "2026-09-01T08:00:00Z",
-    progress: 60,
-    steps: [
-      { id: "s1", label: "Extract citations", status: "complete" },
-      { id: "s2", label: "Resolve against LOM index", status: "failed", detail: "Index sync failed" },
-      { id: "s3", label: "Generate validation report", status: "pending" },
-    ],
-  },
-];
-
-const STATUS_TO_INDICATOR: Record<AgentStatus, "busy" | "paused" | "warning" | "success" | "error"> = {
-  running: "busy",
-  paused: "paused",
-  awaiting_approval: "warning",
-  completed: "success",
-  failed: "error",
+const AUTH_LEVEL_LABELS: Record<number, string> = {
+  0: "Read",
+  1: "Recommend",
+  2: "Draft",
+  3: "Execute + Approval",
+  4: "Controlled Auto",
+  5: "Prohibited",
 };
 
-const STATUS_LABEL: Record<AgentStatus, string> = {
-  running: "Running",
-  paused: "Paused",
-  awaiting_approval: "Awaiting approval",
-  completed: "Completed",
-  failed: "Failed",
+const STATUS_LABELS: Record<string, string> = {
+  pending: "Pending",
+  approved: "Approved",
+  rejected: "Rejected",
+  executed: "Executed",
+  cancelled: "Cancelled",
 };
 
-function stepToTimelineStatus(s: StepStatus): "completed" | "running" | "awaiting_approval" | "failed" | "queued" {
-  switch (s) {
-    case "complete":
-      return "completed";
-    case "active":
-      return "running";
-    case "pending":
-      return "queued";
-    case "failed":
-      return "failed";
-  }
-}
+const STATUS_COLORS: Record<string, string> = {
+  pending: "bg-amber-100 text-amber-700",
+  approved: "bg-green-100 text-green-700",
+  rejected: "bg-red-100 text-red-700",
+  executed: "bg-blue-100 text-blue-700",
+  cancelled: "bg-gray-100 text-gray-500",
+};
 
 export default function HITLPage() {
-  const [runs, setRuns] = useState<AgentRun[]>(MOCK_RUNS);
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const approve = (id: string) => {
-    setRuns((rs) => rs.map((r) => (r.id === id ? { ...r, status: "running", progress: 85 } : r)));
-    toast.success(`Approved ${id} — run resumed`);
+  const getParam = (key: string) => searchParams.get(key) ?? undefined;
+
+  const filters = {
+    matterId: getParam("matterId") ?? undefined,
+    agentName: getParam("agentName") ?? undefined,
+    authLevel: getParam("authLevel") ? Number(getParam("authLevel")) : undefined,
+    status: getParam("status") ?? undefined,
+    limit: 20,
+    cursor: getParam("cursor") ?? undefined,
   };
-  const reject = (id: string) => {
-    setRuns((rs) => rs.map((r) => (r.id === id ? { ...r, status: "failed", progress: r.progress } : r)));
-    toast.error(`Rejected ${id}`);
+
+  const { data, isLoading, isError, error, refetch } = trpcReact.hitl.listAll.useQuery(filters);
+  const stats = trpcReact.hitl.stats.useQuery(undefined, { staleTime: 30_000 });
+
+  const actions = data?.actions ?? [];
+  const nextCursor = data?.nextCursor;
+  const hasMore = data?.hasMore ?? false;
+
+  const pendingCount = stats.data?.byStatus?.pending ?? 0;
+  const pendingApproval = stats.data?.pendingApproval ?? 0;
+
+  const updateFilters = (newFilters: Partial<typeof filters>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    Object.entries(newFilters).forEach(([key, value]) => {
+      if (value === undefined || value === "") {
+        params.delete(key);
+      } else {
+        params.set(key, String(value));
+      }
+    });
+    params.delete("cursor");
+    router.push(`/legalai/hitl?${params.toString()}`);
   };
-  const pause = (id: string) => {
-    setRuns((rs) => rs.map((r) => (r.id === id ? { ...r, status: "paused" } : r)));
-    toast.warning(`Paused ${id}`);
+
+  const clearFilters = () => {
+    router.push("/legalai/hitl");
   };
-  const retry = (id: string) => {
-    setRuns((rs) => rs.map((r) => (r.id === id ? { ...r, status: "running", progress: Math.max(r.progress, 10) } : r)));
-    toast.success(`Retrying ${id}`);
+
+  const hasActiveFilters = Object.values(filters).some(v => v !== undefined && v !== "" && v !== 20);
+
+  const formatDate = (iso?: string | null) => {
+    if (!iso) return "—";
+    try {
+      return new Date(iso).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" });
+    } catch { return "—"; }
   };
 
   return (
     <DashboardShell>
       <div className="space-y-6">
-        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
-              <Eye className="size-5 text-primary" />
-              Agent Control (HITL)
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Human-in-the-loop oversight of AI agent runs. Approve, pause, or intervene at any step.
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="gap-2" asChild>
-              <Link href="/legalai/agent">
-                <Bot className="size-4" /> View agents
-              </Link>
-            </Button>
-            <Button size="sm" className="gap-2" asChild>
-              <Link href="/legalai/assistant">
-                <Sparkles className="size-4" /> New agent run
-              </Link>
-            </Button>
-          </div>
+        <PageHeader
+          title="Human-in-the-Loop"
+          description="Review and approve AI agent actions requiring human authorisation."
+          actions={
+            <>
+              {hasActiveFilters && (
+                <Button variant="outline" size="sm" onClick={clearFilters} className="gap-1.5">
+                  <X className="size-3.5" /> Clear filters
+                </Button>
+              )}
+              <Button variant="outline" size="sm" asChild className="gap-1.5">
+                <Link href="/legalai/hitl/escalations">Escalations</Link>
+              </Button>
+              <Button variant="outline" size="sm" asChild className="gap-1.5">
+                <Link href="/legalai/hitl/history">History</Link>
+              </Button>
+            </>
+          }
+        />
+
+        <div className="grid gap-4 lg:grid-cols-4">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Actions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold tabular-nums">{stats.data?.total ?? 0}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Pending Approval</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold tabular-nums text-amber-600">{pendingApproval}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Approved</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold tabular-nums text-green-600">{stats.data?.byStatus?.approved ?? 0}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Rejected</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold tabular-nums text-destructive">{stats.data?.byStatus?.rejected ?? 0}</div>
+            </CardContent>
+          </Card>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <AIMetricCard
-            title="Active runs"
-            value={runs.filter((r) => r.status === "running").length}
-            icon={Activity}
-            description="Currently executing"
-          />
-          <AIMetricCard
-            title="Awaiting approval"
-            value={runs.filter((r) => r.status === "awaiting_approval").length}
-            icon={Eye}
-            description="Need human review"
-          />
-          <AIMetricCard
-            title="Completed today"
-            value={runs.filter((r) => r.status === "completed").length}
-            icon={CheckCircle2}
-            description="Finished successfully"
-          />
-          <AIMetricCard
-            title="Failed"
-            value={runs.filter((r) => r.status === "failed").length}
-            icon={XCircle}
-            description="Require retry"
-          />
-        </div>
-
-        <div className="space-y-4">
-          {runs.map((run) => (
-            <Agent key={run.id} className="hover:border-primary/30 transition-colors">
-              <AgentHeader name={run.name} model={STATUS_LABEL[run.status]} />
-              <div className="space-y-4 p-4 pt-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <AIStatusIndicator
-                    status={STATUS_TO_INDICATOR[run.status]}
-                    label={STATUS_LABEL[run.status]}
-                    size="sm"
-                    showPulse={run.status === "running"}
-                  />
-                  {run.matterName && (
-                    <Badge variant="secondary" className="text-[10px]">
-                      {run.matterName}
-                    </Badge>
-                  )}
-                </div>
-                <p className="text-sm text-muted-foreground">{run.goal}</p>
-
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>Progress</span>
-                    <span>{run.progress}%</span>
-                  </div>
-                  <Progress
-                    value={run.progress}
-                    className={
-                      run.status === "failed"
-                        ? "[&>div]:bg-red-500"
-                        : run.status === "completed"
-                        ? "[&>div]:bg-emerald-500"
-                        : ""
-                    }
-                  />
-                </div>
-
-                <AgentTimelineView
-                  steps={run.steps.map((s) => ({
-                    name: s.label,
-                    status: stepToTimelineStatus(s.status),
-                    description: s.detail,
-                  }))}
-                />
-
-                {run.status === "awaiting_approval" && (
-                  <ApprovalRequest
-                    action="Submit remediation plan for filing"
-                    agent={run.name}
-                    authorizationLevel={3}
-                    matter={run.matterName}
-                    risk="medium"
-                    evidenceCount={3}
-                    onApprove={() => approve(run.id)}
-                    onReject={() => reject(run.id)}
-                  />
-                )}
-
-                {run.status !== "awaiting_approval" && (
-                  <div className="flex items-center justify-end gap-2 pt-2 border-t">
-                    {run.status === "running" && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="gap-1"
-                        onClick={() => pause(run.id)}
-                      >
-                        <Pause className="size-3.5" /> Pause
-                      </Button>
-                    )}
-                    {run.status === "failed" && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="gap-1"
-                        onClick={() => retry(run.id)}
-                      >
-                        <Play className="size-3.5" /> Retry
-                      </Button>
-                    )}
-                    <Button size="sm" variant="ghost" className="gap-1" asChild>
-                      <Link href={`/legalai/agent`}>
-                        Details <ArrowRight className="size-3.5" />
-                      </Link>
-                    </Button>
-                  </div>
-                )}
+        <Card>
+          <CardHeader>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Filter className="size-4" /> Filters
+                </CardTitle>
               </div>
-            </Agent>
-          ))}
-        </div>
+              <div className="flex flex-wrap gap-2">
+                <Select value={filters.authLevel !== undefined ? String(filters.authLevel) : "all"} onValueChange={(v) => updateFilters({ authLevel: v === "all" ? undefined : Number(v) })}>
+                  <SelectTrigger className="w-[180px]"><SelectValue placeholder="All levels" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All levels</SelectItem>
+                    {AUTH_LEVELS.map(l => <SelectItem key={l} value={String(l)}>L{l} - {AUTH_LEVEL_LABELS[l]}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <Select value={filters.status ?? "all"} onValueChange={(v) => updateFilters({ status: v === "all" ? undefined : v })}>
+                  <SelectTrigger className="w-[160px]"><SelectValue placeholder="All statuses" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All statuses</SelectItem>
+                    {STATUSES.map(s => <SelectItem key={s} value={s}>{STATUS_LABELS[s]}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <Input
+                  placeholder="Search actions..."
+                  value={filters.agentName ?? ""}
+                  onChange={(e) => updateFilters({ agentName: e.target.value })}
+                  className="w-[280px]"
+                  aria-label="Search actions"
+                />
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Agent</TableHead>
+                    <TableHead>Level</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Matter</TableHead>
+                    <TableHead>Created</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell><Skeleton className="h-4 w-[200px]" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-[120px]" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-[60px]" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-[80px]" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-[150px]" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : isError ? (
+              <div className="text-center py-8 text-destructive">
+                <p>Failed to load actions: {error?.message}</p>
+                <Button variant="outline" size="sm" onClick={() => refetch()} className="mt-2">Retry</Button>
+              </div>
+            ) : actions.length === 0 ? (
+              <EmptyState
+                icon={CheckCircle2}
+                title="All caught up"
+                description="No agent actions match your filters."
+              />
+            ) : (
+              <ScrollArea className="max-h-[600px]">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[250px]">Title</TableHead>
+                      <TableHead className="w-[140px]">Agent</TableHead>
+                      <TableHead className="w-[80px]">Level</TableHead>
+                      <TableHead className="w-[120px]">Status</TableHead>
+                      <TableHead className="w-[200px]">Matter</TableHead>
+                      <TableHead className="w-[130px]">Created</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {actions.map((a: { id: string; title: string; agentName: string; authLevel: number; status: string; matter?: { title: string } | null; createdAt: string }) => (
+                      <TableRow key={a.id} className="cursor-pointer hover:bg-accent/40" onClick={() => router.push(`/legalai/hitl/${a.id}`)}>
+                        <TableCell className="font-medium">
+                          <div className="truncate">{a.title}</div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="secondary" className="text-xs">{a.agentName}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline">L{a.authLevel}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="secondary" className={cn(STATUS_COLORS[a.status])}>{STATUS_LABELS[a.status] ?? a.status}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="truncate">{a.matter?.title ?? "—"}</div>
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">{formatDate(a.createdAt)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </ScrollArea>
+            )}
+
+            {hasMore && nextCursor && (
+              <div className="mt-4 flex justify-center">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => updateFilters({ cursor: nextCursor })}
+                  disabled={isLoading}
+                >
+                  Load more
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </DashboardShell>
   );

@@ -70,7 +70,7 @@ export { ActivityItem } from "./activity/activity-item";
 // AI & analysis
 export { MatterAIWorkspace } from "./ai/matter-ai-workspace";
 export { MatterAIActions } from "./ai/matter-ai-actions";
-export { MatterAnalysis } from "./analysis/matter-analysis";
+export { MatterAnalysis, type MatterAnalysisFinding } from "./analysis/matter-analysis";
 
 // conflicts & permissions
 export { MatterConflicts } from "./conflicts/matter-conflicts";
@@ -86,3 +86,6 @@ export { MatterWorkspaceHeader } from "./workspace/matter-workspace-header";
 
 // charts
 export * from "../charts";
+
+// hooks
+export { useMattersList, type UseMattersListOptions, type UseMattersListResult } from "./hooks/use-matters-list";

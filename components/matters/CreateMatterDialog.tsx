@@ -44,12 +44,24 @@ interface CreateMatterDialogProps {
   trigger?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  onSubmit?: (data: {
+    clientId: string;
+    title: string;
+    matterType: string;
+    priority: string;
+    jurisdiction: string;
+    caseNumber?: string;
+    description?: string;
+    assignedTo?: string;
+    deadlineAt?: string;
+  }) => Promise<void>;
 }
 
 export function CreateMatterDialog({
   trigger,
   open: controlledOpen,
   onOpenChange: controlledOnOpenChange,
+  onSubmit,
 }: CreateMatterDialogProps) {
   const [internalOpen, setInternalOpen] = useState(false);
   const open = controlledOpen ?? internalOpen;
@@ -78,14 +90,25 @@ export function CreateMatterDialog({
     if (!title.trim() || !clientId) return;
 
     try {
-      await createMatter.mutateAsync({
-        clientId,
-        title: title.trim(),
-        matterType,
-        priority,
-        jurisdiction: "MY",
-        description: description.trim() || undefined,
-      });
+      if (onSubmit) {
+        await onSubmit({
+          clientId,
+          title: title.trim(),
+          matterType,
+          priority,
+          jurisdiction: "MY",
+          description: description.trim() || undefined,
+        });
+      } else {
+        await createMatter.mutateAsync({
+          clientId,
+          title: title.trim(),
+          matterType,
+          priority,
+          jurisdiction: "MY",
+          description: description.trim() || undefined,
+        });
+      }
       setTitle("");
       setClientSearch("");
       setClientId("");
