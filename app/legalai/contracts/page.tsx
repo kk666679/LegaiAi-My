@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Plus, Upload, Filter, X, FileText, Search } from "lucide-react";
+import { Plus, Upload, Filter, X, FileCheck, Search } from "lucide-react";
 import { trpcReact } from "@/clients";
 import { DashboardShell } from "@/components/lawmate/DashboardShell";
 import { PageHeader } from "@/components/shared/PageHeader";
@@ -15,53 +15,65 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { UploadDialog } from "@/components/lawmate/UploadDialog";
+import { CreateContractDialog } from "@/components/lawmate/CreateContractDialog";
 import { cn } from "@/lib/utils";
 
-const DOC_STATUS = ["draft", "review", "approved", "archived"] as const;
-const DOC_TYPE = [
-  "CONTRACT", "BRIEF", "MOTION", "MEMORANDUM", "PLEADING", "AGREEMENT", "LETTER", "OTHER"
-] as const;
+const CONTRACT_STATUS = ["draft", "review", "negotiation", "executed", "expired", "terminated"] as const;
+const CONTRACT_TYPE = ["NDA", "SERVICE", "EMPLOYMENT", "LEASE", "SALE", "LOAN", "PARTNERSHIP", "OTHER"] as const;
 
-type DocStatus = typeof DOC_STATUS[number];
-type DocType = typeof DOC_TYPE[number];
+type ContractStatus = typeof CONTRACT_STATUS[number];
+type ContractType = typeof CONTRACT_TYPE[number];
 
-const STATUS_LABELS: Record<DocStatus, string> = {
+const STATUS_LABELS: Record<ContractStatus, string> = {
   draft: "Draft",
   review: "Review",
-  approved: "Approved",
-  archived: "Archived",
+  negotiation: "Negotiation",
+  executed: "Executed",
+  expired: "Expired",
+  terminated: "Terminated",
 };
 
-const STATUS_COLORS: Record<DocStatus, string> = {
+const STATUS_COLORS: Record<ContractStatus, string> = {
   draft: "bg-gray-100 text-gray-700",
   review: "bg-blue-100 text-blue-700",
-  approved: "bg-green-100 text-green-700",
-  archived: "bg-gray-100 text-gray-500",
+  negotiation: "bg-amber-100 text-amber-700",
+  executed: "bg-green-100 text-green-700",
+  expired: "bg-red-100 text-red-700",
+  terminated: "bg-gray-100 text-gray-500",
 };
 
-export default function DocumentsPage() {
+type ContractRow = {
+  id: string;
+  title: string;
+  client?: { name?: string | null } | null;
+  contractType: string;
+  status: ContractStatus | string;
+  counterparty?: string | null;
+  expiryDate?: string | null;
+};
+
+export default function ContractsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [uploadOpen, setUploadOpen] = React.useState(false);
+  const [createOpen, setCreateOpen] = React.useState(false);
 
   const getParam = (key: string) => searchParams.get(key) ?? undefined;
 
   const filters = {
-    docType: getParam("docType") as DocType | undefined,
-    status: getParam("status") as DocStatus | undefined,
+    status: getParam("status") as ContractStatus | undefined,
+    contractType: getParam("contractType") as ContractType | undefined,
     clientId: getParam("clientId") ?? undefined,
-    caseNumber: getParam("caseNumber") ?? undefined,
-    court: getParam("court") ?? undefined,
+    matterId: getParam("matterId") ?? undefined,
     search: getParam("search") ?? undefined,
     limit: 20,
     cursor: getParam("cursor") ?? undefined,
   };
 
-  const { data, isLoading, isError, error, refetch } = trpcReact.documents.list.useQuery(filters);
-  const stats = trpcReact.documents.stats.useQuery(undefined, { staleTime: 30_000 });
+  const { data, isLoading, isError, error, refetch } = trpcReact.contracts.list.useQuery(filters);
+  const stats = trpcReact.contracts.stats.useQuery(undefined, { staleTime: 30_000 });
+  const expiring = trpcReact.contracts.getExpiringContracts.useQuery({ withinDays: 90 }, { staleTime: 60_000 });
 
-  const documents = data?.documents ?? [];
+  const contracts: ContractRow[] = data?.contracts ?? [];
   const nextCursor = data?.nextCursor;
   const hasMore = data?.hasMore ?? false;
 
@@ -75,11 +87,11 @@ export default function DocumentsPage() {
       }
     });
     params.delete("cursor");
-    router.push(`/legalai/documents?${params.toString()}`);
+    router.push(`/legalai/contracts?${params.toString()}`);
   };
 
   const clearFilters = () => {
-    router.push("/legalai/documents");
+    router.push("/legalai/contracts");
   };
 
   const hasActiveFilters = Object.values(filters).some(v => v !== undefined && v !== "" && v !== 20);
@@ -91,12 +103,22 @@ export default function DocumentsPage() {
     } catch { return "—"; }
   };
 
+  const handleCreateContract = async (data: { clientId?: string; matterId?: string; title: string; contractType: string; counterparty?: string; value?: number; currency?: string; effectiveDate?: string; expiryDate?: string; autoRenew?: boolean; renewalNoticeDays?: number; content?: string }) => {
+    try {
+      await trpcReact.contracts.create.mutateAsync(data);
+      refetch();
+      setCreateOpen(false);
+    } catch (err) {
+      console.error("Failed to create contract:", err);
+    }
+  };
+
   return (
     <DashboardShell>
       <div className="space-y-6">
         <PageHeader
-          title="Documents"
-          description="Manage legal documents across your workspace."
+          title="Contracts"
+          description="Manage contracts across their full lifecycle."
           actions={
             <>
               {hasActiveFilters && (
@@ -104,11 +126,11 @@ export default function DocumentsPage() {
                   <X className="size-3.5" /> Clear filters
                 </Button>
               )}
-              <Button variant="outline" size="sm" onClick={() => setUploadOpen(true)} className="gap-1.5">
-                <Upload className="size-3.5" /> Upload
+              <Button variant="outline" size="sm" className="gap-1.5">
+                <Upload className="size-3.5" /> Import
               </Button>
-              <Button onClick={() => router.push("/legalai/documents/new")} size="sm" className="gap-1.5">
-                <Plus className="size-3.5" /> New document
+              <Button onClick={() => setCreateOpen(true)} size="sm" className="gap-1.5">
+                <Plus className="size-3.5" /> New contract
               </Button>
             </>
           }
@@ -117,7 +139,7 @@ export default function DocumentsPage() {
         <div className="grid gap-4 lg:grid-cols-4">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Documents</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Contracts</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold tabular-nums">{stats.data?.total ?? 0}</div>
@@ -125,10 +147,10 @@ export default function DocumentsPage() {
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Drafts</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Executed</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold tabular-nums">{stats.data?.byStatus?.draft ?? 0}</div>
+              <div className="text-3xl font-bold tabular-nums text-green-600">{stats.data?.byStatus?.executed ?? 0}</div>
             </CardContent>
           </Card>
           <Card>
@@ -141,10 +163,10 @@ export default function DocumentsPage() {
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Approved</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Expiring (90 days)</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold tabular-nums text-green-600">{stats.data?.byStatus?.approved ?? 0}</div>
+              <div className="text-3xl font-bold tabular-nums text-amber-600">{expiring.data?.length ?? 0}</div>
             </CardContent>
           </Card>
         </div>
@@ -158,26 +180,26 @@ export default function DocumentsPage() {
                 </CardTitle>
               </div>
               <div className="flex flex-wrap gap-2">
-                <Select value={filters.docType ?? "all"} onValueChange={(v) => updateFilters({ docType: v === "all" ? undefined : v as DocType })}>
+                <Select value={filters.status ?? "all"} onValueChange={(v) => updateFilters({ status: v === "all" ? undefined : v as ContractStatus })}>
+                  <SelectTrigger className="w-[180px]"><SelectValue placeholder="All statuses" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All statuses</SelectItem>
+                    {CONTRACT_STATUS.map(s => <SelectItem key={s} value={s}>{STATUS_LABELS[s]}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <Select value={filters.contractType ?? "all"} onValueChange={(v) => updateFilters({ contractType: v === "all" ? undefined : v as ContractType })}>
                   <SelectTrigger className="w-[200px]"><SelectValue placeholder="All types" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All types</SelectItem>
-                    {DOC_TYPE.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-                <Select value={filters.status ?? "all"} onValueChange={(v) => updateFilters({ status: v === "all" ? undefined : v as DocStatus })}>
-                  <SelectTrigger className="w-[160px]"><SelectValue placeholder="All statuses" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All statuses</SelectItem>
-                    {DOC_STATUS.map(s => <SelectItem key={s} value={s}>{STATUS_LABELS[s]}</SelectItem>)}
+                    {CONTRACT_TYPE.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
                   </SelectContent>
                 </Select>
                 <Input
-                  placeholder="Search documents..."
+                  placeholder="Search contracts..."
                   value={filters.search ?? ""}
                   onChange={(e) => updateFilters({ search: e.target.value })}
                   className="w-[280px]"
-                  aria-label="Search documents"
+                  aria-label="Search contracts"
                 />
               </div>
             </div>
@@ -187,20 +209,22 @@ export default function DocumentsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Document</TableHead>
+                    <TableHead>Contract</TableHead>
+                    <TableHead>Client</TableHead>
                     <TableHead>Type</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Version</TableHead>
-                    <TableHead>Updated</TableHead>
+                    <TableHead>Counterparty</TableHead>
+                    <TableHead>Expiry</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {Array.from({ length: 5 }).map((_, i) => (
                     <TableRow key={i}>
                       <TableCell><Skeleton className="h-4 w-[200px]" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-[150px]" /></TableCell>
                       <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
                       <TableCell><Skeleton className="h-4 w-[80px]" /></TableCell>
-                      <TableCell><Skeleton className="h-4 w-[50px]" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-[120px]" /></TableCell>
                       <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
                     </TableRow>
                   ))}
@@ -208,45 +232,51 @@ export default function DocumentsPage() {
               </Table>
             ) : isError ? (
               <div className="text-center py-8 text-destructive">
-                <p>Failed to load documents: {error?.message}</p>
+                <p>Failed to load contracts: {error?.message}</p>
                 <Button variant="outline" size="sm" onClick={() => refetch()} className="mt-2">Retry</Button>
               </div>
-            ) : documents.length === 0 ? (
+            ) : contracts.length === 0 ? (
               <EmptyState
-                icon={FileText}
-                title="No documents found"
-                description="Upload a contract, brief or memorandum to analyse it with AI."
-                action="Upload document"
-                actionHref="/legalai/documents/new"
+                icon={FileCheck}
+                title="No contracts found"
+                description="Create your first contract to start tracking obligations, renewals and risks."
+                action="Create contract"
+                actionHref="/legalai/contracts/new"
               />
             ) : (
               <ScrollArea className="max-h-[600px]">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-[350px]">Document</TableHead>
-                      <TableHead className="w-[150px]">Type</TableHead>
+                      <TableHead className="w-[280px]">Contract</TableHead>
+                      <TableHead className="w-[180px]">Client</TableHead>
+                      <TableHead className="w-[130px]">Type</TableHead>
                       <TableHead className="w-[120px]">Status</TableHead>
-                      <TableHead className="w-[80px]">Version</TableHead>
-                      <TableHead className="w-[130px]">Updated</TableHead>
+                      <TableHead className="w-[180px]">Counterparty</TableHead>
+                      <TableHead className="w-[130px]">Expiry</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {documents.map((d: { id: string; title: string; docType: string; status: string; version: number; updatedAt: string }) => (
-                      <TableRow key={d.id} className="cursor-pointer hover:bg-accent/40" onClick={() => router.push(`/legalai/documents/${d.id}/preview`)}>
+                    {contracts.map((c: ContractRow) => (
+                      <TableRow key={c.id} className="cursor-pointer hover:bg-accent/40" onClick={() => router.push(`/legalai/contracts/${c.id}/overview`)}>
                         <TableCell className="font-medium">
-                          <div className="truncate">{d.title}</div>
+                          <div className="truncate">{c.title}</div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="secondary" className="text-xs">{d.docType}</Badge>
+                          <div className="truncate">{c.client?.name ?? "—"}</div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline" className={cn(STATUS_COLORS[d.status as DocStatus])}>
-                            {STATUS_LABELS[d.status as DocStatus] ?? d.status}
+                          <Badge variant="secondary" className="text-xs">{c.contractType}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className={cn(STATUS_COLORS[c.status as ContractStatus])}>
+                            {STATUS_LABELS[c.status as ContractStatus] ?? c.status}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">v{d.version}</TableCell>
-                        <TableCell className="text-sm text-muted-foreground">{formatDate(d.updatedAt)}</TableCell>
+                        <TableCell>
+                          <div className="truncate">{c.counterparty ?? "—"}</div>
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">{formatDate(c.expiryDate)}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -270,7 +300,7 @@ export default function DocumentsPage() {
         </Card>
       </div>
 
-      <UploadDialog open={uploadOpen} onOpenChange={setUploadOpen} />
+      <CreateContractDialog open={createOpen} onOpenChange={setCreateOpen} onSubmit={handleCreateContract} />
     </DashboardShell>
   );
 }

@@ -1,0 +1,40 @@
+"use client";
+import * as React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+const TABS = (id: string) => [
+  { href: `/documents/${id}/preview`,     label: "Preview" },
+  { href: `/documents/${id}/analysis`,    label: "Analysis" },
+  { href: `/documents/${id}/versions`,    label: "Versions" },
+  { href: `/documents/${id}/comparison`,  label: "Comparison" },
+  { href: `/documents/${id}/comments`,    label: "Comments" },
+  { href: `/documents/${id}/activity`,    label: "Activity" },
+  { href: `/documents/${id}/permissions`, label: "Permissions" },
+  { href: `/documents/${id}/studio`,      label: "Studio" },
+];
+
+export function DocumentScopedNav({ id }: { id: string }) {
+  const pathname = usePathname();
+  const tabs = TABS(id);
+  const active = tabs.find((t) => pathname.startsWith(t.href))?.href ?? tabs[0]?.href ?? "";
+  return (
+    <div className="border-b border-border/60 px-3">
+      <Tabs value={active}>
+        <TabsList className="h-auto gap-1 bg-transparent p-0">
+          {tabs.map((t) => (
+            <TabsTrigger
+              key={t.href}
+              value={t.href}
+              asChild
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
+            >
+              <Link href={t.href}>{t.label}</Link>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
+    </div>
+  );
+}

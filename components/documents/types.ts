@@ -16,11 +16,13 @@ import {
   DOC_STATUSES,
   DOC_TYPES,
   type DocumentCourt,
-  type DocumentFilters as PersistedDocumentFilters,
-  type DocumentListItem,
-  type DocumentStats,
   type DocumentStatus as PersistedDocumentStatus,
   type DocumentType,
+} from "@/lib/documents/constants";
+import type {
+  DocumentFilters as PersistedDocumentFilters,
+  DocumentListItem,
+  DocumentStats,
 } from "@/hooks/useDocuments";
 
 export type {

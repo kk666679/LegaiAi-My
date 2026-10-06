@@ -19,7 +19,7 @@ import {
   ArtifactHeader,
   ArtifactTitle,
 } from "@/components/ai-elements/artifact";
-import { AIDocumentActions } from "./ai-document-actions";
+import { AIDocumentActions } from "../../ai/ai-document-actions";
 
 interface AIDocumentGeneratorProps {
   className?: string;

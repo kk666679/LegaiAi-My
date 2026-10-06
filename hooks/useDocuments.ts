@@ -3,41 +3,22 @@
 import { useCallback, useMemo, useState } from "react";
 import { keepPreviousData, useQueryClient } from "@tanstack/react-query";
 import { trpcReact } from "@/clients";
+import {
+  DOC_COURTS,
+  DOC_STATUSES,
+  DOC_TYPES,
+  type DocumentCourt,
+  type DocumentStatus,
+  type DocumentType,
+} from "@/lib/documents/constants";
 
 // Real documents data layer backed by the `documents` tRPC router.
 // Every field exposed here comes from the database — this module never
 // synthesises documents, statuses or counts, so the UI can be trusted
 // to reflect what is actually stored (see AGENTS.md safety rule 1).
 
-export const DOC_STATUSES = [
-  { value: "draft", label: "Draft" },
-  { value: "review", label: "In review" },
-  { value: "approved", label: "Approved" },
-  { value: "archived", label: "Archived" },
-] as const;
-
-export const DOC_TYPES = [
-  { value: "CONTRACT", label: "Contract" },
-  { value: "BRIEF", label: "Brief" },
-  { value: "MOTION", label: "Motion" },
-  { value: "MEMORANDUM", label: "Memorandum" },
-  { value: "PLEADING", label: "Pleading" },
-  { value: "AGREEMENT", label: "Agreement" },
-  { value: "LETTER", label: "Letter" },
-  { value: "OTHER", label: "Other" },
-] as const;
-
-export const DOC_COURTS = [
-  { value: "FEDERAL", label: "Federal Court" },
-  { value: "APPEAL", label: "Court of Appeal" },
-  { value: "HIGH", label: "High Court" },
-  { value: "SESSIONS", label: "Sessions Court" },
-  { value: "MAGISTRATE", label: "Magistrates Court" },
-] as const;
-
-export type DocumentStatus = (typeof DOC_STATUSES)[number]["value"];
-export type DocumentType = (typeof DOC_TYPES)[number]["value"];
-export type DocumentCourt = (typeof DOC_COURTS)[number]["value"];
+export { DOC_COURTS, DOC_STATUSES, DOC_TYPES };
+export type { DocumentCourt, DocumentStatus, DocumentType };
 
 export interface DocumentListItem {
   id: string;

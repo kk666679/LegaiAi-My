@@ -173,6 +173,12 @@ export { AnalysisClauses } from "./analysis/analysis-clauses";
 export { AnalysisParties } from "./analysis/analysis-parties";
 export { AnalysisConfidence } from "./analysis/analysis-confidence";
 export { AnalysisEvidence } from "./analysis/analysis-evidence";
+export { ProvenanceStrip } from "./analysis/provenance-strip";
+export { ScoreBar } from "./analysis/score-bar";
+export {
+  toDocumentAnalysisFinding,
+  toDocumentAnalysisFindings,
+} from "./analysis/adapters";
 
 // ─── evidence extensions ──────────────────────────────────
 export { EvidenceCard } from "./evidence/evidence-card";
@@ -192,6 +198,9 @@ export { DocumentDrafting } from "./drafting/document-drafting";
 
 // ─── studio extensions ────────────────────────────────────
 export { StudioLayout } from "./studio/studio-layout";
+export type { OutlineSection } from "./studio/studio-outline";
+export type { StudioAIMessage } from "./studio/studio-ai-panel";
+export type { StudioTemplate } from "./studio/studio-toolbar";
 export { StudioSuggestions } from "./studio/studio-suggestions";
 export { StudioInsights } from "./studio/studio-insights";
 
@@ -251,3 +260,6 @@ export { MobileDocumentActions } from "./mobile/mobile-document-actions";
 
 // ─── charts ───────────────────────────────────────────────
 export * from "./charts";
+
+// hooks
+export { useDocumentsList, type UseDocumentsListOptions, type UseDocumentsListResult } from "./hooks/use-documents-list";

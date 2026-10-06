@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 export interface OutlineSection {
   id: string;
   title: string;
+  status?: string;
+  children?: OutlineSection[];
 }
 
 export function StudioOutline({
