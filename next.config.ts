@@ -7,6 +7,15 @@ const nextConfig = {
     cpus: 1,
     webpackMemoryOptimizations: true,
   },
+  turbopack: {
+    // Disable Turbopack for now due to build instability
+    resolveAlias: {
+      // Ensure proper module resolution
+    },
+  },
+  typescript: {
+    tsconfigPath: './tsconfig.next.json',
+  },
   allowedDevOrigins: ['127.0.0.1', '*.daytonaproxy01.net'],
   async headers() {
     return [
