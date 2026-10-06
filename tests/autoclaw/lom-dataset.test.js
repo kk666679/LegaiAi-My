@@ -78,7 +78,7 @@ test('LOMClient re-emits seed records without network access', async () => {
   const record = await client.getAct('884', {
     docType: 'principal',
     status: 'unknown',
-    sourceUrl: 'https://lom.agc.gov.my/ilims/upload/portal/akta/outputaktap/Act%20884.pdf',
+    sourceUrl: 'https://lom.agc.gov.my/',
   });
   assert.equal(record.act_number, '884');
   assert.equal(record.source, 'LOM');
