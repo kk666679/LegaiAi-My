@@ -200,7 +200,7 @@ export function useAIAssistant(options: AIAssistantOptions = {}): AIAssistantApi
             {
               id: "c1",
               title: "Employment Act 1955 — s.14",
-              href: "https://www.lom.agc.gov.my/",
+              href: "https://lom.agc.gov.my/",
               excerpt:
                 "The contract of service may be terminated by either party on grounds of misconduct.",
               source: "LOM Malaysia",

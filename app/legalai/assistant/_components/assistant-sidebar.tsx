@@ -38,11 +38,18 @@ export function AIAssistantSidebar({
       <ScrollArea className="flex-1 px-2 py-2">
         <nav className="space-y-0.5" aria-label="Conversations">
           {conversations.map((c) => (
-            <button
+            <div
               key={c.id}
-              type="button"
+              role="button"
+              tabIndex={0}
               onClick={() => onSelect(c.id)}
               onDoubleClick={() => onRename(c.id, c.title)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onSelect(c.id);
+                }
+              }}
               className={cn(
                 "flex w-full items-center justify-between gap-2 rounded-md px-2 py-1.5 text-sm",
                 activeId === c.id ? "bg-accent text-foreground" : "text-muted-foreground hover:bg-accent/60",
@@ -73,7 +80,7 @@ export function AIAssistantSidebar({
                   🗑
                 </button>
               </span>
-            </button>
+            </div>
           ))}
         </nav>
       </ScrollArea>
