@@ -63,6 +63,10 @@ export function greeting() {
   return "Good evening";
 }
 
+export function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString();
+}
+
 export function relativeTime(iso: string) {
   const diff = (Date.now() - new Date(iso).getTime()) / 1000;
   if (diff < 60) return "just now";

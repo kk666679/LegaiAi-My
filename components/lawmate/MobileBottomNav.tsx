@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
   Bot,
   FileText,
   Briefcase,
@@ -13,13 +12,14 @@ import {
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { QuickPromptSheet } from "@/components/lawmate/QuickPromptSheet";
+import { LawMateMark } from "@/components/navigation/Logo";
 
 export function MobileBottomNav() {
   const pathname = usePathname();
   const [askOpen, setAskOpen] = useState(false);
 
   const items = [
-    { href: "/legalai", label: "Home", icon: LayoutDashboard, matchPrefix: "/legalai" },
+    { href: "/legalai", label: "Home", icon: LawMateMark, matchPrefix: "/legalai" },
     { href: "/legalai/research", label: "Search", icon: Search, matchPrefix: "/legalai/research" },
     { href: "/legalai/documents", label: "Docs", icon: FileText, matchPrefix: "/legalai/documents" },
     { href: "/legalai/matters", label: "Matters", icon: Briefcase, matchPrefix: "/legalai/matters" },
@@ -41,6 +41,7 @@ export function MobileBottomNav() {
           {items.slice(0, 2).map((it) => {
             const Icon = it.icon;
             const active = isActive(it.href, it.matchPrefix);
+            const isHome = it.href === "/legalai";
             return (
               <Link
                 key={it.href}
@@ -51,14 +52,18 @@ export function MobileBottomNav() {
                 )}
                 aria-current={active ? "page" : undefined}
               >
-                <Icon className="size-5" />
+                {isHome ? (
+                  <Icon size={active ? "md" : "sm"} className="shrink-0" aria-hidden="true" />
+                ) : (
+                  <Icon className="size-5" aria-hidden="true" />
+                )}
                 {it.label}
               </Link>
             );
           })}
           <button
             onClick={() => setAskOpen(true)}
-            className="-mt-7 mx-auto flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30"
+            className="-mt-7 mx-auto flex size-14 items-center justify-center rounded-full bg-gradient-to-r from-[hsl(var(--brand-blue))] to-[hsl(var(--brand-indigo))] text-primary-foreground shadow-lg shadow-[hsl(var(--brand-blue))/0.3]"
             aria-label="Ask LawMate"
           >
             <Plus className="size-6" />
@@ -76,7 +81,7 @@ export function MobileBottomNav() {
                 )}
                 aria-current={active ? "page" : undefined}
               >
-                <Icon className="size-5" />
+                <Icon className="size-5" aria-hidden="true" />
                 {it.label}
               </Link>
             );
