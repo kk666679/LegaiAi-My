@@ -1,9 +1,59 @@
+
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+// ── Auth & Multi-Tenancy ───────────────────────────────────────────────────
+
+model Organisation {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  plan      String   @default("free") // free | pro | enterprise
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users     User[]
+
+  @@map("organisations")
+}
+
+model User {
+  id             String       @id @default(cuid())
+  email          String       @unique
+  name           String?
+  passwordHash   String?
+  role           String       @default("viewer") // admin | lawyer | paralegal | viewer
+  orgId          String?
+  org            Organisation? @relation(fields: [orgId], references: [id], onDelete: SetNull)
+  emailVerified  Boolean      @default(false)
+  lastLoginAt    DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  sessions       Session[]
+
+  @@index([orgId])
+  @@index([email])
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([userId])
+  @@map("sessions")
 }
 
 model VectorDoc {
@@ -13,9 +63,929 @@ model VectorDoc {
   content      String?
   metadata     Json?
   vector       Unsupported("vector(1536)")?
+  // Legal metadata
+  caseName     String?
+  court        String?  // FEDERAL | APPEAL | HIGH | SESSIONS | MAGISTRATE
+  judge        String?
+  caseDate     DateTime?
+  citation     String?
+  areaOfLaw    String?
+  paragraphNum Int?
+  language     String?  @default("en")
+  checksum     String?  // SHA-256 of source chunk
+  approvedBy   String?  // paralegal UUID for high-value cases
+  indexVersion Int?     @default(1)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   @@index([collection])
+  @@index([court])
+  @@index([caseDate])
   @@map("vector_docs")
 }
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  traceId     String
+  agentName   String
+  userId      String?
+  orgId       String?
+  action      String
+  input       Json?
+  output      Json?
+  confidence  Float?
+  durationMs  Int?
+  prevHash    String?  // hash chain link
+  hash        String?  // SHA-256(prevHash + payload)
+  caseId      String?  // for legal hold
+  legalHold   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([traceId])
+  @@index([agentName])
+  @@index([caseId])
+  @@index([orgId])
+  @@map("audit_logs")
+}
+
+model DraftDocument {
+  id          String   @id @default(cuid())
+  traceId     String
+  userId      String?
+  orgId       String?
+  docType     String   // WRIT | AFFIDAVIT | SUBMISSION | COMPLAINT | STATEMENT_OF_CLAIM | DEFENCE | NOTICE_OF_APPEAL | SKELETAL_ARGUMENTS | CONSENT_ORDER | SUMMONS | ENFORCEMENT_NOTICE
+  content     String
+  format      String   @default("markdown") // markdown | docx | pdf
+  tone        String   @default("neutral")  // adversarial | neutral | persuasive
+  citationsOk Boolean  @default(false)
+  reviewedBy  String?
+  createdAt   DateTime @default(now())
+
+  @@index([traceId])
+  @@index([orgId])
+  @@map("draft_documents")
+}
+
+// ── Drafting workspace (Phase 1 — extends existing DraftDocument) ──────────
+// These models power the AI-powered drafting workspace:
+//   - CitationReference: structured citation attached to a draft
+//   - EvidenceReference: retrieved authority linked to a draft
+//   - DraftJob:           async AI generation/validation/review job (BullMQ-mirrored)
+//   - DraftAnalysis:      IRAC / quality / conflict results (real, not mock)
+
+enum CitationStatus {
+  PENDING
+  VERIFIED
+  UNVERIFIED
+  INVALID
+  CONFLICT
+  ERROR
+}
+
+enum DraftJobStatus {
+  QUEUED
+  PROCESSING
+  RETRIEVING_EVIDENCE
+  DRAFTING
+  VALIDATING
+  ANALYSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+model CitationReference {
+  id            String         @id @default(cuid())
+  draftId       String
+  orgId         String?
+  userId        String?
+  sourceId      String?        // LOM act_number / case ref / external id
+  displayText   String
+  section       String?
+  jurisdiction  String?
+  status        CitationStatus @default(PENDING)
+  confidence    Float?
+  matchedTitle  String?
+  matchedCitation String?
+  explanation   String?
+  validatedAt   DateTime?
+  createdAt     DateTime       @default(now())
+
+  @@index([draftId])
+  @@index([orgId])
+  @@index([sourceId])
+  @@map("citation_references")
+}
+
+model EvidenceReference {
+  id          String   @id @default(cuid())
+  draftId     String
+  orgId       String?
+  sourceId    String?
+  title       String
+  citation    String?
+  jurisdiction String?
+  section     String?
+  relevance   Float    @default(0)
+  supportType String   @default("authority") // authority | context | counterargument
+  excerpt     String?
+  status      String   @default("PENDING") // PENDING | VERIFIED | UNVERIFIED
+  retrievedAt DateTime @default(now())
+
+  @@index([draftId])
+  @@index([orgId])
+  @@map("evidence_references")
+}
+
+model DraftJob {
+  id         String        @id @default(cuid())
+  draftId    String
+  orgId      String?
+  userId     String?
+  traceId    String?
+  jobType    String        // generate | review | validate | retrieve_evidence
+  status     DraftJobStatus @default(QUEUED)
+  progress   Json?         // stage-based progress (no fake percentages)
+  payload    Json?         // sanitised inputs only — never raw document body
+  result     Json?
+  errorMessage String?
+  startedAt  DateTime?
+  completedAt DateTime?
+  createdAt  DateTime      @default(now())
+
+  @@index([draftId])
+  @@index([orgId])
+  @@index([status])
+  @@map("draft_jobs")
+}
+
+model DraftAnalysis {
+  id            String   @id @default(cuid())
+  draftId       String
+  orgId         String?
+  qualityScore  Int?     // 0–100, derived from real signal (verified/total + conflict + completeness)
+  citationCoverage Float?
+  issues        Json?    // structured findings (high/medium/low)
+  completeness  Json?    // required sections check (real template-based)
+  irac          Json?    // {issue, rule, application, conclusion, uncertainty}
+  conflicts     Json?    // potential conflicts (cautious language only)
+  unsupported   Json?    // detected unsupported assertions
+  createdAt     DateTime @default(now())
+
+  @@index([draftId])
+  @@index([orgId])
+  @@map("draft_analyses")
+}
+
+model UserConsent {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  allowLLM    Boolean  @default(true)
+  allowDraft  Boolean  @default(false)
+  dataRegion  String   @default("MY")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("user_consents")
+}
+
+model DebateTranscript {
+  id          String   @id @default(cuid())
+  traceId     String
+  problem     String
+  rounds      Json     // [{round, agent, argument, citations, score}]
+  winner      String?
+  adjudicator String?
+  anonymised  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([traceId])
+  @@map("debate_transcripts")
+}
+
+model IndexStats {
+  id          String   @id @default(cuid())
+  collection  String   @unique
+  docCount    Int      @default(0)
+  lastUpdated DateTime @default(now())
+  version     Int      @default(1)
+
+  @@map("index_stats")
+}
+
+model LegalDocument {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  docType     String   // CONTRACT | BRIEF | MOTION | MEMORANDUM | PLEADING | AGREEMENT | LETTER | OTHER
+  status      String   @default("draft") // draft | review | approved | archived
+  version     Int      @default(1)
+  orgId       String?
+  
+  // Metadata
+  clientId    String?
+  caseNumber  String?
+  court       String?  // FEDERAL | APPEAL | HIGH | SESSIONS | MAGISTRATE
+  jurisdiction String?
+  tags        String[] @default([])
+  
+  // Parties involved
+  parties     Json?    // { plaintiff?: string, defendant?: string, ... }
+  
+  // File info
+  fileUrl     String?
+  fileSize    Int?
+  mimeType    String?  @default("text/markdown")
+  
+  // Audit
+  createdBy   String?
+  updatedBy   String?
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([docType])
+  @@index([status])
+  @@index([clientId])
+  @@index([caseNumber])
+  @@index([createdAt])
+  @@index([orgId])
+  @@map("legal_documents")
+}
+
+// ── Matter & Client Management ───────────────────────────────────────────
+
+model Client {
+  id            String   @id @default(cuid())
+  orgId         String?
+  name          String
+  email         String?
+  phone         String?
+  company       String?
+  clientType    String   @default("individual") // individual | corporate | government
+  status        String   @default("active")     // active | inactive | conflict
+  conflictCheck Boolean  @default(false)
+  notes         String?
+  createdBy     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  matters       Matter[]
+  contracts     Contract[]
+
+  @@index([orgId])
+  @@index([email])
+  @@map("clients")
+}
+
+model Matter {
+  id            String   @id @default(cuid())
+  orgId         String?
+  clientId      String
+  client        Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  title         String
+  matterNumber  String?  @unique
+  matterType    String   // LITIGATION | CONTRACT | ADVISORY | COMPLIANCE | CONVEYANCING | CORPORATE | CRIMINAL | FAMILY | EMPLOYMENT | IP
+  status        String   @default("open")       // open | active | on_hold | closed | archived
+  priority      String   @default("medium")     // low | medium | high | urgent
+  jurisdiction  String   @default("MY")
+  court         String?
+  caseNumber    String?
+  assignedTo    String?  // userId
+  description   String?
+  riskScore     Float?
+  riskLevel     String?  // low | medium | high | critical
+  openedAt      DateTime @default(now())
+  closedAt      DateTime?
+  deadlineAt    DateTime?
+  lastActivityAt DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  contracts     Contract[]
+  agentActions  AgentAction[]
+  alerts        Alert[]
+  riskScores    RiskScore[]
+  timeline      MatterEvent[]
+
+  @@index([orgId])
+  @@index([clientId])
+  @@index([status])
+  @@index([matterType])
+  @@index([deadlineAt])
+  @@map("matters")
+}
+
+model Contract {
+  id              String   @id @default(cuid())
+  orgId           String?
+  clientId        String?
+  client          Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  matterId        String?
+  matter          Matter?  @relation(fields: [matterId], references: [id], onDelete: SetNull)
+  title           String
+  contractType    String   // NDA | SERVICE | EMPLOYMENT | LEASE | SALE | LOAN | PARTNERSHIP | OTHER
+  status          String   @default("draft")    // draft | review | negotiation | executed | expired | terminated
+  counterparty    String?
+  value           Float?
+  currency        String   @default("MYR")
+  effectiveDate   DateTime?
+  expiryDate      DateTime?
+  autoRenew       Boolean  @default(false)
+  renewalNoticeDays Int?   @default(30)
+  riskScore       Float?
+  riskLevel       String?  // low | medium | high | critical
+  playbook        Json?    // deviation tracking
+  obligations     Json?    // extracted obligations
+  keyTerms        Json?    // extracted key terms
+  fileUrl         String?
+  content         String?
+  version         Int      @default(1)
+  approvedBy      String?
+  approvedAt      DateTime?
+  createdBy       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([orgId])
+  @@index([clientId])
+  @@index([matterId])
+  @@index([status])
+  @@index([expiryDate])
+  @@map("contracts")
+}
+
+model MatterEvent {
+  id          String   @id @default(cuid())
+  matterId    String
+  matter      Matter   @relation(fields: [matterId], references: [id], onDelete: Cascade)
+  eventType   String   // FILING | HEARING | DEADLINE | COMMUNICATION | DOCUMENT | PAYMENT | NOTE | MILESTONE
+  title       String
+  description String?
+  eventDate   DateTime
+  parties     String[]
+  documents   String[]
+  createdBy   String?
+  createdAt   DateTime @default(now())
+
+  @@index([matterId])
+  @@index([eventDate])
+  @@map("matter_events")
+}
+
+// ── HITL Agent Control ────────────────────────────────────────────────────
+
+model AgentAction {
+  id            String   @id @default(cuid())
+  orgId         String?
+  matterId      String?
+  matter        Matter?  @relation(fields: [matterId], references: [id], onDelete: SetNull)
+  agentName     String
+  actionType    String   // RETRIEVE | RECOMMEND | DRAFT | EXECUTE | AUTOMATE
+  authLevel     Int      // 0=Read 1=Recommend 2=Draft 3=Execute+Approval 4=Controlled 5=Prohibited
+  status        String   @default("pending") // pending | approved | rejected | executed | cancelled
+  title         String
+  description   String?
+  input         Json?
+  output        Json?
+  evidence      Json?    // sources, citations, confidence
+  aiModel       String?
+  toolsUsed     String[]
+  requestedBy   String?  // userId or agentName
+  approvedBy    String?
+  approvedAt    DateTime?
+  rejectedBy    String?
+  rejectedAt    DateTime?
+  executedAt    DateTime?
+  expiresAt     DateTime?
+  traceId       String?
+  createdAt     DateTime @default(now())
+
+  @@index([orgId])
+  @@index([matterId])
+  @@index([status])
+  @@index([agentName])
+  @@index([traceId])
+  @@map("agent_actions")
+}
+
+model RiskScore {
+  id            String   @id @default(cuid())
+  orgId         String?
+  matterId      String?
+  matter        Matter?  @relation(fields: [matterId], references: [id], onDelete: SetNull)
+  riskType      String   // LEGAL | FINANCIAL | REGULATORY | CONTRACTUAL | LITIGATION | PRIVACY | REPUTATION | OPERATIONAL
+  score         Float    // 0.0 - 1.0
+  level         String   // low | medium | high | critical
+  evidence      Json?    // supporting evidence
+  reasoning     String?
+  recommendation String?
+  aiModel       String?
+  reviewedBy    String?
+  createdAt     DateTime @default(now())
+
+  @@index([matterId])
+  @@index([riskType])
+  @@map("risk_scores")
+}
+
+model Alert {
+  id            String   @id @default(cuid())
+  orgId         String?
+  matterId      String?
+  matter        Matter?  @relation(fields: [matterId], references: [id], onDelete: SetNull)
+  alertType     String   // DEADLINE | INACTIVITY | REGULATORY | CONTRACT_EXPIRY | RISK | CONFLICT | BILLING | MISSING_DOC
+  severity      String   // info | warning | high | critical
+  title         String
+  description   String
+  evidence      Json?
+  actionRequired Boolean @default(false)
+  acknowledged  Boolean  @default(false)
+  acknowledgedBy String?
+  acknowledgedAt DateTime?
+  resolvedAt    DateTime?
+  createdAt     DateTime @default(now())
+
+  @@index([orgId])
+  @@index([matterId])
+  @@index([alertType])
+  @@index([acknowledged])
+  @@map("alerts")
+}
+
+model AIGovernanceLog {
+  id            String   @id @default(cuid())
+  orgId         String?
+  eventType     String   // MODEL_USED | HALLUCINATION | SECURITY | COST | APPROVAL | REJECTION | KILL_SWITCH
+  aiModel       String?
+  provider      String?
+  dataClass     String?  // public | internal | confidential | privileged
+  promptTokens  Int?
+  completionTokens Int?
+  costUsd       Float?
+  latencyMs     Int?
+  userId        String?
+  matterId      String?
+  traceId       String?
+  details       Json?
+  createdAt     DateTime @default(now())
+
+  @@index([orgId])
+  @@index([eventType])
+  @@index([aiModel])
+  @@index([createdAt])
+  @@map("ai_governance_logs")
+}
+
+model Device {
+  id            String   @id @default(cuid())
+  deviceId      String   @unique
+  platform      String   // macOS, iOS, Android, headless
+  deviceFamily  String   // phone, desktop, tablet
+  pairedAt      DateTime?
+  token         String?  // for reconnect
+  metadata      Json?    // caps/commands for nodes
+  lastSeen      DateTime @updatedAt
+  createdAt     DateTime @default(now())
+  pairingRequests PairingRequest[]
+  
+  @@map("devices")
+}
+
+model PairingRequest {
+  id            String   @id @default(cuid())
+  deviceId      String
+  challenger    String   // connect.challenge nonce
+  signature     String   // signed payload
+  status        String   @default("pending") // pending, approved, rejected
+  approvedBy    String?
+  expiresAt     DateTime
+  createdAt     DateTime @default(now())
+
+  device        Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@unique([deviceId, challenger])
+  @@map("pairing_requests")
+}
+
+// ── BYOK: Bring Your Own Key ───────────────────────────────────────────────
+
+enum ExecutionMode {
+  HOSTED   // Law Mate supplies keys, bills in credits
+  BYOK     // Firm supplies provider keys, pays provider directly
+  LOCAL    // Model runs on firm's own hardware (Ollama/vLLM)
+}
+
+enum ProviderType {
+  OPENAI
+  ANTHROPIC
+  GOOGLE
+  AZURE
+  AWS_BEDROCK
+  OLLAMA
+  OPENROUTER
+  CUSTOM
+}
+
+model ProviderConfig {
+  id            String   @id @default(cuid())
+  orgId         String?
+  userId        String?  // null = org-wide key
+  provider      ProviderType
+  name          String   // human-readable label e.g. "Firm OpenAI"
+  apiKeyRef     String   // encrypted reference, never the actual key
+  apiBaseUrl    String?  // custom endpoint for Azure/OAI-compatible
+  defaultModel  String
+  isActive      Boolean  @default(false)
+  isDefault     Boolean  @default(false)
+  executionMode ExecutionMode @default(BYOK)
+  priority      Int      @default(0) // higher = preferred
+  expiresAt     DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([orgId])
+  @@index([userId])
+  @@index([provider])
+  @@index([isActive])
+  @@map("provider_configs")
+}
+
+model KeyAuditLog {
+  id            String   @id @default(cuid())
+  orgId         String?
+  userId        String?
+  providerConfigId String?
+  action        String   // CREATED | VERIFIED | USED | ROTATED | REVOKED | FAILED
+  provider      String?
+  model         String?
+  keyRef        String   // hashed reference only, never the key itself
+  success       Boolean  @default(true)
+  errorMessage  String?
+  ipAddress     String?
+  userAgent     String?
+  createdAt     DateTime @default(now())
+
+  @@index([orgId])
+  @@index([providerConfigId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("key_audit_logs")
+}
+
+model ModelRoutingConfig {
+  id            String   @id @default(cuid())
+  orgId         String?
+  name          String   // e.g. "Simple Research", "Complex Analysis"
+  taskType      String   // CLASSIFICATION | RETRIEVAL | ANALYSIS | DRAFTING | REASONING
+  provider      ProviderType?
+  model         String?
+  minConfidence Float    @default(0.0)
+  maxCostUsd    Float?
+  isActive      Boolean  @default(true)
+  priority      Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([orgId])
+  @@index([taskType])
+  @@index([isActive])
+  @@map("model_routing_configs")
+}
+
+// ── SUBSCRIPTION & BILLING ────────────────────────────────────────────────
+
+enum SubscriptionStatus {
+  PENDING
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  SUSPENDED
+  TRIALING
+  PAYMENT_FAILED
+  INCOMPLETE
+}
+
+model Subscription {
+  id                    String   @id @default(cuid())
+  orgId                 String   @unique
+  planId                String   // lawyer | firm_sme | business
+  status                SubscriptionStatus @default(ACTIVE)
+  currentPeriodStart    DateTime
+  currentPeriodEnd      DateTime
+  cancelAtPeriodEnd     Boolean  @default(false)
+  trialEndsAt          DateTime?
+  promotionType        String?  // founding | seasonal | launch
+  promotionalPrice     Float?
+  userId               String?
+  customerId           String?
+  provider              String   @default("xendit")
+  providerSubscriptionId String?
+  currency             String   @default("MYR")
+  amount              Float?
+  promotionId          String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  customer             PaymentCustomer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  payments            PaymentRecord[]
+
+  @@index([orgId])
+  @@index([status])
+  @@map("subscriptions")
+}
+
+model CreditAccount {
+  id                    String   @id @default(cuid())
+  orgId                 String   @unique
+  currentBalance        Int      @default(0)
+  totalAllocated        Int      @default(0)
+  totalConsumed         Int      @default(0)
+  lastAllocatedAt       DateTime?
+  lastConsumedAt        DateTime?
+  lifetimeAllocated     Int      @default(0)
+  lifetimeConsumed      Int      @default(0)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  transactions          CreditTransaction[]
+
+  @@index([orgId])
+  @@map("credit_accounts")
+}
+
+model CreditTransaction {
+  id                  String   @id @default(cuid())
+  accountId           String
+  account             CreditAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  type                String   // ALLOCATION | CONSUMPTION | ADJUSTMENT | ROLLOVER | REFUND | EXPIRY
+  amount              Int      // positive for allocation, negative for consumption
+  balanceAfter        Int
+  description         String?
+  referenceId        String?  // subscriptionId, agentRunId, etc.
+  metadata            Json?
+  createdAt           DateTime @default(now())
+
+  @@index([accountId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("credit_transactions")
+}
+
+model Promotion {
+  id              String   @id @default(cuid())
+  planId          String
+  type            String   // founding | seasonal | launch
+  promotionalPrice Float
+  standardPrice   Float
+  startDate       DateTime
+  endDate         DateTime
+  isActive        Boolean  @default(true)
+  maxRedemptions  Int?
+  redemptionCount Int      @default(0)
+  createdAt       DateTime @default(now())
+
+  @@index([planId])
+  @@index([isActive])
+  @@map("promotions")
+}
+
+// ── PAYMENT & BILLING ────────────────────────────────────────────────────
+
+model PaymentCustomer {
+  id                    String   @id @default(cuid())
+  email                 String
+  name                 String?
+  organisationId        String   @unique
+  provider              String   @default("xendit") // xendit | 2c2p | stripe
+  providerCustomerId    String?
+  countryCode           String?
+  status                String   @default("active") // active | inactive | suspended
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  payments             PaymentRecord[]
+  subscriptions        Subscription[]
+
+  @@index([organisationId])
+  @@index([provider])
+  @@map("payment_customers")
+}
+
+model PaymentRecord {
+  id                    String   @id @default(cuid())
+  organisationId        String
+  customerId           String?
+  customer              PaymentCustomer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  subscriptionId       String?
+  subscription          Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  provider              String   @default("xendit")
+  providerPaymentId    String?
+  providerCustomerId    String?
+  currency              String   @default("MYR")
+  amount               Float
+  status               String   @default("pending") // pending | processing | succeeded | failed | cancelled | refunded
+  paymentMethod        String?  // card | bank_transfer | wallet | qr | etc
+  providerMethod       String?  // provider-specific method code
+  countryCode          String?
+  description          String?
+  idempotencyKey       String?  @unique
+  metadata             Json?
+  paidAt               DateTime?
+  failedAt             DateTime?
+  cancelledAt          DateTime?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  refunds              PaymentRefund[]
+
+  @@index([organisationId])
+  @@index([subscriptionId])
+  @@index([provider])
+  @@index([status])
+  @@index([providerPaymentId])
+  @@map("payment_records")
+}
+
+model PaymentRefund {
+  id                  String   @id @default(cuid())
+  paymentId           String
+  payment             PaymentRecord @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  providerRefundId    String?
+  amount              Float
+  currency            String   @default("MYR")
+  status              String   @default("pending") // pending | succeeded | failed | cancelled
+  reason              String?
+  metadata            Json?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([paymentId])
+  @@map("payment_refunds")
+}
+
+model PaymentAuditLog {
+  id                  String   @id @default(cuid())
+  orgId               String?
+  userId              String?
+  action              String   // subscription.created | payment.succeeded | etc
+  subscriptionId       String?
+  paymentId           String?
+  metadata            Json?
+  createdAt           DateTime @default(now())
+
+  @@index([orgId])
+  @@index([subscriptionId])
+  @@index([action])
+  @@map("payment_audit_logs")
+}
+
+model PaymentWebhookEvent {
+  id                  String   @id @default(cuid())
+  provider            String   // xendit | 2c2p
+  eventId             String
+  eventType           String
+  payload             Json
+  signature           String?
+  receivedAt          DateTime @default(now())
+  processedAt         DateTime?
+  processingStatus    String   @default("pending") // pending | processing | processed | failed
+  errorMessage        String?
+  retryCount          Int      @default(0)
+  idempotencyKey      String?
+
+  @@unique([provider, eventId])
+  @@index([provider])
+  @@index([processingStatus])
+  @@map("payment_webhook_events")
+}
+
+model PaymentProviderAccount {
+  id                String   @id @default(cuid())
+  provider          String   @unique // xendit | 2c2p
+  name              String
+  isDefault         Boolean  @default(false)
+  isEnabled         Boolean  @default(true)
+  config            Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("payment_provider_accounts")
+}
+
+model PaymentRoutingRule {
+  id                  String   @id @default(cuid())
+  countryCode         String?
+  currency            String?
+  paymentMethod       String?
+  customerSegment     String?
+  planId             String?
+  transactionValueMin Float?
+  transactionValueMax Float?
+  provider            String   // xendit | 2c2p
+  priority            Int      @default(0)
+  isEnabled          Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([countryCode])
+  @@index([provider])
+  @@map("payment_routing_rules")
+}
+
+model CountryConfig {
+  countryCode         String   @id
+  countryName         String
+  currency            String
+  timezone            String   @default("Asia/Kuala_Lumpur")
+  defaultPaymentProvider String @default("xendit")
+  enabled             Boolean  @default(true)
+  taxEnabled          Boolean  @default(false)
+  subscriptionEnabled Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@map("country_configs")
+}
+
+model TaxRule {
+  id                String   @id @default(cuid())
+  countryCode       String
+  taxType           String   // SST | GST | VAT | etc
+  taxRate           Float
+  effectiveFrom     DateTime
+  effectiveUntil   DateTime?
+  inclusive         Boolean  @default(false)
+  enabled           Boolean  @default(true)
+  createdAt         DateTime @default(now())
+
+  @@index([countryCode])
+  @@map("tax_rules")
+}
+
+model Invoice {
+  id                    String   @id @default(cuid())
+  organisationId        String
+  customerId            String?
+  subscriptionId        String?
+  paymentId            String?
+  invoiceNumber         String   @unique
+  currency              String   @default("MYR")
+  subtotal              Float
+  tax                  Float    @default(0)
+  discount              Float    @default(0)
+  total                Float
+  status                String   @default("draft") // draft | open | paid | void | uncollectible
+  billingPeriodStart   DateTime
+  billingPeriodEnd     DateTime
+  dueDate              DateTime
+  paidAt               DateTime?
+  metadata             Json?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  items                InvoiceItem[]
+
+  @@index([organisationId])
+  @@index([subscriptionId])
+  @@index([status])
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id            String   @id @default(cuid())
+  invoiceId     String
+  invoice       Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  description   String
+  quantity      Int      @default(1)
+  unitPrice    Float
+  amount        Float
+  metadata     Json?
+
+  @@index([invoiceId])
+  @@map("invoice_items")
+}
+
+model PlanPrice {
+  id              String   @id @default(cuid())
+  planId          String
+  countryCode     String
+  currency        String
+  amount          Float
+  billingInterval String   @default("monthly") // monthly | annual
+  provider        String   @default("xendit")
+  providerPriceId String?
+  effectiveFrom   DateTime @default(now())
+  effectiveUntil  DateTime?
+  status          String   @default("active") // active | inactive
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([planId, countryCode, currency, billingInterval])
+  @@index([planId])
+  @@map("plan_prices")
+}
+

@@ -59,6 +59,7 @@ model Session {
 model VectorDoc {
   id           String   @id @default(cuid())
   collection   String
+  source_type  String?
   content      String?
   metadata     Json?
   vector       Unsupported("vector(1536)")?

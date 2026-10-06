@@ -1,0 +1,36 @@
+"use client";
+import * as React from "react";
+import { FileSignature } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+export interface ContractEmptyProps {
+  title?: string;
+  description?: string;
+  icon?: React.ReactNode;
+  primaryAction?: { label: string; onClick: () => void };
+  secondaryAction?: { label: string; onClick: () => void };
+  className?: string;
+}
+
+export function ContractEmpty({
+  title = "No contracts yet",
+  description = "Upload a contract, use a template, or let AI draft one from scratch.",
+  icon, primaryAction, secondaryAction, className,
+}: ContractEmptyProps) {
+  return (
+    <div role="status" className={cn("flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-border/70 bg-muted/20 px-6 py-14 text-center", className)}>
+      <div className="rounded-full bg-muted p-3 text-muted-foreground">{icon ?? <FileSignature className="size-6" />}</div>
+      <div className="space-y-1">
+        <h3 className="text-base font-semibold">{title}</h3>
+        <p className="mx-auto max-w-md text-sm text-muted-foreground">{description}</p>
+      </div>
+      {(primaryAction || secondaryAction) && (
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          {primaryAction ? <Button onClick={primaryAction.onClick}>{primaryAction.label}</Button> : null}
+          {secondaryAction ? <Button variant="outline" onClick={secondaryAction.onClick}>{secondaryAction.label}</Button> : null}
+        </div>
+      )}
+    </div>
+  );
+}
