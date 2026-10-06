@@ -2,11 +2,11 @@
 
 import * as React from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Plus, Upload, Filter, X, FileCheck, Search } from "lucide-react";
+import { Plus, Upload, Filter, X, FileCheck, Search, Users, Calendar, ScrollText, BookOpen, FileText, ShieldAlert, BarChart3 } from "lucide-react";
 import { trpcReact } from "@/clients";
 import { DashboardShell } from "@/components/lawmate/DashboardShell";
 import { PageHeader } from "@/components/shared/PageHeader";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -17,6 +17,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { CreateContractDialog } from "@/components/lawmate/CreateContractDialog";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 const CONTRACT_STATUS = ["draft", "review", "negotiation", "executed", "expired", "terminated"] as const;
 const CONTRACT_TYPE = ["NDA", "SERVICE", "EMPLOYMENT", "LEASE", "SALE", "LOAN", "PARTNERSHIP", "OTHER"] as const;
@@ -170,6 +171,107 @@ export default function ContractsPage() {
             </CardContent>
           </Card>
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileCheck className="size-4" /> Quick Navigation
+            </CardTitle>
+            <CardDescription>Jump to common contract views and tools.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/contracts/new">
+                  <div className="flex items-center gap-2">
+                    <Plus className="size-5 text-primary" />
+                    <div>
+                      <p className="font-medium">New contract</p>
+                      <p className="text-xs text-muted-foreground">Create contract</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/contracts/counterparties">
+                  <div className="flex items-center gap-2">
+                    <Users className="size-5 text-muted-foreground" />
+                    <div>
+                      <p className="font-medium">Counterparties</p>
+                      <p className="text-xs text-muted-foreground">Manage parties</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/contracts/renewals">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="size-5 text-amber-500" />
+                    <div>
+                      <p className="font-medium">Renewals</p>
+                      <p className="text-xs text-muted-foreground">Upcoming renewals</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/contracts/playbooks">
+                  <div className="flex items-center gap-2">
+                    <ScrollText className="size-5 text-muted-foreground" />
+                    <div>
+                      <p className="font-medium">Playbooks</p>
+                      <p className="text-xs text-muted-foreground">Negotiation guides</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/contracts/templates">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="size-5 text-primary" />
+                    <div>
+                      <p className="font-medium">Templates</p>
+                      <p className="text-xs text-muted-foreground">Contract templates</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/contracts/clauses">
+                  <div className="flex items-center gap-2">
+                    <FileText className="size-5 text-muted-foreground" />
+                    <div>
+                      <p className="font-medium">Clause Library</p>
+                      <p className="text-xs text-muted-foreground">Reusable clauses</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/contracts/approvals">
+                  <div className="flex items-center gap-2">
+                    <ShieldAlert className="size-5 text-amber-500" />
+                    <div>
+                      <p className="font-medium">Approvals</p>
+                      <p className="text-xs text-muted-foreground">Pending approvals</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/contracts/analytics">
+                  <div className="flex items-center gap-2">
+                    <BarChart3 className="size-5 text-muted-foreground" />
+                    <div>
+                      <p className="font-medium">Analytics</p>
+                      <p className="text-xs text-muted-foreground">Contract insights</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>

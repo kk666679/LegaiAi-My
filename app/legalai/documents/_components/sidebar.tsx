@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Archive, BookTemplate, Clock, FileSignature, FileText, FolderTree,
-  LayoutDashboard, PenLine, Share2, Star, Trash2,
+  LayoutDashboard, PenLine, Share2, Star, Trash2, Sparkles, Library, History,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -13,10 +13,17 @@ import { cn } from "@/lib/utils";
 const LINKS = [
   { href: "/legalai/documents", label: "Overview", icon: <LayoutDashboard className="size-4" />, exact: true },
   { href: "/legalai/documents", label: "All documents", icon: <FileText className="size-4" /> },
+  { href: "/legalai/documents/recent", label: "Recent", icon: <History className="size-4" /> },
   { href: "/legalai/documents?status=draft", label: "Drafts", icon: <PenLine className="size-4" /> },
   { href: "/legalai/documents?status=review", label: "In review", icon: <Clock className="size-4" /> },
-  { href: "/legalai/contracts", label: "Contracts", icon: <FileSignature className="size-4" /> },
+  { href: "/legalai/documents/favorites", label: "Favorites", icon: <Star className="size-4" /> },
+  { href: "/legalai/documents/shared", label: "Shared with me", icon: <Share2 className="size-4" /> },
+  { href: "/legalai/documents/templates", label: "Templates", icon: <BookTemplate className="size-4" /> },
+  { href: "/legalai/documents/studio", label: "Drafting Studio", icon: <Sparkles className="size-4" /> },
+  { href: "/legalai/documents/library", label: "Library", icon: <Library className="size-4" /> },
+  { href: "/legalai/documents/contracts", label: "Contracts", icon: <FileSignature className="size-4" /> },
   { href: "/legalai/documents?status=archived", label: "Archived", icon: <Archive className="size-4" /> },
+  { href: "/legalai/documents/trash", label: "Trash", icon: <Trash2 className="size-4" /> },
 ];
 
 export function DocumentsSidebar() {

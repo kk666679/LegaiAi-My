@@ -2,17 +2,24 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, BookOpen, Building2, Calendar, FileSignature, LayoutDashboard, ScrollText, ShieldAlert } from "lucide-react";
+import { BarChart3, BookOpen, Building2, Calendar, FileSignature, FileText, LayoutDashboard, PenLine, ScrollText, ShieldAlert, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
   { href: "/legalai/contracts", label: "Overview", icon: <LayoutDashboard className="size-4" />, exact: true },
+  { href: "/legalai/contracts/new", label: "New contract", icon: <PenLine className="size-4" /> },
   { href: "/legalai/contracts?status=review", label: "In review", icon: <ShieldAlert className="size-4" /> },
   { href: "/legalai/contracts?status=executed", label: "Executed", icon: <Building2 className="size-4" /> },
-  { href: "/legalai/contracts?expiring=90", label: "Renewals", icon: <Calendar className="size-4" /> },
-  { href: "/legalai/contracts", label: "Analytics", icon: <BarChart3 className="size-4" /> },
+  { href: "/legalai/contracts?status=draft", label: "Drafts", icon: <FileText className="size-4" /> },
+  { href: "/legalai/contracts/counterparties", label: "Counterparties", icon: <Users className="size-4" /> },
+  { href: "/legalai/contracts/renewals", label: "Renewals", icon: <Calendar className="size-4" /> },
+  { href: "/legalai/contracts/playbooks", label: "Playbooks", icon: <ScrollText className="size-4" /> },
+  { href: "/legalai/contracts/templates", label: "Templates", icon: <BookOpen className="size-4" /> },
+  { href: "/legalai/contracts/clauses", label: "Clause Library", icon: <FileText className="size-4" /> },
+  { href: "/legalai/contracts/approvals", label: "Approvals", icon: <ShieldAlert className="size-4" /> },
+  { href: "/legalai/contracts/analytics", label: "Analytics", icon: <BarChart3 className="size-4" /> },
 ];
 
 export function ContractsSidebar() {

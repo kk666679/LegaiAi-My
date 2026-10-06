@@ -28,14 +28,14 @@ export interface HITLNavItem {
 }
 
 const DEFAULT_ITEMS: HITLNavItem[] = [
-  { href: "/hitl",             label: "Overview",     icon: <LayoutDashboard className="size-4" />, exact: true },
-  { href: "/hitl/inbox",       label: "Inbox",        icon: <Inbox className="size-4" /> },
-  { href: "/hitl/assigned",    label: "Assigned",     icon: <UserCheck className="size-4" /> },
-  { href: "/hitl/team",        label: "Team queue",   icon: <Users className="size-4" /> },
-  { href: "/hitl/escalations", label: "Escalations",  icon: <AlertTriangle className="size-4" /> },
-  { href: "/hitl/history",     label: "History",      icon: <History className="size-4" /> },
-  { href: "/hitl/rules",       label: "Routing rules", icon: <Settings2 className="size-4" /> },
-  { href: "/hitl/analytics",   label: "Analytics",    icon: <BarChart3 className="size-4" /> },
+  { href: "/legalai/hitl",             label: "Overview",     icon: <LayoutDashboard className="size-4" />, exact: true },
+  { href: "/legalai/hitl/inbox",       label: "Inbox",        icon: <Inbox className="size-4" /> },
+  { href: "/legalai/hitl/assigned",    label: "Assigned",     icon: <UserCheck className="size-4" /> },
+  { href: "/legalai/hitl/team",        label: "Team queue",   icon: <Users className="size-4" /> },
+  { href: "/legalai/hitl/escalations", label: "Escalations",  icon: <AlertTriangle className="size-4" /> },
+  { href: "/legalai/hitl/history",     label: "History",      icon: <History className="size-4" /> },
+  { href: "/legalai/hitl/rules",       label: "Routing rules", icon: <Settings2 className="size-4" /> },
+  { href: "/legalai/hitl/analytics",   label: "Analytics",    icon: <BarChart3 className="size-4" /> },
 ];
 
 export interface HITLNavigationProps {

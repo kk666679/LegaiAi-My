@@ -15,13 +15,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { DebateDialog } from "@/components/lawmate/DebateDialog";
 import { formatDate } from "@/lib/lawmate/utils";
-import { cn } from "@/lib/utils";
+import { DebateNavigation } from "./_components/debate-navigation";
 
 export default function DebatePage() {
   const router = useRouter();
-  const [createOpen, setCreateOpen] = React.useState(false);
 
   const { data, isLoading, isError, error, refetch } = trpcReact.debate.list.useQuery({ limit: 20 });
   const [search, setSearch] = React.useState("");
@@ -32,15 +30,6 @@ export default function DebatePage() {
     !search || d.problem.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleCreate = async (data: { problem: string; citations: string[]; rounds: number }) => {
-    try {
-      const result = await trpcReact.debate.start.mutateAsync(data);
-      router.push(`/legalai/debate/${result.jobId}`);
-    } catch (err) {
-      console.error("Failed to start debate:", err);
-    }
-  };
-
   return (
     <DashboardShell>
       <div className="space-y-6">
@@ -48,11 +37,14 @@ export default function DebatePage() {
           title="Debate & Research"
           description="Multi-agent legal debate and research simulation."
           actions={
-            <Button onClick={() => setCreateOpen(true)} size="sm" className="gap-1.5">
-              <Plus className="size-3.5" /> New debate
+            <Button asChild size="sm" className="gap-1.5">
+              <Link href="/legalai/debate/new">
+                <Plus className="size-3.5" /> New debate
+              </Link>
             </Button>
           }
         />
+        <DebateNavigation />
 
         <div className="grid gap-4 lg:grid-cols-2">
           <Card>
@@ -66,7 +58,7 @@ export default function DebatePage() {
                 Run a multi-agent adversarial simulation with Plaintiff, Defendant, and Adjudicator roles.
               </p>
               <Button asChild variant="outline" className="w-full gap-2">
-                <Link href="/legalai/debate"><Swords className="size-4" /> Open Debate</Link>
+                <Link href="/legalai/debate/new"><Swords className="size-4" /> Open Debate</Link>
               </Button>
             </CardContent>
           </Card>
@@ -134,7 +126,7 @@ export default function DebatePage() {
                 title="No debates yet"
                 description="Start a new debate to see AI agents argue both sides of a legal question."
                 action="New debate"
-                actionHref="/legalai/debate"
+                actionHref="/legalai/debate/new"
               />
             ) : (
               <ScrollArea className="max-h-[500px]">
@@ -164,8 +156,6 @@ export default function DebatePage() {
             )}
           </CardContent>
         </Card>
-
-        <DebateDialog open={createOpen} onOpenChange={setCreateOpen} onSubmit={handleCreate} />
       </div>
     </DashboardShell>
   );

@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { cn } from "@/lib/utils";
+import { DebateNavigation } from "../_components/debate-navigation";
 
 export default function ResearchPage() {
   const [query, setQuery] = React.useState("");
@@ -47,6 +47,7 @@ export default function ResearchPage() {
           title="Legal Research"
           description="Retrieve and analyse Malaysian legal sources with AI-assisted reasoning."
         />
+        <DebateNavigation />
 
         <Card>
           <CardHeader>

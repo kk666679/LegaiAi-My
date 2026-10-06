@@ -1,4 +1,8 @@
-import { redirect } from "next/navigation";
+// app/legalai/settings/ai/page.tsx
+import { AISettings } from "./ai-client";
+
+export const metadata = { title: "AI preferences — Settings" };
+
 export default function Page() {
-  redirect("/legalai/settings?tab=ai");
+  return <AISettings />;
 }

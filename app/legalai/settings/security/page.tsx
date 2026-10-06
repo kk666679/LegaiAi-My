@@ -1,4 +1,8 @@
-import { redirect } from "next/navigation";
+// app/legalai/settings/security/page.tsx
+import { SecuritySettings } from "./security-client";
+
+export const metadata = { title: "Security — Settings" };
+
 export default function Page() {
-  redirect("/legalai/settings?tab=security");
+  return <SecuritySettings />;
 }

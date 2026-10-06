@@ -1,4 +1,8 @@
-import { redirect } from "next/navigation";
+// app/legalai/settings/appearance/page.tsx
+import { AppearanceSettings } from "./appearance-client";
+
+export const metadata = { title: "Appearance — Settings" };
+
 export default function Page() {
-  redirect("/legalai/settings?tab=appearance");
+  return <AppearanceSettings />;
 }

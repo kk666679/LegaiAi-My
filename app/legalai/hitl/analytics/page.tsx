@@ -1,4 +1,11 @@
-import { redirect } from "next/navigation";
+import { QueueClient } from "../_components/queue-client";
+
 export default function Page() {
-  redirect("/legalai/hitl");
+  return (
+    <QueueClient
+      title="HITL analytics"
+      description="Current review queue metrics and activity."
+      scope="all"
+    />
+  );
 }

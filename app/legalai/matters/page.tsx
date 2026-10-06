@@ -3,11 +3,11 @@
 import * as React from "react";
 import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Plus, Upload, Filter, X } from "lucide-react";
+import { Plus, Upload, Filter, X, Clock, Star, CalendarClock, ShieldAlert, BarChart3, Briefcase, PauseCircle, CheckCircle2, Archive } from "lucide-react";
 import { trpcReact } from "@/clients";
 import { DashboardShell } from "@/components/lawmate/DashboardShell";
 import { PageHeader } from "@/components/shared/PageHeader";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -18,6 +18,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { CreateMatterDialog } from "@/components/lawmate/CreateMatterDialog";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 const MATTER_STATUS = ["open", "active", "on_hold", "closed", "archived"] as const;
 const MATTER_TYPE = [
@@ -181,6 +182,129 @@ export default function MattersPage() {
             </CardContent>
           </Card>
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Briefcase className="size-4" /> Quick Navigation
+            </CardTitle>
+            <CardDescription>Jump to common matter views and tools.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/matters/new">
+                  <div className="flex items-center gap-2">
+                    <Plus className="size-5 text-primary" />
+                    <div>
+                      <p className="font-medium">New matter</p>
+                      <p className="text-xs text-muted-foreground">Create matter</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/matters/recent">
+                  <div className="flex items-center gap-2">
+                    <Clock className="size-5 text-muted-foreground" />
+                    <div>
+                      <p className="font-medium">Recent</p>
+                      <p className="text-xs text-muted-foreground">Recently updated</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/matters/favorites">
+                  <div className="flex items-center gap-2">
+                    <Star className="size-5 text-amber-500" />
+                    <div>
+                      <p className="font-medium">Favorites</p>
+                      <p className="text-xs text-muted-foreground">Starred matters</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/matters?status=open">
+                  <div className="flex items-center gap-2">
+                    <Briefcase className="size-5 text-blue-500" />
+                    <div>
+                      <p className="font-medium">Open</p>
+                      <p className="text-xs text-muted-foreground">Active engagements</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/matters?status=on_hold">
+                  <div className="flex items-center gap-2">
+                    <PauseCircle className="size-5 text-amber-500" />
+                    <div>
+                      <p className="font-medium">On hold</p>
+                      <p className="text-xs text-muted-foreground">Paused matters</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/matters/closed">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="size-5 text-green-500" />
+                    <div>
+                      <p className="font-medium">Closed</p>
+                      <p className="text-xs text-muted-foreground">Completed matters</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/matters/deadlines">
+                  <div className="flex items-center gap-2">
+                    <CalendarClock className="size-5 text-amber-500" />
+                    <div>
+                      <p className="font-medium">Deadlines</p>
+                      <p className="text-xs text-muted-foreground">Upcoming deadlines</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/matters/conflicts">
+                  <div className="flex items-center gap-2">
+                    <ShieldAlert className="size-5 text-destructive" />
+                    <div>
+                      <p className="font-medium">Conflicts</p>
+                      <p className="text-xs text-muted-foreground">Conflict checks</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/matters/analytics">
+                  <div className="flex items-center gap-2">
+                    <BarChart3 className="size-5 text-muted-foreground" />
+                    <div>
+                      <p className="font-medium">Analytics</p>
+                      <p className="text-xs text-muted-foreground">Matter insights</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/matters?status=archived">
+                  <div className="flex items-center gap-2">
+                    <Archive className="size-5 text-muted-foreground" />
+                    <div>
+                      <p className="font-medium">Archived</p>
+                      <p className="text-xs text-muted-foreground">Stored matters</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>

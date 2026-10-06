@@ -32,6 +32,7 @@ import {
   Eye,
   Cpu,
   AlertTriangle,
+  Workflow,
 } from "lucide-react";
 
 const NAV_GROUPS = [
@@ -52,6 +53,7 @@ const NAV_GROUPS = [
       { href: "/legalai/draft", label: "Document Drafting", icon: FileText },
       { href: "/legalai/draft", label: "Drafting Studio", icon: FileSignature },
       { href: "/legalai/contracts", label: "Contracts", icon: FileSignature },
+      { href: "/legalai/automations", label: "Automations", icon: Workflow },
       { href: "/legalai/debate", label: "Debate Simulation", icon: Swords },
     ],
   },
@@ -161,6 +163,7 @@ export default function Nav() {
                   "/legalai/matters",
                   "/legalai/documents",
                   "/legalai/contracts",
+                  "/legalai/automations",
                   "/legalai/hitl",
                   "/legalai/governance",
                   "/legalai",

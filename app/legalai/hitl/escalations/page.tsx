@@ -1,4 +1,11 @@
-import { redirect } from "next/navigation";
+import { QueueClient } from "../_components/queue-client";
+
 export default function Page() {
-  redirect("/legalai/hitl?authLevel=3");
+  return (
+    <QueueClient
+      title="Escalations"
+      description="Review actions requiring elevated attention."
+      scope="escalations"
+    />
+  );
 }

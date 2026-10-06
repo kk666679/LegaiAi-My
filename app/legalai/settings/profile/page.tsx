@@ -1,4 +1,8 @@
-import { redirect } from "next/navigation";
+// app/legalai/settings/profile/page.tsx
+import { ProfileSettings } from "./profile-client";
+
+export const metadata = { title: "Profile — Settings" };
+
 export default function Page() {
-  redirect("/legalai/settings?tab=profile");
+  return <ProfileSettings />;
 }

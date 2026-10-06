@@ -1,4 +1,11 @@
-import { redirect } from "next/navigation";
+import { QueueClient } from "../_components/queue-client";
+
 export default function Page() {
-  redirect("/legalai/hitl");
+  return (
+    <QueueClient
+      title="Review history"
+      description="Browse completed and past review requests."
+      scope="history"
+    />
+  );
 }

@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/shared/EmptyState";
 import Link from "next/link";
 import { Swords } from "lucide-react";
+import { DebateNavigation } from "../_components/debate-navigation";
 
 export default function DebateDetailPage() {
   const params = useParams();
@@ -23,6 +24,7 @@ export default function DebateDetailPage() {
     return (
       <DashboardShell>
         <div className="space-y-6 p-4 lg:p-6">
+          <DebateNavigation />
           <Skeleton className="h-8 w-64" />
           <Skeleton className="h-40 w-full" />
         </div>
@@ -34,6 +36,7 @@ export default function DebateDetailPage() {
     return (
       <DashboardShell>
         <div className="space-y-6 p-4 lg:p-6">
+          <DebateNavigation />
           <div className="text-center py-12">
             <Swords className="size-12 mx-auto text-destructive" />
             <h2 className="mt-4 text-xl font-semibold">Debate not found</h2>
@@ -50,6 +53,7 @@ export default function DebateDetailPage() {
   return (
     <DashboardShell>
       <div className="space-y-6">
+        <DebateNavigation />
         <PageHeader
           title="Debate Result"
           description={

@@ -27,6 +27,7 @@ import {
   Eye,
   Sparkles,
   Loader2,
+  Workflow,
   Command as CommandIcon,
   type LucideIcon,
 } from "lucide-react";
@@ -77,6 +78,7 @@ const NAV = [
   { label: "Go to Documents", href: "/legalai/documents", icon: FileText, keywords: ["files", "library"] },
   { label: "Go to Drafting", href: "/legalai/draft", icon: FileSignature, keywords: ["draft", "create", "write"] },
   { label: "Go to Contracts", href: "/legalai/contracts", icon: FileSignature, keywords: ["agreements"] },
+  { label: "Go to Automations", href: "/legalai/automations", icon: Workflow, keywords: ["workflows", "automation", "rules"] },
   { label: "Go to Matters", href: "/legalai/matters", icon: Briefcase, keywords: ["cases", "matters"] },
   { label: "Go to Clients", href: "/legalai/clients", icon: Users, keywords: ["parties", "contacts"] },
   { label: "Go to Tasks", href: "/legalai/tasks", icon: CheckSquare, keywords: ["todo", "checklist"] },

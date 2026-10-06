@@ -1,56 +1,13 @@
-import { Analytics } from '@vercel/analytics/next'
-import type { Metadata, Viewport } from 'next'
-import './globals.css'
+import * as React from "react";
+import { AutomationsSidebar } from "./_components/sidebar";
 
-export const metadata: Metadata = {
-  title: 'Lawmate — Workflow builder',
-  description: 'Build clear, automated legal workflows with Lawmate.',
-  generator: 'v0.app',
-  icons: {
-    icon: [
-      {
-        url: '/lawmate-logo/favicon.ico',
-        sizes: 'any',
-      },
-      {
-        url: '/lawmate-logo/favicon-32.png',
-        sizes: '32x32',
-        type: 'image/png',
-      },
-      {
-        url: '/lawmate-logo/favicon-dark-32.png',
-        sizes: '32x32',
-        type: 'image/png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/lawmate-logo/lawmate-mark.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: '/lawmate-logo/apple-touch-icon.png',
-  },
-}
-
-export const viewport: Viewport = {
-  colorScheme: 'light dark',
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#0891B2' },
-    { media: '(prefers-color-scheme: dark)', color: '#0891B2' },
-  ],
-}
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function AutomationsLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className="antialiased">
-        {children}
-        {process.env.NODE_ENV === 'production' && <Analytics />}
-      </body>
-    </html>
-  )
+    <div className="flex h-dvh">
+      <aside className="hidden w-64 shrink-0 border-r border-border/60 md:block">
+        <AutomationsSidebar />
+      </aside>
+      <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">{children}</main>
+    </div>
+  );
 }

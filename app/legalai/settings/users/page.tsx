@@ -1,4 +1,8 @@
-import { redirect } from "next/navigation";
+// app/legalai/settings/users/page.tsx
+import { UsersSettings } from "./users-client";
+
+export const metadata = { title: "Team — Settings" };
+
 export default function Page() {
-  redirect("/legalai/settings?tab=users");
+  return <UsersSettings />;
 }

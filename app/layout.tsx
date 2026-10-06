@@ -1,10 +1,18 @@
 import type { Metadata, Viewport } from "next"
 import "./globals.css"
-import { Manrope } from "next/font/google"
-import { Space_Grotesk, Outfit } from "next/font/google"
-import { cn } from "@/lib/utils";
-import { Providers } from "@/components/providers";
-import { BRAND } from "@/lib/brand";
+import { Manrope, Space_Grotesk, Outfit } from "next/font/google"
+import { cookies, headers } from "next/headers"
+import { cn } from "@/lib/utils"
+import { Providers } from "@/components/providers"
+import { BRAND } from "@/lib/brand"
+import { I18nProvider } from "@/i18n/providers/i18n-provider"
+import { getFallbackMessages, loadMessages } from "@/i18n/messages"
+import {
+  detectFromHeader,
+  localeDirections,
+  LOCALE_COOKIE,
+  toLocale,
+} from "@/i18n/config/locales"
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -21,13 +29,13 @@ const fontMono = Space_Grotesk({
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-space-grotesk",
-  weight: ["400", "500", "600", "700"]
+  weight: ["400", "500", "600", "700"],
 })
 
 const outfit = Outfit({
   subsets: ["latin"],
   variable: "--font-outfit",
-  weight: ["400", "500", "600", "700", "800"]
+  weight: ["400", "500", "600", "700", "800"],
 })
 
 export const metadata: Metadata = {
@@ -89,14 +97,27 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const cookieStore = await cookies()
+  const headerStore = await headers()
+
+  const cookieLocale = cookieStore.get(LOCALE_COOKIE)?.value
+  const locale = cookieLocale
+    ? toLocale(cookieLocale)
+    : detectFromHeader(headerStore.get("accept-language"))
+
+  const messages = loadMessages(locale)
+  const fallbackMessages = locale === "en" ? undefined : getFallbackMessages()
+  const dir = localeDirections[locale]
+
   return (
     <html
-      lang="en"
+      lang={locale}
+      dir={dir}
       suppressHydrationWarning
       className={cn(
         "antialiased bg-background",
@@ -108,7 +129,13 @@ export default function RootLayout({
       )}
     >
       <body className="bg-background text-foreground antialiased">
-        <Providers>{children}</Providers>
+        <I18nProvider
+          locale={locale}
+          messages={messages}
+          fallbackMessages={fallbackMessages}
+        >
+          <Providers>{children}</Providers>
+        </I18nProvider>
       </body>
     </html>
   )

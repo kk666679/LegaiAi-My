@@ -2,5 +2,5 @@
 import { redirect } from "next/navigation";
 
 export default function Page({ params }: { params: { id: string } }) {
-  redirect(`/automations/${params.id}/builder`);
+  redirect(`/legalai/automations/${params.id}/builder`);
 }

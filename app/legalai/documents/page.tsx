@@ -2,11 +2,11 @@
 
 import * as React from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Plus, Upload, Filter, X, FileText, Search } from "lucide-react";
+import { Plus, Upload, Filter, X, FileText, Search, BookTemplate, Sparkles, Star, Share2, Library, Archive, Trash2, History } from "lucide-react";
 import { trpcReact } from "@/clients";
 import { DashboardShell } from "@/components/lawmate/DashboardShell";
 import { PageHeader } from "@/components/shared/PageHeader";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -17,6 +17,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { UploadDialog } from "@/components/lawmate/UploadDialog";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 const DOC_STATUS = ["draft", "review", "approved", "archived"] as const;
 const DOC_TYPE = [
@@ -148,6 +149,107 @@ export default function DocumentsPage() {
             </CardContent>
           </Card>
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="size-4" /> Quick Navigation
+            </CardTitle>
+            <CardDescription>Jump to common document views and tools.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/documents/recent">
+                  <div className="flex items-center gap-2">
+                    <History className="size-5 text-muted-foreground" />
+                    <div>
+                      <p className="font-medium">Recent</p>
+                      <p className="text-xs text-muted-foreground">Recently viewed</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/documents/favorites">
+                  <div className="flex items-center gap-2">
+                    <Star className="size-5 text-amber-500" />
+                    <div>
+                      <p className="font-medium">Favorites</p>
+                      <p className="text-xs text-muted-foreground">Starred documents</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/documents/shared">
+                  <div className="flex items-center gap-2">
+                    <Share2 className="size-5 text-muted-foreground" />
+                    <div>
+                      <p className="font-medium">Shared with me</p>
+                      <p className="text-xs text-muted-foreground">Team documents</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/documents/templates">
+                  <div className="flex items-center gap-2">
+                    <BookTemplate className="size-5 text-primary" />
+                    <div>
+                      <p className="font-medium">Templates</p>
+                      <p className="text-xs text-muted-foreground">Document templates</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/documents/studio">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="size-5 text-primary" />
+                    <div>
+                      <p className="font-medium">Drafting Studio</p>
+                      <p className="text-xs text-muted-foreground">AI-assisted drafting</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/documents/library">
+                  <div className="flex items-center gap-2">
+                    <Library className="size-5 text-muted-foreground" />
+                    <div>
+                      <p className="font-medium">Library</p>
+                      <p className="text-xs text-muted-foreground">Organised collections</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/documents?status=archived">
+                  <div className="flex items-center gap-2">
+                    <Archive className="size-5 text-muted-foreground" />
+                    <div>
+                      <p className="font-medium">Archived</p>
+                      <p className="text-xs text-muted-foreground">Stored documents</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
+                <Link href="/legalai/documents/trash">
+                  <div className="flex items-center gap-2">
+                    <Trash2 className="size-5 text-destructive" />
+                    <div>
+                      <p className="font-medium">Trash</p>
+                      <p className="text-xs text-muted-foreground">Deleted items</p>
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>

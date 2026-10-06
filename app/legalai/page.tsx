@@ -33,6 +33,7 @@ import {
   FileCheck,
   Loader2,
   RefreshCw,
+  Workflow,
   type LucideIcon,
 } from "lucide-react";
 import { DashboardShell } from "@/components/lawmate/DashboardShell";
@@ -156,6 +157,7 @@ const MODULES: { label: string; href: string; icon: LucideIcon }[] = [
   { label: "Documents", href: "/legalai/documents", icon: FileText },
   { label: "Document Analysis", href: "/legalai/analysis", icon: ClipboardList },
   { label: "Contracts", href: "/legalai/contracts", icon: FileCheck },
+  { label: "Automations", href: "/legalai/automations", icon: Workflow },
   { label: "Risk Engine", href: "/legalai/risk", icon: ShieldCheck },
   { label: "Debate Simulation", href: "/legalai/debate", icon: Swords },
   { label: "Change Monitor", href: "/legalai/monitor", icon: Bell },
