@@ -1,14 +1,19 @@
 "use client";
+// i18n/hooks/use-translation.ts
+import { useI18n } from "./use-i18n";
 
-import { useI18n } from './use-i18n';
+export function useTranslation(namespace: string = "common") {
+  const i18n = useI18n();
+  const { t: baseT } = i18n;
 
-export function useTranslation(namespace: string = 'common') {
-  const { messages, t } = useI18n();
+  const t = (key: string, vars?: Record<string, unknown>) =>
+    baseT(namespace ? `${namespace}.${key}` : key, vars);
 
-  const translate = (key: string, interpolation?: Record<string, unknown>) => {
-    const fullKey = namespace ? `${namespace}.${key}` : key;
-    return t(fullKey, interpolation);
+  return {
+    ...i18n,
+    /** Namespace-scoped translate — `t('title')` → `auth.title` */
+    t,
+    /** Escape hatch for cross-namespace lookups */
+    tGlobal: baseT,
   };
-
-  return { t: translate, messages };
 }

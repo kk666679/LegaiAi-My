@@ -1,0 +1,111 @@
+{
+  "title": "Tetapan",
+  "subtitle": "Urus akaun, ruang kerja, dan keutamaan anda",
+  "groups": { "account": "Akaun", "workspace": "Ruang kerja", "ai": "AI", "preferences": "Keutamaan" },
+  "nav": {
+    "overview": "Gambaran keseluruhan",
+    "profile": "Profil",
+    "security": "Keselamatan",
+    "team": "Pasukan",
+    "integrations": "Integrasi",
+    "ai": "Keutamaan AI",
+    "byok": "Kunci API (BYOK)",
+    "notifications": "Pemberitahuan",
+    "appearance": "Penampilan"
+  },
+  "profile": {
+    "title": "Profil",
+    "subtitle": "Butiran peribadi anda dan bagaimana orang lain melihat anda dalam ruang kerja",
+    "photo": "Foto",
+    "basicInfo": "Maklumat asas",
+    "fullName": "Nama penuh",
+    "jobTitle": "Jawatan",
+    "email": "E-mel",
+    "phone": "Telefon",
+    "bio": "Bio",
+    "regional": "Serantau",
+    "timezone": "Zon masa",
+    "language": "Bahasa"
+  },
+  "security": {
+    "title": "Keselamatan",
+    "subtitle": "Lindungi akaun anda dan semak aktiviti terkini",
+    "password": "Kata laluan",
+    "currentPassword": "Kata laluan semasa",
+    "newPassword": "Kata laluan baharu",
+    "confirmPassword": "Sahkan kata laluan",
+    "updatePassword": "Kemas kini kata laluan",
+    "twoFactor": "Pengesahan dua faktor",
+    "activeSessions": "Sesi aktif",
+    "dangerZone": "Zon bahaya",
+    "deleteAccount": "Padam akaun"
+  },
+  "team": {
+    "title": "Pasukan",
+    "subtitle": "Urus ahli, peranan, dan akses ke ruang kerja anda",
+    "inviteMember": "Jemput ahli",
+    "email": "E-mel",
+    "role": "Peranan",
+    "sendInvite": "Hantar jemputan",
+    "members": "Ahli",
+    "roles": "Peranan"
+  },
+  "integrations": {
+    "title": "Integrasi",
+    "subtitle": "Sambung LegAI ke alat yang sudah digunakan oleh pasukan anda",
+    "connect": "Sambung",
+    "disconnect": "Putus",
+    "configure": "Konfigurasi",
+    "connected": "Disambung"
+  },
+  "ai": {
+    "title": "Keutamaan AI",
+    "subtitle": "Kawal bagaimana LegAI menggunakan model, ambang, dan pagar tingkah laku",
+    "defaultModels": "Model lalai",
+    "confidenceThreshold": "Ambang keyakinan",
+    "draftingStyle": "Gaya penggubalan",
+    "tone": "Nada",
+    "guardrails": "Pagar keselamatan"
+  },
+  "byok": {
+    "title": "Kunci API (BYOK)",
+    "subtitle": "Bawa kunci anda sendiri supaya penggunaan AI dibilkan ke akaun pembekal anda",
+    "addKey": "Tambah kunci",
+    "replace": "Ganti",
+    "removeKey": "Buang kunci",
+    "saveKey": "Simpan kunci"
+  },
+  "notifications": {
+    "title": "Pemberitahuan",
+    "subtitle": "Pilih di mana dan bila LegAI menghubungi anda",
+    "channels": "Saluran",
+    "email": "E-mel",
+    "inApp": "Dalam apl",
+    "digest": "E-mel ringkasan",
+    "events": "Peristiwa",
+    "quietHours": "Waktu senyap"
+  },
+  "appearance": {
+    "title": "Penampilan",
+    "subtitle": "Peribadikan bagaimana LegAI kelihatan dan terasa",
+    "theme": "Tema",
+    "light": "Cerah",
+    "dark": "Gelap",
+    "system": "Sistem",
+    "accent": "Warna aksen",
+    "layout": "Susun atur",
+    "density": "Kepadatan",
+    "comfortable": "Selesa",
+    "compact": "Padat",
+    "bodyFont": "Fon badan",
+    "motion": "Gerakan & fokus",
+    "reduceMotion": "Kurangkan gerakan",
+    "compactSidebar": "Bar sisi padat"
+  },
+  "overview": {
+    "title": "Tetapan",
+    "subtitle": "Urus akaun, ruang kerja, dan keutamaan anda di satu tempat",
+    "open": "Buka"
+  },
+  "footer": { "saved": "Perubahan disimpan secara automatik." }
+}

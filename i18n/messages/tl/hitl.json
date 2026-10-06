@@ -1,0 +1,69 @@
+{
+  "title": "Review queue",
+  "subtitle": "Human review for AI actions, approvals, and escalations",
+  "scopes": {
+    "overview": "Overview",
+    "inbox": "Inbox",
+    "assigned": "Assigned",
+    "team": "Team queue",
+    "escalations": "Escalations",
+    "history": "History",
+    "rules": "Routing rules",
+    "analytics": "Analytics"
+  },
+  "status": {
+    "pending": "Pending",
+    "inReview": "In review",
+    "escalated": "Escalated",
+    "changesRequested": "Changes requested",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "deferred": "Deferred",
+    "expired": "Expired",
+    "cancelled": "Cancelled"
+  },
+  "actions": {
+    "claim": "Claim",
+    "approve": "Approve",
+    "reject": "Reject",
+    "requestChanges": "Request changes",
+    "escalate": "Escalate",
+    "defer": "Defer",
+    "comment": "Comment",
+    "internalComment": "Internal only",
+    "submitFeedback": "Submit feedback"
+  },
+  "decisions": {
+    "title": "Decision",
+    "closed": "Closed",
+    "comments": "Comments",
+    "claimToDecide": "Claim this request to make a decision.",
+    "approvals": "Approvals"
+  },
+  "sla": {
+    "breached": "SLA breached",
+    "remaining": "{{time}} remaining"
+  },
+  "feedback": {
+    "title": "Provide feedback on the AI output",
+    "score": "Score",
+    "notes": "Notes",
+    "correctedOutput": "Corrected output (optional)",
+    "allowTraining": "Allow this feedback to be used for training"
+  },
+  "analytics": {
+    "totalInQueue": "Total in queue",
+    "approvedToday": "Approved today",
+    "rejectedToday": "Rejected today",
+    "avgDecision": "Avg decision"
+  },
+  "empty": {
+    "allCaughtUp": "You're all caught up",
+    "allCaughtUpDescription": "No pending review items in this queue."
+  },
+  "messages": {
+    "claimed": "You claimed this request",
+    "approved": "Approved",
+    "rejected": "Rejected"
+  }
+}

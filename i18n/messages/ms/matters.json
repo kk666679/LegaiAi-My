@@ -1,0 +1,101 @@
+{
+  "title": "Kes",
+  "subtitle": "Urus penglibatan klien sepanjang kitaran hayat penuh",
+  "singular": "Kes",
+  "plural": "Kes",
+  "newMatter": "Kes baharu",
+  "matterNumber": "Nombor kes",
+  "practiceArea": "Bidang amalan",
+  "billingArrangement": "Susunan bil",
+  "status": {
+    "intake": "Penerimaan",
+    "open": "Terbuka",
+    "onHold": "Ditahan",
+    "pending": "Menunggu",
+    "review": "Semakan",
+    "billing": "Pengebilan",
+    "closed": "Ditutup",
+    "archived": "Diarkibkan",
+    "cancelled": "Dibatalkan"
+  },
+  "scopes": {
+    "all": "Semua kes",
+    "mine": "Kes saya",
+    "recent": "Terkini",
+    "favorites": "Kegemaran",
+    "open": "Terbuka",
+    "onHold": "Ditahan",
+    "closed": "Ditutup"
+  },
+  "tabs": {
+    "overview": "Gambaran keseluruhan",
+    "tasks": "Tugasan",
+    "deadlines": "Tarikh akhir",
+    "time": "Masa",
+    "billing": "Pengebilan",
+    "documents": "Dokumen",
+    "parties": "Pihak",
+    "team": "Pasukan",
+    "notes": "Nota",
+    "conflicts": "Konflik",
+    "permissions": "Kebenaran",
+    "ai": "AI",
+    "activity": "Aktiviti",
+    "analytics": "Analitik"
+  },
+  "tasks": {
+    "title": "Tugasan",
+    "newTask": "Tugasan baharu",
+    "assignee": "Penerima tugas",
+    "dueDate": "Tarikh akhir",
+    "open": "Terbuka",
+    "completed": "Selesai",
+    "statuses": {
+      "todo": "Belum bermula",
+      "inProgress": "Sedang berjalan",
+      "blocked": "Tersekat",
+      "review": "Semakan",
+      "done": "Selesai",
+      "cancelled": "Dibatalkan"
+    }
+  },
+  "deadlines": {
+    "title": "Tarikh akhir",
+    "addDeadline": "Tambah tarikh akhir",
+    "upcoming": "Akan datang",
+    "completed": "Selesai",
+    "overdue": "Lewat"
+  },
+  "time": {
+    "title": "Penjejakan masa",
+    "logTime": "Rekod masa",
+    "total": "Jumlah",
+    "billable": "Boleh dibil",
+    "nonBillable": "Tidak boleh dibil"
+  },
+  "billingTab": {
+    "title": "Pengebilan",
+    "newInvoice": "Invois baharu",
+    "outstanding": "Belum dibayar",
+    "trustBalance": "Baki amanah"
+  },
+  "parties": { "title": "Pihak", "addParty": "Tambah pihak" },
+  "team": { "title": "Pasukan", "addMember": "Tambah ahli" },
+  "conflicts": {
+    "title": "Konflik",
+    "runCheck": "Jalankan semakan konflik",
+    "noConflicts": "Tiada konflik dikesan",
+    "flagged": "Konflik ditandakan"
+  },
+  "empty": {
+    "noMatters": "Belum ada kes",
+    "noMattersDescription": "Buka kes baharu atau import penglibatan sedia ada untuk bermula."
+  },
+  "messages": {
+    "created": "Kes dicipta",
+    "closed": "Kes ditutup",
+    "reopened": "Kes dibuka semula",
+    "taskCreated": "Tugasan dicipta",
+    "timeLogged": "Masa direkodkan"
+  }
+}

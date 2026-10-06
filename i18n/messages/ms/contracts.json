@@ -1,0 +1,81 @@
+{
+  "title": "Kontrak",
+  "subtitle": "Jejak kontrak dari penerimaan sehingga pembaharuan",
+  "singular": "Kontrak",
+  "plural": "Kontrak",
+  "newContract": "Kontrak baharu",
+  "status": {
+    "draft": "Draf",
+    "inNegotiation": "Dalam rundingan",
+    "pendingApproval": "Menunggu kelulusan",
+    "executed": "Ditandatangani",
+    "active": "Aktif",
+    "expiring": "Hampir tamat",
+    "expired": "Tamat tempoh",
+    "terminated": "Ditamatkan",
+    "renewed": "Diperbaharui",
+    "archived": "Diarkibkan"
+  },
+  "types": {
+    "employment": "Penggajian",
+    "services": "Perkhidmatan",
+    "nda": "NDA",
+    "lease": "Pajakan",
+    "license": "Lesen",
+    "supply": "Bekalan",
+    "distribution": "Pengedaran",
+    "partnership": "Perkongsian",
+    "loan": "Pinjaman",
+    "guarantee": "Jaminan",
+    "settlement": "Penyelesaian",
+    "mou": "MOU",
+    "other": "Lain-lain"
+  },
+  "tabs": {
+    "overview": "Gambaran keseluruhan",
+    "terms": "Terma",
+    "parties": "Pihak",
+    "obligations": "Kewajipan",
+    "risks": "Risiko",
+    "clauses": "Fasal",
+    "playbook": "Buku panduan",
+    "negotiation": "Rundingan",
+    "renewals": "Pembaharuan",
+    "approvals": "Kelulusan",
+    "activity": "Aktiviti",
+    "versions": "Versi"
+  },
+  "risks": {
+    "title": "Risiko",
+    "severity": { "low": "Rendah", "medium": "Sederhana", "high": "Tinggi", "critical": "Kritikal" }
+  },
+  "clauses": { "title": "Fasal", "extract": "Ekstrak fasal" },
+  "playbook": {
+    "title": "Buku panduan",
+    "runPlaybook": "Jalankan buku panduan",
+    "positions": {
+      "preferred": "Diutamakan",
+      "acceptable": "Boleh diterima",
+      "fallback": "Pilihan sandaran",
+      "walkAway": "Tinggalkan"
+    }
+  },
+  "obligations": { "title": "Kewajipan" },
+  "negotiation": { "title": "Rundingan" },
+  "renewals": { "title": "Pembaharuan", "upcoming": "Akan datang" },
+  "approvals": {
+    "title": "Kelulusan",
+    "approve": "Luluskan",
+    "reject": "Tolak",
+    "requestChanges": "Minta perubahan"
+  },
+  "counterparties": { "title": "Rakan niaga" },
+  "empty": {
+    "noContracts": "Belum ada kontrak",
+    "noContractsDescription": "Muat naik kontrak atau jana dengan AI untuk mula menjejak kewajipan dan risiko."
+  },
+  "messages": {
+    "created": "Kontrak dicipta",
+    "analysed": "Analisis kontrak selesai"
+  }
+}

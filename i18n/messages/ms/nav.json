@@ -1,0 +1,25 @@
+{
+  "dashboard": "Papan pemuka",
+  "documents": "Dokumen",
+  "matters": "Kes",
+  "contracts": "Kontrak",
+  "automation": "Automasi",
+  "review": "Barisan semakan",
+  "settings": "Tetapan",
+  "help": "Bantuan",
+  "signOut": "Log keluar",
+  "profile": "Profil",
+  "notifications": "Pemberitahuan",
+  "groups": {
+    "workspace": "Ruang kerja",
+    "intelligence": "Kecerdasan",
+    "preferences": "Keutamaan"
+  },
+  "footer": {
+    "privacy": "Privasi",
+    "terms": "Terma",
+    "security": "Keselamatan",
+    "contact": "Hubungi",
+    "status": "Semua sistem beroperasi"
+  }
+}

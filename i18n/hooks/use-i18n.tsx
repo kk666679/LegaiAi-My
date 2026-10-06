@@ -1,28 +1,35 @@
 "use client";
+// i18n/hooks/use-i18n.tsx
+import * as React from "react";
+import type { Locale } from "../config/locales";
+import type { Formatters } from "../utils/translation-utils";
 
-import { createContext, useContext } from 'react';
-import type { Locale } from '@/i18n/config/locales';
-
-export interface Messages {
-  [key: string]: any;
-}
-
-export interface I18nContextType {
+export interface I18nContextValue {
   locale: Locale;
-  messages: Messages;
-  t: (key: string, interpolation?: Record<string, any>) => string;
-  formatDate: (date: Date, options?: Intl.DateTimeFormatOptions) => string;
-  formatNumber: (number: number, options?: Intl.NumberFormatOptions) => string;
-  formatCurrency: (number: number, currency?: string) => string;
-  plural: (count: number, singular: string, plural: string) => string;
+  dir: "ltr" | "rtl";
+  messages: Record<string, unknown>;
+  /** Translate a fully-qualified dotted key. */
+  t: (key: string, vars?: Record<string, unknown>) => string;
+  /** Fetch the raw value (object/array) at a dotted key. */
+  raw: <T = unknown>(key: string) => T;
+  formatDate: (v: string | number | Date) => string;
+  formatDateTime: (v: string | number | Date) => string;
+  formatTime: (v: string | number | Date) => string;
+  formatRelative: (v: string | number | Date) => string;
+  formatNumber: (v: number) => string;
+  formatPercent: (v: number) => string;
+  formatCompact: (v: number) => string;
+  formatCurrency: (v: number, currency?: string) => string;
+  plural: (count: number, singular: string, pluralForm: string, vars?: Record<string, unknown>) => string;
+  /** All formatters bundled — handy for passing around. */
+  format: Formatters;
+  setLocale: (next: Locale) => void;
 }
 
-export const I18nContext = createContext<I18nContextType | undefined>(undefined);
+export const I18nContext = React.createContext<I18nContextValue | null>(null);
 
-export function useI18n() {
-  const context = useContext(I18nContext);
-  if (!context) {
-    throw new Error('useI18n must be used within I18nProvider');
-  }
-  return context;
+export function useI18n(): I18nContextValue {
+  const ctx = React.useContext(I18nContext);
+  if (!ctx) throw new Error("useI18n must be used inside <I18nProvider>.");
+  return ctx;
 }

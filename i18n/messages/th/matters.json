@@ -1,0 +1,107 @@
+{
+  "title": "Matters",
+  "subtitle": "Manage client engagements across their full lifecycle",
+  "singular": "Matter",
+  "plural": "Matters",
+  "newMatter": "New matter",
+  "matterNumber": "Matter number",
+  "practiceArea": "Practice area",
+  "billingArrangement": "Billing arrangement",
+  "status": {
+    "intake": "Intake",
+    "open": "Open",
+    "onHold": "On hold",
+    "pending": "Pending",
+    "review": "Review",
+    "billing": "Billing",
+    "closed": "Closed",
+    "archived": "Archived",
+    "cancelled": "Cancelled"
+  },
+  "scopes": {
+    "all": "All matters",
+    "mine": "My matters",
+    "recent": "Recent",
+    "favorites": "Favorites",
+    "open": "Open",
+    "onHold": "On hold",
+    "closed": "Closed"
+  },
+  "tabs": {
+    "overview": "Overview",
+    "tasks": "Tasks",
+    "deadlines": "Deadlines",
+    "time": "Time",
+    "billing": "Billing",
+    "documents": "Documents",
+    "parties": "Parties",
+    "team": "Team",
+    "notes": "Notes",
+    "conflicts": "Conflicts",
+    "permissions": "Permissions",
+    "ai": "AI",
+    "activity": "Activity",
+    "analytics": "Analytics"
+  },
+  "tasks": {
+    "title": "Tasks",
+    "newTask": "New task",
+    "assignee": "Assignee",
+    "dueDate": "Due date",
+    "open": "Open",
+    "completed": "Completed",
+    "statuses": {
+      "todo": "To do",
+      "inProgress": "In progress",
+      "blocked": "Blocked",
+      "review": "Review",
+      "done": "Done",
+      "cancelled": "Cancelled"
+    }
+  },
+  "deadlines": {
+    "title": "Deadlines",
+    "addDeadline": "Add deadline",
+    "upcoming": "Upcoming",
+    "completed": "Completed",
+    "overdue": "Overdue"
+  },
+  "time": {
+    "title": "Time tracking",
+    "logTime": "Log time",
+    "total": "Total",
+    "billable": "Billable",
+    "nonBillable": "Non-billable"
+  },
+  "billingTab": {
+    "title": "Billing",
+    "newInvoice": "New invoice",
+    "outstanding": "Outstanding",
+    "trustBalance": "Trust balance"
+  },
+  "parties": {
+    "title": "Parties",
+    "addParty": "Add party"
+  },
+  "team": {
+    "title": "Team",
+    "addMember": "Add member"
+  },
+  "conflicts": {
+    "title": "Conflicts",
+    "runCheck": "Run conflict check",
+    "noConflicts": "No conflicts detected",
+    "flagged": "Conflict flagged"
+  },
+  "empty": {
+    "noMatters": "No matters yet",
+    "noMattersDescription": "Open a new matter or import an existing engagement to get started."
+  },
+  "messages": {
+    "created": "Matter created",
+    "closed": "Matter closed",
+    "reopened": "Matter reopened",
+    "taskCreated": "Task created",
+    "timeLogged": "Time logged"
+  }
+}

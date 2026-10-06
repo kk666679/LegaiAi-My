@@ -1,0 +1,25 @@
+{
+  "dashboard": "Dashboard",
+  "documents": "Documents",
+  "matters": "Matters",
+  "contracts": "Contracts",
+  "automation": "Automations",
+  "review": "Review queue",
+  "settings": "Settings",
+  "help": "Help",
+  "signOut": "Sign out",
+  "profile": "Profile",
+  "notifications": "Notifications",
+  "groups": {
+    "workspace": "Workspace",
+    "intelligence": "Intelligence",
+    "preferences": "Preferences"
+  },
+  "footer": {
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "security": "Security",
+    "contact": "Contact",
+    "status": "All systems operational"
+  }
+}

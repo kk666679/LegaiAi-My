@@ -1,0 +1,66 @@
+{
+  "title": "Automasi",
+  "subtitle": "Reka bentuk, uji, dan jalankan aliran kerja guaman",
+  "singular": "Aliran kerja",
+  "plural": "Aliran kerja",
+  "newWorkflow": "Aliran kerja baharu",
+  "builder": "Pembina",
+  "runs": "Larian",
+  "versions": "Versi",
+  "settings": "Tetapan",
+  "analytics": "Analitik",
+  "status": { "draft": "Draf", "active": "Aktif", "paused": "Dijeda", "archived": "Diarkibkan" },
+  "toolbar": {
+    "testRun": "Larian ujian",
+    "running": "Sedang berjalan…",
+    "reset": "Set semula",
+    "export": "Eksport",
+    "import": "Import",
+    "aiElements": "Elemen AI"
+  },
+  "palette": {
+    "title": "Pustaka",
+    "subtitle": "Langkah & tindakan",
+    "searchPlaceholder": "Cari langkah"
+  },
+  "inspector": {
+    "title": "Konfigurasi",
+    "subtitle": "Butiran langkah",
+    "name": "Nama",
+    "description": "Keterangan",
+    "duplicate": "Salin",
+    "delete": "Padam"
+  },
+  "nodeKinds": {
+    "trigger": "Pencetus",
+    "action": "Tindakan",
+    "condition": "Keadaan",
+    "output": "Keluaran",
+    "delay": "Kelewatan",
+    "loop": "Gelung",
+    "human": "Manusia"
+  },
+  "nodeStatus": {
+    "idle": "Terbiar",
+    "queued": "Dalam giliran",
+    "running": "Sedang berjalan",
+    "success": "Berjaya",
+    "failed": "Gagal",
+    "skipped": "Dilangkau",
+    "waiting": "Menunggu"
+  },
+  "eventLog": { "title": "Log peristiwa", "clear": "Kosongkan log", "empty": "Belum ada peristiwa." },
+  "empty": {
+    "noWorkflows": "Belum ada automasi",
+    "noWorkflowsDescription": "Mula dari templat atau bina aliran kerja dari awal.",
+    "noRuns": "Belum ada larian",
+    "noVersions": "Belum ada sejarah versi"
+  },
+  "messages": {
+    "created": "Aliran kerja dicipta",
+    "saved": "Aliran kerja disimpan",
+    "exported": "Aliran kerja dieksport",
+    "testRunStarted": "Larian ujian bermula",
+    "testRunFinished": "Larian ujian selesai"
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "title": "Contracts",
+  "subtitle": "Track contracts from intake through renewal",
+  "singular": "Contract",
+  "plural": "Contracts",
+  "newContract": "New contract",
+  "status": {
+    "draft": "Draft",
+    "inNegotiation": "In negotiation",
+    "pendingApproval": "Pending approval",
+    "executed": "Executed",
+    "active": "Active",
+    "expiring": "Expiring",
+    "expired": "Expired",
+    "terminated": "Terminated",
+    "renewed": "Renewed",
+    "archived": "Archived"
+  },
+  "types": {
+    "employment": "Employment",
+    "services": "Services",
+    "nda": "NDA",
+    "lease": "Lease",
+    "license": "License",
+    "supply": "Supply",
+    "distribution": "Distribution",
+    "partnership": "Partnership",
+    "loan": "Loan",
+    "guarantee": "Guarantee",
+    "settlement": "Settlement",
+    "mou": "MOU",
+    "other": "Other"
+  },
+  "tabs": {
+    "overview": "Overview",
+    "terms": "Terms",
+    "parties": "Parties",
+    "obligations": "Obligations",
+    "risks": "Risks",
+    "clauses": "Clauses",
+    "playbook": "Playbook",
+    "negotiation": "Negotiation",
+    "renewals": "Renewals",
+    "approvals": "Approvals",
+    "activity": "Activity",
+    "versions": "Versions"
+  },
+  "risks": {
+    "title": "Risks",
+    "severity": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "critical": "Critical"
+    }
+  },
+  "clauses": {
+    "title": "Clauses",
+    "extract": "Extract clauses"
+  },
+  "playbook": {
+    "title": "Playbook",
+    "runPlaybook": "Run playbook",
+    "positions": {
+      "preferred": "Preferred",
+      "acceptable": "Acceptable",
+      "fallback": "Fallback",
+      "walkAway": "Walk-away"
+    }
+  },
+  "obligations": {
+    "title": "Obligations"
+  },
+  "negotiation": {
+    "title": "Negotiation"
+  },
+  "renewals": {
+    "title": "Renewals",
+    "upcoming": "Upcoming"
+  },
+  "approvals": {
+    "title": "Approvals",
+    "approve": "Approve",
+    "reject": "Reject",
+    "requestChanges": "Request changes"
+  },
+  "counterparties": {
+    "title": "Counterparties"
+  },
+  "empty": {
+    "noContracts": "No contracts yet",
+    "noContractsDescription": "Upload a contract or generate one with AI to begin tracking obligations and risks."
+  },
+  "messages": {
+    "created": "Contract created",
+    "analysed": "Contract analysis complete"
+  }
+}

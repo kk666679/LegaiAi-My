@@ -1,0 +1,118 @@
+{
+  "title": "Settings",
+  "subtitle": "Manage your account, workspace, and preferences",
+  "groups": {
+    "account": "Account",
+    "workspace": "Workspace",
+    "ai": "AI",
+    "preferences": "Preferences"
+  },
+  "nav": {
+    "overview": "Overview",
+    "profile": "Profile",
+    "security": "Security",
+    "team": "Team",
+    "integrations": "Integrations",
+    "ai": "AI preferences",
+    "byok": "API keys (BYOK)",
+    "notifications": "Notifications",
+    "appearance": "Appearance"
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Your personal details and how others see you in the workspace",
+    "photo": "Photo",
+    "basicInfo": "Basic info",
+    "fullName": "Full name",
+    "jobTitle": "Job title",
+    "email": "Email",
+    "phone": "Phone",
+    "bio": "Bio",
+    "regional": "Regional",
+    "timezone": "Timezone",
+    "language": "Language"
+  },
+  "security": {
+    "title": "Security",
+    "subtitle": "Protect your account and review recent activity",
+    "password": "Password",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "updatePassword": "Update password",
+    "twoFactor": "Two-factor authentication",
+    "activeSessions": "Active sessions",
+    "dangerZone": "Danger zone",
+    "deleteAccount": "Delete account"
+  },
+  "team": {
+    "title": "Team",
+    "subtitle": "Manage members, roles, and access to your workspace",
+    "inviteMember": "Invite member",
+    "email": "Email",
+    "role": "Role",
+    "sendInvite": "Send invite",
+    "members": "Members",
+    "roles": "Roles"
+  },
+  "integrations": {
+    "title": "Integrations",
+    "subtitle": "Connect LegAI to the tools your team already uses",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "configure": "Configure",
+    "connected": "Connected"
+  },
+  "ai": {
+    "title": "AI preferences",
+    "subtitle": "Control how LegAI uses models, thresholds, and behavioural guardrails",
+    "defaultModels": "Default models",
+    "confidenceThreshold": "Confidence threshold",
+    "draftingStyle": "Drafting style",
+    "tone": "Tone",
+    "guardrails": "Guardrails"
+  },
+  "byok": {
+    "title": "API keys (BYOK)",
+    "subtitle": "Bring your own keys so AI usage is billed to your provider account",
+    "addKey": "Add key",
+    "replace": "Replace",
+    "removeKey": "Remove key",
+    "saveKey": "Save key"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "subtitle": "Choose where and when LegAI reaches out to you",
+    "channels": "Channels",
+    "email": "Email",
+    "inApp": "In-app",
+    "digest": "Digest email",
+    "events": "Events",
+    "quietHours": "Quiet hours"
+  },
+  "appearance": {
+    "title": "Appearance",
+    "subtitle": "Personalise how LegAI looks and feels",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "accent": "Accent colour",
+    "layout": "Layout",
+    "density": "Density",
+    "comfortable": "Comfortable",
+    "compact": "Compact",
+    "bodyFont": "Body font",
+    "motion": "Motion & focus",
+    "reduceMotion": "Reduce motion",
+    "compactSidebar": "Compact sidebar"
+  },
+  "overview": {
+    "title": "Settings",
+    "subtitle": "Manage your account, workspace, and preferences in one place",
+    "open": "Open"
+  },
+  "footer": {
+    "saved": "Changes are saved automatically."
+  }
+}

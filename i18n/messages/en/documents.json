@@ -1,0 +1,121 @@
+{
+  "title": "Documents",
+  "subtitle": "Create, upload, analyse, and manage your legal documents",
+  "singular": "Document",
+  "plural": "Documents",
+  "newDocument": "New document",
+  "uploadDocument": "Upload document",
+  "scopes": {
+    "all": "All documents",
+    "recent": "Recent",
+    "favorites": "Favorites",
+    "shared": "Shared with me",
+    "contracts": "Contracts",
+    "drafts": "Drafts",
+    "templates": "Templates",
+    "archived": "Archived",
+    "trash": "Trash"
+  },
+  "views": {
+    "grid": "Grid view",
+    "list": "List view",
+    "table": "Table view"
+  },
+  "status": {
+    "draft": "Draft",
+    "uploading": "Uploading",
+    "processing": "Processing",
+    "ready": "Ready",
+    "analysing": "Analysing",
+    "analysed": "Analysed",
+    "review": "In review",
+    "changesRequested": "Changes requested",
+    "approved": "Approved",
+    "final": "Final",
+    "archived": "Archived",
+    "error": "Error"
+  },
+  "actions": {
+    "open": "Open",
+    "preview": "Preview",
+    "edit": "Edit",
+    "rename": "Rename",
+    "move": "Move",
+    "duplicate": "Duplicate",
+    "download": "Download",
+    "export": "Export",
+    "share": "Share",
+    "analyse": "Analyse",
+    "compare": "Compare",
+    "archive": "Archive",
+    "delete": "Delete",
+    "star": "Star",
+    "unstar": "Unstar"
+  },
+  "tabs": {
+    "preview": "Preview",
+    "analysis": "Analysis",
+    "versions": "Versions",
+    "comparison": "Comparison",
+    "comments": "Comments",
+    "activity": "Activity",
+    "permissions": "Permissions",
+    "studio": "Studio"
+  },
+  "upload": {
+    "dropzone": "Drop files here or click to browse",
+    "supported": "PDF, DOCX, TXT up to 50 MB each",
+    "chooseFiles": "Choose files",
+    "uploading": "Uploading document",
+    "processing": "Processing document",
+    "extracting": "Extracting text",
+    "preparingAnalysis": "Preparing AI analysis",
+    "ready": "Ready",
+    "failed": "Failed",
+    "retry": "Retry"
+  },
+  "analysis": {
+    "summary": "Summary",
+    "keyFindings": "Key findings",
+    "risks": "Risks",
+    "obligations": "Obligations",
+    "clauses": "Clauses",
+    "parties": "Parties",
+    "dates": "Important dates",
+    "compliance": "Compliance",
+    "evidence": "Evidence",
+    "confidence": "Confidence"
+  },
+  "drafting": {
+    "title": "Drafting Studio",
+    "outline": "Outline",
+    "editor": "Editor",
+    "aiPanel": "AI assistant",
+    "generateDraft": "Generate draft",
+    "improveWording": "Improve wording",
+    "moreFormal": "More formal",
+    "legallyCautious": "Legally cautious",
+    "checkConsistency": "Check consistency",
+    "identifyRisks": "Identify risks",
+    "translateToMalay": "Translate to Malay"
+  },
+  "empty": {
+    "noDocuments": "No documents yet",
+    "noDocumentsDescription": "Create a document with AI or upload an existing legal document to get started.",
+    "noResults": "No documents match your filters",
+    "noFavorites": "No favorites yet",
+    "noShared": "Nothing shared with you yet",
+    "noTrash": "Trash is empty"
+  },
+  "messages": {
+    "created": "Document created",
+    "uploaded": "Document uploaded",
+    "deleted": "Document deleted",
+    "renamed": "Document renamed",
+    "archived": "Document archived",
+    "exportedAs": "Exported as {{format}}",
+    "sharedWith": "Shared with {{name}}",
+    "favourited": "Added to favorites",
+    "unfavourited": "Removed from favorites"
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "title": "Barisan semakan",
+  "subtitle": "Semakan manusia untuk tindakan AI, kelulusan, dan eskalasi",
+  "scopes": {
+    "overview": "Gambaran keseluruhan",
+    "inbox": "Peti masuk",
+    "assigned": "Ditugaskan",
+    "team": "Barisan pasukan",
+    "escalations": "Eskalasi",
+    "history": "Sejarah",
+    "rules": "Peraturan penghalaan",
+    "analytics": "Analitik"
+  },
+  "status": {
+    "pending": "Menunggu",
+    "inReview": "Dalam semakan",
+    "escalated": "Dieskalasi",
+    "changesRequested": "Perubahan diminta",
+    "approved": "Diluluskan",
+    "rejected": "Ditolak",
+    "deferred": "Ditangguh",
+    "expired": "Tamat tempoh",
+    "cancelled": "Dibatalkan"
+  },
+  "actions": {
+    "claim": "Ambil",
+    "approve": "Luluskan",
+    "reject": "Tolak",
+    "requestChanges": "Minta perubahan",
+    "escalate": "Eskalasi",
+    "defer": "Tangguh",
+    "comment": "Komen",
+    "internalComment": "Dalaman sahaja",
+    "submitFeedback": "Hantar maklum balas"
+  },
+  "decisions": {
+    "title": "Keputusan",
+    "closed": "Ditutup",
+    "comments": "Komen",
+    "claimToDecide": "Ambil permintaan ini untuk membuat keputusan.",
+    "approvals": "Kelulusan"
+  },
+  "sla": { "breached": "SLA dilanggar", "remaining": "{{time}} berbaki" },
+  "feedback": {
+    "title": "Berikan maklum balas tentang output AI",
+    "score": "Skor",
+    "notes": "Nota",
+    "correctedOutput": "Output yang diperbetulkan (pilihan)",
+    "allowTraining": "Benarkan maklum balas ini digunakan untuk latihan"
+  },
+  "analytics": {
+    "totalInQueue": "Jumlah dalam barisan",
+    "approvedToday": "Diluluskan hari ini",
+    "rejectedToday": "Ditolak hari ini",
+    "avgDecision": "Keputusan purata"
+  },
+  "empty": {
+    "allCaughtUp": "Anda sudah selesai semuanya",
+    "allCaughtUpDescription": "Tiada item semakan menunggu dalam barisan ini."
+  },
+  "messages": { "claimed": "Anda mengambil permintaan ini", "approved": "Diluluskan", "rejected": "Ditolak" }
+}

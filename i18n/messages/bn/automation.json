@@ -1,0 +1,75 @@
+{
+  "title": "Automations",
+  "subtitle": "Design, test, and run legal workflows",
+  "singular": "Workflow",
+  "plural": "Workflows",
+  "newWorkflow": "New workflow",
+  "builder": "Builder",
+  "runs": "Runs",
+  "versions": "Versions",
+  "settings": "Settings",
+  "analytics": "Analytics",
+  "status": {
+    "draft": "Draft",
+    "active": "Active",
+    "paused": "Paused",
+    "archived": "Archived"
+  },
+  "toolbar": {
+    "testRun": "Test run",
+    "running": "Running…",
+    "reset": "Reset",
+    "export": "Export",
+    "import": "Import",
+    "aiElements": "AI Elements"
+  },
+  "palette": {
+    "title": "Library",
+    "subtitle": "Steps & actions",
+    "searchPlaceholder": "Search steps"
+  },
+  "inspector": {
+    "title": "Configure",
+    "subtitle": "Step details",
+    "name": "Name",
+    "description": "Description",
+    "duplicate": "Duplicate",
+    "delete": "Delete"
+  },
+  "nodeKinds": {
+    "trigger": "Trigger",
+    "action": "Action",
+    "condition": "Condition",
+    "output": "Output",
+    "delay": "Delay",
+    "loop": "Loop",
+    "human": "Human"
+  },
+  "nodeStatus": {
+    "idle": "Idle",
+    "queued": "Queued",
+    "running": "Running",
+    "success": "Success",
+    "failed": "Failed",
+    "skipped": "Skipped",
+    "waiting": "Waiting"
+  },
+  "eventLog": {
+    "title": "Event log",
+    "clear": "Clear log",
+    "empty": "No events yet."
+  },
+  "empty": {
+    "noWorkflows": "No automations yet",
+    "noWorkflowsDescription": "Start from a template or build a workflow from scratch.",
+    "noRuns": "No runs yet",
+    "noVersions": "No version history yet"
+  },
+  "messages": {
+    "created": "Workflow created",
+    "saved": "Workflow saved",
+    "exported": "Workflow exported",
+    "testRunStarted": "Test run started",
+    "testRunFinished": "Test run finished"
+  }
+}

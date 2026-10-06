@@ -1,17 +1,163 @@
-export type Locale = 'en' | 'ms';
+// i18n/config/locales.ts
 
-export const locales: Locale[] = ['en', 'ms'];
+// ─────────────────────────────────────────────────────────────
+// Locale union — mirrors i18n/messages/* folders exactly
+// ─────────────────────────────────────────────────────────────
+export type Locale =
+  | "en" // English
+  | "ms" // Bahasa Malaysia
+  | "id" // Bahasa Indonesia
+  | "th" // ไทย
+  | "vi" // Tiếng Việt
+  | "tl" // Tagalog
+  | "km" // ខ្មែរ
+  | "lo" // ລາວ
+  | "my" // မြန်မာ
+  | "bn" // বাংলা
+  | "jv"; // Basa Jawa
 
-export const defaultLocale: Locale = 'en';
+// ─────────────────────────────────────────────────────────────
+// Locale list + default
+// ─────────────────────────────────────────────────────────────
+export const locales: Locale[] = [
+  "en",
+  "ms",
+  "id",
+  "th",
+  "vi",
+  "tl",
+  "km",
+  "lo",
+  "my",
+  "bn",
+  "jv",
+];
 
+export const defaultLocale: Locale = "en";
+export const DEFAULT_LOCALE: Locale = defaultLocale;
+
+// ─────────────────────────────────────────────────────────────
+// Display names (endonym — the language's own name)
+// ─────────────────────────────────────────────────────────────
 export const localeNames: Record<Locale, string> = {
-  en: 'English',
-  ms: 'Bahasa Malaysia'
+  en: "English",
+  ms: "Bahasa Malaysia",
+  id: "Bahasa Indonesia",
+  th: "ไทย",
+  vi: "Tiếng Việt",
+  tl: "Tagalog",
+  km: "ខ្មែរ",
+  lo: "ລາວ",
+  my: "မြန်မာ",
+  bn: "বাংলা",
+  jv: "Basa Jawa",
 };
 
-export const localeDirections: Record<Locale, 'ltr' | 'rtl'> = {
-  en: 'ltr',
-  ms: 'ltr'
+// ─────────────────────────────────────────────────────────────
+// Text direction
+// ─────────────────────────────────────────────────────────────
+export const localeDirections: Record<Locale, "ltr" | "rtl"> = {
+  en: "ltr",
+  ms: "ltr",
+  id: "ltr",
+  th: "ltr",
+  vi: "ltr",
+  tl: "ltr",
+  km: "ltr",
+  lo: "ltr",
+  my: "ltr",
+  bn: "ltr",
+  jv: "ltr",
 };
 
-export const messagesPath = '/messages';
+// ─────────────────────────────────────────────────────────────
+// Cookie + storage
+// ─────────────────────────────────────────────────────────────
+export const messagesPath = "/messages";
+export const LOCALE_COOKIE = "lawmate_locale";
+
+// ─────────────────────────────────────────────────────────────
+// Extended metadata — flags, Intl codes, readiness
+// ─────────────────────────────────────────────────────────────
+export interface LocaleMeta {
+  code: Locale;
+  /** Endonym — the language's own name */
+  name: string;
+  /** English name */
+  englishName: string;
+  flag: string;
+  /** BCP-47 tag for Intl.* formatters */
+  intlCode: string;
+  /** Default region for dates / currency */
+  region: string;
+  /** Fully translated?  false → falls through to English */
+  ready: boolean;
+}
+
+export const LOCALE_META: Record<Locale, LocaleMeta> = {
+  en: { code: "en", name: "English",          englishName: "English",    flag: "🇬🇧", intlCode: "en-MY",  region: "MY", ready: true  },
+  ms: { code: "ms", name: "Bahasa Malaysia",  englishName: "Malay",      flag: "🇲🇾", intlCode: "ms-MY",  region: "MY", ready: true  },
+  id: { code: "id", name: "Bahasa Indonesia", englishName: "Indonesian", flag: "🇮🇩", intlCode: "id-ID",  region: "ID", ready: false },
+  th: { code: "th", name: "ไทย",              englishName: "Thai",       flag: "🇹🇭", intlCode: "th-TH",  region: "TH", ready: false },
+  vi: { code: "vi", name: "Tiếng Việt",       englishName: "Vietnamese", flag: "🇻🇳", intlCode: "vi-VN",  region: "VN", ready: false },
+  tl: { code: "tl", name: "Tagalog",          englishName: "Tagalog",    flag: "🇵🇭", intlCode: "fil-PH", region: "PH", ready: false },
+  km: { code: "km", name: "ខ្មែរ",               englishName: "Khmer",      flag: "🇰🇭", intlCode: "km-KH",  region: "KH", ready: false },
+  lo: { code: "lo", name: "ລາວ",               englishName: "Lao",        flag: "🇱🇦", intlCode: "lo-LA",  region: "LA", ready: false },
+  my: { code: "my", name: "မြန်မာ",             englishName: "Burmese",    flag: "🇲🇲", intlCode: "my-MM",  region: "MM", ready: false },
+  bn: { code: "bn", name: "বাংলা",             englishName: "Bengali",    flag: "🇧🇩", intlCode: "bn-BD",  region: "BD", ready: false },
+  jv: { code: "jv", name: "Basa Jawa",        englishName: "Javanese",   flag: "🇮🇩", intlCode: "jv-ID",  region: "ID", ready: false },
+};
+
+export function localeMeta(locale: Locale): LocaleMeta {
+  return LOCALE_META[locale] ?? LOCALE_META[defaultLocale];
+}
+
+// ─────────────────────────────────────────────────────────────
+// Guards + normalisers
+// ─────────────────────────────────────────────────────────────
+export function isLocale(value: string | undefined | null): value is Locale {
+  return !!value && (locales as readonly string[]).includes(value);
+}
+
+export function toLocale(value: string | undefined | null): Locale {
+  return isLocale(value) ? value : defaultLocale;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Accept-Language detection
+//   "en-MY,en;q=0.9,ms;q=0.8"  →  "en"
+// ─────────────────────────────────────────────────────────────
+export function detectFromHeader(header: string | null | undefined): Locale {
+  if (!header) return defaultLocale;
+
+  const parts = header
+    .split(",")
+    .map((p) => {
+      const [lang, q] = p.trim().split(";");
+      const langStr = lang ?? "";
+      const quality = q?.startsWith("q=") ? parseFloat(q.slice(2)) : 1;
+      return { lang: langStr.trim().toLowerCase(), quality };
+    })
+    .sort((a, b) => b.quality - a.quality);
+
+  for (const { lang } of parts) {
+    // Exact match — "en" / "ms" / "th" / "vi" …
+    if (lang && (locales as readonly string[]).includes(lang)) return lang as Locale;
+    // Prefix match — "en-MY" → "en", "zh-Hans" → "zh"
+    const base = lang.split("-")[0];
+    if (base && (locales as readonly string[]).includes(base)) return base as Locale;
+  }
+
+  return defaultLocale;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Readiness helpers (for the locale switcher)
+// ─────────────────────────────────────────────────────────────
+export function isReady(locale: Locale): boolean {
+  return localeMeta(locale).ready;
+}
+
+export function readyLocales(): Locale[] {
+  return locales.filter(isReady);
+}
