@@ -72,7 +72,7 @@ export function Navbar() {
             Sign in
           </Link>
           <Link
-            href="/legalai/draft"
+            href="/legalai/documents/studio"
             className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             Drafting Studio
@@ -126,7 +126,7 @@ export function Navbar() {
               Sign in
             </Link>
             <Link
-              href="/legalai/draft"
+              href="/legalai/documents/studio"
               onClick={() => setOpen(false)}
               className="rounded-lg border border-border/70 px-4 py-3 text-center text-sm font-semibold text-foreground"
             >

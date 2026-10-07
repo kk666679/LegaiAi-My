@@ -60,7 +60,7 @@ export function Hero() {
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
             </a>
             <a
-              href="/legalai/agent"
+              href="/legalai/assistant"
               className="inline-flex items-center justify-center gap-2 rounded-xl border border-border/80 bg-muted/30 px-6 py-3.5 text-sm font-semibold text-foreground transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <Play className="size-4" aria-hidden="true" />
@@ -84,7 +84,7 @@ export function Hero() {
               />
             </a>
             <a
-              href="/legalai/draft"
+              href="/legalai/documents/studio"
               className="group inline-flex items-center gap-1 font-medium text-foreground underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               Try the Drafting Studio

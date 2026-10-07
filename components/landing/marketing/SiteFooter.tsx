@@ -3,23 +3,20 @@ import { BRAND } from "@/lib/brand";
 import { Logo } from "@/components/navigation/Logo";
 
 const FOOTER_HREFS: Record<string, string> = {
-  "AI Agents": "/legalai/agent",
-  "Regulatory Timeline": "/legalai/monitor",
+  "AI Agents": "/legalai/agents",
+  "Regulatory Timeline": "/legalai/agents/live",
   "Legal Research": "/legalai/research",
-  "Document Drafting": "/legalai/draft",
-  Compliance: "/legalai/compliance",
-  "Corporate Legal": "/solutions/corporate-legal",
+  "Document Drafting": "/legalai/documents/studio",
+  Compliance: "/legalai/hitl",
+  "Corporate Legal": "/solutions/corporate",
   "Law Firms": "/solutions/law-firms",
   Risk: "/legalai/risk",
-  "Legal Operations": "/solutions/legal-operations",
   About: "/about",
   Security: "/security",
   Careers: "/careers",
   Contact: "/contact",
   Documentation: "/resources/documentation",
-  Insights: "/resources/insights",
-  Blog: "/resources/blog",
-  FAQ: "/resources/faq",
+  "Legal Guides": "/resources/legal-guides",
 };
 
 const COLUMNS = [
@@ -27,18 +24,18 @@ const COLUMNS = [
     heading: "Platform",
     links: ["AI Agents", "Regulatory Timeline", "Legal Research", "Document Drafting", "Compliance"],
   },
-  {
-    heading: "Solutions",
-    links: ["Corporate Legal", "Law Firms", "Compliance", "Risk", "Legal Operations"],
-  },
-  {
-    heading: "Company",
-    links: ["About", "Security", "Careers", "Contact"],
-  },
-  {
-    heading: "Resources",
-    links: ["Documentation", "Insights", "Blog", "FAQ"],
-  },
+    {
+      heading: "Solutions",
+      links: ["Corporate Legal", "Law Firms", "Compliance", "Risk"],
+    },
+    {
+      heading: "Company",
+      links: ["About", "Security", "Careers", "Contact"],
+    },
+    {
+      heading: "Resources",
+      links: ["Documentation", "Legal Guides"],
+    },
 ];
 
 export function SiteFooter() {

@@ -302,7 +302,7 @@ export function DocumentsHub({
 
       <div className="flex flex-wrap gap-2 text-sm">
         <Button variant="outline" asChild>
-          <Link href="/legalai/draft">Draft with AI</Link>
+          <Link href="/legalai/documents/studio">Draft with AI</Link>
         </Button>
         <Button variant="outline" asChild>
           <Link href="/legalai/analysis">Analyse a document</Link>

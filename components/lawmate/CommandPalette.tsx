@@ -72,34 +72,27 @@ interface SearchHit {
 const NAV = [
   { label: "Go to Dashboard", href: "/legalai", icon: LayoutDashboard, keywords: ["home", "overview"] },
   { label: "Go to AI Assistant", href: "/legalai/assistant", icon: Bot, keywords: ["chat", "ai", "copilot"] },
-  { label: "Go to AI Copilot", href: "/legalai/agent", icon: Sparkles, keywords: ["agent"] },
-  { label: "Go to Research", href: "/legalai/research", icon: BookOpen, keywords: ["law", "cases", "statutes"] },
+  { label: "Go to Legal Research", href: "/legalai/research", icon: BookOpen, keywords: ["law", "cases", "statutes"] },
   { label: "Go to Universal Search", href: "/legalai/search", icon: Search, keywords: ["find", "query"] },
   { label: "Go to Documents", href: "/legalai/documents", icon: FileText, keywords: ["files", "library"] },
-  { label: "Go to Drafting", href: "/legalai/draft", icon: FileSignature, keywords: ["draft", "create", "write"] },
   { label: "Go to Contracts", href: "/legalai/contracts", icon: FileSignature, keywords: ["agreements"] },
   { label: "Go to Automations", href: "/legalai/automations", icon: Workflow, keywords: ["workflows", "automation", "rules"] },
   { label: "Go to Matters", href: "/legalai/matters", icon: Briefcase, keywords: ["cases", "matters"] },
-  { label: "Go to Clients", href: "/legalai/clients", icon: Users, keywords: ["parties", "contacts"] },
-  { label: "Go to Tasks", href: "/legalai/tasks", icon: CheckSquare, keywords: ["todo", "checklist"] },
+  { label: "Go to AI Agents", href: "/legalai/agents", icon: Sparkles, keywords: ["agents", "swarm"] },
+  { label: "Go to Debate", href: "/legalai/debate", icon: Gavel, keywords: ["debate", "simulation"] },
   { label: "Go to Risk Engine", href: "/legalai/risk", icon: AlertTriangle, keywords: ["danger", "compliance"] },
-  { label: "Go to Settings", href: "/legalai/settings", icon: Settings, keywords: ["preferences", "config"] },
-  { label: "Go to Notifications", href: "/legalai/notifications", icon: Bell, keywords: ["alerts"] },
+  { label: "Go to Agent Control (HITL)", href: "/legalai/hitl", icon: Eye, keywords: ["approvals", "hitl"] },
   { label: "Go to Saved Items", href: "/legalai/saved", icon: Bookmark, keywords: ["bookmarks"] },
-  { label: "Go to Activity History", href: "/legalai/history", icon: History, keywords: ["log", "timeline"] },
-  { label: "Go to Audit Trail", href: "/legalai/audit", icon: Shield, keywords: ["logs", "governance"] },
-  { label: "Go to Analytics", href: "/legalai/analytics", icon: BarChart3, keywords: ["stats", "metrics"] },
+  { label: "Go to Settings", href: "/legalai/settings", icon: Settings, keywords: ["preferences", "config"] },
 ];
 
 const ACTIONS = [
   { label: "Ask LawMate", href: "/legalai/assistant", icon: Bot, shortcut: "A", action: "ask" },
-  { label: "Upload document", href: "/legalai/documents", icon: Upload, shortcut: "U", action: "upload" },
-  { label: "Create matter", href: "/legalai/matters", icon: Briefcase, shortcut: "M", action: "matter" },
-  { label: "Create task", href: "/legalai/tasks", icon: Plus, shortcut: "T", action: "task" },
-  { label: "Start new draft", href: "/legalai/draft", icon: FileSignature, shortcut: "D", action: "draft" },
+  { label: "Upload document", href: "/legalai/documents/new", icon: Upload, shortcut: "U", action: "upload" },
+  { label: "Create matter", href: "/legalai/matters/new", icon: Briefcase, shortcut: "M", action: "matter" },
+  { label: "New contract", href: "/legalai/contracts/new", icon: FileSignature, shortcut: "C", action: "contract" },
   { label: "Search legislation", href: "/legalai/research", icon: Globe, shortcut: "L", action: "research" },
   { label: "Run legal analysis", href: "/legalai/analysis", icon: Sparkles, shortcut: "N", action: "analyse" },
-  { label: "AI review", href: "/legalai/assistant", icon: Eye, shortcut: "R", action: "review" },
   { label: "View risk dashboard", href: "/legalai/risk", icon: AlertTriangle, shortcut: "K", action: "risk" },
 ];
 
@@ -175,7 +168,7 @@ function buildSearchIndex(query: string): SearchHit[] {
         kind: "Drafts",
         title: d.title,
         description: d.status,
-        href: "/legalai/draft",
+        href: "/legalai/documents/drafts",
         icon: FileSignature,
         score: score * 8,
       });
@@ -190,8 +183,8 @@ function buildSearchIndex(query: string): SearchHit[] {
         kind: "Tasks",
         title: t.title,
         description: t.matterName,
-        href: "/legalai/tasks",
-        icon: CheckSquare,
+        href: "/legalai/matters",
+        icon: Briefcase,
         score: score * 7,
       });
     }

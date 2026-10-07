@@ -337,7 +337,7 @@ export function DraftingStudioPreview() {
               </div>
 
               <Link
-                href="/legalai/draft"
+                href="/legalai/documents/studio"
                 className="group mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[hsl(var(--brand-blue))] to-[hsl(var(--brand-indigo))] px-5 py-3 text-sm font-semibold text-primary-foreground shadow-[0_16px_40px_-18px_hsl(var(--brand-blue))] transition-all hover:shadow-[0_20px_50px_-14px_hsl(var(--brand-blue))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 Open Drafting Studio

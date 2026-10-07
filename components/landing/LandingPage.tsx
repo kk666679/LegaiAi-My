@@ -202,13 +202,13 @@ export default function LandingPage() {
 
         <div className="hidden md:flex items-center gap-2">
           <a
-            href="/legalai/agent"
+            href="/legalai/assistant"
             className="px-3 py-1.5 rounded-lg text-xs font-medium bg-cyan-500/10 border border-cyan-500/20 text-cyan-400"
           >
             Copilot
           </a>
           <a
-            href="/legalai/draft"
+            href="/legalai/documents/studio"
             className="px-3 py-1.5 rounded-lg text-xs font-medium text-gray-400 hover:text-white border border-white/8 hover:border-white/25 transition-all"
           >
             Draft
@@ -226,7 +226,7 @@ export default function LandingPage() {
             Dashboard
           </a>
           <a
-            href="/legalai/monitor"
+            href="/legalai/agents/live"
             className="px-3 py-1.5 rounded-lg text-xs font-medium text-gray-400 hover:text-white border border-white/8 hover:border-white/25 transition-all"
           >
             Monitor
