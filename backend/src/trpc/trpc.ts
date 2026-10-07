@@ -1,15 +1,14 @@
 import { initTRPC, TRPCError } from '@trpc/server';
 import { type Context } from './context';
 import { hasPermission, type Permission } from '../lib/auth';
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const superjson = require('superjson') as { default: unknown } & { serialize: unknown; deserialize: unknown };
+import superjson from 'superjson';
 
 export const t = initTRPC.context<Context>().create({
   errorFormatter(opts) {
     const { shape, error } = opts;
     return { ...shape, data: error.cause };
   },
+  transformer: superjson,
 });
 
 export const router = t.router;

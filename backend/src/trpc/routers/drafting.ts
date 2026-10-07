@@ -16,9 +16,8 @@ const repositoryRoot = path.resolve(
   process.cwd(),
   path.basename(process.cwd()) === 'backend' ? '..' : '.',
 )
-const lomClient: { normalizeActNumber: typeof NormalizeActNumber; inferDocumentType: typeof InferDocumentType } =
-  require(path.join(repositoryRoot, '.autoclaw', 'memory', 'interfaces', 'lom-client.mjs'))
-const { normalizeActNumber, inferDocumentType } = lomClient
+const lomClientPromise = import(path.join(repositoryRoot, '.autoclaw', 'memory', 'interfaces', 'lom-client.mjs'))
+const { normalizeActNumber, inferDocumentType } = await lomClientPromise as { normalizeActNumber: typeof NormalizeActNumber; inferDocumentType: typeof InferDocumentType }
 
 const DRAFT_TEMPLATES_PATH = path.join(repositoryRoot, '.autoclaw', 'datasets', 'lom', 'catalog.jsonl')
 

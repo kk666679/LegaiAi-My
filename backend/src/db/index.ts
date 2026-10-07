@@ -1,19 +1,20 @@
 import { config } from 'dotenv'
 import { resolve } from 'path'
+import { fileURLToPath } from 'url'
 import { existsSync } from 'fs'
 import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { Pool } from 'pg'
 
-declare const __dirname: string
-const here = __dirname
+const here = fileURLToPath(import.meta.url)
 
 function findRepoRoot(start: string): string {
   let dir = start
   let lastWithEnv: string | null = null
   for (let i = 0; i < 8; i++) {
     try {
-      const pkg = require(resolve(dir, 'package.json'))
+      const pkgPath = resolve(dir, 'package.json')
+      const pkg = existsSync(pkgPath) ? require(pkgPath) : undefined
       const isBackend =
         pkg?.name === 'lawMate-backend' || pkg?.name === 'lawmate-backend'
       const hasEnv =
@@ -29,7 +30,13 @@ function findRepoRoot(start: string): string {
   }
   return lastWithEnv ?? start
 }
-const repoRoot = findRepoRoot(resolve(here, '..'))
+
+function dirName(url: string): string {
+  const lastSlash = url.lastIndexOf('/')
+  return lastSlash >= 0 ? url.slice(0, lastSlash) : url
+}
+
+const repoRoot = findRepoRoot(resolve(dirName(here), '..'))
 const envLocal = resolve(repoRoot, '.env.local')
 const envFile = resolve(repoRoot, '.env')
 if (existsSync(envLocal)) config({ path: envLocal, override: false })
