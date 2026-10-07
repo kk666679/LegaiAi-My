@@ -22,7 +22,7 @@ export default function AuditSecurityPage() {
         ]}
         actions={
           <Button asChild>
-            <Link href="/legalai/audit">View Audit Trail <ArrowRight className="ml-2 size-4" /></Link>
+            <Link href="/legalai/agents/audit">View Audit Trail <ArrowRight className="ml-2 size-4" /></Link>
           </Button>
         }
       />

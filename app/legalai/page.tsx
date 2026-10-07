@@ -167,10 +167,10 @@ const MODULES: { label: string; href: string; icon: LucideIcon }[] = [
   { label: "Automations", href: "/legalai/automations", icon: Workflow },
   { label: "Risk Engine", href: "/legalai/risk", icon: ShieldCheck },
   { label: "Debate Simulation", href: "/legalai/debate", icon: Swords },
-  { label: "Change Monitor", href: "/legalai/monitor", icon: Bell },
-  { label: "Analytics", href: "/legalai/analytics", icon: BarChart3 },
-  { label: "Audit Trail", href: "/legalai/audit", icon: Gavel },
-  { label: "Activity History", href: "/legalai/history", icon: History },
+  { label: "Change Monitor", href: "/legalai/agents/live", icon: Bell },
+  { label: "Analytics", href: "/legalai/agents/analytics", icon: BarChart3 },
+  { label: "Audit Trail", href: "/legalai/agents/audit", icon: Gavel },
+  { label: "Activity History", href: "/legalai/hitl/history", icon: History },
   { label: "Saved Items", href: "/legalai/saved", icon: Bookmark },
 ];
 
@@ -368,7 +368,7 @@ export default function DashboardHomePage() {
         kind: "alert" as const,
         title: a.title,
         detail: `Critical alert${a.matter ? ` · ${a.matter.title}` : ""}`,
-        href: "/legalai/notifications",
+        href: "/legalai/hitl",
       })),
       ...attentionData.staleMatters.slice(0, 2).map((m) => ({
         id: m.id,
@@ -662,7 +662,7 @@ export default function DashboardHomePage() {
                   ? `${attentionData.deadlineSoon.length} deadlines in 8 days`
                   : "Unacknowledged"
               }
-              href="/legalai/notifications"
+              href="/legalai/hitl"
               loading={alerts.isLoading}
             />
           </div>
@@ -703,7 +703,7 @@ export default function DashboardHomePage() {
                     {recentMatters.map((m) => (
                       <Link
                         key={m.id}
-                        href="/legalai/matters"
+                        href={`/legalai/matters/${m.id}/overview`}
                         className="flex items-center gap-3 rounded-md border p-3 transition-colors hover:bg-accent/40"
                       >
                         <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted">
@@ -773,7 +773,7 @@ export default function DashboardHomePage() {
                     {pending.map((a) => (
                       <Link
                         key={a.id}
-                        href="/legalai/hitl"
+                        href={`/legalai/hitl/${a.id}`}
                         className="flex items-start gap-3 rounded-md border p-3 transition-colors hover:bg-accent/40"
                       >
                         <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-muted">
@@ -924,7 +924,7 @@ export default function DashboardHomePage() {
                       return (
                         <Link
                           key={`${item.kind}-${item.id}`}
-                          href="/legalai/matters"
+                          href={`/legalai/matters/${item.id}/overview`}
                           className="block rounded-md border p-3 transition-colors hover:bg-accent/40"
                         >
                           <div className="flex items-start justify-between gap-2">
@@ -1138,7 +1138,7 @@ export default function DashboardHomePage() {
                     </CardDescription>
                   </div>
                   <Button asChild variant="ghost" size="sm" className="gap-1 shrink-0">
-                    <Link href="/legalai/notifications">
+                    <Link href="/legalai/hitl">
                       View all <ArrowRight className="size-3" />
                     </Link>
                   </Button>
@@ -1149,7 +1149,7 @@ export default function DashboardHomePage() {
                   {openAlerts.map((a) => (
                     <Link
                       key={a.id}
-                      href="/legalai/notifications"
+                      href="/legalai/hitl"
                       className="flex items-start gap-3 rounded-md border p-3 transition-colors hover:bg-accent/40"
                     >
                       <AlertTriangle
@@ -1198,7 +1198,7 @@ export default function DashboardHomePage() {
                       <Upload className="size-4" /> Analyse a document
                     </Button>
                     <Button asChild variant="outline" className="gap-2">
-                      <Link href="/legalai/draft">
+                      <Link href="/legalai/documents/studio">
                         <FileSignature className="size-4" /> Open Drafting Studio
                       </Link>
                     </Button>
@@ -1377,7 +1377,7 @@ function DraftingLauncher() {
           {DRAFT_TEMPLATES.slice(0, 6).map((t) => (
             <Link
               key={t.id}
-              href={`/legalai/draft?template=${t.id}`}
+              href={`/legalai/documents/studio?template=${t.id}`}
               title={t.description}
               className="rounded-full border px-2.5 py-1 text-[11px] text-muted-foreground transition-colors hover:border-primary/30 hover:text-foreground"
             >
@@ -1386,7 +1386,7 @@ function DraftingLauncher() {
           ))}
         </div>
         <Link
-          href="/legalai/draft"
+          href="/legalai/documents/studio"
           className="flex items-center justify-between rounded-md border bg-card/40 p-3 text-sm transition-colors hover:bg-accent/40"
         >
           <span className="flex items-center gap-2">

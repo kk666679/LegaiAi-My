@@ -59,7 +59,7 @@ export default function InHousePage() {
           </p>
           <div className="flex gap-3 justify-center">
             <Button asChild><Link href="/legalai/contracts">Contract Intelligence</Link></Button>
-            <Button asChild variant="outline"><Link href="/legalai/compliance">Compliance</Link></Button>
+            <Button asChild variant="outline"><Link href="/legalai/hitl">Compliance</Link></Button>
           </div>
         </div>
       </Section>

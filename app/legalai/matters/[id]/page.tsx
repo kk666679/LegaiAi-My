@@ -57,6 +57,8 @@ export default function MatterDetailPage() {
   const alerts = trpcReact.matters.getAlerts.useQuery({ matterId: id, limit: 20 }, { staleTime: 30_000 });
   const riskScores = trpcReact.matters.getRiskScores.useQuery({ matterId: id }, { staleTime: 30_000 });
   const stats = trpcReact.matters.stats.useQuery(undefined, { staleTime: 60_000 });
+  const attention = trpcReact.matters.getAttentionRequired.useQuery(undefined, { staleTime: 30_000 });
+  const updateMatter = trpcReact.matters.update.useMutation();
 
   const documents = trpcReact.documents.list.useQuery(
     { clientId: matter.data?.clientId, limit: 20 },
@@ -109,8 +111,8 @@ export default function MatterDetailPage() {
 
   const handleStatusChange = async (status: string) => {
     try {
-      await trpcReact.matters.update.mutateAsync({ id, status: status as any });
-      matter.refetch();
+      await updateMatter.mutateAsync({ id, status: status as any });
+      void matter.refetch();
     } catch (err) {
       console.error("Failed to update matter:", err);
     }
@@ -127,9 +129,9 @@ export default function MatterDetailPage() {
               {m.client && (
                 <>
                   <span className="mx-2">·</span>
-                  <Link href={`/legalai/clients/${m.clientId}`} className="text-primary hover:underline">
+                  <span className="text-primary">
                     {m.client.name}
-                  </Link>
+                  </span>
                 </>
               )}
             </>
@@ -247,22 +249,21 @@ export default function MatterDetailPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {matter.data && (() => {
-                    const attention = trpcReact.matters.getAttentionRequired.useQuery(undefined);
-                    if (attention.isLoading) return <Skeleton className="h-20 w-full" />;
-                    if (!attention.data?.deadlineSoon.length) return <p className="text-sm text-muted-foreground">No imminent deadlines</p>;
-                    return (
-                      <div className="space-y-2">
-                        {attention.data.deadlineSoon.slice(0, 5).map((d: { id: string; title: string; client?: { name: string } | null; deadlineAt: string }) => (
-                          <div key={d.id} className="p-3 rounded-md border bg-card/40">
-                            <p className="font-medium text-sm">{d.title}</p>
-                            <p className="text-xs text-muted-foreground">{d.client?.name}</p>
-                            <p className="text-xs text-amber-600 font-medium">{formatDate(d.deadlineAt)}</p>
-                          </div>
-                        ))}
-                      </div>
-                    );
-                  })()}
+                  {attention.isLoading ? (
+                    <Skeleton className="h-20 w-full" />
+                  ) : !attention.data?.deadlineSoon.length ? (
+                    <p className="text-sm text-muted-foreground">No imminent deadlines</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {attention.data.deadlineSoon.slice(0, 5).map((d: { id: string; title: string; client?: { name: string } | null; deadlineAt: string }) => (
+                        <div key={d.id} className="p-3 rounded-md border bg-card/40">
+                          <p className="font-medium text-sm">{d.title}</p>
+                          <p className="text-xs text-muted-foreground">{d.client?.name}</p>
+                          <p className="text-xs text-amber-600 font-medium">{formatDate(d.deadlineAt)}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>

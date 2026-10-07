@@ -127,9 +127,9 @@ export default function ContractDetailPage() {
               {c.client && (
                 <>
                   <span className="mx-2">·</span>
-                  <Link href={`/legalai/clients/${c.clientId}`} className="text-primary hover:underline">
+                  <span className="text-primary">
                     {c.client.name}
-                  </Link>
+                  </span>
                 </>
               )}
             </>

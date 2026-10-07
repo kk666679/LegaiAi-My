@@ -171,7 +171,7 @@ export function ResearchHomePage() {
               <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Recent research</p>
               <button
                 type="button"
-                onClick={() => router.push("/legalai/research/history")}
+                onClick={() => router.push("/legalai/research")}
                 className="text-xs text-primary hover:underline"
               >
                 View all

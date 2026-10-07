@@ -59,7 +59,7 @@ export default function CorporatePage() {
           </p>
           <div className="flex gap-3 justify-center">
             <Button asChild><Link href="/legalai/contracts">Contract Intelligence</Link></Button>
-            <Button asChild variant="outline"><Link href="/legalai/governance">AI Governance</Link></Button>
+            <Button asChild variant="outline"><Link href="/legalai/agents/audit">AI Governance</Link></Button>
           </div>
         </div>
       </Section>

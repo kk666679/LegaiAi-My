@@ -109,14 +109,9 @@ export default function MattersPage() {
     } catch { return "—"; }
   };
 
-  const handleCreateMatter = async (data: { clientId: string; title: string; matterType: string; priority: string; jurisdiction: string; court?: string; caseNumber?: string; description?: string; assignedTo?: string; deadlineAt?: string }) => {
-    try {
-      await trpcReact.matters.create.mutateAsync(data);
-      refetch();
-      setCreateOpen(false);
-    } catch (err) {
-      console.error("Failed to create matter:", err);
-    }
+  const handleCreateMatter = () => {
+    setCreateOpen(false);
+    void refetch();
   };
 
   return (
@@ -445,7 +440,7 @@ export default function MattersPage() {
         </Card>
       </div>
 
-      <CreateMatterDialog open={createOpen} onOpenChange={setCreateOpen} onSubmit={handleCreateMatter} />
+      <CreateMatterDialog open={createOpen} onOpenChange={setCreateOpen} />
     </DashboardShell>
   );
 }

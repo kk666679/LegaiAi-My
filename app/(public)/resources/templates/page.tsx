@@ -33,7 +33,7 @@ export default function TemplatesPage() {
         ]}
         actions={
           <Button asChild>
-            <Link href="/legalai/draft">Open Drafting <ArrowRight className="ml-2 size-4" /></Link>
+            <Link href="/legalai/documents/studio">Open Drafting <ArrowRight className="ml-2 size-4" /></Link>
           </Button>
         }
       />

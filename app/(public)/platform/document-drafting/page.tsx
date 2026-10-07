@@ -25,7 +25,7 @@ export default function DocumentDraftingPage() {
         ]}
         actions={
           <Button asChild>
-            <Link href="/legalai/draft">Open Drafting Studio <ArrowRight className="ml-2 size-4" /></Link>
+            <Link href="/legalai/documents/studio">Open Drafting Studio <ArrowRight className="ml-2 size-4" /></Link>
           </Button>
         }
       />
@@ -101,7 +101,7 @@ export default function DocumentDraftingPage() {
           </p>
           <div className="flex gap-3 justify-center">
             <Button asChild>
-              <Link href="/legalai/draft">Open Drafting Studio</Link>
+              <Link href="/legalai/documents/studio">Open Drafting Studio</Link>
             </Button>
             <Button asChild variant="outline">
               <Link href="/platform">Back to Platform</Link>
