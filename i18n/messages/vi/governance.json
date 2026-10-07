@@ -1,0 +1,11 @@
+{
+  "title": "Quản trị AI",
+  "description": "Trạng thái hoạt động của kiểm soát AI, bảo vệ dữ liệu và chính sách tuân thủ.",
+  "systemIndicators": "Chỉ số hệ thống",
+  "systemIndicatorsDescription": "Trạng thái trực tiếp của kiểm soát quản trị.",
+  "governanceControls": "Kiểm soát quản trị",
+  "governanceControlsDescription": "Cấu hình chính sách bảo mật, AI và dữ liệu.",
+  "viewAuditLog": "Xem nhật ký kiểm toán",
+  "quickLinks": "Liên kết nhanh",
+  "configureToast": "Cấu hình {{label}}"
+}

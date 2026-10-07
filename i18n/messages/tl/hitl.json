@@ -65,5 +65,25 @@
     "claimed": "You claimed this request",
     "approved": "Approved",
     "rejected": "Rejected"
-  }
+  },
+  "description": "Human-in-the-loop na pangangasiwa para sa mga run ng AI agent. Aprubahan, i-pause, o mamagitan sa anumang hakbang.",
+  "viewAgents": "Tingnan ang mga ahente",
+  "newAgentRun": "Bagong agent run",
+  "activeRuns": "Aktibong run",
+  "activeRunsDescription": "Kasalukuyang gumagana",
+  "awaitingApproval": "Naghihintay ng approval",
+  "awaitingApprovalDescription": "Kailangan ng human review",
+  "completedToday": "Tapos ngayong araw",
+  "completedTodayDescription": "Matagumpay na natapos",
+  "failedRuns": "Nabigo",
+  "failedRunsDescription": "Kailangan ng retry",
+  "statusRunning": "Tumatakbo",
+  "statusPaused": "Naka-pause",
+  "statusAwaitingApproval": "Naghihintay ng approval",
+  "statusCompleted": "Tapos na",
+  "statusFailed": "Nabigo",
+  "progress": "Progress",
+  "pause": "I-pause",
+  "retry": "Subukan muli",
+  "details": "Mga detalye"
 }

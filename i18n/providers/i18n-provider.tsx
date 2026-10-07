@@ -43,13 +43,16 @@ export function I18nProvider({
   }, [locale]);
 
   const t = React.useCallback(
-    (key: string, vars?: Record<string, unknown>): string => {
+    (key: string, vars?: Record<string, unknown>, defaultValue?: string): string => {
       const value = resolvePath(messages, key);
       if (typeof value === "string") return interpolate(value, vars);
       if (fallbackMessages) {
         const fb = resolvePath(fallbackMessages, key);
         if (typeof fb === "string") return interpolate(fb, vars);
       }
+      // Caller-supplied fallback — used for dynamic keys
+      // (e.g. navigation labels driven by data).
+      if (defaultValue !== undefined) return interpolate(defaultValue, vars);
       // Visible placeholder in dev so misses are easy to spot
       if (process.env.NODE_ENV !== "production") return `⟨${key}⟩`;
       return "";

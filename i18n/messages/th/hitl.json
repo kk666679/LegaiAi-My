@@ -65,5 +65,25 @@
     "claimed": "You claimed this request",
     "approved": "Approved",
     "rejected": "Rejected"
-  }
+  },
+  "description": "การกำกับดูแลโดยมนุษย์ในวงรอบสำหรับการดำเนินการของเอเจนต์ AI อนุมัติ หยุดชั่วคราว หรือแทรกแซงในขั้นตอนใดก็ได้",
+  "viewAgents": "ดูเอเจนต์",
+  "newAgentRun": "เรียกใช้เอเจนต์ใหม่",
+  "activeRuns": "การทำงานที่ใช้งานอยู่",
+  "activeRunsDescription": "กำลังดำเนินการ",
+  "awaitingApproval": "รอการอนุมัติ",
+  "awaitingApprovalDescription": "ต้องการการตรวจสอบจากมนุษย์",
+  "completedToday": "เสร็จสิ้นวันนี้",
+  "completedTodayDescription": "เสร็จสมบูรณ์แล้ว",
+  "failedRuns": "ล้มเหลว",
+  "failedRunsDescription": "ต้องลองใหม่",
+  "statusRunning": "กำลังทำงาน",
+  "statusPaused": "หยุดชั่วคราว",
+  "statusAwaitingApproval": "รอการอนุมัติ",
+  "statusCompleted": "เสร็จสิ้น",
+  "statusFailed": "ล้มเหลว",
+  "progress": "ความคืบหน้า",
+  "pause": "หยุดชั่วคราว",
+  "retry": "ลองใหม่",
+  "details": "รายละเอียด"
 }

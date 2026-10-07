@@ -104,7 +104,12 @@
     "failed": "Gagal",
     "cancelled": "Dibatalkan"
   },
-  "priority": { "low": "Rendah", "normal": "Biasa", "high": "Tinggi", "urgent": "Segera" },
+  "priority": {
+    "low": "Rendah",
+    "normal": "Biasa",
+    "high": "Tinggi",
+    "urgent": "Segera"
+  },
   "time": {
     "justNow": "Baru sahaja",
     "today": "Hari ini",
@@ -144,5 +149,32 @@
     "userMenu": "Menu pengguna",
     "searchInput": "Cari",
     "clearSearch": "Kosongkan carian"
-  }
+  },
+  "viewAll": "Lihat semua",
+  "cancel": "Batal",
+  "save": "Simpan",
+  "configure": "Konfigurasi",
+  "loading": "Memuatkan…",
+  "retry": "Cuba semula",
+  "remove": "Buang",
+  "add": "Tambah",
+  "edit": "Edit",
+  "delete": "Padam",
+  "confirm": "Sahkan",
+  "close": "Tutup",
+  "back": "Kembali",
+  "next": "Seterusnya",
+  "submit": "Hantar",
+  "search": "Cari",
+  "filter": "Tapis",
+  "details": "Butiran",
+  "openAuditTrail": "Buka jejak audit",
+  "openAgentControl": "Buka kawalan ejen",
+  "justNow": "baru sahaja",
+  "minutesAgo": "{{n}}m lalu",
+  "hoursAgo": "{{n}}j lalu",
+  "daysAgo": "{{n}}h lalu",
+  "goodMorning": "Selamat pagi",
+  "goodAfternoon": "Selamat tengah hari",
+  "goodEvening": "Selamat petang"
 }

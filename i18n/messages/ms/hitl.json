@@ -40,7 +40,10 @@
     "claimToDecide": "Ambil permintaan ini untuk membuat keputusan.",
     "approvals": "Kelulusan"
   },
-  "sla": { "breached": "SLA dilanggar", "remaining": "{{time}} berbaki" },
+  "sla": {
+    "breached": "SLA dilanggar",
+    "remaining": "{{time}} berbaki"
+  },
   "feedback": {
     "title": "Berikan maklum balas tentang output AI",
     "score": "Skor",
@@ -58,5 +61,29 @@
     "allCaughtUp": "Anda sudah selesai semuanya",
     "allCaughtUpDescription": "Tiada item semakan menunggu dalam barisan ini."
   },
-  "messages": { "claimed": "Anda mengambil permintaan ini", "approved": "Diluluskan", "rejected": "Ditolak" }
+  "messages": {
+    "claimed": "Anda mengambil permintaan ini",
+    "approved": "Diluluskan",
+    "rejected": "Ditolak"
+  },
+  "description": "Pengawasan manusia-dalam-gelung bagi jalankan ejen AI. Luluskan, jeda, atau campur tangan pada mana-mana langkah.",
+  "viewAgents": "Lihat ejen",
+  "newAgentRun": "Jalankan ejen baru",
+  "activeRuns": "Jalankan aktif",
+  "activeRunsDescription": "Sedang dilaksanakan",
+  "awaitingApproval": "Menunggu kelulusan",
+  "awaitingApprovalDescription": "Perlu semakan manusia",
+  "completedToday": "Selesai hari ini",
+  "completedTodayDescription": "Berjaya diselesaikan",
+  "failedRuns": "Gagal",
+  "failedRunsDescription": "Perlu cuba semula",
+  "statusRunning": "Berjalan",
+  "statusPaused": "Dijeda",
+  "statusAwaitingApproval": "Menunggu kelulusan",
+  "statusCompleted": "Selesai",
+  "statusFailed": "Gagal",
+  "progress": "Kemajuan",
+  "pause": "Jeda",
+  "retry": "Cuba semula",
+  "details": "Butiran"
 }

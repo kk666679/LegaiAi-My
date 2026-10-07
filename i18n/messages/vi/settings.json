@@ -114,5 +114,19 @@
   },
   "footer": {
     "saved": "Changes are saved automatically."
-  }
+  },
+  "description": "Quản lý hồ sơ, bảo mật, nhà cung cấp AI và tùy chọn không gian làm việc của bạn.",
+  "general": "Chung",
+  "aiSettings": "Cài đặt AI",
+  "aiProvidersBYOK": "Nhà cung cấp AI (BYOK)",
+  "teamAndUsers": "Nhóm & người dùng",
+  "generalSection": "Chung",
+  "workspaceAndAccount": "Thông tin không gian làm việc và tài khoản.",
+  "workspace": "Không gian làm việc",
+  "plan": "Gói",
+  "fullName": "Họ và tên",
+  "email": "Email",
+  "role": "Vai trò",
+  "managedByAdmin": "Chi tiết hồ sơ và cài đặt không gian làm việc được quản lý bởi quản trị viên tổ chức của bạn. Liên hệ với họ để cập nhật tên, email hoặc vai trò của bạn.",
+  "personalWorkspace": "Không gian làm việc cá nhân"
 }

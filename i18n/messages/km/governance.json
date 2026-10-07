@@ -1,0 +1,11 @@
+{
+  "title": "អភិបាលកិច្ច AI",
+  "description": "ស្ថានភាពប្រតិបត្តិការនៃការគ្រប់គ្រង AI ការការពារទិន្នន័យ និងគោលនយោបាយអនុលោម។",
+  "systemIndicators": "សូចនាករប្រព័ន្ធ",
+  "systemIndicatorsDescription": "ស្ថានភាពផ្ទាល់នៃការគ្រប់គ្រងអភិបាលកិច្ច។",
+  "governanceControls": "ការគ្រប់គ្រងអភិបាលកិច្ច",
+  "governanceControlsDescription": "កំណត់រចនាសម្ព័ន្ធគោលនយោបាយសុវត្ថិភាព AI និងទិន្នន័យ។",
+  "viewAuditLog": "មើលកំណត់ហេតុត្រួតពិនិត្យ",
+  "quickLinks": "តំណរហ័ស",
+  "configureToast": "កំណត់រចនាសម្ព័ន្ធ {{label}}"
+}

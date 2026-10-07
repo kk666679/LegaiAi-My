@@ -114,5 +114,19 @@
   },
   "footer": {
     "saved": "Changes are saved automatically."
-  }
+  },
+  "description": "Manage your profile, security, AI providers and workspace preferences.",
+  "general": "General",
+  "aiSettings": "AI Settings",
+  "aiProvidersBYOK": "AI Providers (BYOK)",
+  "teamAndUsers": "Team & users",
+  "generalSection": "General",
+  "workspaceAndAccount": "Workspace and account information.",
+  "workspace": "Workspace",
+  "plan": "Plan",
+  "fullName": "Full name",
+  "email": "Email",
+  "role": "Role",
+  "managedByAdmin": "Profile details and workspace settings are managed by your organisation administrator. Contact them to update your name, email address or role.",
+  "personalWorkspace": "Personal workspace"
 }

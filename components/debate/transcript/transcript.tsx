@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from "@/components/ui/empty";
-import { AILiveBadge } from "@/components/lawmate/ai/ailive-badge";
+import { AILiveBadge } from "@/components/ai/ailive-badge";
 import { DebateEvidencePanel } from "../evidence/debate-evidence-panel";
 import { cn } from "@/lib/utils";
 import type { DebateEntry, DebateEvidence, DebateRound, DebateSource } from "@/types/debate";

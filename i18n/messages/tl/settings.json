@@ -114,5 +114,19 @@
   },
   "footer": {
     "saved": "Changes are saved automatically."
-  }
+  },
+  "description": "Pamahalaan ang iyong profile, seguridad, AI providers, at mga preference sa workspace.",
+  "general": "Pangkalahatan",
+  "aiSettings": "Mga Setting ng AI",
+  "aiProvidersBYOK": "Mga AI Provider (BYOK)",
+  "teamAndUsers": "Koponan at mga User",
+  "generalSection": "Pangkalahatan",
+  "workspaceAndAccount": "Impormasyon ng workspace at account.",
+  "workspace": "Workspace",
+  "plan": "Plan",
+  "fullName": "Buong pangalan",
+  "email": "Email",
+  "role": "Role",
+  "managedByAdmin": "Ang mga detalye ng profile at setting ng workspace ay pinamamahalaan ng administrator ng iyong organisasyon. Makipag-ugnayan sa kanila upang i-update ang iyong pangalan, email, o role.",
+  "personalWorkspace": "Personal na workspace"
 }

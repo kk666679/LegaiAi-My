@@ -1,0 +1,11 @@
+{
+  "title": "Tata Kelola AI",
+  "description": "Status operasional kontrol AI, perlindungan data, dan kebijakan kepatuhan.",
+  "systemIndicators": "Indikator sistem",
+  "systemIndicatorsDescription": "Status langsung kontrol tata kelola.",
+  "governanceControls": "Kontrol tata kelola",
+  "governanceControlsDescription": "Konfigurasi kebijakan keamanan, AI, dan data.",
+  "viewAuditLog": "Lihat log audit",
+  "quickLinks": "Tautan cepat",
+  "configureToast": "Konfigurasi {{label}}"
+}

@@ -1,0 +1,11 @@
+{
+  "title": "Tadbir Urus AI",
+  "description": "Status operasi kawalan AI, perlindungan data, dan dasar pematuhan.",
+  "systemIndicators": "Penunjuk sistem",
+  "systemIndicatorsDescription": "Status langsung kawalan tadbir urus.",
+  "governanceControls": "Kawalan tadbir urus",
+  "governanceControlsDescription": "Konfigurasi dasar keselamatan, AI, dan data.",
+  "viewAuditLog": "Lihat log audit",
+  "quickLinks": "Pautan pantas",
+  "configureToast": "Konfigurasi {{label}}"
+}

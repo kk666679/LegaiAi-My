@@ -1,0 +1,11 @@
+{
+  "title": "AI Governance",
+  "description": "Operational status of AI controls, data protection, and compliance policies.",
+  "systemIndicators": "System indicators",
+  "systemIndicatorsDescription": "Live status of governance controls.",
+  "governanceControls": "Governance controls",
+  "governanceControlsDescription": "Configuration of security, AI, and data policies.",
+  "viewAuditLog": "View audit log",
+  "quickLinks": "Quick links",
+  "configureToast": "Configure {{label}}"
+}

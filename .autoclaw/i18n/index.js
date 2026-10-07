@@ -1,42 +1,84 @@
 /**
- * i18n — EN/MS catalogue and language detection.
+ * i18n — shared catalogue loader and language detection.
  *
- * Scope is deliberately narrow: a flat key/value catalogue per language plus
- * a marker-word detector. It is not a translation engine — it resolves
- * scaffolding headings and fixed phrases, which is all the drafting and
- * validation paths need.
+ * The catalogue lives in `i18n/messages/<locale>/analysis.json` at
+ * the repo root — one source of truth shared with the Next.js
+ * frontend. This module flattens that namespace into the
+ * dotted-key catalogue the drafting and validation paths expect,
+ * starting from the English strings and overlaying whatever the
+ * locale file translates. Locales without a file simply keep the
+ * English strings, so the catalogue can never regress to gaps.
  */
 
-const CATALOG = Object.freeze({
-  en: Object.freeze({
-    'conclusion.heading': 'Conclusion',
-    'issue.heading': 'Issue',
-    'rule.heading': 'Rule',
-    'application.heading': 'Application',
-    'citations.heading': 'Citations',
-    'validation.heading': 'Validation',
-    'insufficient.evidence': 'Insufficient verified evidence.',
-    'irac.title': 'IRAC Analysis',
-    'memo.to': 'To',
-    'memo.subject': 'Subject',
-    'memo.date': 'Date',
-    'memo.re': 'Re'
-  }),
-  ms: Object.freeze({
-    'conclusion.heading': 'Kesimpulan',
-    'issue.heading': 'Isu',
-    'rule.heading': 'Undang-undang',
-    'application.heading': 'Pentulahan',
-    'citations.heading': 'Rujukan',
-    'validation.heading': 'Pengesahan',
-    'insufficient.evidence': 'Bukti terverifikasi yang mencukupi tidak tersedia.',
-    'irac.title': 'Analisis IRAC',
-    'memo.to': 'Kepada',
-    'memo.subject': 'Perihal',
-    'memo.date': 'Tarikh',
-    'memo.re': 'Rujukan'
-  })
-});
+import { readFileSync, readdirSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const MESSAGES_ROOT = join(
+  dirname(fileURLToPath(import.meta.url)),
+  "..",
+  "..",
+  "i18n",
+  "messages",
+);
+
+/** Flatten a nested object into dotted keys: `{ a: { b: "c" } }` → `{ "a.b": "c" }`. */
+function flatten(obj, prefix = "") {
+  const out = {};
+  for (const [key, value] of Object.entries(obj)) {
+    const path = prefix ? `${prefix}.${key}` : key;
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      Object.assign(out, flatten(value, path));
+    } else if (typeof value === "string") {
+      out[path] = value;
+    }
+  }
+  return out;
+}
+
+function loadNamespace(locale, namespace) {
+  try {
+    return JSON.parse(
+      readFileSync(join(MESSAGES_ROOT, locale, `${namespace}.json`), "utf8"),
+    );
+  } catch {
+    return {};
+  }
+}
+
+/** Locales that ship their own analysis catalogue. */
+const TRANSLATED = (() => {
+  try {
+    return readdirSync(MESSAGES_ROOT).filter((dir) => {
+      try {
+        readFileSync(join(MESSAGES_ROOT, dir, "analysis.json"), "utf8");
+        return true;
+      } catch {
+        return false;
+      }
+    });
+  } catch {
+    return [];
+  }
+})();
+
+const EN_CATALOG = flatten(loadNamespace("en", "analysis"));
+
+/**
+ * Dotted-key catalogue per language. Every locale starts from the
+ * English strings; a locale file overlays its own translations.
+ */
+const CATALOG = Object.freeze(
+  Object.fromEntries(
+    TRANSLATED.map((locale) => [
+      locale,
+      Object.freeze({
+        ...EN_CATALOG,
+        ...flatten(loadNamespace(locale, "analysis")),
+      }),
+    ]),
+  ),
+);
 
 const LANGS = Object.freeze(Object.keys(CATALOG));
 
@@ -111,7 +153,5 @@ class Translator {
     return table[key] != null;
   }
 }
-
-;
 
 export { CATALOG, LANGS, Translator, detect, normalise };

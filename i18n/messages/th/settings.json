@@ -114,5 +114,19 @@
   },
   "footer": {
     "saved": "Changes are saved automatically."
-  }
+  },
+  "description": "จัดการโปรไฟล์ ความปลอดภัย ผู้ให้บริการ AI และค่ากำหนดพื้นที่ทำงานของคุณ",
+  "general": "ทั่วไป",
+  "aiSettings": "การตั้งค่า AI",
+  "aiProvidersBYOK": "ผู้ให้บริการ AI (BYOK)",
+  "teamAndUsers": "ทีมและผู้ใช้",
+  "generalSection": "ทั่วไป",
+  "workspaceAndAccount": "ข้อมูลพื้นที่ทำงานและบัญชี",
+  "workspace": "พื้นที่ทำงาน",
+  "plan": "แผน",
+  "fullName": "ชื่อเต็ม",
+  "email": "อีเมล",
+  "role": "บทบาท",
+  "managedByAdmin": "รายละเอียดโปรไฟล์และการตั้งค่าพื้นที่ทำงานได้รับการจัดการโดยผู้ดูแลองค์กรของคุณ ติดต่อพวกเขาเพื่ออัปเดตชื่อ อีเมล หรือบทบาทของคุณ",
+  "personalWorkspace": "พื้นที่ทำงานส่วนตัว"
 }

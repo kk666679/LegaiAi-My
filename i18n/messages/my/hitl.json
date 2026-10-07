@@ -65,5 +65,25 @@
     "claimed": "You claimed this request",
     "approved": "Approved",
     "rejected": "Rejected"
-  }
+  },
+  "description": "AI ကိုယ်စားလှယ်များ လည်ပတ်မှုအတွက် လူသား-အလယ်အဝိုင်း ကြီးကြပ်မှု။ မည်သည့်အဆင့်တွင်မဆို အတည်ပြုပါ၊ ခေတ္တရပ်ပါ သို့မဟုတ် ဝင်ရောက်ဆောင်ရွက်ပါ။",
+  "viewAgents": "ကိုယ်စားလှယ်များ ကြည့်ရန်",
+  "newAgentRun": "ကိုယ်စားလှယ် အသစ်လည်ပတ်ရန်",
+  "activeRuns": "လက်ရှိလည်ပတ်မှုများ",
+  "activeRunsDescription": "လုပ်ဆောင်နေသည်",
+  "awaitingApproval": "အတည်ပြုချက် စောင့်ဆိုင်းနေသည်",
+  "awaitingApprovalDescription": "လူသားစစ်ဆေးမှု လိုအပ်သည်",
+  "completedToday": "ယနေ့ ပြီးစီးသည်",
+  "completedTodayDescription": "အောင်မြင်စွာ ပြီးစီးသည်",
+  "failedRuns": "မအောင်မြင်မှုများ",
+  "failedRunsDescription": "ထပ်ကြိုးစားရန် လိုအပ်သည်",
+  "statusRunning": "လည်ပတ်နေသည်",
+  "statusPaused": "ခေတ္တရပ်ထားသည်",
+  "statusAwaitingApproval": "အတည်ပြုချက် စောင့်ဆိုင်းနေသည်",
+  "statusCompleted": "ပြီးစီးသည်",
+  "statusFailed": "မအောင်မြင်ပါ",
+  "progress": "တိုးတက်မှု",
+  "pause": "ခေတ္တရပ်",
+  "retry": "ထပ်ကြိုးစားရန်",
+  "details": "အသေးစိတ်"
 }

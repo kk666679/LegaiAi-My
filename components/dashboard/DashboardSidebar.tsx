@@ -19,7 +19,7 @@ import {
   isItemActive,
   type NavGroup,
 } from "@/lib/navigation";
-import { useTranslation } from "@/lib/i18n/I18nProvider";
+import { useTranslation } from "@/i18n/hooks/use-translation";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -124,26 +124,26 @@ return group.defaultOpen ?? false;
 );
 
 const itemLabel = useCallback(
-(key: string) => t(`items.${key}`, { defaultValue: key }),
-[t],
+  (key: string) => t(`items.${key}`, undefined, key),
+  [t],
 );
 
 const groupLabel = useCallback(
-(key: string) => t(`groups.${key}`, { defaultValue: key }),
-[t],
+  (key: string) => t(`groups.${key}`, undefined, key),
+  [t],
 );
 
 const expandLabel = t("expand");
 const collapseLabel = t("collapse");
 
 return (
-<div className="flex h-full flex-col bg-card/30">
-<SidebarBrand
-collapsed={collapsed}
-onNavigate={onNavigate}
-brandName={t("brandName", { defaultValue: BRAND.shortName })}
-tagline={t("brandTagline", { defaultValue: "Legal AI OS" })}
-/>
+  <div className="flex h-full flex-col bg-card/30">
+    <SidebarBrand
+      collapsed={collapsed}
+      onNavigate={onNavigate}
+      brandName={t("brandName", undefined, BRAND.shortName)}
+      tagline={t("brandTagline", undefined, "Legal AI OS")}
+    />
 
   <nav
     id={SIDEBAR_ID}

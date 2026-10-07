@@ -1,0 +1,11 @@
+{
+  "title": "ການຄຸ້ມຄອງ AI",
+  "description": "ສະຖານະການດຳເນີນງານຂອງການຄວບຄຸມ AI, ການປົກປ້ອງຂໍ້ມູນ ແລະ ນະໂຍບາຍການປະຕິບັດຕາມ.",
+  "systemIndicators": "ຕົວຊີ້ວັດລະບົບ",
+  "systemIndicatorsDescription": "ສະຖານະສົດຂອງການຄວບຄຸມການຄຸ້ມຄອງ.",
+  "governanceControls": "ການຄວບຄຸມການຄຸ້ມຄອງ",
+  "governanceControlsDescription": "ການຕັ້ງຄ່ານະໂຍບາຍຄວາມປອດໄພ, AI ແລະ ຂໍ້ມູນ.",
+  "viewAuditLog": "ເບິ່ງບັນທຶກກວດສອບ",
+  "quickLinks": "ລິ້ງດ່ວນ",
+  "configureToast": "ກຳນົດຄ່າ {{label}}"
+}

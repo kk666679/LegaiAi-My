@@ -8,7 +8,6 @@ import { trpcReact } from "@/clients";
 import { ThemeProvider } from "next-themes";
 import { getToken } from "@/lib/auth";
 import { AuthProvider } from "@/components/auth-provider";
-import { I18nProvider } from "@/lib/i18n/I18nProvider";
 
 function TRPCProvider({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
@@ -48,7 +47,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           enableSystem
           disableTransitionOnChange
         >
-          <I18nProvider>{children}</I18nProvider>
+          {children}
         </ThemeProvider>
       </AuthProvider>
     </TRPCProvider>

@@ -65,5 +65,25 @@
     "claimed": "You claimed this request",
     "approved": "Approved",
     "rejected": "Rejected"
-  }
+  },
+  "description": "Giám sát con người trong vòng lặp cho các lần chạy tác nhân AI. Phê duyệt, tạm dừng hoặc can thiệp ở bất kỳ bước nào.",
+  "viewAgents": "Xem tác nhân",
+  "newAgentRun": "Chạy tác nhân mới",
+  "activeRuns": "Lần chạy đang hoạt động",
+  "activeRunsDescription": "Đang thực thi",
+  "awaitingApproval": "Chờ phê duyệt",
+  "awaitingApprovalDescription": "Cần con người xem xét",
+  "completedToday": "Hoàn thành hôm nay",
+  "completedTodayDescription": "Đã hoàn thành thành công",
+  "failedRuns": "Thất bại",
+  "failedRunsDescription": "Cần thử lại",
+  "statusRunning": "Đang chạy",
+  "statusPaused": "Tạm dừng",
+  "statusAwaitingApproval": "Chờ phê duyệt",
+  "statusCompleted": "Hoàn thành",
+  "statusFailed": "Thất bại",
+  "progress": "Tiến độ",
+  "pause": "Tạm dừng",
+  "retry": "Thử lại",
+  "details": "Chi tiết"
 }

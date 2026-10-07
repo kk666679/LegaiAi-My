@@ -12,9 +12,9 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Download, Copy, FileText, Shield, FileText as FileTextIcon, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { AILoadingState } from '../../ai-elements/ai/ailoading-state';
-import { AIErrorState } from '../../ai-elements/ai/aierror-state';
-import { AIBadge } from '../../ai/aibadge';
+import { AILoadingState } from '@/components/ai/ai-loading-state';
+import { AIErrorState } from '@/components/ai/ai-error-state';
+import { AIBadge } from '@/components/ai/aibadge';
 
 interface MalaysianDocFormData {
   companyName: string;

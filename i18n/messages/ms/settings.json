@@ -1,7 +1,12 @@
 {
   "title": "Tetapan",
   "subtitle": "Urus akaun, ruang kerja, dan keutamaan anda",
-  "groups": { "account": "Akaun", "workspace": "Ruang kerja", "ai": "AI", "preferences": "Keutamaan" },
+  "groups": {
+    "account": "Akaun",
+    "workspace": "Ruang kerja",
+    "ai": "AI",
+    "preferences": "Keutamaan"
+  },
   "nav": {
     "overview": "Gambaran keseluruhan",
     "profile": "Profil",
@@ -107,5 +112,21 @@
     "subtitle": "Urus akaun, ruang kerja, dan keutamaan anda di satu tempat",
     "open": "Buka"
   },
-  "footer": { "saved": "Perubahan disimpan secara automatik." }
+  "footer": {
+    "saved": "Perubahan disimpan secara automatik."
+  },
+  "description": "Urus profil, keselamatan, pembekal AI dan keutamaan ruang kerja anda.",
+  "general": "Umum",
+  "aiSettings": "Tetapan AI",
+  "aiProvidersBYOK": "Pembekal AI (BYOK)",
+  "teamAndUsers": "Pasukan & pengguna",
+  "generalSection": "Umum",
+  "workspaceAndAccount": "Maklumat ruang kerja dan akaun.",
+  "workspace": "Ruang kerja",
+  "plan": "Pelan",
+  "fullName": "Nama penuh",
+  "email": "E-mel",
+  "role": "Peranan",
+  "managedByAdmin": "Butiran profil dan tetapan ruang kerja diurus oleh pentadbir organisasi anda. Hubungi mereka untuk mengemas kini nama, alamat e-mel atau peranan anda.",
+  "personalWorkspace": "Ruang kerja peribadi"
 }

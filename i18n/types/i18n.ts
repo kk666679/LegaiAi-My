@@ -83,7 +83,7 @@ export interface I18nContextValue {
   messages: Messages;
 
   /** Resolve a dotted key with optional interpolation. */
-  t: (key: string, vars?: Record<string, InterpolationValue>) => string;
+  t: (key: string, vars?: Record<string, InterpolationValue>, defaultValue?: string) => string;
 
   /** Resolve a raw object/array at a dotted key. */
   raw: <T = unknown>(key: string) => T;
@@ -130,15 +130,23 @@ export interface I18nProviderProps {
 // Adding a new namespace here keeps `useTranslation` type-safe.
 // ─────────────────────────────────────────────────────────────
 export type Namespace =
-  | "common"
-  | "nav"
-  | "documents"
-  | "matters"
-  | "contracts"
+  | "analysis"
+  | "auth"
   | "automation"
+  | "byok"
+  | "common"
+  | "contracts"
+  | "dashboard"
+  | "disclaimer"
+  | "documents"
+  | "governance"
   | "hitl"
+  | "matters"
+  | "nav"
   | "settings"
-  | "auth";
+  | "sidebar"
+  | "topbar"
+  | "users";
 
 // ─────────────────────────────────────────────────────────────
 // Locale metadata (re-export for convenience)

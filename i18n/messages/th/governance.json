@@ -1,0 +1,11 @@
+{
+  "title": "การกำกับดูแล AI",
+  "description": "สถานะการดำเนินงานของการควบคุม AI การปกป้องข้อมูล และนโยบายการปฏิบัติตาม",
+  "systemIndicators": "ตัวชี้วัดระบบ",
+  "systemIndicatorsDescription": "สถานะสดของการควบคุมการกำกับดูแล",
+  "governanceControls": "การควบคุมการกำกับดูแล",
+  "governanceControlsDescription": "การกำหนดค่านโยบายความปลอดภัย AI และข้อมูล",
+  "viewAuditLog": "ดูบันทึกการตรวจสอบ",
+  "quickLinks": "ลิงก์ด่วน",
+  "configureToast": "กำหนดค่า {{label}}"
+}

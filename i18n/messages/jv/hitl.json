@@ -65,5 +65,25 @@
     "claimed": "You claimed this request",
     "approved": "Approved",
     "rejected": "Rejected"
-  }
+  },
+  "description": "Pengawasan manungsa ing proses agen AI. Setujoni, jedakake, utawa intervensi ing saben langkah.",
+  "viewAgents": "Deleng agen",
+  "newAgentRun": "Proses agen anyar",
+  "activeRuns": "Proses aktif",
+  "activeRunsDescription": "Saweg ditindakake",
+  "awaitingApproval": "Ngenteni persetujuan",
+  "awaitingApprovalDescription": "Mbutuhake tinjauan manungsa",
+  "completedToday": "Rampung dina iki",
+  "completedTodayDescription": "Rampung kanthi sukses",
+  "failedRuns": "Gagal",
+  "failedRunsDescription": "Mbutuhake dicoba maneh",
+  "statusRunning": "Mlaku",
+  "statusPaused": "Dijeda",
+  "statusAwaitingApproval": "Ngenteni persetujuan",
+  "statusCompleted": "Rampung",
+  "statusFailed": "Gagal",
+  "progress": "Kemajuan",
+  "pause": "Jeda",
+  "retry": "Coba maneh",
+  "details": "Rincian"
 }

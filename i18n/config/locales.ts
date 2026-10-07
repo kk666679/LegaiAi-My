@@ -90,22 +90,24 @@ export interface LocaleMeta {
   intlCode: string;
   /** Default region for dates / currency */
   region: string;
+  /** Primary region the locale is spoken in — display name */
+  country: string;
   /** Fully translated?  false → falls through to English */
   ready: boolean;
 }
 
 export const LOCALE_META: Record<Locale, LocaleMeta> = {
-  en: { code: "en", name: "English",          englishName: "English",    flag: "🇬🇧", intlCode: "en-MY",  region: "MY", ready: true  },
-  ms: { code: "ms", name: "Bahasa Malaysia",  englishName: "Malay",      flag: "🇲🇾", intlCode: "ms-MY",  region: "MY", ready: true  },
-  id: { code: "id", name: "Bahasa Indonesia", englishName: "Indonesian", flag: "🇮🇩", intlCode: "id-ID",  region: "ID", ready: false },
-  th: { code: "th", name: "ไทย",              englishName: "Thai",       flag: "🇹🇭", intlCode: "th-TH",  region: "TH", ready: false },
-  vi: { code: "vi", name: "Tiếng Việt",       englishName: "Vietnamese", flag: "🇻🇳", intlCode: "vi-VN",  region: "VN", ready: false },
-  tl: { code: "tl", name: "Tagalog",          englishName: "Tagalog",    flag: "🇵🇭", intlCode: "fil-PH", region: "PH", ready: false },
-  km: { code: "km", name: "ខ្មែរ",               englishName: "Khmer",      flag: "🇰🇭", intlCode: "km-KH",  region: "KH", ready: false },
-  lo: { code: "lo", name: "ລາວ",               englishName: "Lao",        flag: "🇱🇦", intlCode: "lo-LA",  region: "LA", ready: false },
-  my: { code: "my", name: "မြန်မာ",             englishName: "Burmese",    flag: "🇲🇲", intlCode: "my-MM",  region: "MM", ready: false },
-  bn: { code: "bn", name: "বাংলা",             englishName: "Bengali",    flag: "🇧🇩", intlCode: "bn-BD",  region: "BD", ready: false },
-  jv: { code: "jv", name: "Basa Jawa",        englishName: "Javanese",   flag: "🇮🇩", intlCode: "jv-ID",  region: "ID", ready: false },
+  en: { code: "en", name: "English",          englishName: "English",    flag: "🇬🇧", intlCode: "en-MY",  region: "MY", country: "International",   ready: true  },
+  ms: { code: "ms", name: "Bahasa Malaysia",  englishName: "Malay",      flag: "🇲🇾", intlCode: "ms-MY",  region: "MY", country: "Malaysia / Brunei", ready: true  },
+  id: { code: "id", name: "Bahasa Indonesia", englishName: "Indonesian", flag: "🇮🇩", intlCode: "id-ID",  region: "ID", country: "Indonesia",       ready: false },
+  th: { code: "th", name: "ไทย",              englishName: "Thai",       flag: "🇹🇭", intlCode: "th-TH",  region: "TH", country: "Thailand",        ready: false },
+  vi: { code: "vi", name: "Tiếng Việt",       englishName: "Vietnamese", flag: "🇻🇳", intlCode: "vi-VN",  region: "VN", country: "Vietnam",         ready: false },
+  tl: { code: "tl", name: "Tagalog",          englishName: "Tagalog",    flag: "🇵🇭", intlCode: "fil-PH", region: "PH", country: "Philippines",     ready: false },
+  km: { code: "km", name: "ខ្មែរ",               englishName: "Khmer",      flag: "🇰🇭", intlCode: "km-KH",  region: "KH", country: "Cambodia",        ready: false },
+  lo: { code: "lo", name: "ລາວ",               englishName: "Lao",        flag: "🇱🇦", intlCode: "lo-LA",  region: "LA", country: "Laos",            ready: false },
+  my: { code: "my", name: "မြန်မာ",             englishName: "Burmese",    flag: "🇲🇲", intlCode: "my-MM",  region: "MM", country: "Myanmar",         ready: false },
+  bn: { code: "bn", name: "বাংলা",             englishName: "Bengali",    flag: "🇧🇩", intlCode: "bn-BD",  region: "BD", country: "Bangladesh",      ready: false },
+  jv: { code: "jv", name: "Basa Jawa",        englishName: "Javanese",   flag: "🇮🇩", intlCode: "jv-ID",  region: "ID", country: "Indonesia",       ready: false },
 };
 
 export function localeMeta(locale: Locale): LocaleMeta {

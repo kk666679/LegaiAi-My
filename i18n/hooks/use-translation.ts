@@ -6,8 +6,8 @@ export function useTranslation(namespace: string = "common") {
   const i18n = useI18n();
   const { t: baseT } = i18n;
 
-  const t = (key: string, vars?: Record<string, unknown>) =>
-    baseT(namespace ? `${namespace}.${key}` : key, vars);
+  const t = (key: string, vars?: Record<string, unknown>, defaultValue?: string) =>
+    baseT(namespace ? `${namespace}.${key}` : key, vars, defaultValue);
 
   return {
     ...i18n,

@@ -65,5 +65,25 @@
     "claimed": "You claimed this request",
     "approved": "Approved",
     "rejected": "Rejected"
-  }
+  },
+  "description": "ការត្រួតពិនិត្យដោយមនុស្សក្នុងរង្វិលសម្រាប់ដំណើរការភ្នាក់ងារ AI។ អនុម័ត ផ្អាក ឬអន្តរាគមន៍នៅជំហានណាមួយ។",
+  "viewAgents": "មើលភ្នាក់ងារ",
+  "newAgentRun": "ដំណើរការភ្នាក់ងារថ្មី",
+  "activeRuns": "ដំណើរការសកម្ម",
+  "activeRunsDescription": "កំពុងអនុវត្ត",
+  "awaitingApproval": "រង់ចាំការអនុម័ត",
+  "awaitingApprovalDescription": "ត្រូវការការពិនិត្យដោយមនុស្ស",
+  "completedToday": "បានបញ្ចប់ថ្ងៃនេះ",
+  "completedTodayDescription": "បានបញ្ចប់ដោយជោគជ័យ",
+  "failedRuns": "បរាជ័យ",
+  "failedRunsDescription": "ត្រូវការព្យាយាមម្តងទៀត",
+  "statusRunning": "កំពុងដំណើរការ",
+  "statusPaused": "បានផ្អាក",
+  "statusAwaitingApproval": "រង់ចាំការអនុម័ត",
+  "statusCompleted": "បានបញ្ចប់",
+  "statusFailed": "បរាជ័យ",
+  "progress": "វឌ្ឍនភាព",
+  "pause": "ផ្អាក",
+  "retry": "ព្យាយាមម្តងទៀត",
+  "details": "ព័ត៌មានលម្អិត"
 }

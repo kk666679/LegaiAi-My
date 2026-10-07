@@ -9,7 +9,7 @@ export interface I18nContextValue {
   dir: "ltr" | "rtl";
   messages: Record<string, unknown>;
   /** Translate a fully-qualified dotted key. */
-  t: (key: string, vars?: Record<string, unknown>) => string;
+  t: (key: string, vars?: Record<string, unknown>, defaultValue?: string) => string;
   /** Fetch the raw value (object/array) at a dotted key. */
   raw: <T = unknown>(key: string) => T;
   formatDate: (v: string | number | Date) => string;

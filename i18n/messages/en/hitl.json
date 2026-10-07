@@ -65,5 +65,25 @@
     "claimed": "You claimed this request",
     "approved": "Approved",
     "rejected": "Rejected"
-  }
+  },
+  "description": "Human-in-the-loop oversight of AI agent runs. Approve, pause, or intervene at any step.",
+  "viewAgents": "View agents",
+  "newAgentRun": "New agent run",
+  "activeRuns": "Active runs",
+  "activeRunsDescription": "Currently executing",
+  "awaitingApproval": "Awaiting approval",
+  "awaitingApprovalDescription": "Need human review",
+  "completedToday": "Completed today",
+  "completedTodayDescription": "Finished successfully",
+  "failedRuns": "Failed",
+  "failedRunsDescription": "Require retry",
+  "statusRunning": "Running",
+  "statusPaused": "Paused",
+  "statusAwaitingApproval": "Awaiting approval",
+  "statusCompleted": "Completed",
+  "statusFailed": "Failed",
+  "progress": "Progress",
+  "pause": "Pause",
+  "retry": "Retry",
+  "details": "Details"
 }

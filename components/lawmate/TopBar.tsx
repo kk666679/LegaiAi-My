@@ -44,14 +44,14 @@ import {
 import { CommandPalette } from "@/components/lawmate/CommandPalette";
 import { useAuth } from "@/components/auth-provider";
 import { trpcReact } from "@/clients";
-import { useTranslation } from "@/lib/i18n/I18nProvider";
+import { useTranslation } from "@/i18n/hooks/use-translation";
 import { AdminGate } from "@/components/shared/PermissionGate";
 import {
-  LOCALE_FLAGS,
-  LOCALE_LABELS,
-  LOCALE_COUNTRY,
+  LOCALE_META,
+  localeNames,
+  locales,
   type Locale,
-} from "@/lib/i18n/resources";
+} from "@/i18n/config/locales";
 
 function initials(name?: string | null, email?: string | null) {
   if (name) {
@@ -78,7 +78,7 @@ export function TopBar({ onMenu }: TopBarProps) {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [shortcutKey, setShortcutKey] = useState("Ctrl");
   const { setTheme, theme } = useTheme();
-  const { t, locale, setLocale, available } = useTranslation("sidebar");
+  const { t, locale, setLocale } = useTranslation("sidebar");
   const { user, logout } = useAuth();
   const router = useRouter();
 
@@ -281,7 +281,7 @@ export function TopBar({ onMenu }: TopBarProps) {
               <Languages className="size-4" />
               <span className="ml-2">Language</span>
               <span className="ml-auto text-xs text-muted-foreground">
-                {LOCALE_FLAGS[locale]} {LOCALE_LABELS[locale]}
+                {LOCALE_META[locale].flag} {localeNames[locale]}
               </span>
             </DropdownMenuSubTrigger>
             <DropdownMenuSubContent className="min-w-[16rem]">
@@ -292,18 +292,18 @@ export function TopBar({ onMenu }: TopBarProps) {
                 value={locale}
                 onValueChange={(v) => setLocale(v as Locale)}
               >
-                {available.map((code) => (
+                {locales.map((code) => (
                   <DropdownMenuRadioItem
                     key={code}
                     value={code}
                     className="gap-2"
                   >
                     <span className="text-base leading-none">
-                      {LOCALE_FLAGS[code]}
+                      {LOCALE_META[code].flag}
                     </span>
-                    <span className="flex-1">{LOCALE_LABELS[code]}</span>
+                    <span className="flex-1">{localeNames[code]}</span>
                     <span className="text-xs text-muted-foreground">
-                      {LOCALE_COUNTRY[code]}
+                      {LOCALE_META[code].country}
                     </span>
                     {code === locale && (
                       <Check className="size-4 text-primary" />

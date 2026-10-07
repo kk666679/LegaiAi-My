@@ -49,7 +49,7 @@ import { QuickPromptSheet } from "@/components/lawmate/QuickPromptSheet";
 import { CreditUsageDashboard } from "@/components/dashboard/CreditUsageDashboard";
 import { RecentActivityFeed } from "@/components/dashboard/RecentActivityFeed";
 import type { UsageSummary, ActivityItem, SavedResearchItem } from "@/components/dashboard/types";
-import { toDashboardSavedItems, toDashboardActivity } from "@/app/legalai/research/_components/legalai-dashboard-adapters";
+import { toDashboardSavedItems, toDashboardActivity } from "@/app/legalai/(dashboard)/research/_components/legalai-dashboard-adapters";
 import { DashboardStateBoundary } from "@/components/dashboard/DashboardState";
 import { trpcReact } from "@/clients";
 import { useAuth } from "@/components/auth-provider";
@@ -1198,7 +1198,7 @@ export default function DashboardHomePage() {
                       <Upload className="size-4" /> Analyse a document
                     </Button>
                     <Button asChild variant="outline" className="gap-2">
-                      <Link href="/legalai/draft">
+                      <Link href="/legalai/documents/new">
                         <FileSignature className="size-4" /> Open Drafting Studio
                       </Link>
                     </Button>

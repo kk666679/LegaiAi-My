@@ -1,0 +1,11 @@
+{
+  "title": "AI Governance",
+  "description": "Katayuan ng operasyon ng AI controls, proteksyon ng data, at mga patakaran sa compliance.",
+  "systemIndicators": "Mga indicator ng sistema",
+  "systemIndicatorsDescription": "Live na status ng mga kontrol sa governance.",
+  "governanceControls": "Mga kontrol sa governance",
+  "governanceControlsDescription": "Configuration ng security, AI, at data policies.",
+  "viewAuditLog": "Tingnan ang audit log",
+  "quickLinks": "Mabilis na link",
+  "configureToast": "I-configure ang {{label}}"
+}

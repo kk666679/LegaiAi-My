@@ -65,5 +65,25 @@
     "claimed": "You claimed this request",
     "approved": "Approved",
     "rejected": "Rejected"
-  }
+  },
+  "description": "ການຕິດຕາມຈາກມະນຸດໃນວົງຈອນສຳລັບການດຳເນີນການຕົວແທນ AI. ອະນຸມັດ, ຢຸດຊົ່ວຄາວ ຫຼື ແຊກແຊງໃນຂັ້ນຕອນໃດກໍ່ໄດ້.",
+  "viewAgents": "ເບິ່ງຕົວແທນ",
+  "newAgentRun": "ດຳເນີນການຕົວແທນໃໝ່",
+  "activeRuns": "ການດຳເນີນການທີ່ເຄື່ອນໄຫວ",
+  "activeRunsDescription": "ກຳລັງປະຕິບັດ",
+  "awaitingApproval": "ລໍຖ້າການອະນຸມັດ",
+  "awaitingApprovalDescription": "ຕ້ອງການການກວດສອບຈາກມະນຸດ",
+  "completedToday": "ສຳເລັດມື້ນີ້",
+  "completedTodayDescription": "ສຳເລັດຢ່າງສຳເລັດຜົນ",
+  "failedRuns": "ລົ້ມເຫຼວ",
+  "failedRunsDescription": "ຕ້ອງລອງອີກຄັ້ງ",
+  "statusRunning": "ກຳລັງດຳເນີນການ",
+  "statusPaused": "ຢຸດຊົ່ວຄາວ",
+  "statusAwaitingApproval": "ລໍຖ້າການອະນຸມັດ",
+  "statusCompleted": "ສຳເລັດ",
+  "statusFailed": "ລົ້ມເຫຼວ",
+  "progress": "ຄວາມຄືບໜ້າ",
+  "pause": "ຢຸດຊົ່ວຄາວ",
+  "retry": "ລອງອີກຄັ້ງ",
+  "details": "ລາຍລະອຽດ"
 }

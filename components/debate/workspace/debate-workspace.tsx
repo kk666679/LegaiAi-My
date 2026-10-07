@@ -44,8 +44,8 @@ import {
   SourcesContent,
   SourcesTrigger,
 } from "@/components/ai-elements/sources";
-import { ClassificationIndicator } from "@/components/lawmate/ai/legal/classification";
-import { ConfidenceIndicator } from "@/components/lawmate/ai/legal/confidence";
+import { ClassificationIndicator } from "@/components/ai/legal/classification";
+import { ConfidenceIndicator } from "@/components/ai/legal/confidence";
 import {
   DebateLiveState,
   DebateProgressInline,

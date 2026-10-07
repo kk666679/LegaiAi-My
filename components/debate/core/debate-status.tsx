@@ -1,8 +1,8 @@
 "use client";
 
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import { AILiveBadge } from "@/components/lawmate/ai/ailive-badge";
-import { AIStatusIndicator } from "@/components/lawmate/ai/aistatus-indicator";
+import { AILiveBadge } from "@/components/ai/ailive-badge";
+import { AIStatusIndicator } from "@/components/ai/aistatus-indicator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { DebateStatus } from "@/types/debate";

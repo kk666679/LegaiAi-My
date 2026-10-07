@@ -65,5 +65,25 @@
     "claimed": "You claimed this request",
     "approved": "Approved",
     "rejected": "Rejected"
-  }
+  },
+  "description": "Pengawasan manusia-dalam-loop untuk jalankan agen AI. Setujui, jeda, atau intervensi di setiap langkah.",
+  "viewAgents": "Lihat agen",
+  "newAgentRun": "Jalankan agen baru",
+  "activeRuns": "Jalankan aktif",
+  "activeRunsDescription": "Sedang dieksekusi",
+  "awaitingApproval": "Menunggu persetujuan",
+  "awaitingApprovalDescription": "Perlu tinjauan manusia",
+  "completedToday": "Selesai hari ini",
+  "completedTodayDescription": "Berhasil diselesaikan",
+  "failedRuns": "Gagal",
+  "failedRunsDescription": "Perlu dicoba ulang",
+  "statusRunning": "Berjalan",
+  "statusPaused": "Dijeda",
+  "statusAwaitingApproval": "Menunggu persetujuan",
+  "statusCompleted": "Selesai",
+  "statusFailed": "Gagal",
+  "progress": "Kemajuan",
+  "pause": "Jeda",
+  "retry": "Coba lagi",
+  "details": "Detail"
 }

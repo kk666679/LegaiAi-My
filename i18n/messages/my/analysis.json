@@ -1,0 +1,32 @@
+{
+  "conclusion": {
+    "heading": "Conclusion"
+  },
+  "issue": {
+    "heading": "Issue"
+  },
+  "rule": {
+    "heading": "Rule"
+  },
+  "application": {
+    "heading": "Application"
+  },
+  "citations": {
+    "heading": "Citations"
+  },
+  "validation": {
+    "heading": "Validation"
+  },
+  "insufficient": {
+    "evidence": "Insufficient verified evidence."
+  },
+  "irac": {
+    "title": "IRAC Analysis"
+  },
+  "memo": {
+    "to": "To",
+    "subject": "Subject",
+    "date": "Date",
+    "re": "Re"
+  }
+}

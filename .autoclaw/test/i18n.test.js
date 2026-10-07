@@ -1,7 +1,6 @@
-'use strict';
-const test = require('node:test');
-const assert = require('node:assert/strict');
-const { Translator, detect, CATALOG } = require('../i18n');
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { Translator, detect, CATALOG } from '../i18n/index.js';
 
 test('i18n: EN/ MS catalogues exist', () => {
   assert.ok(CATALOG.en['conclusion.heading']);

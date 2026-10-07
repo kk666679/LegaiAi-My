@@ -79,8 +79,14 @@
     "outstanding": "Belum dibayar",
     "trustBalance": "Baki amanah"
   },
-  "parties": { "title": "Pihak", "addParty": "Tambah pihak" },
-  "team": { "title": "Pasukan", "addMember": "Tambah ahli" },
+  "parties": {
+    "title": "Pihak",
+    "addParty": "Tambah pihak"
+  },
+  "team": {
+    "title": "Pasukan",
+    "addMember": "Tambah ahli"
+  },
   "conflicts": {
     "title": "Konflik",
     "runCheck": "Jalankan semakan konflik",
@@ -97,5 +103,30 @@
     "reopened": "Kes dibuka semula",
     "taskCreated": "Tugasan dicipta",
     "timeLogged": "Masa direkodkan"
-  }
+  },
+  "description": "Urus perkara undang-undang dengan pandangan berkuasa AI.",
+  "activeMatters": "Perkara aktif",
+  "highPriority": "Keutamaan tinggi",
+  "inReview": "Dalam semakan",
+  "aiAnalysesRun": "Analisis AI dijalankan",
+  "searchPlaceholder": "Cari perkara…",
+  "allStatus": "Semua status",
+  "active": "Aktif",
+  "pending": "Tertunda",
+  "review": "Semakan",
+  "completed": "Selesai",
+  "archived": "Diarkibkan",
+  "matter": "Perkara",
+  "statusLabel": "Status",
+  "priorityLabel": "Keutamaan",
+  "client": "Pelanggan",
+  "updated": "Dikemas kini",
+  "noTasksYet": "Tiada tugasan lagi.",
+  "aiRiskSummary": "Ringkasan Risiko AI ({{n}})",
+  "noMattersTitle": "Tiada perkara lagi",
+  "noMattersDescription": "Cipta perkara pertama anda untuk mengatur dokumen, penyelidikan, perbualan dan tugasan dalam satu ruang kerja.",
+  "prioritySuffix": "keutamaan {{p}}",
+  "docs": "{{n}} dok",
+  "chats": "{{n}} sembang",
+  "taskCount": "{{n}} tugasan"
 }

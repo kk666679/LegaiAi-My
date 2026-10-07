@@ -114,5 +114,19 @@
   },
   "footer": {
     "saved": "Changes are saved automatically."
-  }
+  },
+  "description": "Kelola profil, keamanan, penyedia AI, dan preferensi ruang kerja Anda.",
+  "general": "Umum",
+  "aiSettings": "Pengaturan AI",
+  "aiProvidersBYOK": "Penyedia AI (BYOK)",
+  "teamAndUsers": "Tim & pengguna",
+  "generalSection": "Umum",
+  "workspaceAndAccount": "Informasi ruang kerja dan akun.",
+  "workspace": "Ruang kerja",
+  "plan": "Paket",
+  "fullName": "Nama lengkap",
+  "email": "Email",
+  "role": "Peran",
+  "managedByAdmin": "Detail profil dan pengaturan ruang kerja dikelola oleh administrator organisasi Anda. Hubungi mereka untuk memperbarui nama, alamat email, atau peran Anda.",
+  "personalWorkspace": "Ruang kerja pribadi"
 }
