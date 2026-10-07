@@ -3,11 +3,11 @@ import { BRAND } from "@/lib/brand";
 import { Button } from "@/components/ui/button";
 
 const LINKS = [
-  { href: "/copilot", label: "Copilot" },
-  { href: "/draft", label: "Draft" },
-  { href: "/debate", label: "Debate" },
-  { href: "/audit", label: "Audit" },
-  { href: "/monitor", label: "Monitor" },
+  { href: "/legalai/assistant", label: "Copilot" },
+  { href: "/legalai/draft", label: "Draft" },
+  { href: "/legalai/debate", label: "Debate" },
+  { href: "/legalai/agents/audit", label: "Audit" },
+  { href: "/legalai/monitor", label: "Monitor" },
 ];
 
 export function AppNav() {

@@ -7,7 +7,7 @@ const FOOTER_HREFS: Record<string, string> = {
   "Regulatory Timeline": "/legalai/agents/live",
   "Legal Research": "/legalai/research",
   "Document Drafting": "/legalai/documents/studio",
-  Compliance: "/legalai/hitl",
+  Compliance: "/legalai/compliance",
   "Corporate Legal": "/solutions/corporate",
   "Law Firms": "/solutions/law-firms",
   Risk: "/legalai/risk",

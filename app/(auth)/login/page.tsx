@@ -27,6 +27,7 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [ssoNotice, setSsoNotice] = useState("");
 
   useEffect(() => {
     if (isAuthenticated) router.replace("/legalai");
@@ -143,7 +144,11 @@ function LoginForm() {
               type="button"
               variant="outline"
               className="w-full justify-center gap-2 hover:bg-muted/50 transition-colors"
-              onClick={() => router.push("/api/auth/signin/google")}
+              onClick={() =>
+                setSsoNotice(
+                  "Google single sign-on is not configured for this deployment. Sign in with your email and password instead, or contact your administrator to enable SSO.",
+                )
+              }
             >
               <svg className="size-4" viewBox="0 0 24 24" aria-hidden="true">
                 <path
@@ -169,7 +174,11 @@ function LoginForm() {
               type="button"
               variant="outline"
               className="w-full justify-center gap-2 hover:bg-muted/50 transition-colors"
-              onClick={() => router.push("/api/auth/signin/microsoft")}
+              onClick={() =>
+                setSsoNotice(
+                  "Microsoft single sign-on is not configured for this deployment. Sign in with your email and password instead, or contact your administrator to enable SSO.",
+                )
+              }
             >
               <svg className="size-4" viewBox="0 0 24 24" aria-hidden="true">
                 <path
@@ -180,6 +189,15 @@ function LoginForm() {
               Microsoft
             </Button>
           </div>
+
+          {ssoNotice && (
+            <p
+              className="mt-3 rounded-lg border border-border/70 bg-muted/50 p-3 text-xs text-muted-foreground"
+              role="status"
+            >
+              {ssoNotice}
+            </p>
+          )}
 
           <p className="mt-8 text-center text-sm text-muted-foreground">
             New here?{" "}

@@ -3,6 +3,8 @@ import { TRPCError } from '@trpc/server'
 import { router, publicProcedure, protectedProcedure, permissionProcedure } from '../trpc'
 import { queues } from '../../queues/index'
 import { prisma } from '../../db'
+import { jobService } from '../../lib/jobs'
+import { JobType } from '@prisma/client'
 import type { AnyRouter } from '@trpc/server'
 
 const DRAFT_DOC_TYPES = z.enum([
@@ -26,8 +28,15 @@ export const agentsRouter: AnyRouter = router({
       topK: z.number().default(5),
     }))
     .mutation(async ({ input, ctx }) => {
-      const job = await queues.retrieval.add('retrieve', { ...input, traceId: ctx.traceId })
-      return { jobId: job.id, traceId: ctx.traceId }
+      const job = await jobService.create({
+        orgId: ctx.orgId ?? undefined,
+        userId: ctx.userId ?? undefined,
+        traceId: ctx.traceId,
+        jobType: JobType.RETRIEVAL,
+        input: input as any,
+      })
+      const bullJob = await queues.retrieval.add('retrieve', { ...input, traceId: ctx.traceId, jobId: job.id })
+      return { jobId: job.id, traceId: ctx.traceId, bullJobId: bullJob.id }
     }),
 
   // ── Agent 2: Analysis ────────────────────────────────────────────────────
@@ -42,8 +51,15 @@ export const agentsRouter: AnyRouter = router({
       })).default([]),
     }))
     .mutation(async ({ input, ctx }) => {
-      const job = await queues.analysis.add('analyse', { ...input, traceId: ctx.traceId })
-      return { jobId: job.id, traceId: ctx.traceId }
+      const job = await jobService.create({
+        orgId: ctx.orgId ?? undefined,
+        userId: ctx.userId ?? undefined,
+        traceId: ctx.traceId,
+        jobType: JobType.ANALYSIS,
+        input: input as any,
+      })
+      const bullJob = await queues.analysis.add('analyse', { ...input, traceId: ctx.traceId, jobId: job.id })
+      return { jobId: job.id, traceId: ctx.traceId, bullJobId: bullJob.id }
     }),
 
   // ── Agent 3: Drafting ────────────────────────────────────────────────────
@@ -63,8 +79,15 @@ export const agentsRouter: AnyRouter = router({
       citations: z.array(z.string()).default([]),
     }))
     .mutation(async ({ input, ctx }) => {
-      const job = await queues.drafting.add('draft', { ...input, traceId: ctx.traceId })
-      return { jobId: job.id, traceId: ctx.traceId }
+      const job = await jobService.create({
+        orgId: ctx.orgId ?? undefined,
+        userId: ctx.userId ?? undefined,
+        traceId: ctx.traceId,
+        jobType: JobType.DRAFTING,
+        input: input as any,
+      })
+      const bullJob = await queues.drafting.add('draft', { ...input, traceId: ctx.traceId, jobId: job.id })
+      return { jobId: job.id, traceId: ctx.traceId, bullJobId: bullJob.id }
     }),
 
   // ── Agent 4: Validation ──────────────────────────────────────────────────
@@ -74,8 +97,15 @@ export const agentsRouter: AnyRouter = router({
       text: z.string().optional(),
     }))
     .mutation(async ({ input, ctx }) => {
-      const job = await queues.validation.add('validate', { ...input, traceId: ctx.traceId })
-      return { jobId: job.id, traceId: ctx.traceId }
+      const job = await jobService.create({
+        orgId: ctx.orgId ?? undefined,
+        userId: ctx.userId ?? undefined,
+        traceId: ctx.traceId,
+        jobType: JobType.VALIDATION,
+        input: input as any,
+      })
+      const bullJob = await queues.validation.add('validate', { ...input, traceId: ctx.traceId, jobId: job.id })
+      return { jobId: job.id, traceId: ctx.traceId, bullJobId: bullJob.id }
     }),
 
   // ── Agent 5: Audit actions ───────────────────────────────────────────────
@@ -87,8 +117,15 @@ export const agentsRouter: AnyRouter = router({
       data: z.record(z.string(), z.unknown()).optional(),
     }))
     .mutation(async ({ input, ctx }) => {
-      const job = await queues.audit.add('audit', { ...input, traceId: ctx.traceId })
-      return { jobId: job.id, traceId: ctx.traceId }
+      const job = await jobService.create({
+        orgId: ctx.orgId ?? undefined,
+        userId: ctx.userId ?? undefined,
+        traceId: ctx.traceId,
+        jobType: JobType.AUDIT,
+        input: input as any,
+      })
+      const bullJob = await queues.audit.add('audit', { ...input, traceId: ctx.traceId, jobId: job.id })
+      return { jobId: job.id, traceId: ctx.traceId, bullJobId: bullJob.id }
     }),
 
   // ── Agent 6: Orchestrate full workflow ───────────────────────────────────
@@ -107,8 +144,15 @@ export const agentsRouter: AnyRouter = router({
       proBono: z.boolean().default(false),
     }))
     .mutation(async ({ input, ctx }) => {
-      const job = await queues.orchestrator.add('full', { ...input, action: 'full', traceId: ctx.traceId })
-      return { jobId: job.id, traceId: ctx.traceId }
+      const job = await jobService.create({
+        orgId: ctx.orgId ?? undefined,
+        userId: ctx.userId ?? undefined,
+        traceId: ctx.traceId,
+        jobType: JobType.ORCHESTRATOR,
+        input: input as any,
+      })
+      const bullJob = await queues.orchestrator.add('full', { ...input, action: 'full', traceId: ctx.traceId, jobId: job.id })
+      return { jobId: job.id, traceId: ctx.traceId, bullJobId: bullJob.id }
     }),
 
   // ── Agent 7: Privacy / PII ───────────────────────────────────────────────
@@ -125,8 +169,15 @@ export const agentsRouter: AnyRouter = router({
       }).optional(),
     }))
     .mutation(async ({ input, ctx }) => {
-      const job = await queues.privacy.add('privacy', { ...input, traceId: ctx.traceId })
-      return { jobId: job.id, traceId: ctx.traceId }
+      const job = await jobService.create({
+        orgId: ctx.orgId ?? undefined,
+        userId: ctx.userId ?? undefined,
+        traceId: ctx.traceId,
+        jobType: JobType.PRIVACY,
+        input: input as any,
+      })
+      const bullJob = await queues.privacy.add('privacy', { ...input, traceId: ctx.traceId, jobId: job.id })
+      return { jobId: job.id, traceId: ctx.traceId, bullJobId: bullJob.id }
     }),
 
   // ── Agent 9: Debate ──────────────────────────────────────────────────────
@@ -137,26 +188,35 @@ export const agentsRouter: AnyRouter = router({
       rounds: z.number().int().min(1).max(4).default(2),
     }))
     .mutation(async ({ input, ctx }) => {
-      const job = await queues.debate.add('debate', {
+      const job = await jobService.create({
+        orgId: ctx.orgId ?? undefined,
+        userId: ctx.userId ?? undefined,
+        traceId: ctx.traceId,
+        jobType: JobType.DEBATE,
+        input: input as any,
+      })
+      const bullJob = await queues.debate.add('debate', {
         ...input,
         traceId: ctx.traceId,
         userId: ctx.user.id,
+        jobId: job.id,
       })
-      return { jobId: job.id, traceId: ctx.traceId }
+      return { jobId: job.id, traceId: ctx.traceId, bullJobId: bullJob.id }
     }),
 
   debateStatus: permissionProcedure('run_agents')
     .input(z.object({ jobId: z.string().min(1).max(256) }))
     .query(async ({ input, ctx }) => {
-      const job = await queues.debate.getJob(input.jobId)
-      if (!job || job.data.userId !== ctx.user.id) {
+      const job = await jobService.getById(input.jobId)
+      if (!job || job.userId !== ctx.user.id) {
         throw new TRPCError({ code: 'NOT_FOUND', message: 'Debate job not found' })
       }
-
-      const state = await job.getState()
       return {
-        state,
-        result: state === 'completed' ? job.returnvalue : null,
+        id: job.id,
+        status: job.status,
+        result: job.status === 'COMPLETED' ? job.result : null,
+        progress: job.progress,
+        errorMessage: job.errorMessage,
       }
     }),
 
@@ -176,8 +236,15 @@ export const agentsRouter: AnyRouter = router({
       }).optional(),
     }))
     .mutation(async ({ input, ctx }) => {
-      const job = await queues.monitoring.add('monitor', { ...input, traceId: ctx.traceId })
-      return { jobId: job.id, traceId: ctx.traceId }
+      const job = await jobService.create({
+        orgId: ctx.orgId ?? undefined,
+        userId: ctx.userId ?? undefined,
+        traceId: ctx.traceId,
+        jobType: JobType.MONITORING,
+        input: input as any,
+      })
+      const bullJob = await queues.monitoring.add('monitor', { ...input, traceId: ctx.traceId, jobId: job.id })
+      return { jobId: job.id, traceId: ctx.traceId, bullJobId: bullJob.id }
     }),
 
   // ── Agent 11: Indexing ───────────────────────────────────────────────────
@@ -193,28 +260,56 @@ export const agentsRouter: AnyRouter = router({
       requireApproval: z.boolean().default(false),
     }))
     .mutation(async ({ input, ctx }) => {
-      const job = await queues.indexing.add('index', { ...input, traceId: ctx.traceId })
-      return { jobId: job.id, traceId: ctx.traceId }
+      const job = await jobService.create({
+        orgId: ctx.orgId ?? undefined,
+        userId: ctx.userId ?? undefined,
+        traceId: ctx.traceId,
+        jobType: JobType.INDEXING,
+        input: input as any,
+      })
+      const bullJob = await queues.indexing.add('index', { ...input, traceId: ctx.traceId, jobId: job.id })
+      return { jobId: job.id, traceId: ctx.traceId, bullJobId: bullJob.id }
     }),
 
   // ── Agent 12: Testing ────────────────────────────────────────────────────
   runGoldEval: permissionProcedure('manage_users')
     .mutation(async ({ ctx }) => {
-      const job = await queues.testing.add('gold_eval', { action: 'gold_eval', traceId: ctx.traceId })
-      return { jobId: job.id, traceId: ctx.traceId }
+      const job = await jobService.create({
+        orgId: ctx.orgId ?? undefined,
+        userId: ctx.userId ?? undefined,
+        traceId: ctx.traceId,
+        jobType: JobType.TESTING,
+        input: { action: 'gold_eval' } as any,
+      })
+      const bullJob = await queues.testing.add('gold_eval', { action: 'gold_eval', traceId: ctx.traceId, jobId: job.id })
+      return { jobId: job.id, traceId: ctx.traceId, bullJobId: bullJob.id }
     }),
 
   runAdversarial: permissionProcedure('manage_users')
     .input(z.object({ count: z.number().default(5) }))
     .mutation(async ({ input, ctx }) => {
-      const job = await queues.testing.add('adversarial', { action: 'adversarial', ...input, traceId: ctx.traceId })
-      return { jobId: job.id, traceId: ctx.traceId }
+      const job = await jobService.create({
+        orgId: ctx.orgId ?? undefined,
+        userId: ctx.userId ?? undefined,
+        traceId: ctx.traceId,
+        jobType: JobType.TESTING,
+        input: { action: 'adversarial', count: input.count } as any,
+      })
+      const bullJob = await queues.testing.add('adversarial', { action: 'adversarial', ...input, traceId: ctx.traceId, jobId: job.id })
+      return { jobId: job.id, traceId: ctx.traceId, bullJobId: bullJob.id }
     }),
 
   runBenchmark: permissionProcedure('manage_users')
     .mutation(async ({ ctx }) => {
-      const job = await queues.testing.add('benchmark', { action: 'benchmark', traceId: ctx.traceId })
-      return { jobId: job.id, traceId: ctx.traceId }
+      const job = await jobService.create({
+        orgId: ctx.orgId ?? undefined,
+        userId: ctx.userId ?? undefined,
+        traceId: ctx.traceId,
+        jobType: JobType.TESTING,
+        input: { action: 'benchmark' } as any,
+      })
+      const bullJob = await queues.testing.add('benchmark', { action: 'benchmark', traceId: ctx.traceId, jobId: job.id })
+      return { jobId: job.id, traceId: ctx.traceId, bullJobId: bullJob.id }
     }),
 
   // ── Agent 13: Vercel Sandbox — safe code execution ───────────────────────
@@ -238,8 +333,111 @@ export const agentsRouter: AnyRouter = router({
       stopAfter: z.boolean().default(false),
     }))
     .mutation(async ({ input, ctx }) => {
-      const job = await queues.sandbox.add('exec', { ...input, traceId: ctx.traceId, userId: ctx.userId, orgId: ctx.orgId })
-      return { jobId: job.id, traceId: ctx.traceId }
+      const job = await jobService.create({
+        orgId: ctx.orgId ?? undefined,
+        userId: ctx.userId ?? undefined,
+        traceId: ctx.traceId,
+        jobType: JobType.SANDBOX,
+        input: input as any,
+      })
+      const bullJob = await queues.sandbox.add('exec', { ...input, traceId: ctx.traceId, userId: ctx.userId, orgId: ctx.orgId, jobId: job.id })
+      return { jobId: job.id, traceId: ctx.traceId, bullJobId: bullJob.id }
+    }),
+
+  // ── Job status queries ───────────────────────────────────────────────────
+  jobStatus: permissionProcedure('run_agents')
+    .input(z.object({ jobId: z.string().cuid() }))
+    .query(async ({ ctx, input }) => {
+      const job = await prisma.job.findUnique({ where: { id: input.jobId } })
+      if (!job) throw new TRPCError({ code: 'NOT_FOUND', message: 'Job not found' })
+      if (ctx.orgId && job.orgId && job.orgId !== ctx.orgId) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Cross-organisation access denied' })
+      }
+      if (ctx.userId && job.userId && job.userId !== ctx.userId && ctx.orgId !== job.orgId) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Access denied' })
+      }
+      return job
+    }),
+
+  jobProgress: permissionProcedure('run_agents')
+    .input(z.object({ jobId: z.string().cuid() }))
+    .subscription(async function* ({ ctx, input }) {
+      const job = await prisma.job.findUnique({ where: { id: input.jobId } })
+      if (!job) throw new TRPCError({ code: 'NOT_FOUND', message: 'Job not found' })
+      if (ctx.orgId && job.orgId && job.orgId !== ctx.orgId) {
+        throw new TRPCError({ code: 'FORBIDDEN' })
+      }
+
+      let lastUpdate = JSON.stringify(job.progress)
+      yield job.progress ?? { stage: job.status.toLowerCase(), percent: 0, message: job.status, timestamp: new Date().toISOString() }
+
+      const interval = setInterval(async () => {
+        const current = await prisma.job.findUnique({ where: { id: input.jobId } })
+        if (!current) return
+        const update = JSON.stringify(current.progress)
+        if (update !== lastUpdate) {
+          lastUpdate = update
+          yield current.progress ?? { stage: current.status.toLowerCase(), percent: 0, message: current.status, timestamp: new Date().toISOString() }
+        }
+      }, 1000)
+
+      return () => clearInterval(interval)
+        }),
+
+  cancelJob: permissionProcedure('run_agents')
+    .input(z.object({ jobId: z.string().cuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const job = await prisma.job.findUnique({ where: { id: input.jobId } })
+      if (!job) throw new TRPCError({ code: 'NOT_FOUND', message: 'Job not found' })
+      if (ctx.orgId && job.orgId && job.orgId !== ctx.orgId) {
+        throw new TRPCError({ code: 'FORBIDDEN' })
+      }
+      if (job.status === 'COMPLETED' || job.status === 'FAILED' || job.status === 'CANCELLED') {
+        return job
+      }
+      await jobService.markCancelled(job.id)
+
+      // Also try to remove from BullMQ
+      try {
+        const queueName = JOB_TYPE_TO_QUEUE_ARRAY[job.jobType]
+        const queue = queueName && queues[queueName]
+        if (queue) {
+          const bullJob = await queue.getJob(job.id)
+          if (bullJob) await bullJob.remove()
+        }
+      } catch (err) {
+        log.warn({ err: (err as Error).message, jobId: job.id }, 'Failed to remove BullMQ job')
+      }
+
+      return prisma.job.findUnique({ where: { id: job.id } })
+    }),
+
+  retryJob: permissionProcedure('run_agents')
+    .input(z.object({ jobId: z.string().cuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const job = await prisma.job.findUnique({ where: { id: input.jobId } })
+      if (!job) throw new TRPCError({ code: 'NOT_FOUND', message: 'Job not found' })
+      if (ctx.orgId && job.orgId && job.orgId !== ctx.orgId) {
+        throw new TRPCError({ code: 'FORBIDDEN' })
+      }
+      if (job.attempts >= job.maxAttempts) {
+        throw new TRPCError({ code: 'PRECONDITION_FAILED', message: 'Max attempts reached' })
+      }
+
+      const updated = await jobService.retry(job.id)
+
+      // Re-dispatch to queue
+      try {
+        const queueName = JOB_TYPE_TO_QUEUE_ARRAY[job.jobType]
+        const queue = queueName && queues[queueName]
+        if (queue) {
+          await queue.add('retry', { ...(job.input as any), traceId: job.traceId, jobId: job.id }, { jobId: job.id })
+        }
+      } catch (err) {
+        log.error({ err: (err as Error).message, jobId: job.id }, 'Failed to re-dispatch job')
+      }
+
+      return updated
     }),
 
   // ── Data queries ─────────────────────────────────────────────────────────
@@ -272,4 +470,46 @@ export const agentsRouter: AnyRouter = router({
       const maxWaiting = Math.max(...Object.values(health).map((d: any) => d.waiting || 0))
       return { status: maxWaiting > 20 ? 'degraded' : 'healthy', queues: health, timestamp: new Date().toISOString() }
     }),
+
+  // ── Worker monitoring ────────────────────────────────────────────────────
+  workerStats: permissionProcedure('manage_users')
+    .query(async () => {
+      const health: Record<string, any> = {}
+      for (const [name, q] of Object.entries(queues)) {
+        health[name] = await (q as any).getJobCounts('waiting', 'active', 'delayed', 'failed', 'completed')
+      }
+
+      const dbJobs = await prisma.job.groupBy({
+        by: ['jobType'],
+        where: { status: { in: ['QUEUED', 'RUNNING', 'PROCESSING'] } },
+        _count: { id: true },
+      })
+
+      const stats = await jobService.getStats(undefined)
+
+      return {
+        queues: health,
+        dbJobs,
+        dbStats: stats,
+        timestamp: new Date().toISOString(),
+      }
+    }),
 })
+
+const JOB_TYPE_TO_QUEUE_ARRAY: Record<JobType, string> = {
+  RETRIEVAL: 'retrieval',
+  ANALYSIS: 'analysis',
+  DRAFTING: 'drafting',
+  VALIDATION: 'validation',
+  AUDIT: 'audit',
+  ORCHESTRATOR: 'orchestrator',
+  PRIVACY: 'privacy',
+  DEBATE: 'debate',
+  MONITORING: 'monitoring',
+  INDEXING: 'indexing',
+  TESTING: 'testing',
+  SANDBOX: 'sandbox',
+  AI_DEVELOPER: 'aiDeveloper',
+}
+
+const log = { warn: (...a: unknown[]) => console.warn('[agents]', ...a), error: (...a: unknown[]) => console.error('[agents]', ...a) }

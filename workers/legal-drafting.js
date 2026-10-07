@@ -15,9 +15,11 @@ import { writeAuditLog } from '@/backend/src/lib/audit.js'
 import { signOutput } from '@/backend/src/lib/crypto.js'
 import { readTemplatePrompt, readTemplateSchema } from '@/backend/src/templates/registry.js'
 import { render } from '@/backend/src/templates/render.js'
+import { jobService } from '@/backend/src/lib/jobs.js'
+import { classifyError, DEFAULT_REDIS_CONNECTION } from '@/backend/src/lib/worker-utils.js'
 
 const log = agentLogger('legal-drafting')
-const connection = { host: process.env.REDIS_HOST || 'localhost', port: parseInt(process.env.REDIS_PORT || '6379') }
+const connection = DEFAULT_REDIS_CONNECTION
 
 const ETHICS_DISCLAIMER = `\n\n---\n⚠️ ETHICS NOTICE: This document is AI-generated and requires review, approval, and signature by a qualified Malaysian lawyer before use in any legal proceeding. It does not constitute legal advice.`
 
@@ -74,6 +76,8 @@ const DraftInputSchema = z.object({
   traceId: z.string().default(() => randomUUID()),
   userId: z.string().optional(),
   orgId: z.string().optional(),
+  jobId: z.string().optional(),
+  draftId: z.string().optional(),
 })
 
 const TONE_INSTRUCTIONS = {
@@ -81,6 +85,8 @@ const TONE_INSTRUCTIONS = {
   neutral:     'Write in a balanced, objective legal style suitable for court submissions.',
   persuasive:  'Write in a compelling, persuasive style that builds a logical narrative toward the relief sought.',
 }
+
+const LLM_TIMEOUT = 180000
 
 async function draftLegacy({ docType, tone, parties, facts, reliefSought, citations }) {
   const header = LEGACY_HEADERS[docType](parties)
@@ -98,10 +104,13 @@ Requirements:
 - Do NOT invent facts or cases not provided
 - Output only the document body (no header)`
 
-  const res = await ollama.chat({
-    model: process.env.LLM_MODEL || 'llama3.1',
-    messages: [{ role: 'user', content: prompt }],
-  })
+  const res = await Promise.race([
+    ollama.chat({
+      model: process.env.LLM_MODEL || 'llama3.1',
+      messages: [{ role: 'user', content: prompt }],
+    }),
+    new Promise((_, reject) => setTimeout(() => reject(new Error('LLM timeout')), LLM_TIMEOUT)),
+  ])
   return `${header}\n\n${res.message.content}`
 }
 
@@ -118,10 +127,13 @@ async function draftFromTemplate({ templateId, inputData, iracText, citations, t
   // Prepend tone instruction
   const fullPrompt = `Style: ${TONE_INSTRUCTIONS[tone]}\n\n${renderedPrompt}`
 
-  const res = await ollama.chat({
-    model: process.env.LLM_MODEL || 'llama3.1',
-    messages: [{ role: 'user', content: fullPrompt }],
-  })
+  const res = await Promise.race([
+    ollama.chat({
+      model: process.env.LLM_MODEL || 'llama3.1',
+      messages: [{ role: 'user', content: fullPrompt }],
+    }),
+    new Promise((_, reject) => setTimeout(() => reject(new Error('LLM timeout')), LLM_TIMEOUT)),
+  ])
   return res.message.content
 }
 
@@ -132,60 +144,98 @@ const worker = new Worker('legal-drafting', async (job) => {
     throw new Error(`Validation failed: ${JSON.stringify(parsed.error.issues)}`)
   }
 
-  const { docType, templateId, inputData, iracText, tone, format, parties, facts, reliefSought, citations, traceId, userId, orgId } = parsed.data
+  const { docType, templateId, inputData, iracText, tone, format, parties, facts, reliefSought, citations, traceId, userId, orgId, jobId, draftId } = parsed.data
   const start = Date.now()
-  log.info({ traceId, docType: docType || templateId, tone }, 'Drafting started')
+  log.info({ traceId, docType: docType || templateId, tone, jobId }, 'Drafting started')
 
-  const citationCheck = validateMLJCitations(citations)
-  const invalidCitations = citationCheck.filter(c => !c.valid)
-  if (invalidCitations.length > 0) log.warn({ traceId, invalidCitations }, 'Non-MLJ citations detected')
-
-  let content
-
-  // Route: explicit templateId > docType→templateId mapping > legacy inline
-  const resolvedTemplateId = templateId ?? (docType ? DOC_TYPE_TO_TEMPLATE_ID[docType] : undefined)
-
-  if (resolvedTemplateId) {
-    content = await draftFromTemplate({ templateId: resolvedTemplateId, inputData, iracText, citations, tone })
-  } else if (docType && LEGACY_DOC_TYPES.has(docType)) {
-    content = await draftLegacy({ docType, tone, parties, facts, reliefSought, citations })
-  } else {
-    throw new Error(`Cannot resolve template for docType: ${docType}`)
+  let unifiedJob = null
+  if (jobId) {
+    unifiedJob = await jobService.getById(jobId)
+    if (unifiedJob) {
+      await jobService.markRunning(unifiedJob.id, `worker-${process.pid}`)
+    }
   }
 
-  const fullDoc = `${content}${ETHICS_DISCLAIMER}`
-  const effectiveDocType = docType || resolvedTemplateId?.toUpperCase() || 'UNKNOWN'
+  try {
+    const citationCheck = validateMLJCitations(citations)
+    const invalidCitations = citationCheck.filter(c => !c.valid)
+    if (invalidCitations.length > 0) log.warn({ traceId, invalidCitations }, 'Non-MLJ citations detected')
 
-  const draft = await prisma.draftDocument.create({
-    data: {
-      traceId, userId, orgId,
+    let content
+
+    // Route: explicit templateId > docType→templateId mapping > legacy inline
+    const resolvedTemplateId = templateId ?? (docType ? DOC_TYPE_TO_TEMPLATE_ID[docType] : undefined)
+
+    await jobService.markProcessing(unifiedJob?.id || '', 'preparing', 10, 'Preparing draft inputs')
+
+    if (resolvedTemplateId) {
+      await jobService.markProcessing(unifiedJob?.id || '', 'drafting_template', 40, 'Generating draft from template')
+      content = await draftFromTemplate({ templateId: resolvedTemplateId, inputData, iracText, citations, tone })
+    } else if (docType && LEGACY_DOC_TYPES.has(docType)) {
+      await jobService.markProcessing(unifiedJob?.id || '', 'drafting_legacy', 40, 'Generating legacy draft')
+      content = await draftLegacy({ docType, tone, parties, facts, reliefSought, citations })
+    } else {
+      throw new Error(`Cannot resolve template for docType: ${docType}`)
+    }
+
+    await jobService.markProcessing(unifiedJob?.id || '', 'finalizing', 90, 'Finalizing document')
+    const fullDoc = `${content}${ETHICS_DISCLAIMER}`
+    const effectiveDocType = docType || resolvedTemplateId?.toUpperCase() || 'UNKNOWN'
+
+    const draft = await prisma.draftDocument.create({
+      data: {
+        traceId, userId, orgId,
+        docType: effectiveDocType,
+        content: fullDoc,
+        format, tone,
+        citationsOk: invalidCitations.length === 0,
+      },
+    })
+
+    const output = {
+      traceId,
+      draftId: draft.id,
       docType: effectiveDocType,
+      tone, format,
       content: fullDoc,
-      format, tone,
-      citationsOk: invalidCitations.length === 0,
-    },
-  })
+      citationValidation: citationCheck,
+      _sig: signOutput({ draftId: draft.id, traceId }),
+    }
 
-  const output = {
-    traceId,
-    draftId: draft.id,
-    docType: effectiveDocType,
-    tone, format,
-    content: fullDoc,
-    citationValidation: citationCheck,
-    _sig: signOutput({ draftId: draft.id, traceId }),
+    await writeAuditLog({
+      traceId, agentName: 'legal-drafting', userId, action: 'draft',
+      input: { docType: effectiveDocType, tone, format, citationCount: citations.length },
+      output: { draftId: draft.id, citationsOk: draft.citationsOk },
+      durationMs: Date.now() - start,
+    })
+
+    if (unifiedJob) await jobService.markCompleted(unifiedJob.id, output)
+
+    log.info({ traceId, draftId: draft.id }, 'Draft complete')
+    return output
+  } catch (err) {
+    const error = err as Error
+    const { retryable, code } = classifyError(error)
+    log.error({ traceId, err: error.message, retryable, code }, 'Drafting job failed')
+
+    await writeAuditLog({
+      traceId, agentName: 'legal-drafting', userId, action: 'draft',
+      input: { docType: docType || templateId, tone, format, citationCount: citations.length },
+      output: { error: error.message },
+      durationMs: Date.now() - start,
+    })
+
+    if (unifiedJob) {
+      if (retryable && unifiedJob.attempts < unifiedJob.maxAttempts) {
+        await jobService.markRetrying(unifiedJob.id, unifiedJob.attempts + 1)
+        throw error
+      }
+      await jobService.markFailed(unifiedJob.id, error.message, code)
+    }
+
+    throw error
   }
-
-  await writeAuditLog({
-    traceId, agentName: 'legal-drafting', userId, action: 'draft',
-    input: { docType: effectiveDocType, tone, format, citationCount: citations.length },
-    output: { draftId: draft.id, citationsOk: draft.citationsOk },
-    durationMs: Date.now() - start,
-  })
-
-  log.info({ traceId, draftId: draft.id }, 'Draft complete')
-  return output
-}, { connection, concurrency: 2 })
+}, { connection, concurrency: 2, maxStalledCount: 2, removeOnFail: false, removeOnComplete: false })
 
 worker.on('failed', (job, err) => log.error({ jobId: job?.id, err: err.message }, 'Drafting job failed'))
 

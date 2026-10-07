@@ -535,7 +535,7 @@ export const MOCK_NOTIFICATIONS: AppNotification[] = [
     kind: "task",
     title: "Task due today",
     body: "Draft response to claim letter (TechNova Sdn Bhd).",
-    href: "/legalai/tasks",
+    href: "/legalai/matters",
     read: false,
     createdAt: isoDaysFromNow(0),
   },
@@ -656,7 +656,7 @@ export const MOCK_ACTIVITY: RecentActivity[] = [
     kind: "draft",
     title: "Warning Letter — Lim Wei Jian",
     detail: "Edited · draft",
-    href: "/legalai/draft",
+    href: "/legalai/documents/studio",
     at: isoDaysFromNow(-1),
   },
   {

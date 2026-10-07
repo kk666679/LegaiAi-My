@@ -1,5 +1,6 @@
 import { config } from 'dotenv'
 import { resolve } from 'path'
+import { createRequire } from 'module'
 import { fileURLToPath } from 'url'
 import { existsSync } from 'fs'
 import { PrismaClient } from '@prisma/client'
@@ -7,6 +8,11 @@ import { PrismaPg } from '@prisma/adapter-pg'
 import { Pool } from 'pg'
 
 const here = fileURLToPath(import.meta.url)
+// This module runs as ESM, where a bare `require` is not defined. Without a
+// working require, findRepoRoot silently threw on every package.json it found,
+// never recorded the directory holding .env.local, and fell back to backend/src
+// — so DATABASE_URL was never loaded and the server crashed at boot.
+const require_ = createRequire(import.meta.url)
 
 function findRepoRoot(start: string): string {
   let dir = start
@@ -14,7 +20,7 @@ function findRepoRoot(start: string): string {
   for (let i = 0; i < 8; i++) {
     try {
       const pkgPath = resolve(dir, 'package.json')
-      const pkg = existsSync(pkgPath) ? require(pkgPath) : undefined
+      const pkg = existsSync(pkgPath) ? require_(pkgPath) : undefined
       const isBackend =
         pkg?.name === 'lawMate-backend' || pkg?.name === 'lawmate-backend'
       const hasEnv =

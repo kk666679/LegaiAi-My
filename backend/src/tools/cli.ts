@@ -1,0 +1,1 @@
+import { getLawmateBanner, getLawmateBannerCompact } from '@/lib/branding/figlet.js';

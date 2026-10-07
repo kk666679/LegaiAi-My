@@ -11,9 +11,14 @@ import { randomUUID } from 'crypto'
 import { agentLogger } from '@/backend/src/lib/logger.js'
 import { writeAuditLog } from '@/backend/src/lib/audit.js'
 import { sha256 } from '@/backend/src/lib/crypto.js'
+import { jobService } from '@/backend/src/lib/jobs.js'
+import { classifyError, DEFAULT_REDIS_CONNECTION } from '@/backend/src/lib/worker-utils.js'
 
 const log = agentLogger('legal-indexing')
-const connection = { host: process.env.REDIS_HOST || 'localhost', port: parseInt(process.env.REDIS_PORT || '6379') }
+const connection = DEFAULT_REDIS_CONNECTION
+
+const EMBED_TIMEOUT = 30000
+const BATCH_SIZE = 10
 
 // Legal-aware chunking: split on legal section boundaries
 const LEGAL_BOUNDARIES = /(?=\b(?:HELD|RATIO|OBITER|FACTS|ISSUES?|DECISION|JUDGMENT|GROUNDS?|ORDERS?)\b[:\s])/i
@@ -57,82 +62,136 @@ async function enrichMetadata(text) {
 }
 
 async function embedText(text) {
-  const res = await ollama.embeddings({
-    model: process.env.EMBED_MODEL || 'mxbai-embed-large',
-    prompt: text,
-  })
+  const res = await Promise.race([
+    ollama.embeddings({
+      model: process.env.EMBED_MODEL || 'mxbai-embed-large',
+      prompt: text,
+    }),
+    new Promise((_, reject) => setTimeout(() => reject(new Error('Embedding timeout')), EMBED_TIMEOUT)),
+  ])
   return res.embedding
 }
 
 const worker = new Worker('legal-indexing', async (job) => {
-  const { documents, collection, traceId = randomUUID(), userId, requireApproval = false } = job.data
+  const { documents, collection, traceId = randomUUID(), userId, requireApproval = false, jobId } = job.data
   const start = Date.now()
-  log.info({ traceId, collection, docCount: documents?.length }, 'Indexing started')
+  log.info({ traceId, collection, docCount: documents?.length, jobId }, 'Indexing started')
 
-  const results = { indexed: 0, skipped: 0, errors: [] }
-
-  for (const doc of (documents || [])) {
-    try {
-      const checksum = sha256(doc.content)
-
-      // Incremental indexing: skip if checksum unchanged
-      const existing = await prisma.vectorDoc.findFirst({
-        where: { collection, checksum },
-        select: { id: true },
-      })
-      if (existing) { results.skipped++; continue }
-
-      // High-value case approval gate
-      if (requireApproval && !doc.approvedBy) {
-        log.warn({ traceId, docId: doc.id }, 'High-value case requires paralegal approval — skipped')
-        results.skipped++
-        continue
-      }
-
-      // Legal-aware chunking
-      const chunks = legalChunk(doc.content)
-      const metadata = await enrichMetadata(doc.content)
-
-      for (let i = 0; i < chunks.length; i++) {
-        const vector = await embedText(chunks[i])
-        await prisma.vectorDoc.create({
-          data: {
-            id: `${doc.id || randomUUID()}-chunk-${i}`,
-            collection,
-            content: chunks[i],
-            metadata: { ...doc.metadata, chunkIndex: i, totalChunks: chunks.length },
-            vector: `[${vector.join(',')}]`,
-            checksum,
-            indexVersion: doc.indexVersion || 1,
-            approvedBy: doc.approvedBy,
-            ...metadata,
-          },
-        })
-      }
-
-      // Update index stats
-      await prisma.indexStats.upsert({
-        where: { collection },
-        update: { docCount: { increment: chunks.length }, lastUpdated: new Date() },
-        create: { collection, docCount: chunks.length },
-      })
-
-      results.indexed++
-    } catch (err) {
-      log.error({ traceId, err: err.message }, 'Chunk indexing error')
-      results.errors.push({ docId: doc.id, error: err.message })
+  let unifiedJob = null
+  if (jobId) {
+    unifiedJob = await jobService.getById(jobId)
+    if (unifiedJob) {
+      await jobService.markRunning(unifiedJob.id, `worker-${process.pid}`)
     }
   }
 
-  await writeAuditLog({
-    traceId, agentName: 'legal-indexing', userId, action: 'index',
-    input: { collection, docCount: documents?.length },
-    output: results, durationMs: Date.now() - start,
-  })
+  try {
+    const results = { indexed: 0, skipped: 0, errors: [] }
+    const total = (documents || []).length
+    const BATCH = Math.max(1, Math.ceil(total / 10))
 
-  log.info({ traceId, ...results }, 'Indexing complete')
-  return { traceId, collection, ...results }
-}, { connection, concurrency: 2 })
+    for (let i = 0; i < total; i++) {
+      const doc = documents[i]
+      await jobService.markProcessing(
+        unifiedJob?.id || '',
+        `indexing_doc_${i + 1}`,
+        Math.round(((i + 1) / total) * 100),
+        `Indexing document ${i + 1} of ${total}`
+      )
+
+      try {
+        const checksum = sha256(doc.content)
+
+        // Incremental indexing: skip if checksum unchanged
+        const existing = await prisma.vectorDoc.findFirst({
+          where: { collection, checksum },
+          select: { id: true },
+        })
+        if (existing) { results.skipped++; continue }
+
+        // High-value case approval gate
+        if (requireApproval && !doc.approvedBy) {
+          log.warn({ traceId, docId: doc.id }, 'High-value case requires paralegal approval — skipped')
+          results.skipped++
+          continue
+        }
+
+        // Legal-aware chunking
+        const chunks = legalChunk(doc.content)
+        const metadata = await enrichMetadata(doc.content)
+
+        // Embed chunks in batches
+        for (let ci = 0; ci < chunks.length; ci++) {
+          const vector = await embedText(chunks[ci])
+          await prisma.vectorDoc.create({
+            data: {
+              id: `${doc.id || randomUUID()}-chunk-${ci}`,
+              collection,
+              content: chunks[ci],
+              metadata: { ...doc.metadata, chunkIndex: ci, totalChunks: chunks.length },
+              vector: `[${vector.join(',')}]`,
+              checksum,
+              indexVersion: doc.indexVersion || 1,
+              approvedBy: doc.approvedBy,
+              ...metadata,
+            },
+          })
+
+          // Progress update during chunk embedding
+          if (unifiedJob && (ci + 1) % BATCH === 0) {
+            const percent = Math.round(((i + 1) / total) * 100)
+            await jobService.markProcessing(
+              unifiedJob.id,
+              `indexing_doc_${i + 1}_chunk_${ci + 1}`,
+              percent,
+              `Document ${i + 1}: indexing chunk ${ci + 1} of ${chunks.length}`
+            )
+          }
+        }
+
+        // Update index stats
+        await prisma.indexStats.upsert({
+          where: { collection },
+          update: { docCount: { increment: chunks.length }, lastUpdated: new Date() },
+          create: { collection, docCount: chunks.length },
+        })
+
+        results.indexed++
+      } catch (err) {
+        const error = err as Error
+        log.error({ traceId, err: error.message }, 'Chunk indexing error')
+        results.errors.push({ docId: doc.id, error: error.message })
+      }
+    }
+
+    const output = { traceId, collection, ...results }
+
+    await writeAuditLog({
+      traceId, agentName: 'legal-indexing', userId, action: 'index',
+      input: { collection, docCount: documents?.length },
+      output: results, durationMs: Date.now() - start,
+    })
+
+    if (unifiedJob) await jobService.markCompleted(unifiedJob.id, output)
+
+    log.info({ traceId, ...results }, 'Indexing complete')
+    return output
+  } catch (err) {
+    const error = err as Error
+    const { retryable, code } = classifyError(error)
+    log.error({ traceId, err: error.message, retryable, code }, 'Indexing job failed')
+
+    if (unifiedJob) {
+      if (retryable && unifiedJob.attempts < unifiedJob.maxAttempts) {
+        await jobService.markRetrying(unifiedJob.id, unifiedJob.attempts + 1)
+        throw error
+      }
+      await jobService.markFailed(unifiedJob.id, error.message, code)
+    }
+
+    throw error
+  }
+}, { connection, concurrency: 2, maxStalledCount: 2, removeOnFail: false, removeOnComplete: false })
 
 worker.on('failed', (job, err) => log.error({ jobId: job?.id, err: err.message }, 'Indexing job failed'))
 process.on('SIGTERM', async () => { await worker.close(); process.exit(0) })

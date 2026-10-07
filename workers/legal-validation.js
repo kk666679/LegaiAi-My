@@ -12,10 +12,15 @@ import { randomUUID } from 'crypto'
 import { agentLogger } from '@/backend/src/lib/logger.js'
 import { writeAuditLog } from '@/backend/src/lib/audit.js'
 import { signOutput } from '@/backend/src/lib/crypto.js'
+import { jobService } from '@/backend/src/lib/jobs.js'
+import { classifyError, DEFAULT_REDIS_CONNECTION, DEFAULT_WORKER_OPTIONS } from '@/backend/src/lib/worker-utils.js'
 
 const log = agentLogger('legal-validation')
-const redis = new Redis({ host: process.env.REDIS_HOST || 'localhost', port: parseInt(process.env.REDIS_PORT || '6379') })
-const connection = { host: process.env.REDIS_HOST || 'localhost', port: parseInt(process.env.REDIS_PORT || '6379') }
+const redis = new Redis(DEFAULT_REDIS_CONNECTION)
+const connection = DEFAULT_REDIS_CONNECTION
+
+const LLM_TIMEOUT = 60000
+const QUERY_TIMEOUT = 30000
 
 // Extract citations from free text: "Tan v Kerajaan Malaysia [2020] 5 MLJ 234"
 const CITATION_REGEX = /([A-Za-z\s&]+v[s]?\s+[A-Za-z\s&]+)\s*\[(\d{4})\]\s*(\d+)\s*MLJ\s*(\d+)/gi
@@ -59,83 +64,130 @@ function confidenceTier(status) {
 }
 
 const worker = new Worker('legal-validation', async (job) => {
-  const { citation, text, traceId = randomUUID(), userId } = job.data
+  const { citation, text, traceId = randomUUID(), userId, jobId } = job.data
   const start = Date.now()
-  log.info({ traceId, citation }, 'Validation started')
+  log.info({ traceId, citation, jobId }, 'Validation started')
 
-  // Step 1: Extract citations from free text if raw text provided
-  const citations = citation ? [{ formatted: citation }] : extractCitations(text || '')
-
-  if (citations.length === 0) {
-    return { traceId, error: 'No valid citations found in input', results: [] }
+  let unifiedJob = null
+  if (jobId) {
+    unifiedJob = await jobService.getById(jobId)
+    if (unifiedJob) {
+      await jobService.markRunning(unifiedJob.id, `worker-${process.pid}`)
+    }
   }
 
-  const results = []
+  try {
+    // Step 1: Extract citations from free text if raw text provided
+    await jobService.markProcessing(unifiedJob?.id || '', 'extracting', 10, 'Extracting citations')
+    const citations = citation ? [{ formatted: citation }] : extractCitations(text || '')
 
-  for (const cite of citations) {
-    const cacheKey = `validation:${cite.formatted}`
-    const cached = await redis.get(cacheKey)
-    if (cached) {
-      results.push({ ...JSON.parse(cached), source: 'cache' })
-      continue
+    if (citations.length === 0) {
+      const output = { traceId, error: 'No valid citations found in input', results: [] }
+      if (unifiedJob) await jobService.markCompleted(unifiedJob.id, output)
+      return output
     }
 
-    // Step 2: Check pgvector store for later cases citing this one
-    const laterCases = await prisma.$queryRaw`
-      SELECT id, "caseName", citation, content, "caseDate"
-      FROM vector_docs
-      WHERE content ILIKE ${'%' + cite.formatted + '%'}
-      ORDER BY "caseDate" DESC
-      LIMIT 10
-    `
+    const results = []
 
-    // Step 3: Infer treatment from later case text
-    let overallStatus = 'cited'
-    const treatments = laterCases.map(c => {
-      const status = inferTreatment(c.content || '')
-      if (status === 'overruled') overallStatus = 'overruled'
-      else if (status === 'distinguished' && overallStatus !== 'overruled') overallStatus = 'distinguished'
-      return { citation: c.citation, caseName: c.caseName, status, date: c.caseDate }
+    for (let i = 0; i < citations.length; i++) {
+      const cite = citations[i]
+      const progress = 20 + Math.floor((i / citations.length) * 70)
+      await jobService.markProcessing(unifiedJob?.id || '', `validating_${i + 1}`, progress, `Validating citation ${i + 1} of ${citations.length}`)
+
+      const cacheKey = `validation:${cite.formatted}`
+      const cached = await redis.get(cacheKey)
+      if (cached) {
+        results.push({ ...JSON.parse(cached), source: 'cache' })
+        continue
+      }
+
+      // Step 2: Check pgvector store for later cases citing this one
+      const laterCases = await Promise.race([
+        prisma.$queryRaw`
+          SELECT id, "caseName", citation, content, "caseDate"
+          FROM vector_docs
+          WHERE content ILIKE ${'%' + cite.formatted + '%'}
+          ORDER BY "caseDate" DESC
+          LIMIT 10
+        `,
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Vector query timeout')), QUERY_TIMEOUT)),
+      ])
+
+      // Step 3: Infer treatment from later case text
+      let overallStatus = 'cited'
+      const treatments = laterCases.map(c => {
+        const status = inferTreatment(c.content || '')
+        if (status === 'overruled') overallStatus = 'overruled'
+        else if (status === 'distinguished' && overallStatus !== 'overruled') overallStatus = 'distinguished'
+        return { citation: c.citation, caseName: c.caseName, status, date: c.caseDate }
+      })
+
+      // Step 4: LLM judicial treatment summary
+      let llmSummary = null
+      if (laterCases.length > 0) {
+        const prompt = `Summarise in one sentence the judicial treatment of "${cite.formatted}" based on these later cases:\n${treatments.map(t => `- ${t.citation}: ${t.status}`).join('\n')}`
+        const res = await Promise.race([
+          ollama.chat({
+            model: process.env.LLM_MODEL || 'minimax-m2.7:cloud',
+            messages: [{ role: 'user', content: prompt }],
+          }),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('LLM timeout')), LLM_TIMEOUT)),
+        ])
+        llmSummary = res.message.content.trim()
+      }
+
+      const tier = confidenceTier(overallStatus)
+      const result = {
+        citation: cite.formatted,
+        status: overallStatus,
+        tier,
+        judicialTreatmentSummary: llmSummary || `No later cases found citing ${cite.formatted}`,
+        laterCases: treatments,
+        _sig: signOutput({ citation: cite.formatted, status: overallStatus }),
+      }
+
+      // Cache for 24h
+      await redis.setex(cacheKey, 86400, JSON.stringify(result))
+      results.push(result)
+    }
+
+    await jobService.markProcessing(unifiedJob?.id || '', 'finalizing', 95, 'Finalizing results')
+    const output = { traceId, results }
+
+    await writeAuditLog({
+      traceId, agentName: 'legal-validation', userId, action: 'validate',
+      input: { citation, citationCount: citations.length },
+      output: { results: results.map(r => ({ citation: r.citation, status: r.status, tier: r.tier })) },
+      durationMs: Date.now() - start,
     })
 
-    // Step 4: LLM judicial treatment summary
-    let llmSummary = null
-    if (laterCases.length > 0) {
-      const prompt = `Summarise in one sentence the judicial treatment of "${cite.formatted}" based on these later cases:\n${treatments.map(t => `- ${t.citation}: ${t.status}`).join('\n')}`
-      const res = await ollama.chat({
-        model: process.env.LLM_MODEL || 'minimax-m2.7:cloud',
-        messages: [{ role: 'user', content: prompt }],
-      })
-      llmSummary = res.message.content.trim()
+    if (unifiedJob) await jobService.markCompleted(unifiedJob.id, output)
+
+    log.info({ traceId, count: results.length }, 'Validation complete')
+    return output
+  } catch (err) {
+    const error = err as Error
+    const { retryable, code } = classifyError(error)
+    log.error({ traceId, err: error.message, retryable, code }, 'Validation job failed')
+
+    await writeAuditLog({
+      traceId, agentName: 'legal-validation', userId, action: 'validate',
+      input: { citation, citationCount: (citation ? [{ formatted: citation }] : extractCitations(text || '')).length },
+      output: { error: error.message },
+      durationMs: Date.now() - start,
+    })
+
+    if (unifiedJob) {
+      if (retryable && unifiedJob.attempts < unifiedJob.maxAttempts) {
+        await jobService.markRetrying(unifiedJob.id, unifiedJob.attempts + 1)
+        throw error
+      }
+      await jobService.markFailed(unifiedJob.id, error.message, code)
     }
 
-    const tier = confidenceTier(overallStatus)
-    const result = {
-      citation: cite.formatted,
-      status: overallStatus,
-      tier,
-      judicialTreatmentSummary: llmSummary || `No later cases found citing ${cite.formatted}`,
-      laterCases: treatments,
-      _sig: signOutput({ citation: cite.formatted, status: overallStatus }),
-    }
-
-    // Cache for 24h
-    await redis.setex(cacheKey, 86400, JSON.stringify(result))
-    results.push(result)
+    throw error
   }
-
-  const output = { traceId, results }
-
-  await writeAuditLog({
-    traceId, agentName: 'legal-validation', userId, action: 'validate',
-    input: { citation, citationCount: citations.length },
-    output: { results: results.map(r => ({ citation: r.citation, status: r.status, tier: r.tier })) },
-    durationMs: Date.now() - start,
-  })
-
-  log.info({ traceId, count: results.length }, 'Validation complete')
-  return output
-}, { connection, concurrency: 3 })
+}, { connection, concurrency: 3, maxStalledCount: 2, removeOnFail: false, removeOnComplete: false })
 
 worker.on('failed', (job, err) => log.error({ jobId: job?.id, err: err.message }, 'Validation job failed'))
 process.on('SIGTERM', async () => { await worker.close(); process.exit(0) })

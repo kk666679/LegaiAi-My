@@ -1,0 +1,41 @@
+{
+  "name": "@kk666679/cli",
+  "version": "1.0.0",
+  "description": "LAWMATE Developer Command Line - LawMate CLI with LAWMATE FIGlet branding",
+  "type": "module",
+  "bin": {
+    "lawmate": "./bin/lawmate.js"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "start": "node bin/lawmate.js",
+    "help": "node bin/lawmate.js --help",
+    "version": "node bin/lawmate.js --version"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kk666679/legalAi-My.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "lawmate",
+    "cli",
+    "command-line",
+    "legal"
+  ],
+  "author": "Kurnia Kadir",
+  "engines": {
+    "node": ">=22"
+  },
+  "files": [
+    "bin/lawmate.js",
+    "banner.js",
+    "index.js",
+    "package.json",
+    "README.md"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  }
+}

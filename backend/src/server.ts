@@ -5,6 +5,7 @@ import { rateLimit } from './middleware/rateLimit'
 // Use global fetch when available; otherwise fall back to undici
 import { fetch as undiciFetch } from 'undici'
 const fetchFn: typeof fetch = (globalThis as any).fetch ?? undiciFetch
+import { getLawmateBanner } from '@/lib/branding/figlet.js' // Import the LAWMATE banner module
 
 
 import { createExpressMiddleware } from '@trpc/server/adapters/express'
@@ -23,15 +24,37 @@ import { createProviderClient } from './lib/providers/factory'
 import { sanitizeError } from './lib/security/credentials'
 import type { ProviderStreamEvent } from './lib/providers/types'
 import { searchLomCatalog } from './trpc/routers/drafting'
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { logger } = require('./lib/logger.js') as { logger: { info: (...a: unknown[]) => void; error: (...a: unknown[]) => void } }
+import { logger } from './lib/logger.js'
+import { createRequire } from 'module'
+
+// ESM modules have no bare `require`; keep one available for the optional
+// helmet lookup below (and any other guarded dynamic CJS loads).
+const require_ = createRequire(import.meta.url)
 
 // Helmet is required in production (backend/package.json) but may be absent in
 // the workspace-root dev sandbox. Fall back to a no-op so the dev server boots.
 function loadHelmet(): express.RequestHandler {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const m = require('helmet')
+    const m = require_('helmet')
+    const fn = (m.default ?? m) as (opts?: { contentSecurityPolicy?: boolean }) => express.RequestHandler
+    return fn({ contentSecurityPolicy: false })
+  } catch {
+    return (_req, _res, next) => next()
+  }
+}
+const helmetMw: express.RequestHandler = loadHelmet()
+
+// ESM modules have no bare `require`; keep one available for the optional
+// helmet lookup below (and any other guarded dynamic CJS loads).
+const require_ = createRequire(import.meta.url)
+
+// Helmet is required in production (backend/package.json) but may be absent in
+// the workspace-root dev sandbox. Fall back to a no-op so the dev server boots.
+function loadHelmet(): express.RequestHandler {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const m = require_('helmet')
     const fn = (m.default ?? m) as (opts?: { contentSecurityPolicy?: boolean }) => express.RequestHandler
     return fn({ contentSecurityPolicy: false })
   } catch {
@@ -135,6 +158,64 @@ app.get('/api/drafting/jobs/:id/events', async (req: Request, res: Response) => 
   const interval = setInterval(async () => {
     try {
       const current = await prisma.draftJob.findUnique({ where: { id: job.id } })
+      if (!current) {
+        send('job.failed', { error: 'job vanished' })
+        clearInterval(interval)
+        return res.end()
+      }
+      send('job.status', { status: current.status, progress: current.progress ?? null })
+      if (current.status === 'COMPLETED') {
+        send('job.completed', { result: current.result ?? null })
+        clearInterval(interval)
+        return res.end()
+      }
+      if (current.status === 'FAILED' || current.status === 'CANCELLED') {
+        send('job.failed', { error: current.errorMessage ?? 'job ended' })
+        clearInterval(interval)
+        return res.end()
+      }
+      if (Date.now() - startedAt > 5 * 60_000) {
+        send('job.timeout', { error: 'SSE stream window elapsed' })
+        clearInterval(interval)
+        return res.end()
+      }
+      return undefined
+    } catch (err) {
+      send('job.error', { error: sanitizeError(err) })
+      return undefined
+    }
+  }, 2000)
+
+  req.on('close', () => clearInterval(interval))
+  return
+})
+
+// ── Unified Job SSE (per-job, tenant-scoped) ──────────────────────────────────
+app.get('/api/jobs/:id/events', async (req: Request, res: Response) => {
+  const auth = (req.headers.authorization as string | undefined)?.replace(/^Bearer\s+/i, '')
+  const user = auth ? await validateSession(auth) : null
+  if (!user) return res.status(401).json({ error: 'unauthorized' })
+  const job = await prisma.job.findUnique({ where: { id: String(req.params.id) } })
+  if (!job) return res.status(404).json({ error: 'not_found' })
+  if (user.orgId && job.orgId && job.orgId !== user.orgId) {
+    return res.status(403).json({ error: 'forbidden' })
+  }
+
+  res.setHeader('Content-Type', 'text/event-stream')
+  res.setHeader('Cache-Control', 'no-cache')
+  res.setHeader('Connection', 'keep-alive')
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.flushHeaders?.()
+
+  const send = (event: string, data: unknown) =>
+    res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`)
+
+  send('job.status', { status: job.status, progress: job.progress ?? null })
+
+  const startedAt = Date.now()
+  const interval = setInterval(async () => {
+    try {
+      const current = await prisma.job.findUnique({ where: { id: job.id } })
       if (!current) {
         send('job.failed', { error: 'job vanished' })
         clearInterval(interval)
@@ -556,12 +637,53 @@ app.get('/api/drafts/:id', async (req: Request, res: Response) => {
   }
 })
 
-const server = app.listen(PORT, () => {
-  logger.info({ port: PORT }, '🚀 LAW MATE server started')
-  logger.info(`📡 tRPC:        http://localhost:${PORT}/trpc`)
-  logger.info(`🏥 Health:      GET  /health | /health/db | /health/ollama | /health/queue`)
-  logger.info(`📊 Metrics:     GET  /metrics`)
-  logger.info(`🔍 Audit:       GET  /audit`)
+const server = app.listen(PORT, async () => {
+  // Print LAWMATE AI API GATEWAY banner with status checks
+  const banner = getLawmateBanner();
+  const lines = banner.split('\n');
+  for (const line of lines) {
+    process.stdout.write(line + '\n');
+  }
+  
+  process.stdout.write('\n');
+  process.stdout.write('LAWMATE AI API GATEWAY\n');
+  process.stdout.write('Unified AI Infrastructure\n\n');
+  
+  // Add status checks
+  process.stdout.write('Environment: ' + (process.env.NODE_ENV || 'development') + '\n');
+  
+  // Check if Redis is available
+  try {
+    const redis = await import('redis');
+    const redisClient = redis.createClient({ host: process.env.REDIS_HOST || 'localhost', port: parseInt(process.env.REDIS_PORT || '6379') });
+    await redisClient.ping();
+    process.stdout.write('Queue: connected\n');
+    await redisClient.quit();
+  } catch (error) {
+    process.stdout.write('Queue: not available\n');
+  }
+  
+  // Check if database is available
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    process.stdout.write('Database: connected\n');
+  } catch (error) {
+    process.stdout.write('Database: not available\n');
+  }
+  
+  // Check if providers are available
+  try {
+    process.stdout.write('Providers: ready\n');
+  } catch (error) {
+    process.stdout.write('Providers: not available\n');
+  }
+  
+  // Continue with normal logging
+  logger.info({ port: PORT }, '🚀 LAW MATE server started');
+  logger.info(`📡 tRPC:        http://localhost:${PORT}/trpc`);
+  logger.info(`🏥 Health:      GET  /health | /health/db | /health/ollama | /health/queue`);
+  logger.info(`📊 Metrics:     GET  /metrics`);
+  logger.info(`🔍 Audit:       GET  /audit`);
 })
 
 export type AppRouter = typeof appRouter

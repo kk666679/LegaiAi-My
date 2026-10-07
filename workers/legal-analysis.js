@@ -10,12 +10,15 @@ import { randomUUID } from 'crypto'
 import { agentLogger } from '@/backend/src/lib/logger.js'
 import { writeAuditLog } from '@/backend/src/lib/audit.js'
 import { signOutput } from '@/backend/src/lib/crypto.js'
-import { queues } from '@/backend/queues/index.js'
+import { jobService } from '@/backend/src/lib/jobs.js'
+import { classifyError, DEFAULT_REDIS_CONNECTION } from '@/backend/src/lib/worker-utils.js'
 
 const log = agentLogger('legal-analysis')
-const connection = { host: process.env.REDIS_HOST || 'localhost', port: parseInt(process.env.REDIS_PORT || '6379') }
+const connection = DEFAULT_REDIS_CONNECTION
 const CONFIDENCE_THRESHOLD = parseFloat(process.env.CONFIDENCE_THRESHOLD || '0.6')
 const MIN_CASES = 3
+const LLM_TIMEOUT = 120000
+const MAX_RETRIES = 3
 
 // Federal Constitution + treaty article mapping keywords
 const RIGHTS_MAP = {
@@ -69,74 +72,116 @@ Respond with:
 
 Format each section clearly. If insufficient cases, state "INSUFFICIENT EVIDENCE".`
 
-  const res = await ollama.chat({
-    model: process.env.LLM_MODEL || 'minimax-m2.7:cloud',
-    messages: [{ role: 'user', content: prompt }],
-  })
+  const res = await Promise.race([
+    ollama.chat({
+      model: process.env.LLM_MODEL || 'minimax-m2.7:cloud',
+      messages: [{ role: 'user', content: prompt }],
+    }),
+    new Promise((_, reject) => setTimeout(() => reject(new Error('LLM timeout')), LLM_TIMEOUT)),
+  ])
   return res.message.content
 }
 
 const worker = new Worker('legal-analysis', async (job) => {
-  const { task, cases = [], traceId = randomUUID(), userId } = job.data
+  const { task, cases = [], traceId = randomUUID(), userId, jobId } = job.data
   const start = Date.now()
-  log.info({ traceId, task, caseCount: cases.length }, 'Analysis started')
+  log.info({ traceId, task, caseCount: cases.length, jobId }, 'Analysis started')
 
-  // Confidence threshold guard
-  const validCases = cases.filter(c => (c.confidence || 0) >= CONFIDENCE_THRESHOLD)
-  if (validCases.length < MIN_CASES) {
-    log.warn({ traceId, validCases: validCases.length }, 'Insufficient cases for analysis')
-    return {
-      traceId,
-      error: `Insufficient evidence: need ${MIN_CASES} cases with confidence ≥ ${CONFIDENCE_THRESHOLD}, got ${validCases.length}`,
-      confidence: 0,
+  let unifiedJob = null
+  if (jobId) {
+    unifiedJob = await jobService.getById(jobId)
+    if (unifiedJob) {
+      await jobService.markRunning(unifiedJob.id, `worker-${process.pid}`)
     }
   }
 
-  // Primary analysis
-  const primaryAnalysis = await analyseWithLLM(task, validCases, traceId, 'primary')
+  try {
+    // Confidence threshold guard
+    await jobService.markProcessing(unifiedJob?.id || '', 'filtering', 10, 'Filtering cases by confidence')
+    const validCases = cases.filter(c => (c.confidence || 0) >= CONFIDENCE_THRESHOLD)
+    if (validCases.length < MIN_CASES) {
+      log.warn({ traceId, validCases: validCases.length }, 'Insufficient cases for analysis')
+      const output = {
+        traceId,
+        error: `Insufficient evidence: need ${MIN_CASES} cases with confidence ≥ ${CONFIDENCE_THRESHOLD}, got ${validCases.length}`,
+        confidence: 0,
+      }
+      if (unifiedJob) await jobService.markCompleted(unifiedJob.id, output)
+      return output
+    }
 
-  // Peer review: second agent with opposing position
-  const peerAnalysis = await analyseWithLLM(task, validCases, traceId, 'opposing')
+    // Primary analysis
+    await jobService.markProcessing(unifiedJob?.id || '', 'analysing_primary', 30, 'Running primary analysis')
+    const primaryAnalysis = await analyseWithLLM(task, validCases, traceId, 'primary')
 
-  // Sentence classification
-  const classified = classifySentences(primaryAnalysis)
+    // Peer review: second agent with opposing position
+    await jobService.markProcessing(unifiedJob?.id || '', 'analysing_peer', 60, 'Running peer review analysis')
+    const peerAnalysis = await analyseWithLLM(task, validCases, traceId, 'opposing')
 
-  // Human rights mapping
-  const rightsEngaged = mapHumanRights(primaryAnalysis)
+    // Sentence classification
+    await jobService.markProcessing(unifiedJob?.id || '', 'classifying', 80, 'Classifying sentences')
+    const classified = classifySentences(primaryAnalysis)
 
-  // Extract confidence from LLM output
-  const confMatch = primaryAnalysis.match(/CONFIDENCE[:\s]+([\d.]+)/i)
-  const confidence = confMatch ? parseFloat(confMatch[1]) : 0.7
+    // Human rights mapping
+    const rightsEngaged = mapHumanRights(primaryAnalysis)
 
-  // Verification links: map citations back to source IDs
-  const verificationLinks = validCases.map(c => ({
-    citation: c.citation,
-    id: c.id,
-    paragraphNum: c.paragraphNum,
-  }))
+    // Extract confidence from LLM output
+    const confMatch = primaryAnalysis.match(/CONFIDENCE[:\s]+([\d.]+)/i)
+    const confidence = confMatch ? parseFloat(confMatch[1]) : 0.7
 
-  const output = {
-    traceId,
-    primaryAnalysis,
-    peerAnalysis,
-    disagreements: primaryAnalysis !== peerAnalysis ? 'Peer review flagged differences — review both analyses' : null,
-    sentenceClassification: classified,
-    humanRightsEngaged: rightsEngaged,
-    verificationLinks,
-    confidence,
-    _sig: signOutput({ primaryAnalysis, traceId }),
+    // Verification links: map citations back to source IDs
+    const verificationLinks = validCases.map(c => ({
+      citation: c.citation,
+      id: c.id,
+      paragraphNum: c.paragraphNum,
+    }))
+
+    const output = {
+      traceId,
+      primaryAnalysis,
+      peerAnalysis,
+      disagreements: primaryAnalysis !== peerAnalysis ? 'Peer review flagged differences — review both analyses' : null,
+      sentenceClassification: classified,
+      humanRightsEngaged: rightsEngaged,
+      verificationLinks,
+      confidence,
+      _sig: signOutput({ primaryAnalysis, traceId }),
+    }
+
+    await writeAuditLog({
+      traceId, agentName: 'legal-analysis', userId, action: 'analyse',
+      input: { task, caseCount: validCases.length },
+      output: { confidence, rightsEngaged, disagreements: output.disagreements },
+      confidence, durationMs: Date.now() - start,
+    })
+
+    if (unifiedJob) await jobService.markCompleted(unifiedJob.id, output)
+
+    log.info({ traceId, confidence, rightsEngaged }, 'Analysis complete')
+    return output
+  } catch (err) {
+    const error = err as Error
+    const { retryable, code } = classifyError(error)
+    log.error({ traceId, err: error.message, retryable, code }, 'Analysis job failed')
+
+    await writeAuditLog({
+      traceId, agentName: 'legal-analysis', userId, action: 'analyse',
+      input: { task, caseCount: cases.length },
+      output: { error: error.message },
+      durationMs: Date.now() - start,
+    })
+
+    if (unifiedJob) {
+      if (retryable && unifiedJob.attempts < unifiedJob.maxAttempts) {
+        await jobService.markRetrying(unifiedJob.id, unifiedJob.attempts + 1)
+        throw error
+      }
+      await jobService.markFailed(unifiedJob.id, error.message, code)
+    }
+
+    throw error
   }
-
-  await writeAuditLog({
-    traceId, agentName: 'legal-analysis', userId, action: 'analyse',
-    input: { task, caseCount: validCases.length },
-    output: { confidence, rightsEngaged, disagreements: output.disagreements },
-    confidence, durationMs: Date.now() - start,
-  })
-
-  log.info({ traceId, confidence, rightsEngaged }, 'Analysis complete')
-  return output
-}, { connection, concurrency: parseInt(process.env.LLM_MAX_CONCURRENCY || '5') })
+}, { connection, concurrency: parseInt(process.env.LLM_MAX_CONCURRENCY || '5'), maxStalledCount: 2, removeOnFail: false, removeOnComplete: false })
 
 worker.on('failed', (job, err) => log.error({ jobId: job?.id, err: err.message }, 'Analysis job failed'))
 process.on('SIGTERM', async () => { await worker.close(); process.exit(0) })

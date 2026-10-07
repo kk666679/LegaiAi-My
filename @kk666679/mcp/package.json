@@ -1,0 +1,43 @@
+{
+  "name": "@kk666679/mcp",
+  "version": "1.0.0",
+  "description": "LAWMATE Model Context Protocol server - MCP server with 11 agents, 17 skills, KG + memory + HITL + consensus",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "start": "node index.js",
+    "serve:stdio": "node index.js",
+    "serve:http": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kk666679/legalAi-My.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "lawmate",
+    "legal"
+  ],
+  "author": "Kurnia Kadir",
+  "engines": {
+    "node": ">=22"
+  },
+  "files": [
+    "index.js",
+    "protocol.js",
+    "capabilities.js",
+    "resources.js",
+    "prompts.js",
+    "server.js",
+    "tools/",
+    "transport/",
+    "README.md"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  }
+}

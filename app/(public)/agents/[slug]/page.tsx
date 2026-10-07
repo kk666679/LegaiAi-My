@@ -155,6 +155,18 @@ const AGENT_DATA: Record<string, {
     dataClasses: ['public', 'internal'],
     workflow: ['Load tests', 'Execute', 'Score', 'Report', 'Flag regressions'],
   },
+  'ai-developer': {
+    name: 'AI Developer',
+    icon: <Code className="size-5" />,
+    description: 'Development utility worker for code generation, refactoring, and technical tasks.',
+    purpose: 'Generate and review code, refactor components, and produce technical documentation.',
+    inputs: ['Codebase context', 'Task description', 'Type constraints'],
+    outputs: ['Generated code', 'Refactored modules', 'Documentation'],
+    capabilities: ['Code generation', 'Refactoring', 'Technical analysis', 'Documentation'],
+    hitlLevel: 2,
+    dataClasses: ['internal'],
+    workflow: ['Ingest context', 'Plan changes', 'Generate', 'Verify', 'Document'],
+  },
 };
 
 const AGENT_SLUGS = Object.keys(AGENT_DATA);

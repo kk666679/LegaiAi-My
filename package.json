@@ -1,8 +1,9 @@
 {
   "name": "lawmate",
-  "version": "1.0.9",
-  "description": "Ollama chat + tRPC/pgVector API + BullMQ AI Agent + OpenClaw Gateway",
+  "version": "1.1.0",
+  "description": "LawMate is a legal AI platform for matter management, document drafting, research, agent governance, and operational analytics.",
   "type": "module",
+  "author": "Kurnia Kadir",
   "main": "index.js",
   "scripts": {
     "i18n:eval": "tsx scripts/eval-detect.mjs",
@@ -61,8 +62,12 @@
     "test:auth": "node --import tsx --test tests/autoclaw/auth-passwords.test.mjs"
   },
   "files": [
-    "SKILL.md"
+    "SKILL.md",
+    "bin/"
   ],
+  "bin": {
+    "lawmate": "./bin/lawmate.js"
+  },
   "dependencies": {
     "@ai-sdk/deepinfra": "^3.0.63",
     "@ai-sdk/openai": "^4.0.84",
@@ -194,7 +199,6 @@
   "engines": {
     "node": ">=24"
   },
-  "author": "Kurnia",
   "license": "MIT",
   "allowScripts": {
     "@prisma/engines": true,

@@ -20,13 +20,14 @@ import { z } from 'zod'
 import { SandboxService } from '@/backend/src/lib/sandbox.js'
 import { writeAuditLog } from '@/backend/src/lib/audit.js'
 import { agentLogger } from '@/backend/src/lib/logger.js'
+import { jobService } from '@/backend/src/lib/jobs.js'
+import { classifyError, DEFAULT_REDIS_CONNECTION } from '@/backend/src/lib/worker-utils.js'
 
 const log = agentLogger('legal-sandbox')
 
-const connection = {
-  host: process.env.REDIS_HOST || 'localhost',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-}
+const connection = DEFAULT_REDIS_CONNECTION
+
+const SANDBOX_TIMEOUT = 300000
 
 const ExecJobSchema = z.object({
   sandboxName: z
@@ -55,6 +56,7 @@ const ExecJobSchema = z.object({
   traceId: z.string().default(() => randomUUID()),
   userId: z.string().optional(),
   orgId: z.string().optional(),
+  jobId: z.string().optional(),
 })
 
 const DEFAULT_CMD = {
@@ -64,9 +66,7 @@ const DEFAULT_CMD = {
   shell:   { cmd: 'sh',      prefixArgs: ['-c'] },
 }
 
-const worker = new Worker(
-  'legal-sandbox',
-  async (job) => {
+const worker = new Worker('legal-sandbox', async (job) => {
     const parsed = ExecJobSchema.safeParse(job.data)
     if (!parsed.success) {
       log.error({ errors: parsed.error.issues }, 'Invalid sandbox job')
@@ -75,107 +75,151 @@ const worker = new Worker(
 
     const data = parsed.data
     const start = Date.now()
-    log.info({ traceId: data.traceId, sandboxName: data.sandboxName, language: data.language }, 'sandbox job started')
+    log.info({ traceId: data.traceId, sandboxName: data.sandboxName, language: data.language, jobId: data.jobId }, 'sandbox job started')
 
-    await SandboxService.getOrCreate({
-      name: data.sandboxName,
-      vcpus: data.vcpus,
-      networkPolicy: data.networkPolicy,
-      audit: { traceId: data.traceId, userId: data.userId, orgId: data.orgId },
-    })
-
-    if (data.files && data.files.length > 0) {
-      await SandboxService.writeFiles(
-        data.sandboxName,
-        data.files.map((f) => ({
-          path: f.path,
-          content: Buffer.from(f.contentBase64, 'base64'),
-          mode: f.mode,
-        })),
-        { traceId: data.traceId, userId: data.userId, orgId: data.orgId },
-      )
+    let unifiedJob = null
+    if (data.jobId) {
+      unifiedJob = await jobService.getById(data.jobId)
+      if (unifiedJob) {
+        await jobService.markRunning(unifiedJob.id, `worker-${process.pid}`)
+      }
     }
 
-    let cmd
-    let args
-    if (data.cmd) {
-      cmd = data.cmd
-      args = data.args || []
-    } else {
-      if (!data.code) throw new Error('Either `cmd` or `code` must be provided')
-      const spec = DEFAULT_CMD[data.language]
-      cmd = spec.cmd
-      args = [...spec.prefixArgs, data.code]
-    }
+    try {
+      await jobService.markProcessing(unifiedJob?.id || '', 'creating_sandbox', 10, 'Creating sandbox')
+      await SandboxService.getOrCreate({
+        name: data.sandboxName,
+        vcpus: data.vcpus,
+        networkPolicy: data.networkPolicy,
+        audit: { traceId: data.traceId, userId: data.userId, orgId: data.orgId },
+      })
 
-    const result = await SandboxService.runCommand(
-      data.sandboxName,
-      { cmd, args, cwd: data.cwd, env: data.env, sudo: true },
-      { traceId: data.traceId, userId: data.userId, orgId: data.orgId },
-    )
+      if (data.files && data.files.length > 0) {
+        await jobService.markProcessing(unifiedJob?.id || '', 'uploading_files', 30, 'Uploading files')
+        await SandboxService.writeFiles(
+          data.sandboxName,
+          data.files.map((f) => ({
+            path: f.path,
+            content: Buffer.from(f.contentBase64, 'base64'),
+            mode: f.mode,
+          })),
+          { traceId: data.traceId, userId: data.userId, orgId: data.orgId },
+        )
+      }
 
-    let snapshotInfo
-    if (data.snapshotAfter) {
-      const snap = await SandboxService.snapshot(data.sandboxName, { audit: { traceId: data.traceId } })
-      snapshotInfo = { snapshotId: snap.snapshotId, sizeBytes: snap.sizeBytes }
-    }
+      let cmd
+      let args
+      if (data.cmd) {
+        cmd = data.cmd
+        args = data.args || []
+      } else {
+        if (!data.code) throw new Error('Either `cmd` or `code` must be provided')
+        const spec = DEFAULT_CMD[data.language]
+        cmd = spec.cmd
+        args = [...spec.prefixArgs, data.code]
+      }
 
-    let stopInfo
-    if (data.stopAfter) {
-      const stopped = await SandboxService.stop(data.sandboxName, { traceId: data.traceId })
-      stopInfo = { snapshotId: stopped.snapshot?.id }
-    }
+      await jobService.markProcessing(unifiedJob?.id || '', 'executing', 50, `Executing: ${cmd}`)
+      const result = await Promise.race([
+        SandboxService.runCommand(
+          data.sandboxName,
+          { cmd, args, cwd: data.cwd, env: data.env, sudo: true },
+          { traceId: data.traceId, userId: data.userId, orgId: data.orgId },
+        ),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Sandbox execution timeout')), SANDBOX_TIMEOUT)),
+      ])
 
-    const output = {
-      traceId: data.traceId,
-      sandboxName: data.sandboxName,
-      exitCode: result.exitCode,
-      stdout: result.stdout,
-      stderr: result.stderr,
-      durationMs: result.durationMs,
-      snapshot: snapshotInfo,
-      stopped: stopInfo,
-    }
+      let snapshotInfo
+      if (data.snapshotAfter) {
+        await jobService.markProcessing(unifiedJob?.id || '', 'snapshotting', 85, 'Creating snapshot')
+        const snap = await SandboxService.snapshot(data.sandboxName, { audit: { traceId: data.traceId } })
+        snapshotInfo = { snapshotId: snap.snapshotId, sizeBytes: snap.sizeBytes }
+      }
 
-    await writeAuditLog({
-      traceId: data.traceId,
-      agentName: 'legal-sandbox',
-      userId: data.userId,
-      action: 'sandbox_exec_complete',
-      input: {
-        sandboxName: data.sandboxName,
-        language: data.language,
-        cmd,
-        argsPreview: args.slice(0, 1),
-        fileCount: data.files?.length ?? 0,
-      },
-      output: {
-        exitCode: result.exitCode,
-        durationMs: result.durationMs,
-        stdoutBytes: result.stdout.length,
-        stderrBytes: result.stderr.length,
-        snapshotId: snapshotInfo?.snapshotId,
-      },
-      durationMs: Date.now() - start,
-    })
+      let stopInfo
+      if (data.stopAfter) {
+        await jobService.markProcessing(unifiedJob?.id || '', 'stopping', 95, 'Stopping sandbox')
+        const stopped = await SandboxService.stop(data.sandboxName, { traceId: data.traceId })
+        stopInfo = { snapshotId: stopped.snapshot?.id }
+      }
 
-    log.info(
-      {
+      const output = {
         traceId: data.traceId,
         sandboxName: data.sandboxName,
         exitCode: result.exitCode,
+        stdout: result.stdout,
+        stderr: result.stderr,
         durationMs: result.durationMs,
-      },
-      'sandbox job complete',
-    )
+        snapshot: snapshotInfo,
+        stopped: stopInfo,
+      }
 
-    return output
+      await writeAuditLog({
+        traceId: data.traceId,
+        agentName: 'legal-sandbox',
+        userId: data.userId,
+        action: 'sandbox_exec_complete',
+        input: {
+          sandboxName: data.sandboxName,
+          language: data.language,
+          cmd,
+          argsPreview: args.slice(0, 1),
+          fileCount: data.files?.length ?? 0,
+        },
+        output: {
+          exitCode: result.exitCode,
+          durationMs: result.durationMs,
+          stdoutBytes: result.stdout.length,
+          stderrBytes: result.stderr.length,
+          snapshotId: snapshotInfo?.snapshotId,
+        },
+        durationMs: Date.now() - start,
+      })
+
+      if (unifiedJob) await jobService.markCompleted(unifiedJob.id, output)
+
+      log.info(
+        {
+          traceId: data.traceId,
+          sandboxName: data.sandboxName,
+          exitCode: result.exitCode,
+          durationMs: result.durationMs,
+        },
+        'sandbox job complete',
+      )
+
+      return output
+    } catch (err) {
+      const error = err as Error
+      const { retryable, code } = classifyError(error)
+      log.error({ traceId: data.traceId, err: error.message, retryable, code }, 'sandbox job failed')
+
+      await writeAuditLog({
+        traceId: data.traceId,
+        agentName: 'legal-sandbox',
+        userId: data.userId,
+        action: 'sandbox_exec_failed',
+        input: { sandboxName: data.sandboxName, language: data.language, cmd: cmd || 'unknown' },
+        output: { error: error.message },
+        durationMs: Date.now() - start,
+      })
+
+      if (unifiedJob) {
+        if (retryable && unifiedJob.attempts < unifiedJob.maxAttempts) {
+          await jobService.markRetrying(unifiedJob.id, unifiedJob.attempts + 1)
+          throw error
+        }
+        await jobService.markFailed(unifiedJob.id, error.message, code)
+      }
+
+      throw error
+    }
   },
-  { connection, concurrency: 2 },
+  { connection, concurrency: 2, maxStalledCount: 2, removeOnFail: false, removeOnComplete: false },
 )
 
 worker.on('completed', (job, result) => {
-  log.info({ jobId: job.id, result }, 'sandbox job completed')
+  log.info({ jobId: job.id }, 'sandbox job completed')
 })
 worker.on('failed', (job, err) => {
   log.error({ jobId: job?.id, err: err.message }, 'sandbox job failed')

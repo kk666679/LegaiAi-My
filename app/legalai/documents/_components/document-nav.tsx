@@ -5,14 +5,14 @@ import { usePathname } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const TABS = (id: string) => [
-  { href: `/documents/${id}/preview`,     label: "Preview" },
-  { href: `/documents/${id}/analysis`,    label: "Analysis" },
-  { href: `/documents/${id}/versions`,    label: "Versions" },
-  { href: `/documents/${id}/comparison`,  label: "Comparison" },
-  { href: `/documents/${id}/comments`,    label: "Comments" },
-  { href: `/documents/${id}/activity`,    label: "Activity" },
-  { href: `/documents/${id}/permissions`, label: "Permissions" },
-  { href: `/documents/${id}/studio`,      label: "Studio" },
+  { href: `/legalai/documents/${id}/preview`,     label: "Preview" },
+  { href: `/legalai/documents/${id}/analysis`,    label: "Analysis" },
+  { href: `/legalai/documents/${id}/versions`,    label: "Versions" },
+  { href: `/legalai/documents/${id}/comparison`,  label: "Comparison" },
+  { href: `/legalai/documents/${id}/comments`,    label: "Comments" },
+  { href: `/legalai/documents/${id}/activity`,    label: "Activity" },
+  { href: `/legalai/documents/${id}/permissions`, label: "Permissions" },
+  { href: `/legalai/documents/${id}/studio`,      label: "Studio" },
 ];
 
 export function DocumentScopedNav({ id }: { id: string }) {

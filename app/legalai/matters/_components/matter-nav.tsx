@@ -5,20 +5,20 @@ import { usePathname } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const TABS = (id: string) => [
-  { href: `/matters/${id}/overview`,   label: "Overview" },
-  { href: `/matters/${id}/tasks`,      label: "Tasks" },
-  { href: `/matters/${id}/deadlines`,  label: "Deadlines" },
-  { href: `/matters/${id}/time`,       label: "Time" },
-  { href: `/matters/${id}/billing`,    label: "Billing" },
-  { href: `/matters/${id}/documents`,  label: "Documents" },
-  { href: `/matters/${id}/parties`,    label: "Parties" },
-  { href: `/matters/${id}/team`,       label: "Team" },
-  { href: `/matters/${id}/notes`,      label: "Notes" },
-  { href: `/matters/${id}/conflicts`,  label: "Conflicts" },
-  { href: `/matters/${id}/permissions`, label: "Permissions" },
-  { href: `/matters/${id}/ai`,         label: "AI" },
-  { href: `/matters/${id}/activity`,   label: "Activity" },
-  { href: `/matters/${id}/analytics`,  label: "Analytics" },
+  { href: `/legalai/matters/${id}/overview`,   label: "Overview" },
+  { href: `/legalai/matters/${id}/tasks`,      label: "Tasks" },
+  { href: `/legalai/matters/${id}/deadlines`,  label: "Deadlines" },
+  { href: `/legalai/matters/${id}/time`,       label: "Time" },
+  { href: `/legalai/matters/${id}/billing`,    label: "Billing" },
+  { href: `/legalai/matters/${id}/documents`,  label: "Documents" },
+  { href: `/legalai/matters/${id}/parties`,    label: "Parties" },
+  { href: `/legalai/matters/${id}/team`,       label: "Team" },
+  { href: `/legalai/matters/${id}/notes`,      label: "Notes" },
+  { href: `/legalai/matters/${id}/conflicts`,  label: "Conflicts" },
+  { href: `/legalai/matters/${id}/permissions`, label: "Permissions" },
+  { href: `/legalai/matters/${id}/ai`,         label: "AI" },
+  { href: `/legalai/matters/${id}/activity`,   label: "Activity" },
+  { href: `/legalai/matters/${id}/analytics`,  label: "Analytics" },
 ];
 
 export function MatterScopedNav({ id }: { id: string }) {

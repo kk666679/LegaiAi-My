@@ -11,4 +11,5 @@ export * from "./useDebate"
 export * from "./useDocuments"
 export * from "./usePlan"
 export * from "./useFeature"
+export * from "./useJobs"
 

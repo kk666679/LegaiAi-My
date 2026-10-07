@@ -10,10 +10,12 @@ import { prisma } from '@/backend/src/db/index.js'
 import { randomUUID } from 'crypto'
 import { agentLogger } from '@/backend/src/lib/logger.js'
 import { writeAuditLog } from '@/backend/src/lib/audit.js'
+import { jobService } from '@/backend/src/lib/jobs.js'
+import { classifyError, DEFAULT_REDIS_CONNECTION } from '@/backend/src/lib/worker-utils.js'
 
 const log = agentLogger('legal-privacy')
-const redis = new Redis({ host: process.env.REDIS_HOST || 'localhost', port: parseInt(process.env.REDIS_PORT || '6379') })
-const connection = { host: process.env.REDIS_HOST || 'localhost', port: parseInt(process.env.REDIS_PORT || '6379') }
+const redis = new Redis(DEFAULT_REDIS_CONNECTION)
+const connection = DEFAULT_REDIS_CONNECTION
 
 // Malaysian PII patterns
 const PII_PATTERNS = [
@@ -49,48 +51,96 @@ export function minimiseForLLM(text, parties = {}) {
 }
 
 const worker = new Worker('legal-privacy', async (job) => {
-  const { action, traceId = randomUUID(), userId, text, parties, consentPrefs } = job.data
+  const { action, traceId = randomUUID(), userId, text, parties, consentPrefs, jobId } = job.data
   const start = Date.now()
+  log.info({ traceId, action, jobId }, 'Privacy processing started')
 
-  if (action === 'redact') {
-    const result = detectAndRedact(text || '')
-    log.info({ traceId, piiTypes: result.detected.map(d => d.type) }, 'PII redaction complete')
-
-    await writeAuditLog({
-      traceId, agentName: 'legal-privacy', userId, action: 'redact',
-      input: { textLength: text?.length },
-      output: { piiFound: result.detected, redactedLength: result.redacted.length },
-      durationMs: Date.now() - start,
-    })
-
-    return { traceId, ...result }
+  let unifiedJob = null
+  if (jobId) {
+    unifiedJob = await jobService.getById(jobId)
+    if (unifiedJob) {
+      await jobService.markRunning(unifiedJob.id, `worker-${process.pid}`)
+    }
   }
 
-  if (action === 'set_consent') {
-    await prisma.userConsent.upsert({
-      where: { userId },
-      update: consentPrefs,
-      create: { userId, ...consentPrefs },
-    })
-    await redis.setex(`consent:${userId}`, 86400, JSON.stringify(consentPrefs))
-    log.info({ traceId, userId }, 'Consent preferences updated')
-    return { traceId, userId, updated: true }
-  }
+  try {
+    if (action === 'redact') {
+      await jobService.markProcessing(unifiedJob?.id || '', 'redacting', 20, 'Detecting and redacting PII')
+      const result = detectAndRedact(text || '')
+      log.info({ traceId, piiTypes: result.detected.map(d => d.type) }, 'PII redaction complete')
 
-  if (action === 'get_consent') {
-    const cached = await redis.get(`consent:${userId}`)
-    if (cached) return { traceId, userId, consent: JSON.parse(cached), source: 'cache' }
-    const consent = await prisma.userConsent.findUnique({ where: { userId } })
-    return { traceId, userId, consent, source: 'db' }
-  }
+      await writeAuditLog({
+        traceId, agentName: 'legal-privacy', userId, action: 'redact',
+        input: { textLength: text?.length },
+        output: { piiFound: result.detected, redactedLength: result.redacted.length },
+        durationMs: Date.now() - start,
+      })
 
-  if (action === 'minimise') {
-    const minimised = minimiseForLLM(text || '', parties || {})
-    return { traceId, minimised }
-  }
+      const output = { traceId, ...result }
+      if (unifiedJob) await jobService.markCompleted(unifiedJob.id, output)
+      return output
+    }
 
-  throw new Error(`Unknown privacy action: ${action}`)
-}, { connection, concurrency: 5 })
+    if (action === 'set_consent') {
+      await jobService.markProcessing(unifiedJob?.id || '', 'saving', 50, 'Saving consent preferences')
+      await prisma.userConsent.upsert({
+        where: { userId },
+        update: consentPrefs,
+        create: { userId, ...consentPrefs },
+      })
+      await redis.setex(`consent:${userId}`, 86400, JSON.stringify(consentPrefs))
+      log.info({ traceId, userId }, 'Consent preferences updated')
+
+      const output = { traceId, userId, updated: true }
+      await writeAuditLog({
+        traceId, agentName: 'legal-privacy', userId, action: 'set_consent',
+        input: { consentPrefs },
+        output: { updated: true },
+        durationMs: Date.now() - start,
+      })
+      if (unifiedJob) await jobService.markCompleted(unifiedJob.id, output)
+      return output
+    }
+
+    if (action === 'get_consent') {
+      await jobService.markProcessing(unifiedJob?.id || '', 'fetching', 30, 'Fetching consent')
+      const cached = await redis.get(`consent:${userId}`)
+      let output
+      if (cached) {
+        output = { traceId, userId, consent: JSON.parse(cached), source: 'cache' }
+      } else {
+        const consent = await prisma.userConsent.findUnique({ where: { userId } })
+        output = { traceId, userId, consent, source: 'db' }
+      }
+      if (unifiedJob) await jobService.markCompleted(unifiedJob.id, output)
+      return output
+    }
+
+    if (action === 'minimise') {
+      await jobService.markProcessing(unifiedJob?.id || '', 'minimising', 20, 'Minimising data for LLM')
+      const minimised = minimiseForLLM(text || '', parties || {})
+      const output = { traceId, minimised }
+      if (unifiedJob) await jobService.markCompleted(unifiedJob.id, output)
+      return output
+    }
+
+    throw new Error(`Unknown privacy action: ${action}`)
+  } catch (err) {
+    const error = err as Error
+    const { retryable, code } = classifyError(error)
+    log.error({ traceId, err: error.message, retryable, code }, 'Privacy job failed')
+
+    if (unifiedJob) {
+      if (retryable && unifiedJob.attempts < unifiedJob.maxAttempts) {
+        await jobService.markRetrying(unifiedJob.id, unifiedJob.attempts + 1)
+        throw error
+      }
+      await jobService.markFailed(unifiedJob.id, error.message, code)
+    }
+
+    throw error
+  }
+}, { connection, concurrency: 5, maxStalledCount: 2, removeOnFail: false, removeOnComplete: false })
 
 worker.on('failed', (job, err) => log.error({ jobId: job?.id, err: err.message }, 'Privacy job failed'))
 process.on('SIGTERM', async () => { await worker.close(); process.exit(0) })

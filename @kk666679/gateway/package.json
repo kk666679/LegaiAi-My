@@ -1,0 +1,38 @@
+{
+  "name": "@kk666679/gateway",
+  "version": "1.0.0",
+  "description": "LAWMATE AI API GATEWAY - Unified AI Infrastructure with LAWMATE FIGlet branding",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "start": "node server.js",
+    "dev": "tsx watch server.js",
+    "health:check": "node -e \"import('./server.js').then(m => console.log('Gateway operational'))\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kk666679/legalAi-My.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "lawmate",
+    "gateway",
+    "ai-api",
+    "legal"
+  ],
+  "author": "Kurnia Kadir",
+  "engines": {
+    "node": ">=22"
+  },
+  "files": [
+    "server.js",
+    "banner.js",
+    "package.json",
+    "README.md"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  }
+}

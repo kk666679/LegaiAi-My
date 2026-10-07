@@ -10,9 +10,13 @@ import { randomUUID } from 'crypto'
 import { agentLogger } from '@/backend/src/lib/logger.js'
 import { writeAuditLog } from '@/backend/src/lib/audit.js'
 import { queues } from '@/backend/queues/index.js'
+import { jobService } from '@/backend/src/lib/jobs.js'
+import { classifyError, DEFAULT_REDIS_CONNECTION } from '@/backend/src/lib/worker-utils.js'
 
 const log = agentLogger('legal-testing')
-const connection = { host: process.env.REDIS_HOST || 'localhost', port: parseInt(process.env.REDIS_PORT || '6379') }
+const connection = DEFAULT_REDIS_CONNECTION
+
+const LLM_TIMEOUT = 180000
 
 // Gold dataset: loaded from datasets/gold_eval_dataset.json
 import { readFileSync } from 'fs'
@@ -39,16 +43,25 @@ function loadGoldDataset() {
 
 const GOLD_DATASET = loadGoldDataset()
 
-async function runGoldEvaluation() {
+async function runGoldEvaluation(traceId) {
   let passed = 0
   const results = []
+  const total = GOLD_DATASET.length
 
-  for (const { query, expectedKeywords } of GOLD_DATASET) {
+  for (let i = 0; i < total; i++) {
+    const { query, expectedKeywords } = GOLD_DATASET[i]
     const start = Date.now()
-    const res = await ollama.chat({
-      model: process.env.LLM_MODEL || 'minimax-m2.7:cloud',
-      messages: [{ role: 'user', content: `Answer this Malaysian legal question concisely: ${query}` }],
-    })
+
+    log.info({ traceId, query: query.slice(0, 50), progress: `${i + 1}/${total}` }, 'Gold eval progress')
+
+    const res = await Promise.race([
+      ollama.chat({
+        model: process.env.LLM_MODEL || 'minimax-m2.7:cloud',
+        messages: [{ role: 'user', content: `Answer this Malaysian legal question concisely: ${query}` }],
+      }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('LLM timeout')), LLM_TIMEOUT)),
+    ])
+
     const answer = res.message.content.toLowerCase()
     const hits = expectedKeywords.filter(k => answer.includes(k.toLowerCase()))
     const score = hits.length / expectedKeywords.length
@@ -75,10 +88,13 @@ async function generateAdversarialTests(count = 5) {
 
 Return as JSON array: [{"query": "...", "expectedBehaviour": "..."}]`
 
-  const res = await ollama.chat({
-    model: process.env.LLM_MODEL || 'minimax-m2.7:cloud',
-    messages: [{ role: 'user', content: prompt }],
-  })
+  const res = await Promise.race([
+    ollama.chat({
+      model: process.env.LLM_MODEL || 'minimax-m2.7:cloud',
+      messages: [{ role: 'user', content: prompt }],
+    }),
+    new Promise((_, reject) => setTimeout(() => reject(new Error('LLM timeout')), LLM_TIMEOUT)),
+  ])
 
   try {
     const jsonMatch = res.message.content.match(/\[[\s\S]*\]/)
@@ -89,49 +105,86 @@ Return as JSON array: [{"query": "...", "expectedBehaviour": "..."}]`
 }
 
 const worker = new Worker('legal-testing', async (job) => {
-  const { action, traceId = randomUUID(), userId } = job.data
+  const { action, traceId = randomUUID(), userId, count, jobId } = job.data
   const start = Date.now()
-  log.info({ traceId, action }, 'Testing started')
+  log.info({ traceId, action, jobId }, 'Testing started')
 
-  if (action === 'gold_eval') {
-    const evaluation = await runGoldEvaluation()
-    log.info({ traceId, credibilityScore: evaluation.credibilityScore }, 'Gold evaluation complete')
+  let unifiedJob = null
+  if (jobId) {
+    unifiedJob = await jobService.getById(jobId)
+    if (unifiedJob) {
+      await jobService.markRunning(unifiedJob.id, `worker-${process.pid}`)
+    }
+  }
 
-    // Disable drafting if credibility drops below 90
-    if (evaluation.credibilityScore < 90) {
-      log.warn({ traceId, score: evaluation.credibilityScore }, '⚠️ Credibility below 90 — drafting features should be reviewed')
+  try {
+    if (action === 'gold_eval') {
+      await jobService.markProcessing(unifiedJob?.id || '', 'running_eval', 10, 'Running gold evaluation')
+      const evaluation = await runGoldEvaluation(traceId)
+      log.info({ traceId, credibilityScore: evaluation.credibilityScore }, 'Gold evaluation complete')
+
+      // Disable drafting if credibility drops below 90
+      if (evaluation.credibilityScore < 90) {
+        log.warn({ traceId, score: evaluation.credibilityScore }, 'Credibility below 90 — drafting features should be reviewed')
+      }
+
+      await writeAuditLog({
+        traceId, agentName: 'legal-testing', userId, action: 'gold_eval',
+        input: { datasetSize: GOLD_DATASET.length },
+        output: { credibilityScore: evaluation.credibilityScore, passed: evaluation.passed },
+        confidence: evaluation.credibilityScore / 100,
+        durationMs: Date.now() - start,
+      })
+
+      if (unifiedJob) await jobService.markCompleted(unifiedJob.id, { traceId, ...evaluation })
+      return { traceId, ...evaluation }
     }
 
+    if (action === 'adversarial') {
+      await jobService.markProcessing(unifiedJob?.id || '', 'generating_tests', 10, 'Generating adversarial tests')
+      const tests = await generateAdversarialTests(job.data.count || 5)
+      log.info({ traceId, count: tests.length }, 'Adversarial tests generated')
+
+      if (unifiedJob) await jobService.markCompleted(unifiedJob.id, { traceId, tests })
+      return { traceId, tests }
+    }
+
+    if (action === 'benchmark') {
+      await jobService.markProcessing(unifiedJob?.id || '', 'bench_enqueue', 50, 'Enqueueing benchmark retrieval jobs')
+      const benchmarks = []
+      for (const { query } of GOLD_DATASET.slice(0, 3)) {
+        const t0 = Date.now()
+        await queues.retrieval.add('benchmark', { query, traceId, topK: 3 })
+        benchmarks.push({ query: query.slice(0, 50), enqueuedMs: Date.now() - t0 })
+      }
+      await jobService.markCompleted(unifiedJob?.id || '', { traceId, benchmarks })
+      return { traceId, benchmarks }
+    }
+
+    throw new Error(`Unknown testing action: ${action}`)
+  } catch (err) {
+    const error = err as Error
+    const { retryable, code } = classifyError(error)
+    log.error({ traceId, err: error.message, retryable, code }, 'Testing job failed')
+
     await writeAuditLog({
-      traceId, agentName: 'legal-testing', userId, action: 'gold_eval',
-      input: { datasetSize: GOLD_DATASET.length },
-      output: { credibilityScore: evaluation.credibilityScore, passed: evaluation.passed },
-      confidence: evaluation.credibilityScore / 100,
+      traceId, agentName: 'legal-testing', userId, action,
+      input: { action, datasetSize: GOLD_DATASET.length },
+      output: { error: error.message },
       durationMs: Date.now() - start,
     })
 
-    return { traceId, ...evaluation }
-  }
-
-  if (action === 'adversarial') {
-    const tests = await generateAdversarialTests(job.data.count || 5)
-    log.info({ traceId, count: tests.length }, 'Adversarial tests generated')
-    return { traceId, tests }
-  }
-
-  if (action === 'benchmark') {
-    // Measure retrieval + analysis latency
-    const benchmarks = []
-    for (const { query } of GOLD_DATASET.slice(0, 3)) {
-      const t0 = Date.now()
-      await queues.retrieval.add('benchmark', { query, traceId, topK: 3 })
-      benchmarks.push({ query: query.slice(0, 50), enqueuedMs: Date.now() - t0 })
+    if (unifiedJob) {
+      if (retryable && unifiedJob.attempts < unifiedJob.maxAttempts) {
+        await jobService.markRetrying(unifiedJob.id, unifiedJob.attempts + 1)
+        throw error
+      }
+      await jobService.markFailed(unifiedJob.id, error.message, code)
     }
-    return { traceId, benchmarks }
-  }
 
-  throw new Error(`Unknown testing action: ${action}`)
-}, { connection, concurrency: 1 })
+    throw error
+  }
+}, { connection, concurrency: 1, maxStalledCount: 2, removeOnFail: false, removeOnComplete: false })
 
 worker.on('failed', (job, err) => log.error({ jobId: job?.id, err: err.message }, 'Testing job failed'))
 process.on('SIGTERM', async () => { await worker.close(); process.exit(0) })

@@ -146,7 +146,7 @@ const AGENTS = [
     capabilities: ['Code generation', 'Refactoring', 'Technical analysis', 'Documentation'],
     hitlLevel: 2,
     dataClasses: ['internal'],
-    href: '/agents',
+    href: '/agents/ai-developer',
   },
 ];
 

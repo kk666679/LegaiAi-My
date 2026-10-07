@@ -219,6 +219,67 @@ model DraftJob {
   @@map("draft_jobs")
 }
 
+// ── Unified Job Model (for all worker types) ─────────────────────────────────
+
+enum JobStatus {
+  QUEUED
+  RUNNING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+  RETRYING
+}
+
+enum JobType {
+  RETRIEVAL
+  ANALYSIS
+  DRAFTING
+  VALIDATION
+  AUDIT
+  ORCHESTRATOR
+  PRIVACY
+  DEBATE
+  MONITORING
+  INDEXING
+  TESTING
+  SANDBOX
+  AI_DEVELOPER
+}
+
+model Job {
+  id              String    @id @default(cuid())
+  orgId           String?
+  userId          String?
+  traceId         String?
+  jobType         JobType
+  status          JobStatus @default(QUEUED)
+  priority        Int       @default(10)
+  input           Json?
+  result          Json?
+  errorMessage    String?
+  errorCode       String?
+  progress        Json?     // { stage: string, percent: int, message: string }
+  attempts        Int       @default(0)
+  maxAttempts     Int       @default(3)
+  startedAt       DateTime?
+  completedAt     DateTime?
+  failedAt        DateTime?
+  queuedAt        DateTime  @default(now())
+  workerId        String?
+  idempotencyKey  String?   @unique
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([orgId])
+  @@index([userId])
+  @@index([traceId])
+  @@index([jobType])
+  @@index([status])
+  @@index([idempotencyKey])
+  @@map("jobs")
+}
+
 model DraftAnalysis {
   id            String   @id @default(cuid())
   draftId       String

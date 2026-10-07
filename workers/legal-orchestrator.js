@@ -8,9 +8,11 @@ import { randomUUID } from 'crypto'
 import { agentLogger } from '@/backend/src/lib/logger.js'
 import { writeAuditLog } from '@/backend/src/lib/audit.js'
 import { queues } from '@/backend/queues/index.js'
+import { jobService } from '@/backend/src/lib/jobs.js'
+import { classifyError, DEFAULT_REDIS_CONNECTION, DEFAULT_WORKER_OPTIONS } from '@/backend/src/lib/worker-utils.js'
 
 const log = agentLogger('legal-orchestrator')
-const connection = { host: process.env.REDIS_HOST || 'localhost', port: parseInt(process.env.REDIS_PORT || '6379') }
+const connection = DEFAULT_REDIS_CONNECTION
 const flow = new FlowProducer({ connection })
 
 // Workflow DAG: Retrieval → Analysis → Drafting (with optional Validation)
@@ -77,27 +79,68 @@ async function orchestrateFullWorkflow(payload) {
 
 const worker = new Worker('legal-orchestrator', async (job) => {
   const { action = 'full', traceId = randomUUID(), ...payload } = job.data
+  const start = Date.now()
+  log.info({ traceId, action, jobId: job.id }, 'Orchestrator started')
 
-  if (action === 'full') return orchestrateFullWorkflow({ ...payload, traceId })
-
-  if (action === 'status') {
-    // Return queue depths for SLA monitoring
-    const depths = {}
-    for (const [name, q] of Object.entries(queues)) {
-      const counts = await q.getJobCounts('waiting', 'active', 'delayed', 'failed')
-      depths[name] = counts
-    }
-    const maxWaiting = Math.max(...Object.values(depths).map(d => d.waiting || 0))
-    return {
-      traceId,
-      status: maxWaiting > 20 ? 'degraded' : 'healthy',
-      queues: depths,
-      timestamp: new Date().toISOString(),
+  let unifiedJob = null
+  if (job.id) {
+    unifiedJob = await jobService.getById(job.id)
+    if (unifiedJob) {
+      await jobService.markRunning(unifiedJob.id, `worker-${process.pid}`)
     }
   }
 
-  throw new Error(`Unknown orchestrator action: ${action}`)
-}, { connection, concurrency: 5 })
+  try {
+    if (action === 'full') {
+      await jobService.markProcessing(unifiedJob?.id || '', 'orchestrating', 10, 'Starting workflow orchestration')
+      const result = await orchestrateFullWorkflow({ ...payload, traceId })
+      await jobService.markCompleted(unifiedJob?.id || '', result)
+      return result
+    }
+
+    if (action === 'status') {
+      // Return queue depths for SLA monitoring
+      await jobService.markProcessing(unifiedJob?.id || '', 'checking_status', 50, 'Checking queue depths')
+      const depths = {}
+      for (const [name, q] of Object.entries(queues)) {
+        const counts = await q.getJobCounts('waiting', 'active', 'delayed', 'failed')
+        depths[name] = counts
+      }
+      const maxWaiting = Math.max(...Object.values(depths).map(d => d.waiting || 0))
+      const output = {
+        traceId,
+        status: maxWaiting > 20 ? 'degraded' : 'healthy',
+        queues: depths,
+        timestamp: new Date().toISOString(),
+      }
+      await jobService.markCompleted(unifiedJob?.id || '', output)
+      return output
+    }
+
+    throw new Error(`Unknown orchestrator action: ${action}`)
+  } catch (err) {
+    const error = err as Error
+    const { retryable, code } = classifyError(error)
+    log.error({ traceId, err: error.message, retryable, code }, 'Orchestrator job failed')
+
+    await writeAuditLog({
+      traceId, agentName: 'legal-orchestrator', userId: payload.userId, action: 'orchestrate',
+      input: payload,
+      output: { error: error.message },
+      durationMs: Date.now() - start,
+    })
+
+    if (unifiedJob) {
+      if (retryable && unifiedJob.attempts < unifiedJob.maxAttempts) {
+        await jobService.markRetrying(unifiedJob.id, unifiedJob.attempts + 1)
+        throw error
+      }
+      await jobService.markFailed(unifiedJob.id, error.message, code)
+    }
+
+    throw error
+  }
+}, { connection, concurrency: 5, maxStalledCount: 2, removeOnFail: false, removeOnComplete: false })
 
 worker.on('failed', (job, err) => log.error({ jobId: job?.id, err: err.message }, 'Orchestrator job failed'))
 process.on('SIGTERM', async () => { await worker.close(); process.exit(0) })

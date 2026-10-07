@@ -4,9 +4,9 @@ id: lom-sync
 order: 10
 ---
 
-# LAW MATE — LOM (Laws of Malaysia) Sync
+# LAW MATE — Law Of Malaysia Sync
 
-Scripts under `scripts/lom-*.mjs` keep the local corpus in sync with the official *Laws of Malaysia* (LOM) source PDFs. The sync is one-way (source → DB) and idempotent.
+Scripts under `scripts/lom-*.mjs` keep the local corpus in sync with the official Law Of Malaysia source PDFs. The sync is one-way (source → DB) and idempotent.
 
 See [deployment.md](deployment.md#database-operations) for general Prisma operations.
 
@@ -16,7 +16,7 @@ See [deployment.md](deployment.md#database-operations) for general Prisma operat
 
 | Script | Purpose |
 |--------|---------|
-| `npm run lom:sync` | Sync all LOM sections |
+| `npm run lom:sync` | Sync all Law Of Malaysia sections |
 | `npm run lom:sync:principal` | Principal Acts only |
 | `npm run lom:sync:amendments` | Amendment Acts |
 | `npm run lom:sync:pu-a` | Perintah Undang-Undang (PU(A)) |

@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
 export default function Page() {
-  redirect("/legalai/audit");
+  // The audit trail viewer lives under the agents module.
+  redirect("/legalai/agents/audit");
 }
