@@ -125,7 +125,7 @@ All steps are tracked with **Provenance** (who, what, why, data, model, tools, r
 ## 🧰 Tech Stack
 
 | Layer | Technology |
-|-------|------------|
+| ------- | ------------ |
 | **Frontend** | Next.js 16, React 19, TanStack Query, Tailwind CSS 4, Radix UI, Framer Motion |
 | **Backend** | Express 5, tRPC 11, Prisma 7, Node.js ≥22 |
 | **AI / LLM** | Ollama (llama3.1, mxbai‑embed‑large), AI SDK, TanStack AI |
@@ -159,11 +159,13 @@ All steps are tracked with **Provenance** (who, what, why, data, model, tools, r
 ## ⚡ Getting Started
 
 ### Prerequisites
+
 - Node.js ≥22
 - Docker & Docker Compose
 - Ollama (installed locally or via Docker)
 
 ### Setup
+
 1. Clone the repository.
 2. Install dependencies:
    ```bash
@@ -192,9 +194,11 @@ All steps are tracked with **Provenance** (who, what, why, data, model, tools, r
    node scripts/seed_legal_documents.mjs
    ```
 8. Start the full development stack:
+
    ```bash
    npm run dev
    ```
+
    This launches: Redis, all 11 workers, Express/tRPC backend, and Next.js concurrently.
 
 ---
