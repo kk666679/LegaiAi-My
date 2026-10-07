@@ -1,5 +1,5 @@
 import { Receipt, CircleDollarSign, Briefcase, ArrowRight } from "lucide-react";
-import { ModulePage, type ModuleStat } from "../_components/module-page";
+import { ModulePage, type ModuleStat } from "@/app/legalai/(dashboard)/_components/module-page";
 
 const stats: ModuleStat[] = [
   { label: "Total billable", value: "RM 128.4k", hint: "Current cycle", tone: "default" },

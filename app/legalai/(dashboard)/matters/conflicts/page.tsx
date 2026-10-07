@@ -1,5 +1,5 @@
 import { AlertTriangle, ShieldCheck, Scale, ArrowRight } from "lucide-react";
-import { ModulePage, type ModuleStat } from "../_components/module-page";
+import { ModulePage, type ModuleStat } from "../../_components/module-page";
 
 const stats: ModuleStat[] = [
   { label: "Open risks", value: "18", hint: "Across active matters", tone: "default" },

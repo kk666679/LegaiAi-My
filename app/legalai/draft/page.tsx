@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { FileText, Sparkles, CheckCircle2, ArrowRight } from "lucide-react";
-import { ModulePage, type ModuleStat } from "../_components/module-page";
+import { ModulePage, type ModuleStat } from "@/app/legalai/(dashboard)/_components/module-page";
 
 const stats: ModuleStat[] = [
   { label: "Drafts in process", value: "12", hint: "Across matters", tone: "default" },

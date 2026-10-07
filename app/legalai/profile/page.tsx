@@ -1,5 +1,5 @@
 import { User, Shield, Bell, Settings2 } from "lucide-react";
-import { ModulePage, type ModuleStat } from "../_components/module-page";
+import { ModulePage, type ModuleStat } from "@/app/legalai/(dashboard)/_components/module-page";
 
 const stats: ModuleStat[] = [
   { label: "Role", value: "Lawyer", hint: "Current access level", tone: "default" },

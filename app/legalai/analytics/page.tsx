@@ -1,5 +1,5 @@
 import { BarChart3, TrendingUp, Database, ArrowRight } from "lucide-react";
-import { ModulePage, type ModuleStat } from "../_components/module-page";
+import { ModulePage, type ModuleStat } from "@/app/legalai/(dashboard)/_components/module-page";
 
 const stats: ModuleStat[] = [
   { label: "AI ROI", value: "3.8x", hint: "Improvement vs baseline", tone: "success" },

@@ -1,5 +1,5 @@
 import { Bell, ShieldCheck, ArrowRight } from "lucide-react";
-import { ModulePage, type ModuleStat } from "../_components/module-page";
+import { ModulePage, type ModuleStat } from "@/app/legalai/(dashboard)/_components/module-page";
 
 const stats: ModuleStat[] = [
   { label: "Tracked updates", value: "84", hint: "Regulatory signals", tone: "default" },

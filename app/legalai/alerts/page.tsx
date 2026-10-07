@@ -1,5 +1,5 @@
 import { Bell, AlertTriangle, ArrowRight } from "lucide-react";
-import { ModulePage, type ModuleStat } from "../_components/module-page";
+import { ModulePage, type ModuleStat } from "@/app/legalai/(dashboard)/_components/module-page";
 
 const stats: ModuleStat[] = [
   { label: "Unread alerts", value: "9", hint: "Requires attention", tone: "warning" },

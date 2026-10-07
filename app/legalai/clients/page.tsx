@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Building2, Search, FileText, Briefcase, ArrowRight } from "lucide-react";
-import { ModulePage, type ModuleStat } from "../_components/module-page";
+import { ModulePage, type ModuleStat } from "@/app/legalai/(dashboard)/_components/module-page";
 
 const stats: ModuleStat[] = [
   { label: "Active clients", value: "128", hint: "Across all matters", tone: "default" },

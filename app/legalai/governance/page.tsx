@@ -1,5 +1,5 @@
 import { Cpu, Lock, ShieldCheck, ArrowRight } from "lucide-react";
-import { ModulePage, type ModuleStat } from "../_components/module-page";
+import { ModulePage, type ModuleStat } from "@/app/legalai/(dashboard)/_components/module-page";
 
 const stats: ModuleStat[] = [
   { label: "Model usage", value: "1,482", hint: "Requests this month", tone: "default" },

@@ -56,6 +56,7 @@ declare module 'lucide-react' {
   export const ChevronLeftIcon: any
   export const ChevronRight: any
   export const ChevronRightIcon: any
+  export const ChevronUp: any
   export const ChevronUpIcon: any
   export const ChevronsUpDownIcon: any
   export const Circle: any
@@ -160,6 +161,7 @@ declare module 'lucide-react' {
   export const MessageSquare: any
   export const MessageSquareQuote: any
   export const MessageSquareText: any
+  export const Mic: any
   export const MicIcon: any
   export const Minus: any
   export const MinusCircle: any
@@ -249,6 +251,7 @@ declare module 'lucide-react' {
   export const VenusIcon: any
   export const VideoIcon: any
   export const Wand2: any
+  export const WifiOff: any
   export const Webhook: any
   export const Workflow: any
   export const Wrench: any

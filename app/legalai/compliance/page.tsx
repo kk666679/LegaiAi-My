@@ -1,5 +1,5 @@
 import { ShieldCheck, Scale, Gavel, ArrowRight } from "lucide-react";
-import { ModulePage, type ModuleStat } from "../_components/module-page";
+import { ModulePage, type ModuleStat } from "@/app/legalai/(dashboard)/_components/module-page";
 
 const stats: ModuleStat[] = [
   { label: "Policies", value: "16", hint: "Active frameworks", tone: "default" },
