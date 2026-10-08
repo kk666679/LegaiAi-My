@@ -99,6 +99,11 @@ export interface WorkflowRun {
   status: "queued" | "running" | "success" | "failed" | "cancelled";
   trigger?: string;
   durationMs?: number;
+  jobId?: string; // Backend job ID for correlation
+  input?: unknown; // Run input data
+  output?: unknown; // Run output data
+  errorMessage?: string; // Error message if run failed
+  createdAt: string; // When the run was created
   nodeResults?: Array<{ nodeId: string; status: WorkflowNodeStatus; message?: string }>;
 }
 
