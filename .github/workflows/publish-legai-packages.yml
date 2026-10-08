@@ -10,7 +10,7 @@ name: Publish @lawmate/* Packages
 on:
   push:
     tags:
-      - "v*"
+      - "lawmate-packages-v*"
   workflow_dispatch:
     inputs:
       confirm:
@@ -89,20 +89,30 @@ jobs:
 
       - name: Type-check
         working-directory: ${{ matrix.path }}
-        run: npx tsc --noEmit || echo "TypeScript not configured for this package, skipping"
+        run: |
+          if [ -f tsconfig.json ]; then
+            npx tsc --noEmit
+          else
+            echo "No tsconfig.json; skipping TypeScript check"
+          fi
 
       - name: Lint
         working-directory: ${{ matrix.path }}
         run: |
           if [ -f "./node_modules/.bin/eslint" ]; then
-            npx eslint . || true
+            npx eslint .
           else
             echo "eslint not installed, skipping"
           fi
 
       - name: Build
         working-directory: ${{ matrix.path }}
-        run: npm run build || echo "Build process not configured"
+        run: |
+          if node -e "process.exit(require('./package.json').scripts?.build ? 0 : 1)"; then
+            npm run build
+          else
+            echo "No build script; skipping"
+          fi
 
       - name: Pack
         working-directory: ${{ matrix.path }}
@@ -122,7 +132,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish
-        if: ${{ github.event.inputs.package == 'all' || github.event.inputs.package == matrix.name }}
+        if: ${{ github.event_name == 'push' || github.event.inputs.package == 'all' || github.event.inputs.package == matrix.name }}
         working-directory: ${{ matrix.path }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -132,7 +142,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.name }}-npm-package
-          path: ${{ matrix.path }}-*.tgz
+          path: ${{ matrix.path }}/*.tgz
 
       - name: Summary
         if: always()

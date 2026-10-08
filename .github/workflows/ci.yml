@@ -17,7 +17,7 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm install --legacy-peer-deps --no-audit --no-fund
-      - name: Prisma generate (root + backend)
+      - name: Generate backend Prisma client
         run: npm run db:generate
       - name: Build @lawmate/* packages
         # next build type-checks the app, which imports @lawmate/* from
