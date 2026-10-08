@@ -118,21 +118,22 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules",
-    ".openclaw/**",
-    "dist",
-    "build",
-    ".next",
-    "out",
-    "coverage",
-    "backend/**/*.test.ts",
-    "backend/**/*.test.tsx",
-    "backend/**/*.spec.ts",
-    "backend/**/*.spec.tsx",
-    "backend/**/dist/**",
-    "backend/**/test/**",
-    "backend/**/node_modules/**",
-    "backend/schemas"
-  ]
+"exclude": [
+      "node_modules",
+      ".openclaw/**",
+      "packages/autoclaw/**",
+      "dist",
+      "build",
+      ".next",
+      "out",
+      "coverage",
+      "backend/**/*.test.ts",
+      "backend/**/*.test.tsx",
+      "backend/**/*.spec.ts",
+      "backend/**/*.spec.tsx",
+      "backend/**/dist/**",
+      "backend/**/test/**",
+      "backend/**/node_modules/**",
+      "backend/schemas"
+    ]
 }

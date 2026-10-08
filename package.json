@@ -46,7 +46,7 @@
     "test:gold": "node -e \"import('./queues/index.js').then(({queues})=>queues.testing.add('gold_eval',{action:'gold_eval'}))\"",
     "openclaw": "OLLAMA_API_KEY=ollama-local openclaw agent --local --session-id legalai",
     "setup:openclaw": "OLLAMA_API_KEY=ollama-local openclaw models status",
-    "lint": "node -e \"if(!require('node:fs').existsSync('./node_modules/.bin/eslint')){console.log('eslint not installed — skipping');process.exit(0)}require('node:child_process').spawnSync('./node_modules/.bin/eslint',['.','--max-warnings','0'],{stdio:'inherit'})\"",
+    "lint": "node -e \"if(!require('node:fs').existsSync('./node_modules/.bin/eslint')){console.log('eslint not installed \u2014 skipping');process.exit(0)}require('node:child_process').spawnSync('./node_modules/.bin/eslint',['.','--max-warnings','0'],{stdio:'inherit'})\"",
     "type-check": "tsc --noEmit",
     "test:autoclaw": "node --test tests/autoclaw/*.test.js",
     "test:byok": "node --import tsx --test tests/autoclaw/byok-credentials.test.mjs",
@@ -66,7 +66,11 @@
     "intent:install": "npx @tanstack/intent@latest install",
     "intent:validate": "npx @tanstack/intent@latest validate",
     "intent:stale": "npx @tanstack/intent@latest stale",
-    "test:auth": "node --import tsx --test tests/autoclaw/auth-passwords.test.mjs"
+    "test:auth": "node --import tsx --test tests/autoclaw/auth-passwords.test.mjs",
+    "typecheck": "node scripts/typecheck-packages.mjs",
+    "build:packages": "node scripts/build-packages.mjs",
+    "test:packages": "node scripts/test-packages.mjs",
+    "lawmate": "node bin/lawmate.js"
   },
   "files": [
     "SKILL.md",

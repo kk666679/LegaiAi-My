@@ -48,19 +48,21 @@ next-env.d.ts
 
 # turbo (if using Turbopack or Turborepo)
 .turbo
-.next
-.env*
-!.env.example
 
 
 # Build artifacts
 # backend/ holds tracked source (321 files) — ignore only its build output.
 backend/dist/
 backend/node_modules/
+
+# Package dependencies
+packages/*/node_modules/
+packages/*/dist/
 workers/
 scripts/
 
 # Configuration
+.kilo/
 .openclaw/
 .clinerules
 .kilocodemodes
@@ -81,9 +83,18 @@ fly.toml
 .autoclaw/orchestrator/comms/loop-journal.jsonl
 .autoclaw/orchestrator/comms/loop-state.json
 .autoclaw/orchestrator/comms/_gc/last-run.json
-
+packages/autoclaw/kg/kg.db
+packages/autoclaw/spine/spine.db
+packages/autoclaw/vector/db.sqlite
+packages/autoclaw/orchestrator/comms/comms-log.jsonl
+packages/autoclaw/orchestrator/comms/loop-journal.jsonl
+packages/autoclaw/orchestrator/comms/loop-state.json
+packages/autoclaw/orchestrator/comms/_gc/last-run.json
 
 # npm pack output
 *.tgz
 **/*.tgz
 dist/
+
+node_modules
+.env*
