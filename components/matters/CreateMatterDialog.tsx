@@ -212,7 +212,7 @@ export function CreateMatterDialog({
             ) : (
               <p className="text-xs text-muted-foreground">
                 No matching clients.{" "}
-                <Link className="text-primary underline" href="/legalai/clients">
+                <Link className="text-primary underline" href="/lawmate/clients">
                   Manage clients
                 </Link>
                 .

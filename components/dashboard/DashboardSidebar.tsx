@@ -304,7 +304,7 @@ function SidebarBrand({
         collapsed && "justify-center px-2",
       )}
     >
-      <Link href="/legalai" onClick={onNavigate} aria-label={brandName} className="group flex min-w-0 items-center gap-2" >
+      <Link href="/lawmate" onClick={onNavigate} aria-label={brandName} className="group flex min-w-0 items-center gap-2" >
         <LawMateMark size="md" className="shrink-0" aria-hidden="true" />
 
         {!collapsed && (

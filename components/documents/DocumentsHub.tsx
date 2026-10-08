@@ -172,7 +172,7 @@ export function DocumentsHub({
             clients={availableClients}
             onCreated={(id) => {
               onCreated?.(id);
-              router.push(`/legalai/documents/${id}`);
+              router.push(`/lawmate/documents/${id}`);
             }}
             trigger={
               <Button ref={createButtonRef} size="sm">
@@ -275,7 +275,7 @@ export function DocumentsHub({
                 loading={query.isLoading}
                 view={view}
                 onViewChange={setView}
-                onOpen={(document) => router.push(`/legalai/documents/${document.id}`)}
+                onOpen={(document) => router.push(`/lawmate/documents/${document.id}`)}
                 emptyAction={{
                   label: "Create document",
                   onClick: () => createButtonRef.current?.click(),
@@ -302,13 +302,13 @@ export function DocumentsHub({
 
       <div className="flex flex-wrap gap-2 text-sm">
         <Button variant="outline" asChild>
-          <Link href="/legalai/documents/studio">Draft with AI</Link>
+          <Link href="/lawmate/documents/studio">Draft with AI</Link>
         </Button>
         <Button variant="outline" asChild>
-          <Link href="/legalai/analysis">Analyse a document</Link>
+          <Link href="/lawmate/analysis">Analyse a document</Link>
         </Button>
         <Button variant="outline" asChild>
-          <Link href="/legalai/contracts">Review contracts</Link>
+          <Link href="/lawmate/contracts">Review contracts</Link>
         </Button>
       </div>
 

@@ -70,7 +70,7 @@ export function DocumentAIContext({
           AI is working on this document
         </p>
         <Link
-          href={documentHref ?? `/legalai/documents/${documentId}`}
+          href={documentHref ?? `/lawmate/documents/${documentId}`}
           className="block truncate text-sm font-medium hover:underline"
         >
           {documentTitle}
