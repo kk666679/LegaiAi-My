@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { IdSchema, VersionSchema, TimestampSchema, MetadataSchema } from './common';
 
 export const BuildStepStatusSchema = z.enum(['pending', 'running', 'completed', 'failed', 'skipped']);
-export type BuildStepStatus = z.infer<BuildStepStatusSchema>;
+export type BuildStepStatus = z.infer<typeof BuildStepStatusSchema>;
 
 export const BuildStepSchema = z.object({
   id: z.string(),
@@ -20,10 +20,10 @@ export const BuildStepSchema = z.object({
   output: z.string().optional(),
   error: z.string().optional(),
 });
-export type BuildStep = z.infer<BuildStepSchema>;
+export type BuildStep = z.infer<typeof BuildStepSchema>;
 
 export const BuildResultSchema = z.enum(['success', 'failed', 'cancelled']);
-export type BuildResult = z.infer<BuildResultSchema>;
+export type BuildResult = z.infer<typeof BuildResultSchema>;
 
 export const BuildPlanSchema = z.object({
   id: IdSchema,
@@ -32,7 +32,7 @@ export const BuildPlanSchema = z.object({
   policy: z.record(z.string(), z.unknown()).default({}),
   createdAt: TimestampSchema,
 });
-export type BuildPlan = z.infer<BuildPlanSchema>;
+export type BuildPlan = z.infer<typeof BuildPlanSchema>;
 
 export const BuildArtifactSchema = z.object({
   id: IdSchema,
@@ -47,7 +47,7 @@ export const BuildArtifactSchema = z.object({
   metadata: MetadataSchema.default({}),
   createdAt: TimestampSchema,
 });
-export type BuildArtifact = z.infer<BuildArtifactSchema>;
+export type BuildArtifact = z.infer<typeof BuildArtifactSchema>;
 
 export const BuildSchema = z.object({
   id: IdSchema,
@@ -63,4 +63,4 @@ export const BuildSchema = z.object({
   logs: z.string().optional(),
   provenance: z.array(z.string()).default([]),
 });
-export type Build = z.infer<BuildSchema>;
+export type Build = z.infer<typeof BuildSchema>;

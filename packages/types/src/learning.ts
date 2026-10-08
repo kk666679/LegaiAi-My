@@ -14,7 +14,7 @@ export const LearningExampleSchema = z.object({
   collectedAt: TimestampSchema,
   metadata: MetadataSchema.default({}),
 });
-export type LearningExample = z.infer<LearningExampleSchema>;
+export type LearningExample = z.infer<typeof LearningExampleSchema>;
 
 export const LearningExperimentSchema = z.object({
   id: IdSchema,
@@ -28,7 +28,7 @@ export const LearningExperimentSchema = z.object({
   results: z.record(z.string(), z.unknown()).optional(),
   metadata: MetadataSchema.default({}),
 });
-export type LearningExperiment = z.infer<LearningExperimentSchema>;
+export type LearningExperiment = z.infer<typeof LearningExperimentSchema>;
 
 export const LearningProposalSchema = z.object({
   id: IdSchema,
@@ -54,7 +54,7 @@ export const LearningProposalSchema = z.object({
   }).optional(),
   createdAt: TimestampSchema,
 });
-export type LearningProposal = z.infer<LearningProposalSchema>;
+export type LearningProposal = z.infer<typeof LearningProposalSchema>;
 
 export const LearningArtifactSchema = z.object({
   id: IdSchema,
@@ -66,7 +66,7 @@ export const LearningArtifactSchema = z.object({
   deployedAt: TimestampSchema.optional(),
   metadata: MetadataSchema.default({}),
 });
-export type LearningArtifact = z.infer<LearningArtifactSchema>;
+export type LearningArtifact = z.infer<typeof LearningArtifactSchema>;
 
 export const LearningRunSchema = z.object({
   id: IdSchema,
@@ -78,4 +78,4 @@ export const LearningRunSchema = z.object({
   outcome: z.string().optional(),
   metrics: z.record(z.string(), z.unknown()).optional(),
 });
-export type LearningRun = z.infer<LearningRunSchema>;
+export type LearningRun = z.infer<typeof LearningRunSchema>;

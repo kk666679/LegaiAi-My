@@ -16,7 +16,7 @@ export const EntitySchema = z.object({
   updatedAt: TimestampSchema,
   metadata: MetadataSchema.default({}),
 });
-export type Entity = z.infer<EntitySchema>;
+export type Entity = z.infer<typeof EntitySchema>;
 
 export const RelationSchema = z.object({
   id: IdSchema,
@@ -31,7 +31,7 @@ export const RelationSchema = z.object({
   createdAt: TimestampSchema,
   metadata: MetadataSchema.default({}),
 });
-export type Relation = z.infer<RelationSchema>;
+export type Relation = z.infer<typeof RelationSchema>;
 
 export const OntologySchema = z.object({
   id: IdSchema,
@@ -41,7 +41,7 @@ export const OntologySchema = z.object({
   relationTypes: z.array(z.string()).default([]),
   metadata: MetadataSchema.default({}),
 });
-export type Ontology = z.infer<OntologySchema>;
+export type Ontology = z.infer<typeof OntologySchema>;
 
 export const GraphQuerySchema = z.object({
   entityIds: z.array(IdSchema).optional(),
@@ -49,7 +49,7 @@ export const GraphQuerySchema = z.object({
   maxDepth: z.number().int().positive().default(3),
   limit: z.number().int().positive().default(50),
 });
-export type GraphQuery = z.infer<GraphQuerySchema>;
+export type GraphQuery = z.infer<typeof GraphQuerySchema>;
 
 export const GraphMutationSchema = z.object({
   type: z.enum(['create-entity', 'update-entity', 'delete-entity', 'create-relation', 'delete-relation']),
@@ -57,4 +57,4 @@ export const GraphMutationSchema = z.object({
   relation: RelationSchema.partial().optional(),
   reason: z.string().optional(),
 });
-export type GraphMutation = z.infer<GraphMutationSchema>;
+export type GraphMutation = z.infer<typeof GraphMutationSchema>;

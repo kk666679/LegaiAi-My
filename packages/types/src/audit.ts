@@ -19,7 +19,7 @@ export const AuditCategorySchema = z.enum([
   'comms-message',
   'build',
 ]);
-export type AuditCategory = z.infer<AuditCategorySchema>;
+export type AuditCategory = z.infer<typeof AuditCategorySchema>;
 
 export const AuditEventSchema = z.object({
   id: IdSchema,
@@ -33,4 +33,4 @@ export const AuditEventSchema = z.object({
   requestId: z.string().optional(),
   correlationId: z.string().optional(),
 });
-export type AuditEvent = z.infer<AuditEventSchema>;
+export type AuditEvent = z.infer<typeof AuditEventSchema>;

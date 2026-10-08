@@ -1,29 +1,29 @@
 /**
- * @lawmate/types — Shared contracts and type definitions for the LAWMATE platform.
+ * @lawmate/types — public entry point.
  *
- * This package is the foundation of the LAWMATE dependency graph. Every other
- * package depends on it for stable, versioned contracts. It must remain free
- * of any runtime dependencies other than `zod` for schema validation.
+ * Note: `Confidence` and `Decision` are re-exported from `common.js` only.
+ * kdream.ts has internal schemas with the same name (DecisionSchema2 etc.)
+ * and re-exports them under the `Kdream*` prefix to avoid collision.
  */
+export * from './common.js';
+export * from './adapter.js';
+export * from './agent.js';
+export * from './audit.js';
+export * from './autobuild.js';
+export * from './comms.js';
+export * from './dataset.js';
+export * from './eval.js';
+export * from './event.js';
+export * from './evidence.js';
+export * from './execution.js';
+export * from './kg.js';
+export * from './learning.js';
+export * from './memory.js';
+export * from './policy.js';
+export * from './registry.js';
+export * from './skill.js';
+export * from './tool.js';
+export * from './vector.js';
 
-// Re-export all public contracts.
-export * from './agent';
-export * from './skill';
-export * from './tool';
-export * from './memory';
-export * from './kg';
-export * from './kdream';
-export * from './vector';
-export * from './evidence';
-export * from './dataset';
-export * from './eval';
-export * from './learning';
-export * from './policy';
-export * from './registry';
-export * from './event';
-export * from './execution';
-export * from './common';
-export * from './audit';
-export * from './comms';
-export * from './adapter';
-export * from './autobuild';
+// kdream intentionally excluded from the barrel to avoid Confidence / Decision collision.
+// Consumers who need it: `import type { KDREAMState } from '@lawmate/types/kdream'`

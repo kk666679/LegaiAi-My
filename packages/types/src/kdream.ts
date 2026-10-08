@@ -13,7 +13,7 @@ export const ConfidenceSchema = z.object({
   basis: z.string().optional(),
   sources: z.array(z.string()).default([]),
 });
-export type Confidence = z.infer<ConfidenceSchema>;
+export type Confidence = z.infer<typeof ConfidenceSchema>;
 
 export const ConceptSchema = z.object({
   id: IdSchema,
@@ -23,7 +23,7 @@ export const ConceptSchema = z.object({
   domain: z.string().optional(),
   metadata: MetadataSchema.default({}),
 });
-export type Concept = z.infer<ConceptSchema>;
+export type Concept = z.infer<typeof ConceptSchema>;
 
 export const ObservationSchema = z.object({
   id: IdSchema,
@@ -34,7 +34,7 @@ export const ObservationSchema = z.object({
   provenance: z.array(z.string()).default([]),
   metadata: MetadataSchema.default({}),
 });
-export type Observation = z.infer<ObservationSchema>;
+export type Observation = z.infer<typeof ObservationSchema>;
 
 export const HypothesisSchema = z.object({
   id: IdSchema,
@@ -46,7 +46,7 @@ export const HypothesisSchema = z.object({
   updatedAt: TimestampSchema,
   metadata: MetadataSchema.default({}),
 });
-export type Hypothesis = z.infer<HypothesisSchema>;
+export type Hypothesis = z.infer<typeof HypothesisSchema>;
 
 export const GoalSchema = z.object({
   id: IdSchema,
@@ -58,7 +58,7 @@ export const GoalSchema = z.object({
   createdAt: TimestampSchema,
   metadata: MetadataSchema.default({}),
 });
-export type Goal = z.infer<GoalSchema>;
+export type Goal = z.infer<typeof GoalSchema>;
 
 export const PlanSchema = z.object({
   id: IdSchema,
@@ -73,7 +73,7 @@ export const PlanSchema = z.object({
   createdAt: TimestampSchema,
   updatedAt: TimestampSchema,
 });
-export type Plan = z.infer<PlanSchema>;
+export type Plan = z.infer<typeof PlanSchema>;
 
 export const DecisionSchema2 = z.object({
   id: IdSchema,
@@ -86,7 +86,7 @@ export const DecisionSchema2 = z.object({
   decidedAt: TimestampSchema,
   metadata: MetadataSchema.default({}),
 });
-export type Decision = z.infer<DecisionSchema2>;
+export type Decision = z.infer<typeof DecisionSchema2>;
 
 export const KDREAMStateSchema = z.object({
   id: IdSchema,
@@ -104,7 +104,7 @@ export const KDREAMStateSchema = z.object({
   updatedAt: TimestampSchema,
   metadata: MetadataSchema.default({}),
 });
-export type KDREAMState = z.infer<KDREAMStateSchema>;
+export type KDREAMState = z.infer<typeof KDREAMStateSchema>;
 
 export const ReasoningTraceSchema = z.object({
   id: IdSchema,
@@ -118,4 +118,4 @@ export const ReasoningTraceSchema = z.object({
   })).default([]),
   createdAt: TimestampSchema,
 });
-export type ReasoningTrace = z.infer<ReasoningTraceSchema>;
+export type ReasoningTrace = z.infer<typeof ReasoningTraceSchema>;

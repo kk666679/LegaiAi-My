@@ -132,7 +132,7 @@ export const PaginationSchema = z.object({
   limit: z.number().int().positive().default(50),
   cursor: z.string().optional(),
 });
-export type Pagination = z.infer<PaginationSchema>;
+export type Pagination = z.infer<typeof PaginationSchema>;
 
 export const PageSchema = z.object({
   items: z.array(z.any()),
@@ -144,7 +144,7 @@ export type Page<T> = { items: T[]; nextCursor?: string; total?: number };
 // --- Environment -----------------------------------------------------------
 
 export const EnvSchema = z.enum(['development', 'staging', 'production']);
-export type Env = z.infer<EnvSchema>;
+export type Env = z.infer<typeof EnvSchema>;
 
 // --- Generic result --------------------------------------------------------
 
@@ -152,4 +152,6 @@ export const ResultSchema = z.object({
   success: z.boolean(),
   error: LawmateErrorSchema.optional(),
 });
-export type Result = z.infer<ResultSchema>;
+export type Result = z.infer<typeof ResultSchema>;
+export const ConfidenceSchema = z.number().min(0).max(1);
+export type Confidence = z.infer<typeof ConfidenceSchema>;

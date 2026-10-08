@@ -16,7 +16,7 @@ export const SourceSchema = z.object({
   hash: z.string().optional(),
   metadata: MetadataSchema.default({}),
 });
-export type Source = z.infer<SourceSchema>;
+export type Source = z.infer<typeof SourceSchema>;
 
 export const EvidenceSchema = z.object({
   id: IdSchema,
@@ -31,7 +31,7 @@ export const EvidenceSchema = z.object({
   createdAt: TimestampSchema,
   metadata: MetadataSchema.default({}),
 });
-export type Evidence = z.infer<EvidenceSchema>;
+export type Evidence = z.infer<typeof EvidenceSchema>;
 
 export const ClaimSchema = z.object({
   id: IdSchema,
@@ -44,7 +44,7 @@ export const ClaimSchema = z.object({
   updatedAt: TimestampSchema,
   metadata: MetadataSchema.default({}),
 });
-export type Claim = z.infer<ClaimSchema>;
+export type Claim = z.infer<typeof ClaimSchema>;
 
 export const EvidenceChainSchema = z.object({
   claimId: IdSchema,
@@ -53,4 +53,4 @@ export const EvidenceChainSchema = z.object({
   verifiedAt: TimestampSchema,
   summary: z.string().optional(),
 });
-export type EvidenceChain = z.infer<EvidenceChainSchema>;
+export type EvidenceChain = z.infer<typeof EvidenceChainSchema>;

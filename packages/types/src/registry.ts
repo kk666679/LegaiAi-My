@@ -27,21 +27,21 @@ export const RegistryEntrySchema = z.object({
   createdAt: TimestampSchema,
   updatedAt: TimestampSchema,
 });
-export type RegistryEntry = z.infer<RegistryEntrySchema>;
+export type RegistryEntry = z.infer<typeof RegistryEntrySchema>;
 
 export const RegistryQuerySchema = z.object({
   kind: z.string().optional(),
   capability: CapabilitySchema.optional(),
   status: z.string().optional(),
-  version: VersionSchema optional,
+  version: VersionSchema.optional(),
   limit: z.number().int().positive().default(50),
   cursor: z.string().optional(),
 });
-export type RegistryQuery = z.infer<RegistryQuerySchema>;
+export type RegistryQuery = z.infer<typeof RegistryQuerySchema>;
 
 export const RegistrySearchResultSchema = z.object({
   entries: z.array(RegistryEntrySchema),
   total: z.number().int().nonnegative(),
   nextCursor: z.string().optional(),
 });
-export type RegistrySearchResult = z.infer<RegistrySearchResultSchema>;
+export type RegistrySearchResult = z.infer<typeof RegistrySearchResultSchema>;

@@ -12,7 +12,7 @@ export const MemoryTypeSchema = z.enum([
   'user-project',
   'session',
 ]);
-export type MemoryType = z.infer<MemoryTypeSchema>;
+export type MemoryType = z.infer<typeof MemoryTypeSchema>;
 
 export const MemoryRecordSchema = z.object({
   id: IdSchema,
@@ -33,7 +33,7 @@ export const MemoryRecordSchema = z.object({
   retention: RetentionPolicySchema.optional(),
   provenance: z.array(z.string()).default([]),
 });
-export type MemoryRecord = z.infer<MemoryRecordSchema>;
+export type MemoryRecord = z.infer<typeof MemoryRecordSchema>;
 
 export const MemoryQuerySchema = z.object({
   agentId: IdSchema,
@@ -44,10 +44,10 @@ export const MemoryQuerySchema = z.object({
   tenantId: z.string().optional(),
   projectId: z.string().optional(),
 });
-export type MemoryQuery = z.infer<MemoryQuerySchema>;
+export type MemoryQuery = z.infer<typeof MemoryQuerySchema>;
 
 export const MemoryResultSchema = z.object({
   records: z.array(MemoryRecordSchema),
   total: z.number().int().nonnegative(),
 });
-export type MemoryResult = z.infer<MemoryResultSchema>;
+export type MemoryResult = z.infer<typeof MemoryResultSchema>;

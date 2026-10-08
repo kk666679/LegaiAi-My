@@ -15,7 +15,7 @@ export const PolicyRuleSchema = z.object({
   priority: z.number().int().default(0),
   enabled: z.boolean().default(true),
 });
-export type PolicyRule = z.infer<PolicyRuleSchema>;
+export type PolicyRule = z.infer<typeof PolicyRuleSchema>;
 
 export const PolicySchema = z.object({
   id: IdSchema,
@@ -26,7 +26,7 @@ export const PolicySchema = z.object({
   enabled: z.boolean().default(true),
   metadata: z.record(z.string(), z.unknown()).default({}),
 });
-export type Policy = z.infer<PolicySchema>;
+export type Policy = z.infer<typeof PolicySchema>;
 
 export const PolicyEvaluationRequestSchema = z.object({
   actor: z.string(),
@@ -37,7 +37,7 @@ export const PolicyEvaluationRequestSchema = z.object({
   dataClass: DataClassSchema.optional(),
   riskLevel: RiskLevelSchema.optional(),
 });
-export type PolicyEvaluationRequest = z.infer<PolicyEvaluationRequestSchema>;
+export type PolicyEvaluationRequest = z.infer<typeof PolicyEvaluationRequestSchema>;
 
 export const PolicyEvaluationResultSchema = z.object({
   decision: DecisionSchema,
@@ -47,4 +47,4 @@ export const PolicyEvaluationResultSchema = z.object({
   redactFields: z.array(z.string()).default([]),
   escalateTo: z.string().optional(),
 });
-export type PolicyEvaluationResult = z.infer<PolicyEvaluationResultSchema>;
+export type PolicyEvaluationResult = z.infer<typeof PolicyEvaluationResultSchema>;

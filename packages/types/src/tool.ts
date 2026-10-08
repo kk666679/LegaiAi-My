@@ -20,11 +20,16 @@ export const ToolManifestSchema = z.object({
     cancellable: z.boolean().default(true),
     retries: z.number().int().nonnegative().default(0),
     idempotent: z.boolean().default(false),
-  }).default({}),
+  }).default({
+    sandbox: false,
+    cancellable: true,
+    retries: 0,
+    idempotent: false,
+  }),
   allowedDataClasses: z.array(z.enum(['public', 'internal', 'confidential', 'privileged'])).default(['public', 'internal']),
   metadata: MetadataSchema.default({}),
 });
-export type ToolManifest = z.infer<ToolManifestSchema>;
+export type ToolManifest = z.infer<typeof ToolManifestSchema>;
 
 /** Tool invocation record. */
 export const ToolInvocationSchema = z.object({
@@ -40,4 +45,4 @@ export const ToolInvocationSchema = z.object({
   error: z.string().optional(),
   policyDecision: DecisionSchema.optional(),
 });
-export type ToolInvocation = z.infer<ToolInvocationSchema>;
+export type ToolInvocation = z.infer<typeof ToolInvocationSchema>;

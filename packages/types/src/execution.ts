@@ -15,7 +15,7 @@ export const ExecutionContextSchema = z.object({
   traceId: z.string().optional(),
   spanId: z.string().optional(),
 });
-export type ExecutionContext = z.infer<ExecutionContextSchema>;
+export type ExecutionContext = z.infer<typeof ExecutionContextSchema>;
 
 export const TaskGraphSchema = z.object({
   id: IdSchema,
@@ -36,7 +36,7 @@ export const TaskGraphSchema = z.object({
   })).default([]),
   metadata: MetadataSchema.default({}),
 });
-export type TaskGraph = z.infer<TaskGraphSchema>;
+export type TaskGraph = z.infer<typeof TaskGraphSchema>;
 
 export const JobSchema = z.object({
   id: IdSchema,
@@ -55,7 +55,7 @@ export const JobSchema = z.object({
   error: z.string().optional(),
   result: z.record(z.string(), z.unknown()).optional(),
 });
-export type Job = z.infer<JobSchema>;
+export type Job = z.infer<typeof JobSchema>;
 
 export const WorkflowSchema = z.object({
   id: IdSchema,
@@ -65,4 +65,4 @@ export const WorkflowSchema = z.object({
   steps: z.array(z.string()).default([]),
   metadata: MetadataSchema.default({}),
 });
-export type Workflow = z.infer<WorkflowSchema>;
+export type Workflow = z.infer<typeof WorkflowSchema>;

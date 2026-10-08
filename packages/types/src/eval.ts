@@ -11,7 +11,7 @@ export const MetricSchema = z.object({
   threshold: z.number().optional(),
   passed: z.boolean().optional(),
 });
-export type Metric = z.infer<MetricSchema>;
+export type Metric = z.infer<typeof MetricSchema>;
 
 export const EvalCaseSchema = z.object({
   id: IdSchema,
@@ -21,7 +21,7 @@ export const EvalCaseSchema = z.object({
   rubric: z.string().optional(),
   metadata: MetadataSchema.default({}),
 });
-export type EvalCase = z.infer<EvalCaseSchema>;
+export type EvalCase = z.infer<typeof EvalCaseSchema>;
 
 export const EvalRunSchema = z.object({
   id: IdSchema,
@@ -35,7 +35,7 @@ export const EvalRunSchema = z.object({
   completedAt: TimestampSchema.optional(),
   metadata: MetadataSchema.default({}),
 });
-export type EvalRun = z.infer<EvalRunSchema>;
+export type EvalRun = z.infer<typeof EvalRunSchema>;
 
 export const EvaluatorSchema = z.object({
   id: IdSchema,
@@ -45,7 +45,7 @@ export const EvaluatorSchema = z.object({
   metricNames: z.array(z.string()).default([]),
   config: z.record(z.string(), z.unknown()).default({}),
 });
-export type Evaluator = z.infer<EvaluatorSchema>;
+export type Evaluator = z.infer<typeof EvaluatorSchema>;
 
 export const BenchmarkSchema = z.object({
   id: IdSchema,
@@ -55,4 +55,4 @@ export const BenchmarkSchema = z.object({
   cases: z.array(EvalCaseSchema).default([]),
   metadata: MetadataSchema.default({}),
 });
-export type Benchmark = z.infer<BenchmarkSchema>;
+export type Benchmark = z.infer<typeof BenchmarkSchema>;

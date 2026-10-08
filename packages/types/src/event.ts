@@ -16,7 +16,7 @@ export const EventEnvelopeSchema = z.object({
   payload: z.record(z.string(), z.unknown()).default({}),
   metadata: MetadataSchema.default({}),
 });
-export type EventEnvelope = z.infer<EventEnvelopeSchema>;
+export type EventEnvelope = z.infer<typeof EventEnvelopeSchema>;
 
 export const EventTypeSchema = z.enum([
   'AgentStarted',
@@ -52,4 +52,4 @@ export const EventTypeSchema = z.enum([
   'BuildStarted',
   'BuildCompleted',
 ]);
-export type EventType = z.infer<EventTypeSchema>;
+export type EventType = z.infer<typeof EventTypeSchema>;

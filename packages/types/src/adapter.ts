@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { IdSchema, VersionSchema, MetadataSchema, TimestampSchema } from './common';
 
 export const AdapterCapabilitySchema = z.string();
-export type AdapterCapability = z.infer<AdapterCapabilitySchema>;
+export type AdapterCapability = z.infer<typeof AdapterCapabilitySchema>;
 
 export const AdapterManifestSchema = z.object({
   id: IdSchema,
@@ -17,7 +17,7 @@ export const AdapterManifestSchema = z.object({
   description: z.string().max(1024).optional(),
   metadata: MetadataSchema.default({}),
 });
-export type AdapterManifest = z.infer<AdapterManifestSchema>;
+export type AdapterManifest = z.infer<typeof AdapterManifestSchema>;
 
 export const AdapterHealthSchema = z.object({
   status: z.enum(['healthy', 'degraded', 'unhealthy', 'unknown']),
@@ -26,7 +26,7 @@ export const AdapterHealthSchema = z.object({
   error: z.string().optional(),
   details: MetadataSchema.default({}),
 });
-export type AdapterHealth = z.infer<AdapterHealthSchema>;
+export type AdapterHealth = z.infer<typeof AdapterHealthSchema>;
 
 export const AdapterStatusSchema = z.enum(['discovered', 'registered', 'validated', 'initialized', 'active', 'paused', 'disabled', 'shutdown', 'removed']);
-export type AdapterStatus = z.infer<AdapterStatusSchema>;
+export type AdapterStatus = z.infer<typeof AdapterStatusSchema>;
