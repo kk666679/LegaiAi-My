@@ -27,6 +27,12 @@ model User {
   id             String       @id @default(cuid())
   email          String       @unique
   name           String?
+  phone          String?
+  jobTitle       String?
+  bio            String?
+  timezone       String?      @default("Asia/Kuala_Lumpur")
+  language       String       @default("en")
+  profilePhoto   String?
   passwordHash   String?
   role           String       @default("viewer") // admin | lawyer | paralegal | viewer
   orgId          String?
@@ -37,6 +43,8 @@ model User {
   updatedAt      DateTime     @updatedAt
 
   sessions       Session[]
+  savedAuthorities SavedAuthority[]
+  integrationConnections IntegrationConnection[]
 
   @@index([orgId])
   @@index([email])
@@ -49,11 +57,38 @@ model Session {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   token     String   @unique
   expiresAt DateTime
+  userAgent String?
+  ipAddress String?
   createdAt DateTime @default(now())
 
   @@index([token])
   @@index([userId])
   @@map("sessions")
+}
+
+model SavedAuthority {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sourceId  String
+  authority Json
+  createdAt DateTime @default(now())
+  @@unique([userId, sourceId])
+  @@index([userId, createdAt])
+  @@map("saved_authorities")
+}
+
+model IntegrationConnection {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider    String
+  config      String
+  connectedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@unique([userId, provider])
+  @@index([userId])
+  @@map("integration_connections")
 }
 
 model VectorDoc {
@@ -1116,4 +1151,3 @@ model AutomationVersion {
   @@index([automationId])
   @@map("automation_versions")
 }
-
