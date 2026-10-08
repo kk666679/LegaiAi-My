@@ -19,6 +19,12 @@ jobs:
       - run: npm install --legacy-peer-deps --no-audit --no-fund
       - name: Prisma generate (root + backend)
         run: npm run db:generate
+      - name: Build @lawmate/* packages
+        # next build type-checks the app, which imports @lawmate/* from
+        # packages/*/dist. Those outputs are NOT produced by postinstall
+        # (only db:generate runs), so build them explicitly or every
+        # TS2307 "Cannot find module '@lawmate/*'" error reappears.
+        run: npm run build:packages
       - name: Lint
         run: npm run lint
       - name: Type-check
@@ -48,6 +54,8 @@ jobs:
       - name: Prisma generate (schema wiring)
         working-directory: backend
         run: npx prisma generate
+      - name: Build @lawmate/* packages
+        run: npm run build:packages
       - name: Backend test
         working-directory: backend
         run: npm test --if-present

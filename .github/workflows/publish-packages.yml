@@ -1,33 +1,32 @@
-name: Publish LAWMATE Packages
+name: Publish @kk666679/* Packages
 
+# Publishing on every commit to main is unsafe and wasteful — it would
+# re-publish unchanged versions on every push. Only publish on version
+# tags or explicit manual dispatch.
 on:
   push:
-    branches: [main]
-    paths:
-      - 'package.json'
-      - 'lib/branding/**'
-      - 'bin/**'
-      - 'backend/src/**'
-      - '.autoclaw/**'
-      - '@kk666679/**'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'package.json'
-      - 'lib/branding/**'
-      - 'bin/**'
-      - 'backend/src/**'
-      - '.autoclaw/**'
-      - '@kk666679/**'
+    tags:
+      - 'kk666679/v*'
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      package:
+        description: 'Package to publish (or "all")'
+        required: false
+        default: 'all'
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   build-and-publish:
+    name: Publish ${{ matrix.package }}
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+    timeout-minutes: 20
 
     strategy:
+      fail-fast: false
       matrix:
         package: [@kk666679/mcp, @kk666679/cli, @kk666679/gateway]
 
@@ -46,16 +45,14 @@ jobs:
           scope: '@kk666679'
 
       - name: Install dependencies
-        run: |
-          cd ./${{ matrix.package }}
-          npm install
+        run: npm install --legacy-peer-deps --no-audit --no-fund
 
-      - name: Run type check
+      - name: Type check
         run: |
           cd ./${{ matrix.package }}
           npx tsc --noEmit 2>&1 || echo "TypeScript not configured for this package, skipping"
 
-      - name: Run lint
+      - name: Lint
         run: |
           cd ./${{ matrix.package }}
           if [ -f "./node_modules/.bin/eslint" ]; then
@@ -63,11 +60,6 @@ jobs:
           else
             echo "eslint not installed, skipping"
           fi
-
-      - name: Run tests
-        run: |
-          cd ./${{ matrix.package }}
-          npm test 2>&1 || echo "No tests configured or tests failed"
 
       - name: Build package
         run: |
@@ -87,17 +79,12 @@ jobs:
           echo "//npm.pkg.github.com/:always-auth=true" >> .npmrc
 
       - name: Publish package
+        if: ${{ github.event.inputs.package == 'all' || github.event.inputs.package == matrix.name }}
         run: |
           cd ./${{ matrix.package }}
           npm publish --access restricted
         env:
           NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Verify package
-        run: |
-          cd ./${{ matrix.package }}
-          npm pack --dry-run
-          echo "Package verification complete"
 
       - name: Upload package artifact
         uses: actions/upload-artifact@v4

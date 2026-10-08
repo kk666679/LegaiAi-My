@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  # Message broker for comms/queue
+  redis:
+    image: redis:7-alpine
+    container_name: lawmate-redis
+    ports:
+      - '6379:6379'
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Vector database (pgvector extension on PostgreSQL)
+  postgres:
+    image: pgvector/pgvector:16
+    container_name: lawmate-postgres
+    environment:
+      POSTGRES_DB: lawmate
+      POSTGRES_USER: lawmate
+      POSTGRES_PASSWORD: lawmate
+    ports:
+      - '5432:5432'
+    restart: unless-stopped
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U lawmate']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Local LLM + embeddings
+  ollama:
+    image: ollama/ollama:latest
+    container_name: lawmate-ollama
+    ports:
+      - '11434:11434'
+    restart: unless-stopped
+    volumes:
+      - ollama-data:/root/.ollama
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:11434/api/tags']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    # Pull models on startup
+    postStart:
+      - bash
+      - -c
+      - |
+        sleep 5
+        ollama pull llama3.1 || true
+        ollama pull mxbai-embed-large || true
+
+  # LAWMATE API Gateway
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lawmate-gateway
+    environment:
+      LAWMATE_ENV: development
+      LAWMATE_LOG_LEVEL: info
+      LAWMATE_API_URL: http://localhost:3001
+      REDIS_URL: redis://lawmate-redis:6379
+      DATABASE_URL: postgresql://lawmate:lawmate@lawmate-postgres:5432/lawmate
+      OLLAMA_URL: http://lawmate-ollama:11434
+    ports:
+      - '3001:3001'
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  redis-data:
+  pg-data:
+  ollama-data:
