@@ -34,7 +34,7 @@ import {
   X,
   AlertTriangle,
 } from "lucide-react";
-import type { DraftRequest } from "@/lib/legalai/draft/types";
+import type { DraftRequest } from "@/lib/lawmate/draft/types";
 
 const documentTypes = [
   { value: "WRIT", label: "Writ of Summons" },

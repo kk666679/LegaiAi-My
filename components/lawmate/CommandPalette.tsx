@@ -70,30 +70,30 @@ interface SearchHit {
 }
 
 const NAV = [
-  { label: "Go to Dashboard", href: "/legalai", icon: LayoutDashboard, keywords: ["home", "overview"] },
-  { label: "Go to AI Assistant", href: "/legalai/assistant", icon: Bot, keywords: ["chat", "ai", "copilot"] },
-  { label: "Go to Legal Research", href: "/legalai/research", icon: BookOpen, keywords: ["law", "cases", "statutes"] },
-  { label: "Go to Universal Search", href: "/legalai/search", icon: Search, keywords: ["find", "query"] },
-  { label: "Go to Documents", href: "/legalai/documents", icon: FileText, keywords: ["files", "library"] },
-  { label: "Go to Contracts", href: "/legalai/contracts", icon: FileSignature, keywords: ["agreements"] },
-  { label: "Go to Automations", href: "/legalai/automations", icon: Workflow, keywords: ["workflows", "automation", "rules"] },
-  { label: "Go to Matters", href: "/legalai/matters", icon: Briefcase, keywords: ["cases", "matters"] },
-  { label: "Go to AI Agents", href: "/legalai/agents", icon: Sparkles, keywords: ["agents", "swarm"] },
-  { label: "Go to Debate", href: "/legalai/debate", icon: Gavel, keywords: ["debate", "simulation"] },
-  { label: "Go to Risk Engine", href: "/legalai/risk", icon: AlertTriangle, keywords: ["danger", "compliance"] },
-  { label: "Go to Agent Control (HITL)", href: "/legalai/hitl", icon: Eye, keywords: ["approvals", "hitl"] },
-  { label: "Go to Saved Items", href: "/legalai/saved", icon: Bookmark, keywords: ["bookmarks"] },
-  { label: "Go to Settings", href: "/legalai/settings", icon: Settings, keywords: ["preferences", "config"] },
+  { label: "Go to Dashboard", href: "/lawmate", icon: LayoutDashboard, keywords: ["home", "overview"] },
+  { label: "Go to AI Assistant", href: "/lawmate/assistant", icon: Bot, keywords: ["chat", "ai", "copilot"] },
+  { label: "Go to Legal Research", href: "/lawmate/research", icon: BookOpen, keywords: ["law", "cases", "statutes"] },
+  { label: "Go to Universal Search", href: "/lawmate/search", icon: Search, keywords: ["find", "query"] },
+  { label: "Go to Documents", href: "/lawmate/documents", icon: FileText, keywords: ["files", "library"] },
+  { label: "Go to Contracts", href: "/lawmate/contracts", icon: FileSignature, keywords: ["agreements"] },
+  { label: "Go to Automations", href: "/lawmate/automations", icon: Workflow, keywords: ["workflows", "automation", "rules"] },
+  { label: "Go to Matters", href: "/lawmate/matters", icon: Briefcase, keywords: ["cases", "matters"] },
+  { label: "Go to AI Agents", href: "/lawmate/agents", icon: Sparkles, keywords: ["agents", "swarm"] },
+  { label: "Go to Debate", href: "/lawmate/debate", icon: Gavel, keywords: ["debate", "simulation"] },
+  { label: "Go to Risk Engine", href: "/lawmate/risk", icon: AlertTriangle, keywords: ["danger", "compliance"] },
+  { label: "Go to Agent Control (HITL)", href: "/lawmate/hitl", icon: Eye, keywords: ["approvals", "hitl"] },
+  { label: "Go to Saved Items", href: "/lawmate/saved", icon: Bookmark, keywords: ["bookmarks"] },
+  { label: "Go to Settings", href: "/lawmate/settings", icon: Settings, keywords: ["preferences", "config"] },
 ];
 
 const ACTIONS = [
-  { label: "Ask LawMate", href: "/legalai/assistant", icon: Bot, shortcut: "A", action: "ask" },
-  { label: "Upload document", href: "/legalai/documents/new", icon: Upload, shortcut: "U", action: "upload" },
-  { label: "Create matter", href: "/legalai/matters/new", icon: Briefcase, shortcut: "M", action: "matter" },
-  { label: "New contract", href: "/legalai/contracts/new", icon: FileSignature, shortcut: "C", action: "contract" },
-  { label: "Search legislation", href: "/legalai/research", icon: Globe, shortcut: "L", action: "research" },
-  { label: "Run legal analysis", href: "/legalai/analysis", icon: Sparkles, shortcut: "N", action: "analyse" },
-  { label: "View risk dashboard", href: "/legalai/risk", icon: AlertTriangle, shortcut: "K", action: "risk" },
+  { label: "Ask LawMate", href: "/lawmate/assistant", icon: Bot, shortcut: "A", action: "ask" },
+  { label: "Upload document", href: "/lawmate/documents/new", icon: Upload, shortcut: "U", action: "upload" },
+  { label: "Create matter", href: "/lawmate/matters/new", icon: Briefcase, shortcut: "M", action: "matter" },
+  { label: "New contract", href: "/lawmate/contracts/new", icon: FileSignature, shortcut: "C", action: "contract" },
+  { label: "Search legislation", href: "/lawmate/research", icon: Globe, shortcut: "L", action: "research" },
+  { label: "Run legal analysis", href: "/lawmate/analysis", icon: Sparkles, shortcut: "N", action: "analyse" },
+  { label: "View risk dashboard", href: "/lawmate/risk", icon: AlertTriangle, shortcut: "K", action: "risk" },
 ];
 
 function fuzzyMatch(haystack: string, needle: string): number {
@@ -123,7 +123,7 @@ function buildSearchIndex(query: string): SearchHit[] {
         kind: "Documents",
         title: d.name,
         description: d.classification,
-        href: "/legalai/documents",
+        href: "/lawmate/documents",
         icon: FileText,
         score: score * 10,
       });
@@ -138,7 +138,7 @@ function buildSearchIndex(query: string): SearchHit[] {
         kind: "Matters",
         title: m.name,
         description: `${m.client ?? "—"} · ${m.area}`,
-        href: "/legalai/matters",
+        href: "/lawmate/matters",
         icon: Briefcase,
         score: score * 9,
       });
@@ -153,7 +153,7 @@ function buildSearchIndex(query: string): SearchHit[] {
         kind: "Conversations",
         title: c.title,
         description: c.preview,
-        href: "/legalai/assistant",
+        href: "/lawmate/assistant",
         icon: Bot,
         score: score * 8,
       });
@@ -168,7 +168,7 @@ function buildSearchIndex(query: string): SearchHit[] {
         kind: "Drafts",
         title: d.title,
         description: d.status,
-        href: "/legalai/documents/drafts",
+        href: "/lawmate/documents/drafts",
         icon: FileSignature,
         score: score * 8,
       });
@@ -183,7 +183,7 @@ function buildSearchIndex(query: string): SearchHit[] {
         kind: "Tasks",
         title: t.title,
         description: t.matterName,
-        href: "/legalai/matters",
+        href: "/lawmate/matters",
         icon: Briefcase,
         score: score * 7,
       });
@@ -198,7 +198,7 @@ function buildSearchIndex(query: string): SearchHit[] {
         kind: "Legal Sources",
         title: s.title,
         description: `${s.type} · ${s.section ?? ""} · ${s.area}`,
-        href: "/legalai/research",
+        href: "/lawmate/research",
         icon: s.type === "case" ? Gavel : BookOpen,
         score: score * 6,
       });
@@ -213,7 +213,7 @@ function buildSearchIndex(query: string): SearchHit[] {
         kind: "Saved",
         title: s.title,
         description: (s.tags ?? []).join(", "),
-        href: "/legalai/saved",
+        href: "/lawmate/saved",
         icon: Bookmark,
         score: score * 5,
       });

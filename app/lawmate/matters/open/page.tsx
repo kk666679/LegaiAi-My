@@ -1,4 +1,4 @@
 import { redirect } from "next/navigation";
 export default function Page() {
-  redirect("/legalai/matters?status=open");
+  redirect("/lawmate/matters?status=open");
 }

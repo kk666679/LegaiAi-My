@@ -1,4 +1,4 @@
-// app/legalai/research/[sessionId]/layout.tsx
+// app/lawmate/research/[sessionId]/layout.tsx
 import * as React from "react";
 import { SessionScopedNav } from "../_components/session-scoped-nav";
 

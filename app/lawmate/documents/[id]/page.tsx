@@ -79,7 +79,7 @@ export default function DocumentDetailPage() {
             <FileText className="size-12 mx-auto text-destructive" />
             <h2 className="mt-4 text-xl font-semibold">Document not found</h2>
             <p className="mt-2 text-muted-foreground">The document you're looking for doesn't exist or you don't have access.</p>
-            <Button asChild className="mt-4"><Link href="/legalai/documents">Back to documents</Link></Button>
+            <Button asChild className="mt-4"><Link href="/lawmate/documents">Back to documents</Link></Button>
           </div>
         </div>
       </DashboardShell>
@@ -103,7 +103,7 @@ export default function DocumentDetailPage() {
           }
           actions={
             <>
-              <Button asChild variant="outline" size="sm"><Link href={`/legalai/documents/${id}/studio`}>Open Studio</Link></Button>
+              <Button asChild variant="outline" size="sm"><Link href={`/lawmate/documents/${id}/studio`}>Open Studio</Link></Button>
             </>
           }
         />
@@ -317,7 +317,7 @@ export default function DocumentDetailPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">The drafting studio provides an AI-powered editing environment for this document.</p>
-                <Button asChild className="mt-4 gap-2"><Link href={`/legalai/documents/${id}/studio`}><FileSignature className="size-4" /> Open Studio</Link></Button>
+                <Button asChild className="mt-4 gap-2"><Link href={`/lawmate/documents/${id}/studio`}><FileSignature className="size-4" /> Open Studio</Link></Button>
               </CardContent>
             </Card>
           </TabsContent>

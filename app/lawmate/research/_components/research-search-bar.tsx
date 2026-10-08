@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/research/_components/research-search-bar.tsx
+// app/lawmate/research/_components/research-search-bar.tsx
 import * as React from "react";
 import { ArrowUp, Search, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";

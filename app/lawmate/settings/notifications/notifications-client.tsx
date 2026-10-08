@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/settings/notifications/notifications-client.tsx
+// app/lawmate/settings/notifications/notifications-client.tsx
 import * as React from "react";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -166,7 +166,7 @@ export function NotificationSettings() {
           {quiet ? (
             <p className="text-xs text-muted-foreground">
               Default: 20:00 – 07:00 in your local timezone. Adjust in{" "}
-              <a href="/legalai/settings/profile" className="text-primary hover:underline">
+              <a href="/lawmate/settings/profile" className="text-primary hover:underline">
                 Profile → Regional
               </a>
               .

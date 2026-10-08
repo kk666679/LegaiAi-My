@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/research/_components/research-timeline.tsx
+// app/lawmate/research/_components/research-timeline.tsx
 import * as React from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

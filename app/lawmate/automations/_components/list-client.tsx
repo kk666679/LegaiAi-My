@@ -26,7 +26,7 @@ export function AutomationsListPage() {
         <div className="flex items-center gap-2">
           <Button size="sm" variant="outline" className="gap-1.5"><Upload className="size-3.5" />Import</Button>
           <Button asChild size="sm" className="gap-1.5">
-            <Link href="/legalai/automations/new"><Plus className="size-3.5" />New workflow</Link>
+            <Link href="/lawmate/automations/new"><Plus className="size-3.5" />New workflow</Link>
           </Button>
         </div>
       </header>
@@ -41,7 +41,7 @@ export function AutomationsListPage() {
             statsById={statsById}
             view={view}
             onViewChange={setView}
-            emptyAction={{ label: "Create workflow", onClick: () => { window.location.href = "/legalai/automations/new"; } }}
+            emptyAction={{ label: "Create workflow", onClick: () => { window.location.href = "/lawmate/automations/new"; } }}
           />
         )}
       </div>

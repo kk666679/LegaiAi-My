@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/research/_components/research-session-overview.tsx
+// app/lawmate/research/_components/research-session-overview.tsx
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { useResearch } from "./use-research";
@@ -11,7 +11,7 @@ import {
   toDashboardActivity,
   toDashboardMetrics,
   toDashboardSources,
-} from "./legalai-dashboard-adapters";
+} from "./lawmate-dashboard-adapters";
 
 export function ResearchSessionOverview({ id }: { id: string }) {
   const router = useRouter();
@@ -41,21 +41,21 @@ export function ResearchSessionOverview({ id }: { id: string }) {
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
-          onClick={() => router.push(`/legalai/research/${id}/results`)}
+          onClick={() => router.push(`/lawmate/research/${id}/results`)}
           className="rounded-md border border-border/60 px-3 py-1.5 text-xs hover:bg-accent"
         >
           View results
         </button>
         <button
           type="button"
-          onClick={() => router.push(`/legalai/research/${id}/memo`)}
+          onClick={() => router.push(`/lawmate/research/${id}/memo`)}
           className="rounded-md border border-border/60 px-3 py-1.5 text-xs hover:bg-accent"
         >
           Open memo
         </button>
         <button
           type="button"
-          onClick={() => router.push(`/legalai/research/${id}/reasoning`)}
+          onClick={() => router.push(`/lawmate/research/${id}/reasoning`)}
           className="rounded-md border border-border/60 px-3 py-1.5 text-xs hover:bg-accent"
         >
           See reasoning

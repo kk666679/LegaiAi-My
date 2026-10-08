@@ -83,7 +83,7 @@ export function QuickPromptSheet({
     });
     setText("");
     onOpenChange(false);
-    router.push("/legalai/assistant");
+    router.push("/lawmate/assistant");
   };
 
   return (

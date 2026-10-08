@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/research/_components/research-results.tsx
+// app/lawmate/research/_components/research-results.tsx
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Bookmark, BookmarkCheck, Download, GitCompare, Share2 } from "lucide-react";
@@ -17,7 +17,7 @@ import {
   toDashboardQueryResult,
   toDashboardSources,
   toDashboardStatus,
-} from "./legalai-dashboard-adapters";
+} from "./lawmate-dashboard-adapters";
 import type { Authority, ResearchFilters, ResearchSort } from "./types";
 
 export function ResearchResultsPage({ id }: { id: string }) {
@@ -101,7 +101,7 @@ export function ResearchResultsPage({ id }: { id: string }) {
                   size="sm"
                   variant="outline"
                   className="gap-1.5"
-                  onClick={() => router.push(`/legalai/research/${id}/memo`)}
+                  onClick={() => router.push(`/lawmate/research/${id}/memo`)}
                 >
                   <Download className="size-3.5" /> Memo
                 </Button>
@@ -111,7 +111,7 @@ export function ResearchResultsPage({ id }: { id: string }) {
                   className="gap-1.5"
                   onClick={() => {
                     if (compareIds.length >= 2) {
-                      router.push(`/legalai/research/compare?a=${compareIds[0]}&b=${compareIds[1]}`);
+                      router.push(`/lawmate/research/compare?a=${compareIds[0]}&b=${compareIds[1]}`);
                     } else {
                       toast.message("Select two authorities to compare");
                     }
@@ -136,7 +136,7 @@ export function ResearchResultsPage({ id }: { id: string }) {
             onChange={setQuery}
             onSubmit={() => {
               if (!query.trim()) return;
-              router.push("/legalai/research/new");
+              router.push("/lawmate/research/new");
             }}
           />
 
@@ -188,7 +188,7 @@ export function ResearchResultsPage({ id }: { id: string }) {
                       size="sm"
                       variant="ghost"
                       className="h-7 px-2 text-xs"
-                      onClick={() => router.push(`/legalai/research/${id}/authorities/${source.id}`)}
+                      onClick={() => router.push(`/lawmate/research/${id}/authorities/${source.id}`)}
                     >
                       Open
                     </Button>

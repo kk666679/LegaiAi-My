@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/agents/_components/killswitch-page.tsx
+// app/lawmate/agents/_components/killswitch-page.tsx
 import * as React from "react";
 import { AlertTriangle, RotateCcw, Skull } from "lucide-react";
 import { Card } from "@/components/ui/card";

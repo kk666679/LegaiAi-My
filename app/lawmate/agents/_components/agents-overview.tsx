@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/agents/_components/agents-overview.tsx
+// app/lawmate/agents/_components/agents-overview.tsx
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -32,7 +32,7 @@ export function AgentsOverview({
     pollMs: scope === "live" ? 5_000 : 0,
   });
 
-  const handleOpen = (agent: Agent) => router.push(`/legalai/agents/${agent.id}/overview`);
+  const handleOpen = (agent: Agent) => router.push(`/lawmate/agents/${agent.id}/overview`);
   const handleRun = async (agent: Agent) => {
     await run(agent.id);
     toast.success(`Started ${agent.name}`);

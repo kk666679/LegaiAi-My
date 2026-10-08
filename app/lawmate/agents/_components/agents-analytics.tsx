@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/agents/_components/agents-analytics.tsx
+// app/lawmate/agents/_components/agents-analytics.tsx
 import * as React from "react";
 import { KpiCard } from "@/components/charts/kpi/kpi-card";
 import { ChartCard } from "@/components/charts/primitives/chart-card";

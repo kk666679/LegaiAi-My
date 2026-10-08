@@ -1,4 +1,4 @@
-// app/legalai/research/compare/page.tsx
+// app/lawmate/research/compare/page.tsx
 import { ResearchComparePage } from "../_components/research-compare";
 
 export const metadata = {

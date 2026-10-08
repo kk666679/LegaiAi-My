@@ -1,4 +1,4 @@
-// app/legalai/agents/_components/types.ts
+// app/lawmate/agents/_components/types.ts
 
 export type AgentTier = "orchestrator" | "tier1" | "tier2" | "tier3";
 

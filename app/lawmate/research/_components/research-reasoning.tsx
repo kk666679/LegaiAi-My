@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/research/_components/research-reasoning.tsx
+// app/lawmate/research/_components/research-reasoning.tsx
 import * as React from "react";
 import { useResearch } from "./use-research";
 import { IRACReasoningTimeline } from "@/components/dashboard/IRACReasoningTimeline";
@@ -10,7 +10,7 @@ import {
   toDashboardCitations,
   toDashboardStatus,
   toDashboardWorkflow,
-} from "./legalai-dashboard-adapters";
+} from "./lawmate-dashboard-adapters";
 
 export function ResearchReasoningPage({ id }: { id: string }) {
   const { activeSession, sessionReasoning, sessionFindings, sessionAuthorities } = useResearch({ sessionId: id });

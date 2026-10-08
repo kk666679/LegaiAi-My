@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/settings/_components/settings-page.tsx
+// app/lawmate/settings/_components/settings-page.tsx
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";

@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/agents/_components/all-runs-page.tsx
+// app/lawmate/agents/_components/all-runs-page.tsx
 import * as React from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";

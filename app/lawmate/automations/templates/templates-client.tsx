@@ -14,7 +14,7 @@ export function TemplatesGalleryPage() {
       </header>
       <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {DEFAULT_TEMPLATES.map((t) => (
-          <TemplateCard key={t.id} template={t} onUse={() => router.push(`/legalai/automations/new?template=${t.id}`)} />
+          <TemplateCard key={t.id} template={t} onUse={() => router.push(`/lawmate/automations/new?template=${t.id}`)} />
         ))}
       </div>
     </div>

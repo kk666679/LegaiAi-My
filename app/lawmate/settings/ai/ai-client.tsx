@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/settings/ai/ai-client.tsx
+// app/lawmate/settings/ai/ai-client.tsx
 import * as React from "react";
 import { Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";

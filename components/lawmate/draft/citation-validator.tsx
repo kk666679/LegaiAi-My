@@ -27,7 +27,7 @@ import {
   ChainOfThoughtStep 
 } from "@/components/ai-elements/chain-of-thought";
 
-import type { ValidationResult } from '@/lib/legalai/draft/types';
+import type { ValidationResult } from '@/lib/lawmate/draft/types';
 
 
 interface CitationValidation {

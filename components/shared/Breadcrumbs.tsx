@@ -116,7 +116,7 @@ function buildCrumbsFromPath(pathname: string, showHome: boolean) {
   if (showHome) {
     crumbs.push({
       label: "Home",
-      href: "/legalai",
+      href: "/lawmate",
     });
   }
 

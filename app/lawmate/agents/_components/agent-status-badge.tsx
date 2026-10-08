@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/agents/_components/agent-status-badge.tsx
+// app/lawmate/agents/_components/agent-status-badge.tsx
 import * as React from "react";
 import { AlertCircle, CheckCircle2, Circle, Loader2, Pause, Skull, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";

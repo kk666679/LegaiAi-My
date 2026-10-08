@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/research/_components/authority-detail.tsx
+// app/lawmate/research/_components/authority-detail.tsx
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Bookmark, ExternalLink, Quote, Sparkles } from "lucide-react";
@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { SourceCard } from "@/components/dashboard/SourceCard";
 import { CitationList } from "@/components/dashboard/SourceList";
 import { useResearch } from "./use-research";
-import { toDashboardCitations, toDashboardSource } from "./legalai-dashboard-adapters";
+import { toDashboardCitations, toDashboardSource } from "./lawmate-dashboard-adapters";
 
 export function AuthorityDetailPage({
   sessionId,
@@ -53,7 +53,7 @@ export function AuthorityDetailPage({
             variant="ghost"
             className="size-8"
             aria-label="Back to results"
-            onClick={() => router.push(`/legalai/research/${sessionId}/results`)}
+            onClick={() => router.push(`/lawmate/research/${sessionId}/results`)}
           >
             <ArrowLeft className="size-4" />
           </Button>

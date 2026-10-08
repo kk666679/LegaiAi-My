@@ -35,7 +35,7 @@ export function ScopedLibrary({ title, description, scope }: ScopedLibraryProps)
             onViewChange={setView}
             sort={sort}
             onSortChange={(k) => setSort((s) => ({ ...s, key: k }))}
-            onOpen={(d) => router.push(`/legalai/documents/${d.id}/preview`)}
+            onOpen={(d) => router.push(`/lawmate/documents/${d.id}/preview`)}
           />
         </div>
       </DocumentsShell>

@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/research/_components/authority-filters.tsx
+// app/lawmate/research/_components/authority-filters.tsx
 import * as React from "react";
 import { X } from "lucide-react";
 import { Input } from "@/components/ui/input";

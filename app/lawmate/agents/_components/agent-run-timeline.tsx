@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/agents/_components/agent-run-timeline.tsx
+// app/lawmate/agents/_components/agent-run-timeline.tsx
 import * as React from "react";
 import { AlertCircle, CheckCircle2, Circle, Loader2, Pause } from "lucide-react";
 import { cn } from "@/lib/utils";

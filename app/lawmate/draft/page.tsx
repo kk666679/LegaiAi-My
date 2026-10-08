@@ -16,8 +16,8 @@ export default function DraftPage() {
       description="Create, review, and validate draft legal documents with AI-supported workflow controls."
       actions={
         <div className="flex items-center gap-2">
-          <Link href="/legalai/matters/new" className="inline-flex items-center rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground">Create draft</Link>
-          <Link href="/legalai/documents" className="inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium">Open document library</Link>
+          <Link href="/lawmate/matters/new" className="inline-flex items-center rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground">Create draft</Link>
+          <Link href="/lawmate/documents" className="inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium">Open document library</Link>
         </div>
       }
       stats={stats}

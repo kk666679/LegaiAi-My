@@ -76,14 +76,14 @@ export default function Nav() {
   // Flat list of top-level items for desktop quick nav
   const topItems = NAVIGATION_GROUPS.flatMap((g) => g.items).filter((i) =>
     [
-      "/legalai",
-      "/legalai/assistant",
-      "/legalai/matters",
-      "/legalai/documents",
-      "/legalai/contracts",
-      "/legalai/research",
-      "/legalai/agents",
-      "/legalai/hitl",
+      "/lawmate",
+      "/lawmate/assistant",
+      "/lawmate/matters",
+      "/lawmate/documents",
+      "/lawmate/contracts",
+      "/lawmate/research",
+      "/lawmate/agents",
+      "/lawmate/hitl",
     ].includes(i.href)
   );
 
@@ -91,7 +91,7 @@ export default function Nav() {
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
       <div className="content-width safe-x">
         <div className="flex min-w-0 h-14 items-center justify-between gap-3">
-          <Link href="/legalai" className="flex items-center">
+          <Link href="/lawmate" className="flex items-center">
             <Logo size="sm" />
           </Link>
 

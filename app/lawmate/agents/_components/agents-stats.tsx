@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/agents/_components/agents-stats.tsx
+// app/lawmate/agents/_components/agents-stats.tsx
 import * as React from "react";
 import { AlertCircle, Bot, CircleDollarSign, PlayCircle, ShieldAlert, Zap } from "lucide-react";
 import { Card } from "@/components/ui/card";

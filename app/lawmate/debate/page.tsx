@@ -38,7 +38,7 @@ export default function DebatePage() {
           description="Multi-agent legal debate and research simulation."
           actions={
             <Button asChild size="sm" className="gap-1.5">
-              <Link href="/legalai/debate/new">
+              <Link href="/lawmate/debate/new">
                 <Plus className="size-3.5" /> New debate
               </Link>
             </Button>
@@ -58,7 +58,7 @@ export default function DebatePage() {
                 Run a multi-agent adversarial simulation with Plaintiff, Defendant, and Adjudicator roles.
               </p>
               <Button asChild variant="outline" className="w-full gap-2">
-                <Link href="/legalai/debate/new"><Swords className="size-4" /> Open Debate</Link>
+                <Link href="/lawmate/debate/new"><Swords className="size-4" /> Open Debate</Link>
               </Button>
             </CardContent>
           </Card>
@@ -74,7 +74,7 @@ export default function DebatePage() {
                 Retrieve and analyse Malaysian legal sources with AI-assisted reasoning.
               </p>
               <Button asChild variant="outline" className="w-full gap-2">
-                <Link href="/legalai/debate/research"><Search className="size-4" /> Open Research</Link>
+                <Link href="/lawmate/debate/research"><Search className="size-4" /> Open Research</Link>
               </Button>
             </CardContent>
           </Card>
@@ -126,7 +126,7 @@ export default function DebatePage() {
                 title="No debates yet"
                 description="Start a new debate to see AI agents argue both sides of a legal question."
                 action="New debate"
-                actionHref="/legalai/debate/new"
+                actionHref="/lawmate/debate/new"
               />
             ) : (
               <ScrollArea className="max-h-[500px]">
@@ -140,7 +140,7 @@ export default function DebatePage() {
                   </TableHeader>
                   <TableBody>
                     {filtered.map((d: any) => (
-                      <TableRow key={d.id} className="cursor-pointer hover:bg-accent/40" onClick={() => router.push(`/legalai/debate/${d.id}`)}>
+                      <TableRow key={d.id} className="cursor-pointer hover:bg-accent/40" onClick={() => router.push(`/lawmate/debate/${d.id}`)}>
                         <TableCell className="font-medium">
                           <div className="truncate">{d.problem}</div>
                         </TableCell>

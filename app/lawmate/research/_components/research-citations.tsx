@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/research/_components/research-citations.tsx
+// app/lawmate/research/_components/research-citations.tsx
 import * as React from "react";
 import { useResearch } from "./use-research";
 import { CitationList, SourceList } from "@/components/dashboard/SourceList";
@@ -8,7 +8,7 @@ import {
   toDashboardCitations,
   toDashboardSources,
   toDashboardStatus,
-} from "./legalai-dashboard-adapters";
+} from "./lawmate-dashboard-adapters";
 
 export function ResearchCitationsPage({ id }: { id: string }) {
   const { activeSession, sessionAuthorities } = useResearch({ sessionId: id });

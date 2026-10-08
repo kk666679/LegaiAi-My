@@ -17,7 +17,7 @@ export default function NewDebatePage() {
     rounds: number;
   }) => {
     const result = await startDebate.mutateAsync(input);
-    router.push(`/legalai/debate/${result.jobId}`);
+    router.push(`/lawmate/debate/${result.jobId}`);
   };
 
   return (

@@ -1,6 +1,6 @@
 import { Toaster } from '@/components/ui/sonner'
 
-// The /legalai app shell (sidebar, top bar, breadcrumbs, mobile
+// The /lawmate app shell (sidebar, top bar, breadcrumbs, mobile
 // navigation) is provided by DashboardShell inside each page. This
 // layout intentionally renders no additional chrome so the shell is
 // not duplicated.

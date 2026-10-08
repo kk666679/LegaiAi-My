@@ -1,4 +1,4 @@
-// app/legalai/settings/notifications/page.tsx
+// app/lawmate/settings/notifications/page.tsx
 import { NotificationSettings } from "./notifications-client";
 
 export const metadata = { title: "Notifications — Settings" };

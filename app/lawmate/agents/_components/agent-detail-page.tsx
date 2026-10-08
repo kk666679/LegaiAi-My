@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/agents/_components/agent-detail-page.tsx
+// app/lawmate/agents/_components/agent-detail-page.tsx
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -41,7 +41,7 @@ export function AgentDetailPage({ id }: { id: string }) {
           variant="ghost"
           className="size-8"
           aria-label="Back to agents"
-          onClick={() => router.push("/legalai/agents")}
+          onClick={() => router.push("/lawmate/agents")}
         >
           <ArrowLeft className="size-4" />
         </Button>

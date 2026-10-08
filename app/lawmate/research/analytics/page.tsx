@@ -1,4 +1,4 @@
-// app/legalai/research/analytics/page.tsx
+// app/lawmate/research/analytics/page.tsx
 import { ResearchAnalyticsPage } from "../_components/research-analytics";
 
 export const metadata = {

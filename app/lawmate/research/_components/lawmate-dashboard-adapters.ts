@@ -1,8 +1,8 @@
-// app/legalai/research/_components/legalai-dashboard-adapters.ts
+// app/lawmate/research/_components/lawmate-dashboard-adapters.ts
 //
 // LegalAI → dashboard view-model bridge.
 //
-// `app/legalai` owns domain orchestration (sessions, authorities, findings,
+// `app/lawmate` owns domain orchestration (sessions, authorities, findings,
 // reasoning, memos). `components/dashboard` owns presentation. This module is
 // the ONLY place the two vocabularies meet: every function is total (returns
 // a dashboard type, never throws on unexpected input) and never fabricates
@@ -435,7 +435,7 @@ export function toDashboardSavedItems(
       title: s.title || s.query.text,
       snippet: s.query.text,
       savedAt: s.updatedAt,
-      href: `/legalai/research/${s.id}/results`,
+      href: `/lawmate/research/${s.id}/results`,
       tags: s.tags,
       meta: s.matterName ? `Matter ${s.matterName}` : undefined,
     }));
@@ -448,6 +448,6 @@ export function toDashboardActivity(sessions: readonly ResearchSession[]): Activ
     title: s.title || s.query.text,
     detail: `${s.authorityCount} authorities · ${s.findingCount} findings`,
     at: s.updatedAt,
-    href: `/legalai/research/${s.id}/results`,
+    href: `/lawmate/research/${s.id}/results`,
   }));
 }

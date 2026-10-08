@@ -1,4 +1,4 @@
-// app/legalai/agents/page.tsx
+// app/lawmate/agents/page.tsx
 import { AgentsOverview } from "./_components/agents-overview";
 
 export default function Page() {

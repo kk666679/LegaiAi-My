@@ -1,4 +1,4 @@
-// app/legalai/settings/security/page.tsx
+// app/lawmate/settings/security/page.tsx
 import { SecuritySettings } from "./security-client";
 
 export const metadata = { title: "Security — Settings" };

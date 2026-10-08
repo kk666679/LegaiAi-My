@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Consistent page header used across /legalai sections.
+ * Consistent page header used across /lawmate sections.
  * Keeps title, description and action row aligned everywhere.
  */
 export function PageHeader({

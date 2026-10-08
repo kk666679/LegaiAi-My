@@ -15,7 +15,7 @@ import {
   CheckCircle, 
   AlertTriangle
 } from "lucide-react";
-import type { ValidationResult } from "@/lib/legalai/draft/types";
+import type { ValidationResult } from "@/lib/lawmate/draft/types";
 
 interface DraftWorkflowProps {
   currentStep: number;

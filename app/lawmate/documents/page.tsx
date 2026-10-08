@@ -76,11 +76,11 @@ export default function DocumentsPage() {
       }
     });
     params.delete("cursor");
-    router.push(`/legalai/documents?${params.toString()}`);
+    router.push(`/lawmate/documents?${params.toString()}`);
   };
 
   const clearFilters = () => {
-    router.push("/legalai/documents");
+    router.push("/lawmate/documents");
   };
 
   const hasActiveFilters = Object.values(filters).some(v => v !== undefined && v !== "" && v !== 20);
@@ -108,7 +108,7 @@ export default function DocumentsPage() {
               <Button variant="outline" size="sm" onClick={() => setUploadOpen(true)} className="gap-1.5">
                 <Upload className="size-3.5" /> Upload
               </Button>
-              <Button onClick={() => router.push("/legalai/documents/new")} size="sm" className="gap-1.5">
+              <Button onClick={() => router.push("/lawmate/documents/new")} size="sm" className="gap-1.5">
                 <Plus className="size-3.5" /> New document
               </Button>
             </>
@@ -160,7 +160,7 @@ export default function DocumentsPage() {
           <CardContent>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/documents/recent">
+                <Link href="/lawmate/documents/recent">
                   <div className="flex items-center gap-2">
                     <History className="size-5 text-muted-foreground" />
                     <div>
@@ -171,7 +171,7 @@ export default function DocumentsPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/documents/favorites">
+                <Link href="/lawmate/documents/favorites">
                   <div className="flex items-center gap-2">
                     <Star className="size-5 text-amber-500" />
                     <div>
@@ -182,7 +182,7 @@ export default function DocumentsPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/documents/shared">
+                <Link href="/lawmate/documents/shared">
                   <div className="flex items-center gap-2">
                     <Share2 className="size-5 text-muted-foreground" />
                     <div>
@@ -193,7 +193,7 @@ export default function DocumentsPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/documents/templates">
+                <Link href="/lawmate/documents/templates">
                   <div className="flex items-center gap-2">
                     <BookTemplate className="size-5 text-primary" />
                     <div>
@@ -204,7 +204,7 @@ export default function DocumentsPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/documents/studio">
+                <Link href="/lawmate/documents/studio">
                   <div className="flex items-center gap-2">
                     <Sparkles className="size-5 text-primary" />
                     <div>
@@ -215,7 +215,7 @@ export default function DocumentsPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/documents/library">
+                <Link href="/lawmate/documents/library">
                   <div className="flex items-center gap-2">
                     <Library className="size-5 text-muted-foreground" />
                     <div>
@@ -226,7 +226,7 @@ export default function DocumentsPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/documents?status=archived">
+                <Link href="/lawmate/documents?status=archived">
                   <div className="flex items-center gap-2">
                     <Archive className="size-5 text-muted-foreground" />
                     <div>
@@ -237,7 +237,7 @@ export default function DocumentsPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/documents/trash">
+                <Link href="/lawmate/documents/trash">
                   <div className="flex items-center gap-2">
                     <Trash2 className="size-5 text-destructive" />
                     <div>
@@ -319,7 +319,7 @@ export default function DocumentsPage() {
                 title="No documents found"
                 description="Upload a contract, brief or memorandum to analyse it with AI."
                 action="Upload document"
-                actionHref="/legalai/documents/new"
+                actionHref="/lawmate/documents/new"
               />
             ) : (
               <ScrollArea className="max-h-[600px]">
@@ -335,7 +335,7 @@ export default function DocumentsPage() {
                   </TableHeader>
                   <TableBody>
                     {documents.map((d: { id: string; title: string; docType: string; status: string; version: number; updatedAt: string }) => (
-                      <TableRow key={d.id} className="cursor-pointer hover:bg-accent/40" onClick={() => router.push(`/legalai/documents/${d.id}/preview`)}>
+                      <TableRow key={d.id} className="cursor-pointer hover:bg-accent/40" onClick={() => router.push(`/lawmate/documents/${d.id}/preview`)}>
                         <TableCell className="font-medium">
                           <div className="truncate">{d.title}</div>
                         </TableCell>

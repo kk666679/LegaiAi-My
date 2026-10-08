@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/research/_components/authority-badges.tsx
+// app/lawmate/research/_components/authority-badges.tsx
 import * as React from "react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";

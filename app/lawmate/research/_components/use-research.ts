@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/research/_components/use-research.ts
+// app/lawmate/research/_components/use-research.ts
 import * as React from "react";
 import type {
   Authority,

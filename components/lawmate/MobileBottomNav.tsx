@@ -19,14 +19,14 @@ export function MobileBottomNav() {
   const [askOpen, setAskOpen] = useState(false);
 
   const items = [
-    { href: "/legalai", label: "Home", icon: LawMateMark, matchPrefix: "/legalai" },
-    { href: "/legalai/research", label: "Search", icon: Search, matchPrefix: "/legalai/research" },
-    { href: "/legalai/documents", label: "Docs", icon: FileText, matchPrefix: "/legalai/documents" },
-    { href: "/legalai/matters", label: "Matters", icon: Briefcase, matchPrefix: "/legalai/matters" },
+    { href: "/lawmate", label: "Home", icon: LawMateMark, matchPrefix: "/lawmate" },
+    { href: "/lawmate/research", label: "Search", icon: Search, matchPrefix: "/lawmate/research" },
+    { href: "/lawmate/documents", label: "Docs", icon: FileText, matchPrefix: "/lawmate/documents" },
+    { href: "/lawmate/matters", label: "Matters", icon: Briefcase, matchPrefix: "/lawmate/matters" },
   ];
 
   const isActive = (href: string, prefix?: string) => {
-    if (href === "/legalai") return pathname === "/legalai";
+    if (href === "/lawmate") return pathname === "/lawmate";
     if (prefix) return pathname.startsWith(prefix);
     return pathname === href;
   };
@@ -41,7 +41,7 @@ export function MobileBottomNav() {
           {items.slice(0, 2).map((it) => {
             const Icon = it.icon;
             const active = isActive(it.href, it.matchPrefix);
-            const isHome = it.href === "/legalai";
+            const isHome = it.href === "/lawmate";
             return (
               <Link
                 key={it.href}

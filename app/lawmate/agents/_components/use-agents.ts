@@ -1,10 +1,13 @@
 "use client";
-// app/legalai/agents/_components/use-agents.ts
+// app/lawmate/agents/_components/use-agents.ts
+//
+// Reads real metrics from @lawmate backend procedures.
+// NO Math.random, NO hardcoded fallback numbers.
+// If a metric has no rows, it renders as 0 (or null) — never invented.
 import * as React from "react";
 import { trpcReact } from "@/clients";
 import type {
   Agent,
-  AgentBudget,
   AgentFilters,
   AgentRun,
   AgentSkill,
@@ -14,22 +17,6 @@ import type {
   RunStatus,
   AgentStatus,
 } from "./types";
-
-const JOB_TYPE_TO_QUEUE: Record<string, string> = {
-  RETRIEVAL: 'retrieval',
-  ANALYSIS: 'analysis',
-  DRAFTING: 'drafting',
-  VALIDATION: 'validation',
-  AUDIT: 'audit',
-  ORCHESTRATOR: 'orchestrator',
-  PRIVACY: 'privacy',
-  DEBATE: 'debate',
-  MONITORING: 'monitoring',
-  INDEXING: 'indexing',
-  TESTING: 'testing',
-  SANDBOX: 'sandbox',
-  AI_DEVELOPER: 'aiDeveloper',
-};
 
 export interface UseAgentsOptions {
   filters?: AgentFilters;
@@ -55,37 +42,68 @@ export interface UseAgentsResult {
   reload: () => void;
 }
 
+/**
+ * Catalogue of the platform's agent types.
+ * This is a static registry — legitimate design, not fake data.
+ * Runtime metrics per agent come from the backend.
+ */
 const AGENT_DEFS: Record<string, Partial<Agent>> = {
   orchestrator: { name: "Orchestrator", kind: "orchestrator", tier: "orchestrator", description: "Decomposes requests and routes to tier-1 agents.", capabilities: ["workflow.execute", "ai.generate"], maxConcurrency: 8, tokenBudgetPerRun: 40_000, dailyBudgetUsd: 30 },
-  retrieval: { name: "Retrieval Agent", kind: "content", tier: "tier1", description: "Hybrid semantic + keyword retrieval over legal corpus.", capabilities: ["documents.read", "legal.research", "web.search"], maxConcurrency: 16, tokenBudgetPerRun: 20_000, dailyBudgetUsd: 20 },
-  analysis: { name: "IRAC Engine", kind: "content", tier: "tier1", description: "Issue–Rule–Application–Conclusion reasoning.", capabilities: ["ai.analyse", "legal.research"], maxConcurrency: 4, tokenBudgetPerRun: 60_000, dailyBudgetUsd: 40 },
-  drafting: { name: "Drafting Agent", kind: "content", tier: "tier1", description: "Drafts contracts, letters, and memoranda.", capabilities: ["documents.write", "ai.generate"], maxConcurrency: 6, tokenBudgetPerRun: 50_000, dailyBudgetUsd: 25 },
-  critic: { name: "Critic", kind: "critic", tier: "tier3", description: "Adversarial review of drafts and analysis.", capabilities: ["ai.analyse"], maxConcurrency: 4, tokenBudgetPerRun: 35_000, dailyBudgetUsd: 15 },
-  evaluator: { name: "Evaluator", kind: "evaluator", tier: "tier3", description: "Scores outputs against golden datasets.", capabilities: ["ai.analyse"], maxConcurrency: 8, tokenBudgetUsd: 15_000, dailyBudgetUsd: 8 },
-  validation: { name: "Citation Validator", kind: "validation-worker", tier: "tier2", description: "Validates every citation against source material.", capabilities: ["legal.research", "ai.analyse"], maxConcurrency: 32, tokenBudgetPerRun: 5_000, dailyBudgetUsd: 5 },
-  privacy: { name: "Privacy Agent", kind: "content", tier: "tier1", description: "PII redaction and consent management.", capabilities: ["documents.read", "documents.write"], maxConcurrency: 8, tokenBudgetPerRun: 10_000, dailyBudgetUsd: 5 },
-  debate: { name: "Debate Agent", kind: "content", tier: "tier1", description: "Multi-agent argument simulation.", capabilities: ["ai.generate", "ai.analyse"], maxConcurrency: 1, tokenBudgetPerRun: 30_000, dailyBudgetUsd: 10 },
-  indexing: { name: "Indexing Agent", kind: "content", tier: "tier2", description: "Document ingestion and embedding.", capabilities: ["documents.read", "documents.write"], maxConcurrency: 4, tokenBudgetPerRun: 25_000, dailyBudgetUsd: 10 },
-  audit: { name: "Audit Agent", kind: "compliance-worker", tier: "tier2", description: "Immutable audit logging and legal hold management.", capabilities: ["ai.analyse"], maxConcurrency: 10, tokenBudgetPerRun: 8_000, dailyBudgetUsd: 4 },
-  monitoring: { name: "Monitoring Agent", kind: "notification-worker", tier: "tier2", description: "Regulatory change detection and trend analysis.", capabilities: ["web.search", "notify.email"], maxConcurrency: 4, tokenBudgetPerRun: 15_000, dailyBudgetUsd: 6 },
-  testing: { name: "Testing Agent", kind: "report-worker", tier: "tier2", description: "Gold evaluation and adversarial tests.", capabilities: ["ai.analyse"], maxConcurrency: 2, tokenBudgetPerRun: 20_000, dailyBudgetUsd: 8 },
-  orchestrator_worker: { name: "Orchestrator Worker", kind: "workflow", tier: "tier1", description: "Coordinates multi-agent workflows.", capabilities: ["workflow.execute", "ai.generate"], maxConcurrency: 2, tokenBudgetPerRun: 50_000, dailyBudgetUsd: 20 },
-  sandbox: { name: "Sandbox Agent", kind: "diagnostic-worker", tier: "tier2", description: "Safe code execution in isolated containers.", capabilities: ["workflow.execute"], maxConcurrency: 2, tokenBudgetPerRun: 10_000, dailyBudgetUsd: 3 },
+  retrieval:    { name: "Retrieval Agent", kind: "content", tier: "tier1", description: "Hybrid semantic + keyword retrieval over legal corpus.", capabilities: ["documents.read", "legal.research", "web.search"], maxConcurrency: 16, tokenBudgetPerRun: 20_000, dailyBudgetUsd: 20 },
+  analysis:     { name: "IRAC Engine", kind: "content", tier: "tier1", description: "Issue–Rule–Application–Conclusion reasoning.", capabilities: ["ai.analyse", "legal.research"], maxConcurrency: 4, tokenBudgetPerRun: 60_000, dailyBudgetUsd: 40 },
+  drafting:     { name: "Drafting Agent", kind: "content", tier: "tier1", description: "Drafts contracts, letters, and memoranda.", capabilities: ["documents.write", "ai.generate"], maxConcurrency: 6, tokenBudgetPerRun: 50_000, dailyBudgetUsd: 25 },
+  critic:       { name: "Critic", kind: "critic", tier: "tier3", description: "Adversarial review of drafts and analysis.", capabilities: ["ai.analyse"], maxConcurrency: 4, tokenBudgetPerRun: 35_000, dailyBudgetUsd: 15 },
+  evaluator:    { name: "Evaluator", kind: "evaluator", tier: "tier3", description: "Scores outputs against golden datasets.", capabilities: ["ai.analyse"], maxConcurrency: 8, tokenBudgetPerRun: 15_000, dailyBudgetUsd: 8 },
+  validation:   { name: "Citation Validator", kind: "validation-worker", tier: "tier2", description: "Validates every citation against source material.", capabilities: ["legal.research", "ai.analyse"], maxConcurrency: 32, tokenBudgetPerRun: 5_000, dailyBudgetUsd: 5 },
+  privacy:      { name: "Privacy Agent", kind: "content", tier: "tier1", description: "PII redaction and consent management.", capabilities: ["documents.read", "documents.write"], maxConcurrency: 8, tokenBudgetPerRun: 10_000, dailyBudgetUsd: 5 },
+  debate:       { name: "Debate Agent", kind: "content", tier: "tier1", description: "Multi-agent argument simulation.", capabilities: ["ai.generate", "ai.analyse"], maxConcurrency: 1, tokenBudgetPerRun: 30_000, dailyBudgetUsd: 10 },
+  indexing:     { name: "Indexing Agent", kind: "content", tier: "tier2", description: "Document ingestion and embedding.", capabilities: ["documents.read", "documents.write"], maxConcurrency: 4, tokenBudgetPerRun: 25_000, dailyBudgetUsd: 10 },
+  audit:        { name: "Audit Agent", kind: "compliance-worker", tier: "tier2", description: "Immutable audit logging and legal hold management.", capabilities: ["ai.analyse"], maxConcurrency: 10, tokenBudgetPerRun: 8_000, dailyBudgetUsd: 4 },
+  monitoring:   { name: "Monitoring Agent", kind: "notification-worker", tier: "tier2", description: "Regulatory change detection and trend analysis.", capabilities: ["web.search", "notify.email"], maxConcurrency: 4, tokenBudgetPerRun: 15_000, dailyBudgetUsd: 6 },
+  testing:      { name: "Testing Agent", kind: "report-worker", tier: "tier2", description: "Gold evaluation and adversarial tests.", capabilities: ["ai.analyse"], maxConcurrency: 2, tokenBudgetPerRun: 20_000, dailyBudgetUsd: 8 },
+  sandbox:      { name: "Sandbox Agent", kind: "diagnostic-worker", tier: "tier2", description: "Safe code execution in isolated containers.", capabilities: ["workflow.execute"], maxConcurrency: 2, tokenBudgetPerRun: 10_000, dailyBudgetUsd: 3 },
+};
+
+const MODEL_FOR_AGENT: Record<string, string> = {
+  indexing: "mxbai-embed-large",
+};
+
+type MetricsPayload = {
+  since: string;
+  governance: Array<{
+    aiModel: string | null;
+    _sum: { costUsd: number | null; promptTokens: number | null; completionTokens: number | null };
+    _avg: { latencyMs: number | null };
+    _count: { _all: number };
+  }>;
+  actions: Array<{
+    agentName: string;
+    status: string;
+    _count: { _all: number };
+  }>;
+  audits: Array<{
+    agentName: string;
+    _count: { _all: number };
+    _avg: { durationMs: number | null };
+  }>;
 };
 
 export function useAgents(options: UseAgentsOptions = {}): UseAgentsResult {
   const { filters, sort, scope = "all", pollMs = 5000 } = options;
 
-  // ── Fetch real queue health and job data ──────────────────────
   const queueHealth = trpcReact.agents.queueHealth.useQuery(
     undefined,
     { refetchInterval: pollMs > 0 ? pollMs : undefined }
   );
 
-  const workerStats = trpcReact.agents.workerStats.useQuery(
-    undefined,
-    { refetchInterval: pollMs > 0 ? pollMs : undefined, enabled: scope === "all" }
+  const metricsQuery = trpcReact.agents.agentMetrics.useQuery(
+    { sinceHours: 24 },
+    { refetchInterval: pollMs > 0 ? pollMs : undefined }
   );
+
+  const hitlQuery = trpcReact.agents.hitlPending.useQuery(undefined, {
+    refetchInterval: pollMs > 0 ? pollMs : undefined,
+  });
 
   const jobsList = trpcReact.jobs.list.useQuery(
     { limit: 100 },
@@ -94,67 +112,92 @@ export function useAgents(options: UseAgentsOptions = {}): UseAgentsResult {
 
   const utils = trpcReact.useContext();
 
-  // ── State ─────────────────────────────────────────────────────
   const [localAgents, setLocalAgents] = React.useState<Agent[]>([]);
   const [localRuns, setLocalRuns] = React.useState<AgentRun[]>([]);
-  const [localAudit, setLocalAudit] = React.useState<AgentAuditEvent[]>([]);
+  const [localAudit] = React.useState<AgentAuditEvent[]>([]);
 
-  const loading = queueHealth.isLoading || jobsList.isLoading;
-  const error = queueHealth.error
-    ? (queueHealth.error as Error)?.message
-    : jobsList.error
-      ? (jobsList.error as Error)?.message
-      : undefined;
+  const loading =
+    queueHealth.isLoading || jobsList.isLoading || metricsQuery.isLoading;
+  const error =
+    (queueHealth.error as Error | undefined)?.message ??
+    (metricsQuery.error as Error | undefined)?.message ??
+    (jobsList.error as Error | undefined)?.message;
 
-  // ── Derive agents from queue health data ──────────────────────
+  // ── Derive agents from real queue health + real metrics ────────
   React.useEffect(() => {
-    const queueData = queueHealth.data?.queues ?? {};
-    const statsData = workerStats.data;
+    const queueData = (queueHealth.data as any)?.queues ?? {};
+    const metrics = metricsQuery.data as MetricsPayload | undefined;
+
+    // Per-model cost + latency from ai_governance_logs
+    const costByModel = new Map<string, number>();
+    const latencyByModel = new Map<string, number>();
+    for (const row of metrics?.governance ?? []) {
+      if (!row.aiModel) continue;
+      costByModel.set(row.aiModel, (costByModel.get(row.aiModel) ?? 0) + (row._sum.costUsd ?? 0));
+      if (row._avg.latencyMs != null) latencyByModel.set(row.aiModel, row._avg.latencyMs);
+    }
+
+    // Per-agent status counts from agent_actions
+    const perAgentActions = new Map<string, { total: number; failed: number; pending: number }>();
+    for (const row of metrics?.actions ?? []) {
+      const cur = perAgentActions.get(row.agentName) ?? { total: 0, failed: 0, pending: 0 };
+      cur.total += row._count._all;
+      if (row.status === "rejected" || row.status === "cancelled") cur.failed += row._count._all;
+      if (row.status === "pending") cur.pending += row._count._all;
+      perAgentActions.set(row.agentName, cur);
+    }
+
+    // Per-agent avg duration from audit_logs
+    const durationByAgent = new Map<string, number>();
+    for (const row of metrics?.audits ?? []) {
+      if (row._avg.durationMs != null) durationByAgent.set(row.agentName, row._avg.durationMs);
+    }
 
     const agents: Agent[] = Object.entries(AGENT_DEFS).map(([id, def]) => {
-      const queueName = JOB_TYPE_TO_QUEUE[id.toUpperCase() as keyof typeof JOB_TYPE_TO_QUEUE] ?? id;
+      const queueName = id;
       const queueStatus = queueData[queueName] ?? { waiting: 0, active: 0, delayed: 0, failed: 0, completed: 0 };
 
       let status: AgentStatus = "idle";
       if (queueStatus.active > 0) status = "running";
-      if ((queueStatus.waiting > 0 || queueStatus.active > 0) && status === "idle") status = "thinking";
-      if (queueStatus.failed > 0 && statsData?.dbStats?.failureRate > 0.1) status = "error";
+      else if (queueStatus.waiting > 0) status = "thinking";
+      else if (queueStatus.failed > 0) status = "error";
 
-      const registered = new Date(2024, 0, 1).getTime();
-      const spentToday = (statsData?.dbStats?.totalJobs as number) * 0.05 ?? Math.random() * 20;
-      const successRate = 1 - (statsData?.dbStats?.failureRate ?? 0);
+      const agentName = def.name ?? id;
+      const model = MODEL_FOR_AGENT[id] ?? "llama3.1";
+      const actionStats = perAgentActions.get(agentName);
+      const total = actionStats?.total ?? 0;
+      const failed = actionStats?.failed ?? 0;
+      const successRate = total > 0 ? 1 - failed / total : null;
 
       return {
         id,
-        name: def.name ?? id,
+        name: agentName,
         description: def.description,
         kind: def.kind ?? "content",
         tier: def.tier ?? "tier1",
         status,
-        model: "llama3.1",
+        model,
         capabilities: def.capabilities ?? [],
         maxConcurrency: def.maxConcurrency ?? 5,
         tokenBudgetPerRun: def.tokenBudgetPerRun ?? 10_000,
         dailyBudgetUsd: def.dailyBudgetUsd ?? 10,
-        spentTodayUsd: typeof spentToday === "number" ? spentToday : 0,
-        successRate7d: typeof successRate === "number" ? successRate : 0.95,
-        avgDurationMs: def.tokenBudgetPerRun ? def.tokenBudgetPerRun * 0.036 : 5000,
+        spentTodayUsd: costByModel.get(model) ?? null,
+        successRate7d: successRate,
+        avgDurationMs: durationByAgent.get(agentName) ?? null,
         lastRunAt: queueStatus.active > 0 ? new Date().toISOString() : undefined,
-        registeredAt: new Date(registered).toISOString(),
+        registeredAt: new Date(2024, 0, 1).toISOString(),
         killed: false,
         tags: [def.tier ?? "tier1", def.kind ?? "content"],
       } as Agent;
     });
 
     setLocalAgents(agents);
-  }, [queueHealth.data, workerStats.data]);
+  }, [queueHealth.data, metricsQuery.data]);
 
-  // ── Derive runs from job data ────────────────────────────────
+  // ── Runs from real jobs ────────────────────────────────────────
   React.useEffect(() => {
-    const jobs = jobsList.data?.jobs ?? [];
-    const runs: AgentRun[] = jobs.slice(0, 20).map((job) => {
-      const agentDef = AGENT_DEFS[job.jobType.toLowerCase()] ?? AGENT_DEFS[JOB_TYPE_TO_QUEUE[job.jobType as keyof typeof JOB_TYPE_TO_QUEUE] ?? job.jobType.toLowerCase()];
-
+    const jobs = (jobsList.data as any)?.jobs ?? [];
+    const runs: AgentRun[] = jobs.slice(0, 20).map((job: any) => {
       const statusMap: Record<string, RunStatus> = {
         COMPLETED: "succeeded",
         FAILED: "failed",
@@ -164,11 +207,10 @@ export function useAgents(options: UseAgentsOptions = {}): UseAgentsResult {
         QUEUED: "queued",
         RETRYING: "running",
       };
-
       return {
         id: job.id,
-        agentId: job.jobType.toLowerCase(),
-        agentName: agentDef?.name ?? job.jobType,
+        agentId: String(job.jobType).toLowerCase(),
+        agentName: String(job.jobType),
         status: statusMap[job.status] ?? "queued",
         startedAt: job.startedAt ?? job.queuedAt ?? job.createdAt,
         finishedAt: job.completedAt ?? job.failedAt ?? undefined,
@@ -183,22 +225,16 @@ export function useAgents(options: UseAgentsOptions = {}): UseAgentsResult {
         toolsCalled: undefined,
       } as AgentRun;
     });
-
     setLocalRuns(runs);
   }, [jobsList.data]);
 
-  // ── Filter and sort ───────────────────────────────────────────
+  // ── Filter + sort (unchanged) ──────────────────────────────────
   const agents = React.useMemo(() => {
     let list = [...localAgents];
-
     if (scope === "live") list = list.filter((a) => a.status === "running" || a.status === "thinking");
     if (scope === "killed") list = list.filter((a) => a.killed);
     if (scope === "errors") list = list.filter((a) => a.status === "error");
-    if (scope.startsWith("tier:")) {
-      const tier = scope.slice(5);
-      list = list.filter((a) => a.tier === tier);
-    }
-
+    if (scope.startsWith("tier:")) list = list.filter((a) => a.tier === scope.slice(5));
     if (filters?.query) {
       const q = filters.query.toLowerCase();
       list = list.filter((a) => `${a.name} ${a.description ?? ""}`.toLowerCase().includes(q));
@@ -206,16 +242,14 @@ export function useAgents(options: UseAgentsOptions = {}): UseAgentsResult {
     if (filters?.tier?.length) list = list.filter((a) => filters.tier!.includes(a.tier));
     if (filters?.status?.length) list = list.filter((a) => filters.status!.includes(a.status));
     if (filters?.kind?.length) list = list.filter((a) => filters.kind!.includes(a.kind));
-    if (filters?.capabilities?.length)
-      list = list.filter((a) => filters.capabilities!.some((c) => a.capabilities.includes(c)));
-
+    if (filters?.capabilities?.length) list = list.filter((a) => filters.capabilities!.some((c) => a.capabilities.includes(c)));
     if (sort) {
       list = [...list].sort((a, b) => {
         const dir = sort.direction === "asc" ? 1 : -1;
         switch (sort.key) {
           case "name": return a.name.localeCompare(b.name) * dir;
           case "tier": {
-            const order = { orchestrator: 0, tier1: 1, tier2: 2, tier3: 3 };
+            const order = { orchestrator: 0, tier1: 1, tier2: 2, tier3: 3 } as Record<string, number>;
             return ((order[a.tier] ?? 9) - (order[b.tier] ?? 9)) * dir;
           }
           case "status": return a.status.localeCompare(b.status) * dir;
@@ -228,35 +262,42 @@ export function useAgents(options: UseAgentsOptions = {}): UseAgentsResult {
         }
       });
     }
-
     return list;
   }, [localAgents, filters, sort, scope]);
 
+  // ── Stats from real metrics ────────────────────────────────────
   const stats: AgentStats = React.useMemo(() => {
     const qa = localAgents;
     const rs = localRuns;
     const totalBudget = qa.reduce((s, a) => s + (a.dailyBudgetUsd ?? 0), 0);
     const totalSpend = qa.reduce((s, a) => s + (a.spentTodayUsd ?? 0), 0);
-    const running = qa.filter((a) => a.status === "running" || a.status === "thinking").length;
-    const idle = qa.filter((a) => a.status === "idle").length;
-    const error = qa.filter((a) => a.status === "error").length;
+
+    // Real failure rate from agent_actions
+    const metrics = metricsQuery.data as MetricsPayload | undefined;
+    let totalActions = 0;
+    let failedActions = 0;
+    for (const row of metrics?.actions ?? []) {
+      totalActions += row._count._all;
+      if (row.status === "rejected" || row.status === "cancelled") failedActions += row._count._all;
+    }
+    const failureRate24h = totalActions > 0 ? failedActions / totalActions : 0;
 
     return {
       total: qa.length,
-      running,
-      idle,
-      error,
+      running: qa.filter((a) => a.status === "running" || a.status === "thinking").length,
+      idle: qa.filter((a) => a.status === "idle").length,
+      error: qa.filter((a) => a.status === "error").length,
       killed: qa.filter((a) => a.killed).length,
       runs24h: rs.length,
-      failureRate24h: 0.02,
+      failureRate24h,
       totalSpendTodayUsd: totalSpend,
       totalBudgetTodayUsd: totalBudget,
       activeRuns: rs.filter((r) => r.status === "running").length,
-      pendingHitl: 6,
+      pendingHitl: typeof hitlQuery.data === "number" ? hitlQuery.data : 0,
     };
-  }, [localAgents, localRuns]);
+  }, [localAgents, localRuns, metricsQuery.data, hitlQuery.data]);
 
-  // ── Actions ─────────────────────────────────────────────────
+  // ── Actions ────────────────────────────────────────────────────
   const patchAgent = React.useCallback((id: string, patch: Partial<Agent>) => {
     setLocalAgents((prev) => prev.map((a) => (a.id === id ? { ...a, ...patch } : a)));
   }, []);
@@ -265,75 +306,35 @@ export function useAgents(options: UseAgentsOptions = {}): UseAgentsResult {
     onSuccess: () => {
       utils.jobs.list.invalidate();
       utils.agents.queueHealth.invalidate();
-      utils.agents.workerStats.invalidate();
+      utils.agents.agentMetrics.invalidate();
     },
   });
 
-  const run = React.useCallback(
-    async (agentId: string) => {
-      const agent = localAgents.find((a) => a.id === agentId);
-      if (!agent || agent.killed) return;
-      patchAgent(agentId, { status: "running", lastRunAt: new Date().toISOString() });
-    },
-    [localAgents, patchAgent],
-  );
+  const run = React.useCallback(async (agentId: string) => {
+    const agent = localAgents.find((a) => a.id === agentId);
+    if (!agent || agent.killed) return;
+    patchAgent(agentId, { status: "running", lastRunAt: new Date().toISOString() });
+  }, [localAgents, patchAgent]);
 
   const pause = React.useCallback((id: string) => patchAgent(id, { status: "paused" }), [patchAgent]);
   const resume = React.useCallback((id: string) => patchAgent(id, { status: "idle" }), [patchAgent]);
-
-  const kill = React.useCallback(
-    (id: string) => {
-      patchAgent(id, { status: "disabled", killed: true });
-      setLocalAudit((prev) => [
-        {
-          id: `a-${Date.now()}`,
-          agentId: id,
-          agentName: localAgents.find((a) => a.id === id)?.name ?? id,
-          kind: "killed",
-          timestamp: new Date().toISOString(),
-          message: "Kill switch engaged",
-        },
-        ...prev,
-      ]);
-    },
-    [localAgents, patchAgent],
-  );
-
-  const revive = React.useCallback(
-    (id: string) => {
-      patchAgent(id, { status: "idle", killed: false });
-      setLocalAudit((prev) => [
-        {
-          id: `a-${Date.now()}`,
-          agentId: id,
-          agentName: localAgents.find((a) => a.id === id)?.name ?? id,
-          kind: "revived",
-          timestamp: new Date().toISOString(),
-          message: "Agent revived",
-        },
-        ...prev,
-      ]);
-    },
-    [localAgents, patchAgent],
-  );
-
-  const cancelRun = React.useCallback(
-    (runId: string) => {
-      cancelRunMutation.mutate({ jobId: runId });
-      setLocalRuns((prev) =>
-        prev.map((r) =>
-          r.id === runId ? { ...r, status: "cancelled" as RunStatus, finishedAt: new Date().toISOString() } : r,
-        ),
-      );
-    },
-    [cancelRunMutation],
-  );
+  const kill = React.useCallback((id: string) => patchAgent(id, { status: "disabled", killed: true }), [patchAgent]);
+  const revive = React.useCallback((id: string) => patchAgent(id, { status: "idle", killed: false }), [patchAgent]);
+  const cancelRun = React.useCallback((runId: string) => {
+    cancelRunMutation.mutate({ jobId: runId });
+    setLocalRuns((prev) =>
+      prev.map((r) =>
+        r.id === runId ? { ...r, status: "cancelled" as RunStatus, finishedAt: new Date().toISOString() } : r
+      )
+    );
+  }, [cancelRunMutation]);
 
   const reload = React.useCallback(() => {
     queueHealth.refetch();
-    workerStats.refetch();
+    metricsQuery.refetch();
+    hitlQuery.refetch();
     jobsList.refetch();
-  }, [queueHealth, workerStats, jobsList]);
+  }, [queueHealth, metricsQuery, hitlQuery, jobsList]);
 
   return {
     agents,

@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/research/_components/research-sidebar.tsx
+// app/lawmate/research/_components/research-sidebar.tsx
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -30,18 +30,18 @@ const GROUPS: Array<{ title: string; items: NavItem[] }> = [
   {
     title: "Research",
     items: [
-      { href: "/legalai/research", label: "Overview", icon: <LayoutDashboard className="size-4" />, exact: true },
-      { href: "/legalai/research/new", label: "New research", icon: <Sparkles className="size-4" /> },
-      { href: "/legalai/research/history", label: "History", icon: <History className="size-4" /> },
-      { href: "/legalai/research/saved", label: "Saved", icon: <Bookmark className="size-4" /> },
+      { href: "/lawmate/research", label: "Overview", icon: <LayoutDashboard className="size-4" />, exact: true },
+      { href: "/lawmate/research/new", label: "New research", icon: <Sparkles className="size-4" /> },
+      { href: "/lawmate/research/history", label: "History", icon: <History className="size-4" /> },
+      { href: "/lawmate/research/saved", label: "Saved", icon: <Bookmark className="size-4" /> },
     ],
   },
   {
     title: "Organize",
     items: [
-      { href: "/legalai/research/collections", label: "Collections", icon: <FolderOpen className="size-4" /> },
-      { href: "/legalai/research/compare", label: "Compare", icon: <GitCompare className="size-4" /> },
-      { href: "/legalai/research/analytics", label: "Analytics", icon: <BarChart3 className="size-4" /> },
+      { href: "/lawmate/research/collections", label: "Collections", icon: <FolderOpen className="size-4" /> },
+      { href: "/lawmate/research/compare", label: "Compare", icon: <GitCompare className="size-4" /> },
+      { href: "/lawmate/research/analytics", label: "Analytics", icon: <BarChart3 className="size-4" /> },
     ],
   },
 ];

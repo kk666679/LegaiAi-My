@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/research/_components/metric-meters.tsx
+// app/lawmate/research/_components/metric-meters.tsx
 import * as React from "react";
 import { cn } from "@/lib/utils";
 

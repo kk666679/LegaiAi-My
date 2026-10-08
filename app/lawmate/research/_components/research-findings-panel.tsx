@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/research/_components/research-findings-panel.tsx
+// app/lawmate/research/_components/research-findings-panel.tsx
 import * as React from "react";
 import { AlertTriangle, ArrowRight, CheckCircle2, GitBranch, MinusCircle, Sparkles } from "lucide-react";
 import { Card } from "@/components/ui/card";

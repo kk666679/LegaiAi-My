@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/settings/_components/settings-section.tsx
+// app/lawmate/settings/_components/settings-section.tsx
 import * as React from "react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";

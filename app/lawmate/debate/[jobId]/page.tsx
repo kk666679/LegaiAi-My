@@ -41,7 +41,7 @@ export default function DebateDetailPage() {
             <Swords className="size-12 mx-auto text-destructive" />
             <h2 className="mt-4 text-xl font-semibold">Debate not found</h2>
             <p className="mt-2 text-muted-foreground">The debate job you're looking for doesn't exist or you don't have access.</p>
-            <Button asChild className="mt-4"><Link href="/legalai/debate">Back to debates</Link></Button>
+            <Button asChild className="mt-4"><Link href="/lawmate/debate">Back to debates</Link></Button>
           </div>
         </div>
       </DashboardShell>
@@ -64,7 +64,7 @@ export default function DebateDetailPage() {
           }
           actions={
             <Button asChild variant="outline" size="sm">
-              <Link href="/legalai/debate">Back to debates</Link>
+              <Link href="/lawmate/debate">Back to debates</Link>
             </Button>
           }
         />

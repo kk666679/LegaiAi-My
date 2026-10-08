@@ -1,4 +1,4 @@
 import { redirect } from "next/navigation";
 export default function Page({ params }: { params: { id: string } }) {
-  redirect(`/legalai/documents/${params.id}?tab=preview`);
+  redirect(`/lawmate/documents/${params.id}?tab=preview`);
 }

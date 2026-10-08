@@ -46,7 +46,7 @@ export function ScopedLibrary({ title, description, scope, status }: ScopedLibra
             onViewChange={setView}
             sort={sort}
             onSortChange={(k) => setSort((s) => ({ ...s, key: k }))}
-            onOpen={(m) => router.push(`/legalai/matters/${m.id}/overview`)}
+            onOpen={(m) => router.push(`/lawmate/matters/${m.id}/overview`)}
           />
         </div>
       </MattersShell>

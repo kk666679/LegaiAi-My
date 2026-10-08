@@ -1,4 +1,4 @@
-// app/legalai/settings/appearance/page.tsx
+// app/lawmate/settings/appearance/page.tsx
 import { AppearanceSettings } from "./appearance-client";
 
 export const metadata = { title: "Appearance — Settings" };

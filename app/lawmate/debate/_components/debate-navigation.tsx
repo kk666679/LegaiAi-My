@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const links = [
-  { href: "/legalai/debate", label: "Debates", icon: List, exact: true },
-  { href: "/legalai/debate/new", label: "New debate", icon: Plus },
-  { href: "/legalai/debate/research", label: "Legal research", icon: BookOpen },
+  { href: "/lawmate/debate", label: "Debates", icon: List, exact: true },
+  { href: "/lawmate/debate/new", label: "New debate", icon: Plus },
+  { href: "/lawmate/debate/research", label: "Legal research", icon: BookOpen },
 ];
 
 export function DebateNavigation() {

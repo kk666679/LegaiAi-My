@@ -5,12 +5,12 @@ import { usePathname } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const TABS = (id: string) => [
-  { href: `/legalai/contracts/${id}`, label: "Overview" },
-  { href: `/legalai/contracts/${id}?tab=obligations`, label: "Obligations" },
-  { href: `/legalai/contracts/${id}?tab=risks`, label: "Risks" },
-  { href: `/legalai/contracts/${id}?tab=playbook`, label: "Playbook" },
-  { href: `/legalai/contracts/${id}?tab=versions`, label: "Versions" },
-  { href: `/legalai/contracts/${id}?tab=ai`, label: "AI" },
+  { href: `/lawmate/contracts/${id}`, label: "Overview" },
+  { href: `/lawmate/contracts/${id}?tab=obligations`, label: "Obligations" },
+  { href: `/lawmate/contracts/${id}?tab=risks`, label: "Risks" },
+  { href: `/lawmate/contracts/${id}?tab=playbook`, label: "Playbook" },
+  { href: `/lawmate/contracts/${id}?tab=versions`, label: "Versions" },
+  { href: `/lawmate/contracts/${id}?tab=ai`, label: "AI" },
 ];
 
 export function ContractScopedNav({ id }: { id: string }) {

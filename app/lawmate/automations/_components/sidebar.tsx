@@ -8,11 +8,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
-  { href: "/legalai/automations", label: "All workflows", icon: <Workflow className="size-4" />, exact: true },
-  { href: "/legalai/automations/new", label: "New workflow", icon: <Plus className="size-4" /> },
-  { href: "/legalai/automations/templates", label: "Templates", icon: <BookTemplate className="size-4" /> },
-  { href: "/legalai/automations/runs", label: "Runs", icon: <Activity className="size-4" /> },
-  { href: "/legalai/automations/integrations", label: "Integrations", icon: <Plug className="size-4" /> },
+  { href: "/lawmate/automations", label: "All workflows", icon: <Workflow className="size-4" />, exact: true },
+  { href: "/lawmate/automations/new", label: "New workflow", icon: <Plus className="size-4" /> },
+  { href: "/lawmate/automations/templates", label: "Templates", icon: <BookTemplate className="size-4" /> },
+  { href: "/lawmate/automations/runs", label: "Runs", icon: <Activity className="size-4" /> },
+  { href: "/lawmate/automations/integrations", label: "Integrations", icon: <Plug className="size-4" /> },
 ];
 
 export function AutomationsSidebar() {

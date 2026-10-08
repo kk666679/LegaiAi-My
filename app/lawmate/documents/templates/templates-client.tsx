@@ -15,7 +15,7 @@ export function TemplatesPage() {
       <div className="p-4">
         <DocumentTemplates
           templates={templates}
-          onSelect={(t) => router.push(`/legalai/documents/new?template=${t.id}`)}
+          onSelect={(t) => router.push(`/lawmate/documents/new?template=${t.id}`)}
         />
       </div>
     </div>

@@ -1,17 +1,17 @@
 "use client";
-// app/legalai/research/_components/session-scoped-nav.tsx
+// app/lawmate/research/_components/session-scoped-nav.tsx
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const TABS = (id: string) => [
-  { href: `/legalai/research/${id}/results`, label: "Results" },
-  { href: `/legalai/research/${id}/reasoning`, label: "Reasoning" },
-  { href: `/legalai/research/${id}/citations`, label: "Citations" },
-  { href: `/legalai/research/${id}/timeline`, label: "Timeline" },
-  { href: `/legalai/research/${id}/memo`, label: "Memo" },
-  { href: `/legalai/research/${id}/overview`, label: "Overview" },
+  { href: `/lawmate/research/${id}/results`, label: "Results" },
+  { href: `/lawmate/research/${id}/reasoning`, label: "Reasoning" },
+  { href: `/lawmate/research/${id}/citations`, label: "Citations" },
+  { href: `/lawmate/research/${id}/timeline`, label: "Timeline" },
+  { href: `/lawmate/research/${id}/memo`, label: "Memo" },
+  { href: `/lawmate/research/${id}/overview`, label: "Overview" },
 ];
 
 export function SessionScopedNav({ id }: { id: string }) {

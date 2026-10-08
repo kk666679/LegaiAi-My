@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/research/_components/research-states.tsx
+// app/lawmate/research/_components/research-states.tsx
 import * as React from "react";
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";

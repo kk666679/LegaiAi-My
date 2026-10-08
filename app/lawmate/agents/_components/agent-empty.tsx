@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/agents/_components/agent-empty.tsx
+// app/lawmate/agents/_components/agent-empty.tsx
 import * as React from "react";
 import { Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";

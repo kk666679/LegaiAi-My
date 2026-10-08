@@ -1,4 +1,4 @@
 import { redirect } from "next/navigation";
 export default function Page() {
-  redirect("/legalai/contracts?withinDays=90");
+  redirect("/lawmate/contracts?withinDays=90");
 }

@@ -93,11 +93,11 @@ export default function MattersPage() {
       }
     });
     params.delete("cursor");
-    router.push(`/legalai/matters?${params.toString()}`);
+    router.push(`/lawmate/matters?${params.toString()}`);
   };
 
   const clearFilters = () => {
-    router.push("/legalai/matters");
+    router.push("/lawmate/matters");
   };
 
   const hasActiveFilters = Object.values(filters).some(v => v !== undefined && v !== "" && v !== 20);
@@ -188,7 +188,7 @@ export default function MattersPage() {
           <CardContent>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/matters/new">
+                <Link href="/lawmate/matters/new">
                   <div className="flex items-center gap-2">
                     <Plus className="size-5 text-primary" />
                     <div>
@@ -199,7 +199,7 @@ export default function MattersPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/matters/recent">
+                <Link href="/lawmate/matters/recent">
                   <div className="flex items-center gap-2">
                     <Clock className="size-5 text-muted-foreground" />
                     <div>
@@ -210,7 +210,7 @@ export default function MattersPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/matters/favorites">
+                <Link href="/lawmate/matters/favorites">
                   <div className="flex items-center gap-2">
                     <Star className="size-5 text-amber-500" />
                     <div>
@@ -221,7 +221,7 @@ export default function MattersPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/matters?status=open">
+                <Link href="/lawmate/matters?status=open">
                   <div className="flex items-center gap-2">
                     <Briefcase className="size-5 text-blue-500" />
                     <div>
@@ -232,7 +232,7 @@ export default function MattersPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/matters?status=on_hold">
+                <Link href="/lawmate/matters?status=on_hold">
                   <div className="flex items-center gap-2">
                     <PauseCircle className="size-5 text-amber-500" />
                     <div>
@@ -243,7 +243,7 @@ export default function MattersPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/matters/closed">
+                <Link href="/lawmate/matters/closed">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="size-5 text-green-500" />
                     <div>
@@ -254,7 +254,7 @@ export default function MattersPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/matters/deadlines">
+                <Link href="/lawmate/matters/deadlines">
                   <div className="flex items-center gap-2">
                     <CalendarClock className="size-5 text-amber-500" />
                     <div>
@@ -265,7 +265,7 @@ export default function MattersPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/matters/conflicts">
+                <Link href="/lawmate/matters/conflicts">
                   <div className="flex items-center gap-2">
                     <ShieldAlert className="size-5 text-destructive" />
                     <div>
@@ -276,7 +276,7 @@ export default function MattersPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/matters/analytics">
+                <Link href="/lawmate/matters/analytics">
                   <div className="flex items-center gap-2">
                     <BarChart3 className="size-5 text-muted-foreground" />
                     <div>
@@ -287,7 +287,7 @@ export default function MattersPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/matters?status=archived">
+                <Link href="/lawmate/matters?status=archived">
                   <div className="flex items-center gap-2">
                     <Archive className="size-5 text-muted-foreground" />
                     <div>
@@ -378,7 +378,7 @@ export default function MattersPage() {
                 title="No matters found"
                 description="Create your first matter to start tracking cases, documents and AI activity."
                 action="Create matter"
-                actionHref="/legalai/matters/new"
+                actionHref="/lawmate/matters/new"
               />
             ) : (
               <ScrollArea className="max-h-[600px]">
@@ -395,7 +395,7 @@ export default function MattersPage() {
                   </TableHeader>
                   <TableBody>
                     {matters.map((m: { id: string; title: string; matterNumber: string; client?: { name: string } | null; matterType: string; status: string; priority: string; updatedAt: string }) => (
-                      <TableRow key={m.id} className="cursor-pointer hover:bg-accent/40" onClick={() => router.push(`/legalai/matters/${m.id}/overview`)}>
+                      <TableRow key={m.id} className="cursor-pointer hover:bg-accent/40" onClick={() => router.push(`/lawmate/matters/${m.id}/overview`)}>
                         <TableCell className="font-medium">
                           <div>
                             <div className="truncate">{m.title}</div>

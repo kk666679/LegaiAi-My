@@ -44,7 +44,7 @@ export function NewDocumentPage() {
           ...(values.jurisdiction ? { jurisdiction: values.jurisdiction } : {}),
         });
         toast.success("Document created");
-        router.push(`/legalai/documents/${created.id}/preview`);
+        router.push(`/lawmate/documents/${created.id}/preview`);
       } catch (err) {
         toast.error(err instanceof Error ? err.message : "Failed to create document");
       }
@@ -91,7 +91,7 @@ export function NewDocumentPage() {
       failedUploads.forEach(({ name, error }) => toast.error(`${name}: ${error}`));
 
       const lastCreatedId = successfulUploads.at(-1)?.id;
-      if (lastCreatedId) router.push(`/legalai/documents/${lastCreatedId}/preview`);
+      if (lastCreatedId) router.push(`/lawmate/documents/${lastCreatedId}/preview`);
     });
   };
 
@@ -134,7 +134,7 @@ export function NewDocumentPage() {
           >
             {isPending ? "Saving..." : tab === "upload" ? "Upload files" : "Create document"}
           </Button>
-          <Button variant="ghost" onClick={() => router.push("/legalai/documents")}>Cancel</Button>
+          <Button variant="ghost" onClick={() => router.push("/lawmate/documents")}>Cancel</Button>
         </div>
       </div>
     </div>

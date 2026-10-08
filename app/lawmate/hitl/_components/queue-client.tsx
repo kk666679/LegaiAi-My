@@ -52,7 +52,7 @@ export function QueueClient({ title, description, scope, currentUser }: QueueCli
             </p>
           ) : null}
           {stats ? <HITLStatsCards stats={stats} /> : null}
-          <HITLSLAAlerts requests={requests} onOpen={(r) => router.push(`/legalai/hitl/${r.id}`)} />
+          <HITLSLAAlerts requests={requests} onOpen={(r) => router.push(`/lawmate/hitl/${r.id}`)} />
           <div className="flex flex-wrap items-center gap-2">
             <HITLQueueSearch value={filters.query} onChange={(q) => setFilters((f) => ({ ...f, query: q }))} className="min-w-0 flex-1" />
             <HITLQueueFilters filters={filters} onFiltersChange={(n) => setFilters((f) => ({ ...f, ...n }))} onReset={() => setFilters({})} />
@@ -62,7 +62,7 @@ export function QueueClient({ title, description, scope, currentUser }: QueueCli
             loading={loading}
             view={view}
             onViewChange={setView}
-            onOpen={(r) => router.push(`/legalai/hitl/${r.id}`)}
+            onOpen={(r) => router.push(`/lawmate/hitl/${r.id}`)}
             groupBy={(r) => r.status}
           />
         </div>

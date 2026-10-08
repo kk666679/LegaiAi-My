@@ -16,8 +16,8 @@ export default function ClientsPage() {
       description="Track client relationships, conflicts, and the matters tied to each engagement."
       actions={
         <div className="flex items-center gap-2">
-          <Link href="/legalai/matters/new" className="inline-flex items-center rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground">Create matter</Link>
-          <Link href="/legalai/search" className="inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium">Search client records</Link>
+          <Link href="/lawmate/matters/new" className="inline-flex items-center rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground">Create matter</Link>
+          <Link href="/lawmate/search" className="inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium">Search client records</Link>
         </div>
       }
       stats={stats}
@@ -48,9 +48,9 @@ export default function ClientsPage() {
           content: (
             <div className="space-y-3">
               {[
-                { label: "Add client", href: "/legalai/clients" },
-                { label: "Run conflict check", href: "/legalai/matters/conflicts" },
-                { label: "View documents", href: "/legalai/documents" },
+                { label: "Add client", href: "/lawmate/clients" },
+                { label: "Run conflict check", href: "/lawmate/matters/conflicts" },
+                { label: "View documents", href: "/lawmate/documents" },
               ].map(({ label, href }) => (
                 <Link key={label} href={href} className="flex items-center justify-between rounded-md border border-border/70 p-3 text-sm font-medium hover:bg-accent/40">
                   <span className="flex items-center gap-2"><Search className="size-4 text-primary" />{label}</span>

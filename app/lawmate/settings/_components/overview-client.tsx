@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/settings/_components/overview-client.tsx
+// app/lawmate/settings/_components/overview-client.tsx
 import * as React from "react";
 import Link from "next/link";
 import {
@@ -20,14 +20,14 @@ interface Tile {
 }
 
 const TILES: Tile[] = [
-  { href: "/legalai/settings/profile", label: "Profile", description: "Your name, photo, and timezone.", icon: <User className="size-4" /> },
-  { href: "/legalai/settings/security", label: "Security", description: "Password, two-factor, and sessions.", icon: <ShieldCheck className="size-4" />, badge: "2FA on" },
-  { href: "/legalai/settings/users", label: "Team", description: "Invite members and assign roles.", icon: <Users className="size-4" />, badge: "5 members" },
-  { href: "/legalai/settings/integrations", label: "Integrations", description: "Slack, LOM, Drive, and more.", icon: <Plug className="size-4" /> },
-  { href: "/legalai/settings/ai", label: "AI preferences", description: "Models, thresholds, and tone.", icon: <Bot className="size-4" /> },
-  { href: "/legalai/settings/byok", label: "API keys (BYOK)", description: "Bring your own provider keys.", icon: <KeyRound className="size-4" />, badge: "2 keys" },
-  { href: "/legalai/settings/notifications", label: "Notifications", description: "Email, in-app, and digests.", icon: <Bell className="size-4" /> },
-  { href: "/legalai/settings/appearance", label: "Appearance", description: "Theme, density, and motion.", icon: <Palette className="size-4" /> },
+  { href: "/lawmate/settings/profile", label: "Profile", description: "Your name, photo, and timezone.", icon: <User className="size-4" /> },
+  { href: "/lawmate/settings/security", label: "Security", description: "Password, two-factor, and sessions.", icon: <ShieldCheck className="size-4" />, badge: "2FA on" },
+  { href: "/lawmate/settings/users", label: "Team", description: "Invite members and assign roles.", icon: <Users className="size-4" />, badge: "5 members" },
+  { href: "/lawmate/settings/integrations", label: "Integrations", description: "Slack, LOM, Drive, and more.", icon: <Plug className="size-4" /> },
+  { href: "/lawmate/settings/ai", label: "AI preferences", description: "Models, thresholds, and tone.", icon: <Bot className="size-4" /> },
+  { href: "/lawmate/settings/byok", label: "API keys (BYOK)", description: "Bring your own provider keys.", icon: <KeyRound className="size-4" />, badge: "2 keys" },
+  { href: "/lawmate/settings/notifications", label: "Notifications", description: "Email, in-app, and digests.", icon: <Bell className="size-4" /> },
+  { href: "/lawmate/settings/appearance", label: "Appearance", description: "Theme, density, and motion.", icon: <Palette className="size-4" /> },
 ];
 
 export function SettingsOverview() {

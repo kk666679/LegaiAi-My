@@ -100,7 +100,7 @@ export default function MatterDetailPage() {
             <AlertTriangle className="size-12 mx-auto text-destructive" />
             <h2 className="mt-4 text-xl font-semibold">Matter not found</h2>
             <p className="mt-2 text-muted-foreground">The matter you're looking for doesn't exist or you don't have access.</p>
-            <Button asChild className="mt-4"><Link href="/legalai/matters">Back to matters</Link></Button>
+            <Button asChild className="mt-4"><Link href="/lawmate/matters">Back to matters</Link></Button>
           </div>
         </div>
       </DashboardShell>
@@ -319,7 +319,7 @@ export default function MatterDetailPage() {
                     {documents.data?.documents.map((d: { id: string; title: string; docType: string; version: number; updatedAt: string; status: string }) => (
                       <Link
                         key={d.id}
-                        href={`/legalai/documents/${d.id}/preview`}
+                        href={`/lawmate/documents/${d.id}/preview`}
                         className="flex items-center gap-3 rounded-md border p-3 transition-colors hover:bg-accent/40"
                       >
                         <FileText className="size-5 text-muted-foreground" />

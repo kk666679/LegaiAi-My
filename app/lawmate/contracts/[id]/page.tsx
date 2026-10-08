@@ -90,7 +90,7 @@ export default function ContractDetailPage() {
             <FileText className="size-12 mx-auto text-destructive" />
             <h2 className="mt-4 text-xl font-semibold">Contract not found</h2>
             <p className="mt-2 text-muted-foreground">The contract you're looking for doesn't exist or you don't have access.</p>
-            <Button asChild className="mt-4"><Link href="/legalai/contracts">Back to contracts</Link></Button>
+            <Button asChild className="mt-4"><Link href="/lawmate/contracts">Back to contracts</Link></Button>
           </div>
         </div>
       </DashboardShell>

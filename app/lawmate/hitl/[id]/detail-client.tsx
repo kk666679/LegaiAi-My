@@ -115,7 +115,7 @@ export function HITLDetailClient({ id }: { id: string }) {
     <HITLProvider requests={[request]} currentUser={user}>
       <HITLReviewSurface
         request={request}
-        headerActions={<Button variant="ghost" size="sm" onClick={() => router.push("/legalai/hitl")}>Back</Button>}
+        headerActions={<Button variant="ghost" size="sm" onClick={() => router.push("/lawmate/hitl")}>Back</Button>}
         sidePanel={
           <div className="space-y-3">
             <HITLSourcePanel request={request} />

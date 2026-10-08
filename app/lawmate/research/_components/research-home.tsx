@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/research/_components/research-home.tsx
+// app/lawmate/research/_components/research-home.tsx
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -17,7 +17,7 @@ import {
   toDashboardActivity,
   toDashboardMetrics,
   toDashboardSavedItems,
-} from "./legalai-dashboard-adapters";
+} from "./lawmate-dashboard-adapters";
 import type { ResearchScope } from "./types";
 
 const SAMPLE_QUERIES = [
@@ -171,7 +171,7 @@ export function ResearchHomePage() {
               <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Recent research</p>
               <button
                 type="button"
-                onClick={() => router.push("/legalai/research")}
+                onClick={() => router.push("/lawmate/research")}
                 className="text-xs text-primary hover:underline"
               >
                 View all
@@ -183,7 +183,7 @@ export function ResearchHomePage() {
                   key={s.id}
                   session={s}
                   variant="row"
-                  onOpen={() => router.push(`/legalai/research/${s.id}/results`)}
+                  onOpen={() => router.push(`/lawmate/research/${s.id}/results`)}
                 />
               ))}
             </div>

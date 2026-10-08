@@ -167,7 +167,7 @@ export function TopBar({ onMenu }: TopBarProps) {
         variant="default"
         size="sm"
         className="hidden gap-1.5 lg:inline-flex"
-        onClick={() => router.push("/legalai/assistant")}
+        onClick={() => router.push("/lawmate/assistant")}
       >
         <Sparkles className="size-4" />
         Ask LawMate
@@ -188,23 +188,23 @@ export function TopBar({ onMenu }: TopBarProps) {
           <DropdownMenuLabel>Create new</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
-            <Link href="/legalai/documents/new" className="gap-2">
+            <Link href="/lawmate/documents/new" className="gap-2">
               <Plus className="size-4" /> New document
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/legalai/matters/new" className="gap-2">
+            <Link href="/lawmate/matters/new" className="gap-2">
               <Plus className="size-4" /> New matter
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/legalai/contracts/new" className="gap-2">
+            <Link href="/lawmate/contracts/new" className="gap-2">
               <Plus className="size-4" /> New contract
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
-            <Link href="/legalai/documents/new" className="gap-2">
+            <Link href="/lawmate/documents/new" className="gap-2">
               <Plus className="size-4" /> Upload document
             </Link>
           </DropdownMenuItem>
@@ -212,7 +212,7 @@ export function TopBar({ onMenu }: TopBarProps) {
       </DropdownMenu>
 
       <Button variant="ghost" size="icon" aria-label="Notifications" asChild>
-        <Link href="/legalai/hitl" className="relative">
+        <Link href="/lawmate/hitl" className="relative">
           <Bell className="size-4" />
           {unread > 0 && (
             <span
@@ -255,23 +255,23 @@ export function TopBar({ onMenu }: TopBarProps) {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
-            <Link href="/legalai/settings/profile" className="gap-2">
+            <Link href="/lawmate/settings/profile" className="gap-2">
               <UserIcon className="size-4" /> Profile
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/legalai/settings" className="gap-2">
+            <Link href="/lawmate/settings" className="gap-2">
               <Settings className="size-4" /> Settings
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/legalai/settings/byok" className="gap-2">
+            <Link href="/lawmate/settings/byok" className="gap-2">
               <Sparkles className="size-4" /> AI Settings
             </Link>
           </DropdownMenuItem>
           <AdminGate>
             <DropdownMenuItem asChild>
-              <Link href="/legalai/settings/users" className="gap-2">
+              <Link href="/lawmate/settings/users" className="gap-2">
                 <Users className="size-4" /> Team &amp; users
               </Link>
             </DropdownMenuItem>

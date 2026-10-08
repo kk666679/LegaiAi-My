@@ -5,20 +5,20 @@ import { usePathname } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const TABS = (id: string) => [
-  { href: `/legalai/matters/${id}/overview`,   label: "Overview" },
-  { href: `/legalai/matters/${id}/tasks`,      label: "Tasks" },
-  { href: `/legalai/matters/${id}/deadlines`,  label: "Deadlines" },
-  { href: `/legalai/matters/${id}/time`,       label: "Time" },
-  { href: `/legalai/matters/${id}/billing`,    label: "Billing" },
-  { href: `/legalai/matters/${id}/documents`,  label: "Documents" },
-  { href: `/legalai/matters/${id}/parties`,    label: "Parties" },
-  { href: `/legalai/matters/${id}/team`,       label: "Team" },
-  { href: `/legalai/matters/${id}/notes`,      label: "Notes" },
-  { href: `/legalai/matters/${id}/conflicts`,  label: "Conflicts" },
-  { href: `/legalai/matters/${id}/permissions`, label: "Permissions" },
-  { href: `/legalai/matters/${id}/ai`,         label: "AI" },
-  { href: `/legalai/matters/${id}/activity`,   label: "Activity" },
-  { href: `/legalai/matters/${id}/analytics`,  label: "Analytics" },
+  { href: `/lawmate/matters/${id}/overview`,   label: "Overview" },
+  { href: `/lawmate/matters/${id}/tasks`,      label: "Tasks" },
+  { href: `/lawmate/matters/${id}/deadlines`,  label: "Deadlines" },
+  { href: `/lawmate/matters/${id}/time`,       label: "Time" },
+  { href: `/lawmate/matters/${id}/billing`,    label: "Billing" },
+  { href: `/lawmate/matters/${id}/documents`,  label: "Documents" },
+  { href: `/lawmate/matters/${id}/parties`,    label: "Parties" },
+  { href: `/lawmate/matters/${id}/team`,       label: "Team" },
+  { href: `/lawmate/matters/${id}/notes`,      label: "Notes" },
+  { href: `/lawmate/matters/${id}/conflicts`,  label: "Conflicts" },
+  { href: `/lawmate/matters/${id}/permissions`, label: "Permissions" },
+  { href: `/lawmate/matters/${id}/ai`,         label: "AI" },
+  { href: `/lawmate/matters/${id}/activity`,   label: "Activity" },
+  { href: `/lawmate/matters/${id}/analytics`,  label: "Analytics" },
 ];
 
 export function MatterScopedNav({ id }: { id: string }) {

@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/settings/appearance/appearance-client.tsx
+// app/lawmate/settings/appearance/appearance-client.tsx
 import * as React from "react";
 import { Check, Moon, Monitor, Sun, Grid3x3, Rows3, Sparkles, Zap } from "lucide-react";
 import { Card } from "@/components/ui/card";

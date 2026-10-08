@@ -1,4 +1,4 @@
-// app/legalai/settings/layout.tsx
+// app/lawmate/settings/layout.tsx
 import * as React from "react";
 import { SettingsSidebar } from "./_components/sidebar";
 
@@ -13,7 +13,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
       <header className="border-b border-border/60 bg-background/80 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 lg:px-6">
           <div className="flex items-center gap-3">
-            <a href="/legalai" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+            <a href="/lawmate" className="text-sm font-medium text-muted-foreground hover:text-foreground">
               ← LegAI
             </a>
             <span className="text-muted-foreground/40">/</span>

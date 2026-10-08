@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/research/_components/research-scope-selector.tsx
+// app/lawmate/research/_components/research-scope-selector.tsx
 import * as React from "react";
 import { Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";

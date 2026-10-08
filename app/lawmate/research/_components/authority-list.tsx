@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/research/_components/authority-list.tsx
+// app/lawmate/research/_components/authority-list.tsx
 import * as React from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";

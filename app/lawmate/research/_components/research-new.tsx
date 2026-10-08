@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/research/_components/research-new.tsx
+// app/lawmate/research/_components/research-new.tsx
 import * as React from "react";
 import { ResearchHomePage } from "./research-home";
 

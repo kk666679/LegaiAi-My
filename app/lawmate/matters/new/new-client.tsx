@@ -99,7 +99,7 @@ export function NewMatterPage() {
         description: description.trim() ? `${description.trim()}\nBilling: ${billing}` : undefined,
       });
       toast.success("Matter created");
-      router.push(`/legalai/matters/${matter.id}/overview`);
+      router.push(`/lawmate/matters/${matter.id}/overview`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to create matter");
     }
@@ -150,7 +150,7 @@ export function NewMatterPage() {
 
         <div className="flex gap-2">
           <Button onClick={handleCreate} disabled={!name.trim() || !clientName.trim() || (conflict ? conflict.severity !== "none" : false)}>Open matter</Button>
-          <Button asChild variant="ghost"><Link href="/legalai/matters">Cancel</Link></Button>
+          <Button asChild variant="ghost"><Link href="/lawmate/matters">Cancel</Link></Button>
         </div>
       </div>
     </div>

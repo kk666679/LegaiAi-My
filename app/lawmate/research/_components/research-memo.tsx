@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/research/_components/research-memo.tsx
+// app/lawmate/research/_components/research-memo.tsx
 import * as React from "react";
 import { Copy, Download, FileText, Save, Sparkles } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -23,7 +23,7 @@ import {
   toDashboardCitations,
   toDashboardSources,
   toDashboardStatus,
-} from "./legalai-dashboard-adapters";
+} from "./lawmate-dashboard-adapters";
 
 export function ResearchMemoPage({ id }: { id: string }) {
   const { activeSession, sessionMemo, sessionAuthorities, updateMemo } = useResearch({ sessionId: id });

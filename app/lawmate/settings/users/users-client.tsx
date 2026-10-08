@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/settings/users/users-client.tsx
+// app/lawmate/settings/users/users-client.tsx
 import * as React from "react";
 import { MoreHorizontal, Plus, Search, Shield, UserPlus } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

@@ -1,4 +1,4 @@
-// app/legalai/research/page.tsx
+// app/lawmate/research/page.tsx
 import { ResearchHomePage } from "./_components/research-home";
 
 export default function Page() {

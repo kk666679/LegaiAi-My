@@ -1,4 +1,4 @@
-// app/legalai/agents/layout.tsx
+// app/lawmate/agents/layout.tsx
 import * as React from "react";
 
 export const metadata = {

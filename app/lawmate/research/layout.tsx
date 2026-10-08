@@ -1,4 +1,4 @@
-// app/legalai/research/layout.tsx
+// app/lawmate/research/layout.tsx
 import * as React from "react";
 import { DashboardShell } from "@/components/lawmate/DashboardShell";
 import { ResearchSidebar } from "./_components/research-sidebar";

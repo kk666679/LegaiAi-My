@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/settings/integrations/integrations-client.tsx
+// app/lawmate/settings/integrations/integrations-client.tsx
 import * as React from "react";
 import {
   BookOpen, Search,

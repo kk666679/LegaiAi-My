@@ -6,11 +6,11 @@ import { BarChart3, GitBranch, History, Settings2, Workflow } from "lucide-react
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const TABS = (id: string) => [
-  { href: `/legalai/automations/${id}/builder`, label: "Builder", icon: <Workflow className="size-3.5" /> },
-  { href: `/legalai/automations/${id}/runs`, label: "Runs", icon: <History className="size-3.5" /> },
-  { href: `/legalai/automations/${id}/versions`, label: "Versions", icon: <GitBranch className="size-3.5" /> },
-  { href: `/legalai/automations/${id}/analytics`, label: "Analytics", icon: <BarChart3 className="size-3.5" /> },
-  { href: `/legalai/automations/${id}/settings`, label: "Settings", icon: <Settings2 className="size-3.5" /> },
+  { href: `/lawmate/automations/${id}/builder`, label: "Builder", icon: <Workflow className="size-3.5" /> },
+  { href: `/lawmate/automations/${id}/runs`, label: "Runs", icon: <History className="size-3.5" /> },
+  { href: `/lawmate/automations/${id}/versions`, label: "Versions", icon: <GitBranch className="size-3.5" /> },
+  { href: `/lawmate/automations/${id}/analytics`, label: "Analytics", icon: <BarChart3 className="size-3.5" /> },
+  { href: `/lawmate/automations/${id}/settings`, label: "Settings", icon: <Settings2 className="size-3.5" /> },
 ];
 
 export function WorkflowScopedNav({ id }: { id: string }) {

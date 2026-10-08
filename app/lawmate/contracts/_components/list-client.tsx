@@ -42,7 +42,7 @@ export function ContractsListClient() {
             actions={
               <div className="flex items-center gap-2">
                 <Button size="sm" variant="outline" className="gap-1.5"><Upload className="size-3.5" />Import</Button>
-                <Button asChild size="sm" className="gap-1.5"><Link href="/legalai/contracts/new"><Plus className="size-3.5" />New contract</Link></Button>
+                <Button asChild size="sm" className="gap-1.5"><Link href="/lawmate/contracts/new"><Plus className="size-3.5" />New contract</Link></Button>
               </div>
             }
           />
@@ -55,7 +55,7 @@ export function ContractsListClient() {
             expiring={[]}
           />
           <ContractSearch filters={filters} sort={sort} onFiltersChange={(n) => setFilters((f) => ({ ...f, ...n }))} onReset={() => setFilters({})} onSortChange={setSort} />
-          <ContractLibrary contracts={filtered} view={view} onViewChange={setView} sort={sort} emptyAction={{ label: "Create contract", onClick: () => { window.location.href = "/legalai/contracts/new"; } }} />
+          <ContractLibrary contracts={filtered} view={view} onViewChange={setView} sort={sort} emptyAction={{ label: "Create contract", onClick: () => { window.location.href = "/lawmate/contracts/new"; } }} />
         </div>
       </ContractsShell>
     </ContractsProvider>

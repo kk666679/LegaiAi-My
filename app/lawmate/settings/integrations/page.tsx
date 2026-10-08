@@ -1,4 +1,4 @@
-// app/legalai/settings/integrations/page.tsx
+// app/lawmate/settings/integrations/page.tsx
 import { IntegrationsSettings } from "./integrations-client";
 
 export const metadata = { title: "Integrations — Settings" };

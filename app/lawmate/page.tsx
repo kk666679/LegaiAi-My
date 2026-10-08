@@ -49,7 +49,7 @@ import { QuickPromptSheet } from "@/components/lawmate/QuickPromptSheet";
 import { CreditUsageDashboard } from "@/components/dashboard/CreditUsageDashboard";
 import { RecentActivityFeed } from "@/components/dashboard/RecentActivityFeed";
 import type { UsageSummary, ActivityItem, SavedResearchItem } from "@/components/dashboard/types";
-import { toDashboardSavedItems, toDashboardActivity } from "@/app/legalai/research/_components/legalai-dashboard-adapters";
+import { toDashboardSavedItems, toDashboardActivity } from "@/app/lawmate/research/_components/lawmate-dashboard-adapters";
 import { DashboardStateBoundary } from "@/components/dashboard/DashboardState";
 import { trpcReact } from "@/clients";
 import { useAuth } from "@/components/auth-provider";
@@ -160,18 +160,18 @@ interface AlertSummary {
 }
 
 const MODULES: { label: string; href: string; icon: LucideIcon }[] = [
-  { label: "Legal Research", href: "/legalai/research", icon: BookOpen },
-  { label: "Documents", href: "/legalai/documents", icon: FileText },
-  { label: "Document Analysis", href: "/legalai/analysis", icon: ClipboardList },
-  { label: "Contracts", href: "/legalai/contracts", icon: FileCheck },
-  { label: "Automations", href: "/legalai/automations", icon: Workflow },
-  { label: "Risk Engine", href: "/legalai/risk", icon: ShieldCheck },
-  { label: "Debate Simulation", href: "/legalai/debate", icon: Swords },
-  { label: "Change Monitor", href: "/legalai/agents/live", icon: Bell },
-  { label: "Analytics", href: "/legalai/agents/analytics", icon: BarChart3 },
-  { label: "Audit Trail", href: "/legalai/agents/audit", icon: Gavel },
-  { label: "Activity History", href: "/legalai/hitl/history", icon: History },
-  { label: "Saved Items", href: "/legalai/saved", icon: Bookmark },
+  { label: "Legal Research", href: "/lawmate/research", icon: BookOpen },
+  { label: "Documents", href: "/lawmate/documents", icon: FileText },
+  { label: "Document Analysis", href: "/lawmate/analysis", icon: ClipboardList },
+  { label: "Contracts", href: "/lawmate/contracts", icon: FileCheck },
+  { label: "Automations", href: "/lawmate/automations", icon: Workflow },
+  { label: "Risk Engine", href: "/lawmate/risk", icon: ShieldCheck },
+  { label: "Debate Simulation", href: "/lawmate/debate", icon: Swords },
+  { label: "Change Monitor", href: "/lawmate/agents/live", icon: Bell },
+  { label: "Analytics", href: "/lawmate/agents/analytics", icon: BarChart3 },
+  { label: "Audit Trail", href: "/lawmate/agents/audit", icon: Gavel },
+  { label: "Activity History", href: "/lawmate/hitl/history", icon: History },
+  { label: "Saved Items", href: "/lawmate/saved", icon: Bookmark },
 ];
 
 function formatDate(iso?: string | null) {
@@ -361,21 +361,21 @@ export default function DashboardHomePage() {
         kind: "deadline" as const,
         title: m.title,
         detail: `Deadline ${formatDate(m.deadlineAt)}${m.client ? ` · ${m.client.name}` : ""}`,
-        href: "/legalai/matters",
+        href: "/lawmate/matters",
       })),
       ...attentionData.criticalAlerts.slice(0, 2).map((a) => ({
         id: a.id,
         kind: "alert" as const,
         title: a.title,
         detail: `Critical alert${a.matter ? ` · ${a.matter.title}` : ""}`,
-        href: "/legalai/hitl",
+        href: "/lawmate/hitl",
       })),
       ...attentionData.staleMatters.slice(0, 2).map((m) => ({
         id: m.id,
         kind: "stale" as const,
         title: m.title,
         detail: "No activity in 21+ days",
-        href: "/legalai/matters",
+        href: "/lawmate/matters",
       })),
     ].slice(0, 5);
   }, [attentionData]);
@@ -454,7 +454,7 @@ export default function DashboardHomePage() {
   const submitAsk = (value: string) => {
     const text = value.trim();
     if (!text) return;
-    router.push(`/legalai/assistant?q=${encodeURIComponent(text)}`);
+    router.push(`/lawmate/assistant?q=${encodeURIComponent(text)}`);
   };
 
   return (
@@ -630,7 +630,7 @@ export default function DashboardHomePage() {
                   ? `${urgentMatters} high priority`
                   : `${mStats?.total ?? 0} total`
               }
-              href="/legalai/matters"
+              href="/lawmate/matters"
               loading={mattersStats.isLoading}
             />
             <MetricCard
@@ -642,7 +642,7 @@ export default function DashboardHomePage() {
                   ? `${docsDraft} draft · ${docsInReview} in review`
                   : `${dStats?.recentActivity ?? 0} updated this month`
               }
-              href="/legalai/documents"
+              href="/lawmate/documents"
               loading={docsStats.isLoading}
             />
             <MetricCard
@@ -650,7 +650,7 @@ export default function DashboardHomePage() {
               value={pendingActions.data?.length ?? 0}
               icon={CircleDashed}
               sub="Awaiting human review"
-              href="/legalai/hitl"
+              href="/lawmate/hitl"
               loading={pendingActions.isLoading}
             />
             <MetricCard
@@ -662,7 +662,7 @@ export default function DashboardHomePage() {
                   ? `${attentionData.deadlineSoon.length} deadlines in 8 days`
                   : "Unacknowledged"
               }
-              href="/legalai/hitl"
+              href="/lawmate/hitl"
               loading={alerts.isLoading}
             />
           </div>
@@ -681,7 +681,7 @@ export default function DashboardHomePage() {
                     </CardDescription>
                   </div>
                   <Button asChild variant="ghost" size="sm" className="gap-1 shrink-0">
-                    <Link href="/legalai/matters">
+                    <Link href="/lawmate/matters">
                       View all <ArrowRight className="size-3" />
                     </Link>
                   </Button>
@@ -696,14 +696,14 @@ export default function DashboardHomePage() {
                     title="No matters yet"
                     description="Create your first matter to start tracking cases, documents and AI activity."
                     action="Create matter"
-                    actionHref="/legalai/matters"
+                    actionHref="/lawmate/matters"
                   />
                 ) : (
                   <div className="space-y-2">
                     {recentMatters.map((m) => (
                       <Link
                         key={m.id}
-                        href={`/legalai/matters/${m.id}/overview`}
+                        href={`/lawmate/matters/${m.id}/overview`}
                         className="flex items-center gap-3 rounded-md border p-3 transition-colors hover:bg-accent/40"
                       >
                         <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted">
@@ -752,7 +752,7 @@ export default function DashboardHomePage() {
                     </CardDescription>
                   </div>
                   <Button asChild variant="ghost" size="sm" className="gap-1 shrink-0">
-                    <Link href="/legalai/hitl">
+                    <Link href="/lawmate/hitl">
                       <ArrowUpRight className="size-3" />
                       <span className="sr-only">Open agent control</span>
                     </Link>
@@ -773,7 +773,7 @@ export default function DashboardHomePage() {
                     {pending.map((a) => (
                       <Link
                         key={a.id}
-                        href={`/legalai/hitl/${a.id}`}
+                        href={`/lawmate/hitl/${a.id}`}
                         className="flex items-start gap-3 rounded-md border p-3 transition-colors hover:bg-accent/40"
                       >
                         <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-muted">
@@ -816,7 +816,7 @@ export default function DashboardHomePage() {
                     </CardDescription>
                   </div>
                   <Button asChild variant="ghost" size="sm" className="gap-1 shrink-0">
-                    <Link href="/legalai/documents">
+                    <Link href="/lawmate/documents">
                       View all <ArrowRight className="size-3" />
                     </Link>
                   </Button>
@@ -831,7 +831,7 @@ export default function DashboardHomePage() {
                     title="No documents yet"
                     description="Upload a contract, brief or memorandum to analyse it with AI."
                     action="Upload document"
-                    actionHref="/legalai/documents"
+                    actionHref="/lawmate/documents"
                   />
                 ) : (
                   <div className="space-y-2">
@@ -841,7 +841,7 @@ export default function DashboardHomePage() {
                         className="flex items-center gap-3 rounded-md border p-3 transition-colors hover:bg-accent/40"
                       >
                         <Link
-                          href={`/legalai/documents/${d.id}`}
+                          href={`/lawmate/documents/${d.id}`}
                           className="flex min-w-0 flex-1 items-center gap-3"
                         >
                           <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted">
@@ -870,7 +870,7 @@ export default function DashboardHomePage() {
                           className="size-8 shrink-0"
                           aria-label={`Analyse ${d.title}`}
                         >
-                          <Link href={`/legalai/analysis?documentId=${d.id}`}>
+                          <Link href={`/lawmate/analysis?documentId=${d.id}`}>
                             <Sparkles className="size-4" />
                           </Link>
                         </Button>
@@ -924,7 +924,7 @@ export default function DashboardHomePage() {
                       return (
                         <Link
                           key={`${item.kind}-${item.id}`}
-                          href={`/legalai/matters/${item.id}/overview`}
+                          href={`/lawmate/matters/${item.id}/overview`}
                           className="block rounded-md border p-3 transition-colors hover:bg-accent/40"
                         >
                           <div className="flex items-start justify-between gap-2">
@@ -1041,10 +1041,10 @@ export default function DashboardHomePage() {
               </CardHeader>
               <CardContent className="space-y-2">
                 {[
-                  { label: "Employment Act 1955", href: "/legalai/research" },
-                  { label: "Contracts Act 1950", href: "/legalai/research" },
-                  { label: "PDPA 2010", href: "/legalai/research" },
-                  { label: "Industrial Relations Act 1967", href: "/legalai/research" },
+                  { label: "Employment Act 1955", href: "/lawmate/research" },
+                  { label: "Contracts Act 1950", href: "/lawmate/research" },
+                  { label: "PDPA 2010", href: "/lawmate/research" },
+                  { label: "Industrial Relations Act 1967", href: "/lawmate/research" },
                 ].map((s) => (
                   <Link
                     key={s.label}
@@ -1138,7 +1138,7 @@ export default function DashboardHomePage() {
                     </CardDescription>
                   </div>
                   <Button asChild variant="ghost" size="sm" className="gap-1 shrink-0">
-                    <Link href="/legalai/hitl">
+                    <Link href="/lawmate/hitl">
                       View all <ArrowRight className="size-3" />
                     </Link>
                   </Button>
@@ -1149,7 +1149,7 @@ export default function DashboardHomePage() {
                   {openAlerts.map((a) => (
                     <Link
                       key={a.id}
-                      href="/legalai/hitl"
+                      href="/lawmate/hitl"
                       className="flex items-start gap-3 rounded-md border p-3 transition-colors hover:bg-accent/40"
                     >
                       <AlertTriangle
@@ -1198,12 +1198,12 @@ export default function DashboardHomePage() {
                       <Upload className="size-4" /> Analyse a document
                     </Button>
                     <Button asChild variant="outline" className="gap-2">
-                      <Link href="/legalai/documents/studio">
+                      <Link href="/lawmate/documents/studio">
                         <FileSignature className="size-4" /> Open Drafting Studio
                       </Link>
                     </Button>
                     <Button asChild variant="outline" className="gap-2">
-                      <Link href="/legalai/research">
+                      <Link href="/lawmate/research">
                         <BookOpen className="size-4" /> Research Malaysian law
                       </Link>
                     </Button>
@@ -1336,7 +1336,7 @@ function DocumentAnalysisCard({
         </p>
         {latest && (
           <Link
-            href={`/legalai/analysis?documentId=${latest.id}`}
+            href={`/lawmate/analysis?documentId=${latest.id}`}
             className="flex items-center gap-3 rounded-md border bg-card/40 p-3 text-sm transition-colors hover:bg-accent/40"
           >
             <FileText className="size-4 text-muted-foreground" aria-hidden />
@@ -1347,7 +1347,7 @@ function DocumentAnalysisCard({
           </Link>
         )}
         <Button asChild variant="outline" size="sm" className="w-full gap-2">
-          <Link href="/legalai/analysis">
+          <Link href="/lawmate/analysis">
             <Sparkles className="size-4" /> Open Document Analysis
           </Link>
         </Button>
@@ -1377,7 +1377,7 @@ function DraftingLauncher() {
           {DRAFT_TEMPLATES.slice(0, 6).map((t) => (
             <Link
               key={t.id}
-              href={`/legalai/documents/studio?template=${t.id}`}
+              href={`/lawmate/documents/studio?template=${t.id}`}
               title={t.description}
               className="rounded-full border px-2.5 py-1 text-[11px] text-muted-foreground transition-colors hover:border-primary/30 hover:text-foreground"
             >
@@ -1386,7 +1386,7 @@ function DraftingLauncher() {
           ))}
         </div>
         <Link
-          href="/legalai/documents/studio"
+          href="/lawmate/documents/studio"
           className="flex items-center justify-between rounded-md border bg-card/40 p-3 text-sm transition-colors hover:bg-accent/40"
         >
           <span className="flex items-center gap-2">

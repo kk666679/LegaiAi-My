@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/settings/security/security-client.tsx
+// app/lawmate/settings/security/security-client.tsx
 import * as React from "react";
 import { Laptop, Smartphone, LogOut, ShieldCheck } from "lucide-react";
 import { Card } from "@/components/ui/card";

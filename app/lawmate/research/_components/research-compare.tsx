@@ -1,10 +1,10 @@
 "use client";
-// app/legalai/research/_components/research-compare.tsx
+// app/lawmate/research/_components/research-compare.tsx
 import * as React from "react";
 import { useResearch } from "./use-research";
 import { SourceCard } from "@/components/dashboard/SourceCard";
 import { DashboardStateBoundary } from "@/components/dashboard/DashboardState";
-import { toDashboardStatus } from "./legalai-dashboard-adapters";
+import { toDashboardStatus } from "./lawmate-dashboard-adapters";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Check, Minus } from "lucide-react";

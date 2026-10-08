@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/research/_components/research-results-header.tsx
+// app/lawmate/research/_components/research-results-header.tsx
 import * as React from "react";
 import { ArrowDownAZ, Calendar, ChevronDown, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";

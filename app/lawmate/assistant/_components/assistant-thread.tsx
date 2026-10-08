@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/assistant/_components/assistant-thread.tsx
+// app/lawmate/assistant/_components/assistant-thread.tsx
 import * as React from "react";
 import { Bot, Loader2, RefreshCw, User } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";

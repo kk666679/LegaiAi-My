@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/agents/_components/agent-list.tsx
+// app/lawmate/agents/_components/agent-list.tsx
 import * as React from "react";
 import { LayoutGrid, Table2 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";

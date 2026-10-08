@@ -1,4 +1,4 @@
-// app/legalai/research/_components/types.ts
+// app/lawmate/research/_components/types.ts
 
 export type AuthorityKind =
   | "case"

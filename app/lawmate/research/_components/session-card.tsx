@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/research/_components/session-card.tsx
+// app/lawmate/research/_components/session-card.tsx
 import * as React from "react";
 import { ArrowRight, Bookmark, BookmarkCheck, FileText, Sparkles } from "lucide-react";
 import { Card } from "@/components/ui/card";

@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/settings/byok/byok-client.tsx
+// app/lawmate/settings/byok/byok-client.tsx
 import * as React from "react";
 import { Check, Copy, Eye, EyeOff, KeyRound, Plus, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";

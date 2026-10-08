@@ -76,11 +76,11 @@ export default function HITLPage() {
       }
     });
     params.delete("cursor");
-    router.push(`/legalai/hitl?${params.toString()}`);
+    router.push(`/lawmate/hitl?${params.toString()}`);
   };
 
   const clearFilters = () => {
-    router.push("/legalai/hitl");
+    router.push("/lawmate/hitl");
   };
 
   const hasActiveFilters =
@@ -108,10 +108,10 @@ export default function HITLPage() {
                 </Button>
               )}
               <Button variant="outline" size="sm" asChild className="gap-1.5">
-                <Link href="/legalai/hitl/escalations">Escalations</Link>
+                <Link href="/lawmate/hitl/escalations">Escalations</Link>
               </Button>
               <Button variant="outline" size="sm" asChild className="gap-1.5">
-                <Link href="/legalai/hitl/history">History</Link>
+                <Link href="/lawmate/hitl/history">History</Link>
               </Button>
             </>
           }
@@ -236,7 +236,7 @@ export default function HITLPage() {
                   </TableHeader>
                   <TableBody>
                     {actions.map((a: { id: string; title: string; agentName: string; authLevel: number; status: string; matter?: { title: string } | null; createdAt: string }) => (
-                      <TableRow key={a.id} className="cursor-pointer hover:bg-accent/40" onClick={() => router.push(`/legalai/hitl/${a.id}`)}>
+                      <TableRow key={a.id} className="cursor-pointer hover:bg-accent/40" onClick={() => router.push(`/lawmate/hitl/${a.id}`)}>
                         <TableCell className="font-medium">
                           <div className="truncate">{a.title}</div>
                         </TableCell>

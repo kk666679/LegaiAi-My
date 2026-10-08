@@ -41,7 +41,7 @@ export function DocumentsRootPage() {
   });
 
   const docMutations = useDocumentMutations((docId?: string) => {
-    if (docId) router.push(`/legalai/documents/${docId}/preview`);
+    if (docId) router.push(`/lawmate/documents/${docId}/preview`);
   });
 
   const handleCreateDocument = async (v: DocumentCreationFormValues & { templateId?: string; typeId?: string }) => {
@@ -127,11 +127,11 @@ export function DocumentsRootPage() {
             activity={[]}
             onCreate={() => setNewOpen(true)}
             onUpload={() => setUploadOpen(true)}
-            onAnalyse={() => router.push("/legalai/documents/library?filter=analysed")}
-            onContracts={() => router.push("/legalai/documents/contracts")}
-            onDraftingStudio={() => router.push("/legalai/documents/studio")}
-            onOpenDocument={(d) => router.push(`/legalai/documents/${d.id}/preview`)}
-            onViewAll={() => router.push("/legalai/documents/library")}
+            onAnalyse={() => router.push("/lawmate/documents/library?filter=analysed")}
+            onContracts={() => router.push("/lawmate/documents/contracts")}
+            onDraftingStudio={() => router.push("/lawmate/documents/studio")}
+            onOpenDocument={(d) => router.push(`/lawmate/documents/${d.id}/preview`)}
+            onViewAll={() => router.push("/lawmate/documents/library")}
           />
 
           <div className="space-y-3">
@@ -149,7 +149,7 @@ export function DocumentsRootPage() {
               onViewChange={setView}
               sort={sort}
               onSortChange={(k) => setSort((s) => ({ ...s, key: k }))}
-              onOpen={(d) => router.push(`/legalai/documents/${d.id}/preview`)}
+              onOpen={(d) => router.push(`/lawmate/documents/${d.id}/preview`)}
               onFavoriteChange={(d, fav) => {
                 // Persist favourite
               }}

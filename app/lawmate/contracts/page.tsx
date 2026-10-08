@@ -88,11 +88,11 @@ export default function ContractsPage() {
       }
     });
     params.delete("cursor");
-    router.push(`/legalai/contracts?${params.toString()}`);
+    router.push(`/lawmate/contracts?${params.toString()}`);
   };
 
   const clearFilters = () => {
-    router.push("/legalai/contracts");
+    router.push("/lawmate/contracts");
   };
 
   const hasActiveFilters = Object.values(filters).some(v => v !== undefined && v !== "" && v !== 20);
@@ -182,7 +182,7 @@ export default function ContractsPage() {
           <CardContent>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/contracts/new">
+                <Link href="/lawmate/contracts/new">
                   <div className="flex items-center gap-2">
                     <Plus className="size-5 text-primary" />
                     <div>
@@ -193,7 +193,7 @@ export default function ContractsPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/contracts/counterparties">
+                <Link href="/lawmate/contracts/counterparties">
                   <div className="flex items-center gap-2">
                     <Users className="size-5 text-muted-foreground" />
                     <div>
@@ -204,7 +204,7 @@ export default function ContractsPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/contracts/renewals">
+                <Link href="/lawmate/contracts/renewals">
                   <div className="flex items-center gap-2">
                     <Calendar className="size-5 text-amber-500" />
                     <div>
@@ -215,7 +215,7 @@ export default function ContractsPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/contracts/playbooks">
+                <Link href="/lawmate/contracts/playbooks">
                   <div className="flex items-center gap-2">
                     <ScrollText className="size-5 text-muted-foreground" />
                     <div>
@@ -226,7 +226,7 @@ export default function ContractsPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/contracts/templates">
+                <Link href="/lawmate/contracts/templates">
                   <div className="flex items-center gap-2">
                     <BookOpen className="size-5 text-primary" />
                     <div>
@@ -237,7 +237,7 @@ export default function ContractsPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/contracts/clauses">
+                <Link href="/lawmate/contracts/clauses">
                   <div className="flex items-center gap-2">
                     <FileText className="size-5 text-muted-foreground" />
                     <div>
@@ -248,7 +248,7 @@ export default function ContractsPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/contracts/approvals">
+                <Link href="/lawmate/contracts/approvals">
                   <div className="flex items-center gap-2">
                     <ShieldAlert className="size-5 text-amber-500" />
                     <div>
@@ -259,7 +259,7 @@ export default function ContractsPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-auto p-3 gap-2 justify-start">
-                <Link href="/legalai/contracts/analytics">
+                <Link href="/lawmate/contracts/analytics">
                   <div className="flex items-center gap-2">
                     <BarChart3 className="size-5 text-muted-foreground" />
                     <div>
@@ -343,7 +343,7 @@ export default function ContractsPage() {
                 title="No contracts found"
                 description="Create your first contract to start tracking obligations, renewals and risks."
                 action="Create contract"
-                actionHref="/legalai/contracts/new"
+                actionHref="/lawmate/contracts/new"
               />
             ) : (
               <ScrollArea className="max-h-[600px]">
@@ -360,7 +360,7 @@ export default function ContractsPage() {
                   </TableHeader>
                   <TableBody>
                     {contracts.map((c: ContractRow) => (
-                      <TableRow key={c.id} className="cursor-pointer hover:bg-accent/40" onClick={() => router.push(`/legalai/contracts/${c.id}/overview`)}>
+                      <TableRow key={c.id} className="cursor-pointer hover:bg-accent/40" onClick={() => router.push(`/lawmate/contracts/${c.id}/overview`)}>
                         <TableCell className="font-medium">
                           <div className="truncate">{c.title}</div>
                         </TableCell>

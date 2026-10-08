@@ -23,7 +23,7 @@ export function NewWorkflowPage() {
     // Then redirect to /automations/{id}/builder
     const id = `wf-${Date.now()}`;
     toast.success("Workflow created");
-    router.push(`/legalai/automations/${id}/builder${templateId ? `?template=${templateId}` : ""}`);
+    router.push(`/lawmate/automations/${id}/builder${templateId ? `?template=${templateId}` : ""}`);
   };
 
   return (
@@ -57,7 +57,7 @@ export function NewWorkflowPage() {
 
         <div className="flex gap-2">
           <Button onClick={handleCreate} disabled={!name.trim()}>Create workflow</Button>
-          <Button asChild variant="ghost"><Link href="/legalai/automations">Cancel</Link></Button>
+          <Button asChild variant="ghost"><Link href="/lawmate/automations">Cancel</Link></Button>
         </div>
       </div>
     </div>

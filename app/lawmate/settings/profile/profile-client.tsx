@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/settings/profile/profile-client.tsx
+// app/lawmate/settings/profile/profile-client.tsx
 import * as React from "react";
 import { Camera, Mail, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

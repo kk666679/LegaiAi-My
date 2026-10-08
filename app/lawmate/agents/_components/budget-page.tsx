@@ -1,5 +1,5 @@
 "use client";
-// app/legalai/agents/_components/budget-page.tsx
+// app/lawmate/agents/_components/budget-page.tsx
 import * as React from "react";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";

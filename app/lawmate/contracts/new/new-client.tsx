@@ -35,7 +35,7 @@ export function NewContractClient() {
       });
       await utils.contracts.list.invalidate();
       toast.success("Contract created");
-      router.push(`/legalai/contracts/${created.id}`);
+      router.push(`/lawmate/contracts/${created.id}`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to create contract");
     }
@@ -61,7 +61,7 @@ export function NewContractClient() {
           <Button onClick={() => void handleCreate()} disabled={!name.trim() || createContract.isPending}>
             {createContract.isPending ? "Creating…" : "Create contract"}
           </Button>
-          <Button asChild variant="ghost"><Link href="/legalai/contracts">Cancel</Link></Button>
+          <Button asChild variant="ghost"><Link href="/lawmate/contracts">Cancel</Link></Button>
         </div>
       </div>
     </div>
