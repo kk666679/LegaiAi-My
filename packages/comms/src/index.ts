@@ -1,6 +1,7 @@
 /**
- * @lawmate/comms — Public API.
+ * @lawmate/comms — Inter-agent messaging.
  */
-export * from './envelope';
-export * from './bus';
-export * from './events';
+export type { Envelope } from './envelope.js';
+export { CommsEvents } from './events.js';
+export type { CommsEvent } from './events.js';
+export { subscribe, publish, topics } from './bus.js';
