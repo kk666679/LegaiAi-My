@@ -76,7 +76,7 @@ export default function ForgotPasswordPage() {
               type="button"
               variant="outline"
               className="w-full justify-center gap-2"
-              onClick={() => router.push("/legalai/settings/security")}
+              onClick={() => router.push("/lawmate/settings/security")}
             >
               Open password settings
             </Button>

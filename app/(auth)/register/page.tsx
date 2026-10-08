@@ -43,7 +43,7 @@ function RegisterForm() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated) router.replace("/legalai");
+    if (isAuthenticated) router.replace("/lawmate");
   }, [isAuthenticated, router]);
 
   async function onSubmit(e: React.FormEvent) {
@@ -72,7 +72,7 @@ function RegisterForm() {
         orgName,
         orgSlug,
       });
-      router.push("/legalai");
+      router.push("/lawmate");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Could not create the workspace.");
     } finally {
@@ -247,7 +247,3 @@ function RegisterForm() {
     </div>
   );
 }
-
-              Lowercase letters, numbers and dashes only.
-            </p>
-          </div>

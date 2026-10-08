@@ -30,7 +30,7 @@ function LoginForm() {
   const [ssoNotice, setSsoNotice] = useState("");
 
   useEffect(() => {
-    if (isAuthenticated) router.replace("/legalai");
+    if (isAuthenticated) router.replace("/lawmate");
   }, [isAuthenticated, router]);
 
   async function onSubmit(e: React.FormEvent) {
@@ -39,7 +39,7 @@ function LoginForm() {
     setLoading(true);
     try {
       await login(email, password);
-      router.push(params.get("next") || "/legalai");
+      router.push(params.get("next") || "/lawmate");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {

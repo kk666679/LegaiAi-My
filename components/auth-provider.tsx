@@ -124,7 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setTokenState(null);
     // Disabling the query does NOT discard its cached data, so without this
     // `me.data` survives logout: isAuthenticated stays true, the login page
-    // bounces straight back to /legalai, and a shared browser briefly renders
+    // bounces straight back to /lawmate, and a shared browser briefly renders
     // the previous account's role and organisation.
     queryClient.removeQueries({ queryKey: ["auth", "me"] });
     if (currentToken) {
