@@ -3,7 +3,7 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Archive, BookTemplate, Clock, FileSignature, FileText, FolderTree,
+  Archive, BookTemplate, Clock, FileSignature, FileText,
   LayoutDashboard, PenLine, Share2, Star, Trash2, Sparkles, Library, History,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";

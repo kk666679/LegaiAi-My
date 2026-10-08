@@ -1,5 +1,5 @@
 "use client";
-// app/lawmate/agents/_components/agent-detail-page.tsx
+// app/lawmate/agents/[id]/overview/agent-detail-page.tsx
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -10,9 +10,9 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { useAgents } from "./use-agents";
-import { AgentStatusBadge, AgentTierBadge, RunStatusBadge } from "./agent-status-badge";
-import { AgentRunTimeline } from "./agent-run-timeline";
+import { useAgents } from "../../_components/use-agents";
+import { AgentStatusBadge, AgentTierBadge, RunStatusBadge } from "../../_components/agent-status-badge";
+import { AgentRunTimeline } from "../../_components/agent-run-timeline";
 
 export function AgentDetailPage({ id }: { id: string }) {
   const router = useRouter();

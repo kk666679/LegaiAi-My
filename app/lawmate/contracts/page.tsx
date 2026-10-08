@@ -59,10 +59,17 @@ export default function ContractsPage() {
   const [createOpen, setCreateOpen] = React.useState(false);
 
   const getParam = (key: string) => searchParams.get(key) ?? undefined;
+  const withinDaysParam = getParam("withinDays");
+  const withinDaysValue = withinDaysParam ? Number(withinDaysParam) : undefined;
+  const expiringWithinDays =
+    withinDaysValue !== undefined && Number.isInteger(withinDaysValue) && withinDaysValue > 0
+      ? withinDaysValue
+      : undefined;
 
   const filters = {
     status: getParam("status") as ContractStatus | undefined,
     contractType: getParam("contractType") as ContractType | undefined,
+    expiringWithinDays,
     clientId: getParam("clientId") ?? undefined,
     matterId: getParam("matterId") ?? undefined,
     search: getParam("search") ?? undefined,

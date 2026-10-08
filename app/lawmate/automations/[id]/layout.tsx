@@ -1,6 +1,6 @@
 // app/automations/[id]/layout.tsx
 import * as React from "react";
-import { WorkflowScopedNav } from "../_components/workflow-nav";
+import { WorkflowScopedNav } from "./_components/workflow-nav";
 
 export default function WorkflowLayout({ children, params }: { children: React.ReactNode; params: { id: string } }) {
   return (

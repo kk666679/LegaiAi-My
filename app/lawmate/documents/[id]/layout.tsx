@@ -1,5 +1,5 @@
 import * as React from "react";
-import { DocumentScopedNav } from "../_components/document-nav";
+import { DocumentScopedNav } from "./_components/document-nav";
 
 export default function DocumentLayout({ children, params }: { children: React.ReactNode; params: { id: string } }) {
   return (

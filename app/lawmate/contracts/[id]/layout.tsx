@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ContractScopedNav } from "../_components/contract-nav";
+import { ContractScopedNav } from "./_components/contract-nav";
 
 export default function ContractLayout({ children, params }: { children: React.ReactNode; params: { id: string } }) {
   return (

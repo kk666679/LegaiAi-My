@@ -1,5 +1,5 @@
 import * as React from "react";
-import { AgentScopedNav } from "../_components/agent-scoped-nav";
+import { AgentScopedNav } from "./_components/agent-scoped-nav";
 
 export default function AgentLayout({ children, params }: { children: React.ReactNode; params: { id: string } }) {
   return (

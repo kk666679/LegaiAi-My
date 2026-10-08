@@ -1,6 +1,6 @@
 // app/lawmate/research/[sessionId]/layout.tsx
 import * as React from "react";
-import { SessionScopedNav } from "../_components/session-scoped-nav";
+import { SessionScopedNav } from "./_components/session-scoped-nav";
 
 export default function SessionLayout({
   children,

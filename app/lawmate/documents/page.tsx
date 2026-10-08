@@ -51,6 +51,9 @@ export default function DocumentsPage() {
   const filters = {
     docType: getParam("docType") as DocType | undefined,
     status: getParam("status") as DocStatus | undefined,
+    sortBy: ["createdAt", "updatedAt", "title"].includes(getParam("sort") ?? "")
+      ? (getParam("sort") as "createdAt" | "updatedAt" | "title")
+      : undefined,
     clientId: getParam("clientId") ?? undefined,
     caseNumber: getParam("caseNumber") ?? undefined,
     court: getParam("court") ?? undefined,

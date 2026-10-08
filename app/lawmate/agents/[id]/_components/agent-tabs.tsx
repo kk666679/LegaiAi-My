@@ -1,5 +1,5 @@
 "use client";
-// app/lawmate/agents/_components/agent-tabs.tsx
+// app/lawmate/agents/[id]/_components/agent-tabs.tsx
 import * as React from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,9 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { RunStatusBadge } from "./agent-status-badge";
-import { AgentRunTimeline } from "./agent-run-timeline";
-import { useAgents } from "./use-agents";
+import { RunStatusBadge } from "../../_components/agent-status-badge";
+import { AgentRunTimeline } from "../../_components/agent-run-timeline";
+import { useAgents } from "../../_components/use-agents";
 
 export function AgentRunsTab({ id }: { id: string }) {
   const { runs } = useAgents({ scope: "all" });

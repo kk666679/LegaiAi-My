@@ -1,5 +1,5 @@
 import * as React from "react";
-import { MatterScopedNav } from "../_components/matter-nav";
+import { MatterScopedNav } from "./_components/matter-nav";
 
 export default function MatterLayout({ children, params }: { children: React.ReactNode; params: { id: string } }) {
   return (
