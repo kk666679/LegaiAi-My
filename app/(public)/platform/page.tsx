@@ -61,7 +61,7 @@ const PLATFORM_FEATURES = [
     icon: <BarChart3 className="size-5" />,
     title: 'Executive Analytics',
     description: 'AI ROI, team utilization, matter cycle times, deadline compliance, and contract risk — all grounded in real data.',
-    href: '/legalai/analytics',
+    href: '/lawmate/analytics',
   },
   {
     icon: <Shield className="size-5" />,
@@ -73,19 +73,19 @@ const PLATFORM_FEATURES = [
     icon: <AlertTriangle className="size-5" />,
     title: 'Risk Intelligence',
     description: 'Proactive alerts with evidence-grounded risk scores across matters, contracts, deadlines, citations, and compliance.',
-    href: '/legalai/risk',
+    href: '/lawmate/risk',
   },
   {
     icon: <Bell className="size-5" />,
     title: 'Legal Monitoring',
     description: 'Regulatory change detection, case-law developments, and trend analysis with configurable alerts and subscriptions.',
-    href: '/legalai/monitor',
+    href: '/lawmate/monitor',
   },
   {
     icon: <Search className="size-5" />,
     title: 'Universal Search',
     description: 'Full-text and semantic search across matters, clients, contracts, documents, authorities, and audit events.',
-    href: '/legalai/search',
+    href: '/lawmate/search',
   },
 ];
 
@@ -100,7 +100,7 @@ export default function PlatformPage() {
         actions={
           <div className="flex gap-3">
             <Button asChild>
-              <Link href="/legalai">
+              <Link href="/lawmate">
                 Open {BRAND.name} <ArrowRight className="ml-2 size-4" />
               </Link>
             </Button>
@@ -186,7 +186,7 @@ export default function PlatformPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button asChild size="lg">
-              <Link href="/legalai">Open {BRAND.name} Workspace</Link>
+              <Link href="/lawmate">Open {BRAND.name} Workspace</Link>
             </Button>
             <Button asChild size="lg" variant="outline">
               <Link href="/pricing">View Pricing</Link>

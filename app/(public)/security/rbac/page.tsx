@@ -33,7 +33,7 @@ export default function RBACPage() {
         ]}
         actions={
           <Button asChild>
-            <Link href="/legalai/agents/audit">AI Governance <ArrowRight className="ml-2 size-4" /></Link>
+            <Link href="/lawmate/agents/audit">AI Governance <ArrowRight className="ml-2 size-4" /></Link>
           </Button>
         }
       />

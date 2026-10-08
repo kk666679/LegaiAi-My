@@ -44,7 +44,7 @@ export default function RequestAccessPage() {
               <CheckCircle2 className="size-12 text-primary" />
               <h2 className="mt-5 font-heading text-2xl font-semibold">Request received</h2>
               <p className="mt-3 max-w-sm leading-relaxed text-muted-foreground">Thanks for your interest. Our team will follow up with next steps for your legal workspace.</p>
-              <Button asChild className="mt-7"><Link href="/legalai">Explore {BRAND.name} <ArrowRight data-icon="inline-end" /></Link></Button>
+              <Button asChild className="mt-7"><Link href="/lawmate">Explore {BRAND.name} <ArrowRight data-icon="inline-end" /></Link></Button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">

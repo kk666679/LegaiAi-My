@@ -127,7 +127,7 @@ function ResearchPreview() {
 
 const PATHWAYS = [
   {
-    href: "/legalai",
+    href: "/lawmate",
     icon: LayoutDashboard,
     eyebrow: "Step 1 · Workspace",
     title: "Start in the operations center",
@@ -142,7 +142,7 @@ const PATHWAYS = [
     visual: <WorkspacePreview />,
   },
   {
-    href: "/legalai/draft",
+    href: "/lawmate/draft",
     icon: Sparkles,
     eyebrow: "Step 2 · Drafting Studio",
     title: "Draft with evidence attached",
@@ -158,7 +158,7 @@ const PATHWAYS = [
     featured: true,
   },
   {
-    href: "/legalai/research",
+    href: "/lawmate/research",
     icon: BookOpen,
     eyebrow: "Step 3 · Research",
     title: "Verify before you rely",

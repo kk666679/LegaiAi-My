@@ -25,7 +25,7 @@ export default function MatterManagementPage() {
         ]}
         actions={
           <Button asChild>
-            <Link href="/legalai/matters">Open Matter Registry <ArrowRight className="ml-2 size-4" /></Link>
+            <Link href="/lawmate/matters">Open Matter Registry <ArrowRight className="ml-2 size-4" /></Link>
           </Button>
         }
       />
@@ -111,7 +111,7 @@ export default function MatterManagementPage() {
           </p>
           <div className="flex gap-3 justify-center">
             <Button asChild>
-              <Link href="/legalai/matters">Open Matter Registry</Link>
+              <Link href="/lawmate/matters">Open Matter Registry</Link>
             </Button>
             <Button asChild variant="outline">
               <Link href="/platform">Back to Platform</Link>

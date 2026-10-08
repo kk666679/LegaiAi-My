@@ -6,19 +6,19 @@ import { useReveal } from "./use-reveal";
 
 const PATHS = [
   {
-    href: "/legalai",
+    href: "/lawmate",
     icon: LayoutDashboard,
     label: "Open Workspace",
     desc: "Matters, deadlines and approvals in one view.",
   },
   {
-    href: "/legalai/draft",
+    href: "/lawmate/draft",
     icon: Sparkles,
     label: "Open Drafting Studio",
     desc: "Draft from a template with citations attached.",
   },
   {
-    href: "/legalai/research",
+    href: "/lawmate/research",
     icon: BookOpen,
     label: "Research Malaysian law",
     desc: "Source-backed answers from the LOM catalogue.",
@@ -76,7 +76,7 @@ export function FinalCTA() {
             <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
           </a>
           <a
-            href="/legalai/assistant"
+            href="/lawmate/assistant"
             className="inline-flex items-center justify-center gap-2 rounded-xl border border-border/80 bg-muted/30 px-7 py-3.5 text-sm font-semibold text-foreground transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <Play className="size-4" aria-hidden="true" />

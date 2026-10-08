@@ -25,7 +25,7 @@ export default function CorporatePage() {
         ]}
         actions={
           <Button asChild>
-            <Link href="/legalai">Open {BRAND.name} <ArrowRight className="ml-2 size-4" /></Link>
+            <Link href="/lawmate">Open {BRAND.name} <ArrowRight className="ml-2 size-4" /></Link>
           </Button>
         }
       />
@@ -58,8 +58,8 @@ export default function CorporatePage() {
             From boardroom to contract room, AI handles the operational load while your team drives strategy.
           </p>
           <div className="flex gap-3 justify-center">
-            <Button asChild><Link href="/legalai/contracts">Contract Intelligence</Link></Button>
-            <Button asChild variant="outline"><Link href="/legalai/agents/audit">AI Governance</Link></Button>
+            <Button asChild><Link href="/lawmate/contracts">Contract Intelligence</Link></Button>
+            <Button asChild variant="outline"><Link href="/lawmate/agents/audit">AI Governance</Link></Button>
           </div>
         </div>
       </Section>

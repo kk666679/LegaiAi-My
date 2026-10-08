@@ -176,7 +176,7 @@ export default function AgentsPage() {
         badge="12 agents"
         actions={
           <Button asChild>
-            <Link href="/legalai/hitl">Agent Control Center <ArrowRight className="ml-2 size-4" /></Link>
+            <Link href="/lawmate/hitl">Agent Control Center <ArrowRight className="ml-2 size-4" /></Link>
           </Button>
         }
       />
@@ -251,8 +251,8 @@ export default function AgentsPage() {
             Monitor agent actions, approve or reject HITL requests, and maintain full oversight of AI operations.
           </p>
           <div className="flex gap-3 justify-center">
-            <Button asChild><Link href="/legalai/hitl">Open HITL Control</Link></Button>
-            <Button asChild variant="outline"><Link href="/legalai/agents/audit">AI Governance</Link></Button>
+            <Button asChild><Link href="/lawmate/hitl">Open HITL Control</Link></Button>
+            <Button asChild variant="outline"><Link href="/lawmate/agents/audit">AI Governance</Link></Button>
           </div>
         </div>
       </Section>

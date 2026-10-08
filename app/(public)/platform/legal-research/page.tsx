@@ -25,7 +25,7 @@ export default function LegalResearchPage() {
         ]}
         actions={
           <Button asChild>
-            <Link href="/legalai/research">Start Research <ArrowRight className="ml-2 size-4" /></Link>
+            <Link href="/lawmate/research">Start Research <ArrowRight className="ml-2 size-4" /></Link>
           </Button>
         }
       />
@@ -95,7 +95,7 @@ export default function LegalResearchPage() {
           </p>
           <div className="flex gap-3 justify-center">
             <Button asChild>
-              <Link href="/legalai/research">Start Legal Research</Link>
+              <Link href="/lawmate/research">Start Legal Research</Link>
             </Button>
             <Button asChild variant="outline">
               <Link href="/platform">Back to Platform</Link>

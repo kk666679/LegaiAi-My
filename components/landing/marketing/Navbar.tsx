@@ -66,19 +66,19 @@ export function Navbar() {
 
         <div className="hidden items-center gap-3 lg:flex">
           <Link
-            href="/legalai"
+            href="/lawmate"
             className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             Sign in
           </Link>
           <Link
-            href="/legalai/documents/studio"
+            href="/lawmate/documents/studio"
             className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             Drafting Studio
           </Link>
           <Link
-            href="/legalai"
+            href="/lawmate"
             className="group inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[hsl(var(--brand-blue))] to-[hsl(var(--brand-indigo))] px-4 py-2 text-sm font-semibold text-primary-foreground shadow-[0_10px_30px_-12px_hsl(var(--brand-blue)/0.9)] transition-all hover:shadow-[0_14px_40px_-12px_hsl(var(--brand-blue))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             Open {BRAND.name}
@@ -119,21 +119,21 @@ export function Navbar() {
           ))}
           <li className="mt-2 flex flex-col gap-2 border-t border-border/70 pt-4">
             <Link
-              href="/legalai"
+              href="/lawmate"
               onClick={() => setOpen(false)}
               className="rounded-lg border border-border/70 px-4 py-3 text-center text-sm font-semibold text-foreground"
             >
               Sign in
             </Link>
             <Link
-              href="/legalai/documents/studio"
+              href="/lawmate/documents/studio"
               onClick={() => setOpen(false)}
               className="rounded-lg border border-border/70 px-4 py-3 text-center text-sm font-semibold text-foreground"
             >
               Drafting Studio
             </Link>
             <Link
-              href="/legalai"
+              href="/lawmate"
               onClick={() => setOpen(false)}
               className="rounded-lg bg-gradient-to-r from-[hsl(var(--brand-blue))] to-[hsl(var(--brand-indigo))] px-4 py-3 text-center text-sm font-semibold text-primary-foreground"
             >

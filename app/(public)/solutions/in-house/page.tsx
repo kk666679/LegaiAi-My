@@ -25,7 +25,7 @@ export default function InHousePage() {
         ]}
         actions={
           <Button asChild>
-            <Link href="/legalai">Open {BRAND.name} <ArrowRight className="ml-2 size-4" /></Link>
+            <Link href="/lawmate">Open {BRAND.name} <ArrowRight className="ml-2 size-4" /></Link>
           </Button>
         }
       />
@@ -58,8 +58,8 @@ export default function InHousePage() {
             From contract intake to board reporting, AI handles the operational workload so your team can focus on judgment.
           </p>
           <div className="flex gap-3 justify-center">
-            <Button asChild><Link href="/legalai/contracts">Contract Intelligence</Link></Button>
-            <Button asChild variant="outline"><Link href="/legalai/hitl">Compliance</Link></Button>
+            <Button asChild><Link href="/lawmate/contracts">Contract Intelligence</Link></Button>
+            <Button asChild variant="outline"><Link href="/lawmate/hitl">Compliance</Link></Button>
           </div>
         </div>
       </Section>

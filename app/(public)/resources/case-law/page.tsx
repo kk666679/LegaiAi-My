@@ -38,7 +38,7 @@ export default function CaseLawPage() {
         ]}
         actions={
           <Button asChild>
-            <Link href="/legalai/research">Search Case Law <ArrowRight className="ml-2 size-4" /></Link>
+            <Link href="/lawmate/research">Search Case Law <ArrowRight className="ml-2 size-4" /></Link>
           </Button>
         }
       />

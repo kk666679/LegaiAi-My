@@ -25,7 +25,7 @@ export default function CompliancePage() {
         ]}
         actions={
           <Button asChild>
-            <Link href="/legalai/hitl">Open Compliance <ArrowRight className="ml-2 size-4" /></Link>
+            <Link href="/lawmate/hitl">Open Compliance <ArrowRight className="ml-2 size-4" /></Link>
           </Button>
         }
       />
@@ -74,8 +74,8 @@ export default function CompliancePage() {
             Regulatory changes detected automatically. Obligations tracked. Gaps identified. Audit ready.
           </p>
           <div className="flex gap-3 justify-center">
-            <Button asChild><Link href="/legalai/hitl">Open Compliance</Link></Button>
-            <Button asChild variant="outline"><Link href="/legalai/agents/live">Regulatory Monitor</Link></Button>
+            <Button asChild><Link href="/lawmate/hitl">Open Compliance</Link></Button>
+            <Button asChild variant="outline"><Link href="/lawmate/agents/live">Regulatory Monitor</Link></Button>
           </div>
         </div>
       </Section>

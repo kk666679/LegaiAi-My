@@ -214,7 +214,7 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ sl
         actions={
           <div className="flex gap-3">
             <Button asChild>
-              <Link href="/legalai/hitl">Agent Control Center <ArrowRight className="ml-2 size-4" /></Link>
+              <Link href="/lawmate/hitl">Agent Control Center <ArrowRight className="ml-2 size-4" /></Link>
             </Button>
             <Button asChild variant="outline">
               <Link href="/agents">All Agents</Link>

@@ -25,7 +25,7 @@ export default function LawFirmsPage() {
         ]}
         actions={
           <Button asChild>
-            <Link href="/legalai">Open {BRAND.name} <ArrowRight className="ml-2 size-4" /></Link>
+            <Link href="/lawmate">Open {BRAND.name} <ArrowRight className="ml-2 size-4" /></Link>
           </Button>
         }
       />
@@ -60,8 +60,8 @@ export default function LawFirmsPage() {
             Start with the workflow that matters most. Every feature connects through one coherent platform.
           </p>
           <div className="flex gap-3 justify-center">
-            <Button asChild><Link href="/legalai/matters">Manage Matters</Link></Button>
-            <Button asChild variant="outline"><Link href="/legalai/research">Legal Research</Link></Button>
+            <Button asChild><Link href="/lawmate/matters">Manage Matters</Link></Button>
+            <Button asChild variant="outline"><Link href="/lawmate/research">Legal Research</Link></Button>
           </div>
         </div>
       </Section>

@@ -56,7 +56,7 @@ export default function SolutionsPage() {
         breadcrumbs={[{ label: 'Solutions' }]}
         actions={
           <Button asChild>
-            <Link href="/legalai">Open {BRAND.name} <ArrowRight className="ml-2 size-4" /></Link>
+            <Link href="/lawmate">Open {BRAND.name} <ArrowRight className="ml-2 size-4" /></Link>
           </Button>
         }
       />
@@ -110,7 +110,7 @@ export default function SolutionsPage() {
               <Link href="/platform">Explore Platform</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href="/legalai">Open Workspace</Link>
+              <Link href="/lawmate">Open Workspace</Link>
             </Button>
           </div>
         </div>

@@ -25,7 +25,7 @@ export default function LitigationPage() {
         ]}
         actions={
           <Button asChild>
-            <Link href="/legalai">Open {BRAND.name} <ArrowRight className="ml-2 size-4" /></Link>
+            <Link href="/lawmate">Open {BRAND.name} <ArrowRight className="ml-2 size-4" /></Link>
           </Button>
         }
       />
@@ -58,8 +58,8 @@ export default function LitigationPage() {
             From chronology to closing argument, AI handles research and drafting while you focus on strategy.
           </p>
           <div className="flex gap-3 justify-center">
-            <Button asChild><Link href="/legalai/research">Legal Research</Link></Button>
-            <Button asChild variant="outline"><Link href="/legalai/debate">Debate Simulation</Link></Button>
+            <Button asChild><Link href="/lawmate/research">Legal Research</Link></Button>
+            <Button asChild variant="outline"><Link href="/lawmate/debate">Debate Simulation</Link></Button>
           </div>
         </div>
       </Section>

@@ -1,7 +1,7 @@
 // components/landing/HeroDemo.tsx
-import { GlassPanel } from "@/components/legalai/GlassPanel";
+import { GlassPanel } from "@/components/lawmate/GlassPanel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import LegalTimeline from "@/components/legalai/LegalTimeline/LegalTimeline";
+import LegalTimeline from "@/components/lawmate/LegalTimeline/LegalTimeline";
 import { AIWidget } from "@/components/ai/aiwidget";
 
 export function HeroDemo() {

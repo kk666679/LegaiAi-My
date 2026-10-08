@@ -140,7 +140,7 @@ export function DraftingStudioPreview() {
             <span className="size-2.5 rounded-full bg-amber-400/70" />
             <span className="size-2.5 rounded-full bg-emerald-400/70" />
             <span className="ml-3 font-mono text-xs text-muted-foreground">
-              app.legalai.my/legalai/draft
+              app.legalai.my/lawmate/draft
             </span>
             <span className="ml-auto hidden items-center gap-1.5 rounded-full border border-border/70 px-2.5 py-1 text-[10px] text-muted-foreground sm:inline-flex">
               <Sparkles className="size-3" aria-hidden="true" />
@@ -337,7 +337,7 @@ export function DraftingStudioPreview() {
               </div>
 
               <Link
-                href="/legalai/documents/studio"
+                href="/lawmate/documents/studio"
                 className="group mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[hsl(var(--brand-blue))] to-[hsl(var(--brand-indigo))] px-5 py-3 text-sm font-semibold text-primary-foreground shadow-[0_16px_40px_-18px_hsl(var(--brand-blue))] transition-all hover:shadow-[0_20px_50px_-14px_hsl(var(--brand-blue))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 Open Drafting Studio

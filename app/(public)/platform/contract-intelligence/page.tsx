@@ -25,7 +25,7 @@ export default function ContractIntelligencePage() {
         ]}
         actions={
           <Button asChild>
-            <Link href="/legalai/contracts">Open Contract Analyzer <ArrowRight className="ml-2 size-4" /></Link>
+            <Link href="/lawmate/contracts">Open Contract Analyzer <ArrowRight className="ml-2 size-4" /></Link>
           </Button>
         }
       />
@@ -95,7 +95,7 @@ export default function ContractIntelligencePage() {
           </p>
           <div className="flex gap-3 justify-center">
             <Button asChild>
-              <Link href="/legalai/contracts">Open Contract Analyzer</Link>
+              <Link href="/lawmate/contracts">Open Contract Analyzer</Link>
             </Button>
             <Button asChild variant="outline">
               <Link href="/platform">Back to Platform</Link>

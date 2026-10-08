@@ -3,14 +3,14 @@ import { BRAND } from "@/lib/brand";
 import { Logo } from "@/components/navigation/Logo";
 
 const FOOTER_HREFS: Record<string, string> = {
-  "AI Agents": "/legalai/agents",
-  "Regulatory Timeline": "/legalai/agents/live",
-  "Legal Research": "/legalai/research",
-  "Document Drafting": "/legalai/documents/studio",
-  Compliance: "/legalai/compliance",
+  "AI Agents": "/lawmate/agents",
+  "Regulatory Timeline": "/lawmate/agents/live",
+  "Legal Research": "/lawmate/research",
+  "Document Drafting": "/lawmate/documents/studio",
+  Compliance: "/lawmate/compliance",
   "Corporate Legal": "/solutions/corporate",
   "Law Firms": "/solutions/law-firms",
-  Risk: "/legalai/risk",
+  Risk: "/lawmate/risk",
   About: "/about",
   Security: "/security",
   Careers: "/careers",

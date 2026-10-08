@@ -1,6 +1,6 @@
 "use client";
 
-import { AIOrb } from "@/components/legalai/AIOrb";
+import { AIOrb } from "@/components/lawmate/AIOrb";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { motion } from "framer-motion";
 

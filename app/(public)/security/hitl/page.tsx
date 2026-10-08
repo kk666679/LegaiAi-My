@@ -32,7 +32,7 @@ export default function HITLSecurityPage() {
         ]}
         actions={
           <Button asChild>
-            <Link href="/legalai/hitl">Open Control Center <ArrowRight className="ml-2 size-4" /></Link>
+            <Link href="/lawmate/hitl">Open Control Center <ArrowRight className="ml-2 size-4" /></Link>
           </Button>
         }
       />

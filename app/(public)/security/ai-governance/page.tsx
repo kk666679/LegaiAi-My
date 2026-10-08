@@ -22,7 +22,7 @@ export default function AIGovernancePage() {
         ]}
         actions={
           <Button asChild>
-            <Link href="/legalai/agents/audit">Open Governance <ArrowRight className="ml-2 size-4" /></Link>
+            <Link href="/lawmate/agents/audit">Open Governance <ArrowRight className="ml-2 size-4" /></Link>
           </Button>
         }
       />
