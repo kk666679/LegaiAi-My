@@ -11,10 +11,10 @@ export function generateToken(): string {
   return randomBytes(32).toString('hex')
 }
 
-export async function createSession(userId: string) {
+export async function createSession(userId: string, metadata?: { userAgent?: string; ipAddress?: string }) {
   const token = generateToken()
   const session = await prisma.session.create({
-    data: { userId, token, expiresAt: new Date(Date.now() + SESSION_TTL_MS) },
+    data: { userId, token, expiresAt: new Date(Date.now() + SESSION_TTL_MS), ...metadata },
   })
   return session.token
 }

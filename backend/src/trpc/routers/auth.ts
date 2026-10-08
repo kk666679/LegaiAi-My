@@ -66,7 +66,7 @@ export const authRouter = router({
       })
 
       clearThrottleFailures(keys)
-      const token = await createSession(user.id)
+      const token = await createSession(user.id, { userAgent: ctx.userAgent, ipAddress: ctx.ipAddress })
       return { user, token }
     }),
 
@@ -107,7 +107,7 @@ export const authRouter = router({
       })
 
       clearThrottleFailures(keys)
-      const token = await createSession(user.id)
+      const token = await createSession(user.id, { userAgent: ctx.userAgent, ipAddress: ctx.ipAddress })
       return { user, token }
     }),
 
@@ -141,7 +141,7 @@ export const authRouter = router({
       }
 
       await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } })
-      const token = await createSession(user.id)
+      const token = await createSession(user.id, { userAgent: ctx.userAgent, ipAddress: ctx.ipAddress })
       return {
         token,
         user: { id: user.id, email: user.email, name: user.name, role: user.role, orgId: user.orgId },
@@ -155,14 +155,67 @@ export const authRouter = router({
       return { ok: true }
     }),
 
+  updateProfile: protectedProcedure
+    .input(z.object({
+      name: z.string().trim().min(1).max(120),
+      phone: z.string().trim().max(40).nullable(),
+      jobTitle: z.string().trim().max(120).nullable(),
+      bio: z.string().trim().max(1000).nullable(),
+      timezone: z.string().trim().min(1).max(80),
+      language: z.enum(['en', 'ms', 'zh', 'ta']),
+      profilePhoto: z.string().max(512).nullable(),
+    }))
+    .mutation(async ({ ctx, input }) => prisma.user.update({
+      where: { id: ctx.user.id },
+      data: input,
+      select: { id: true, name: true, email: true, phone: true, jobTitle: true, bio: true, timezone: true, language: true, profilePhoto: true },
+    })),
+
+  changePassword: protectedProcedure
+    .input(z.object({ currentPassword: z.string().min(1), newPassword: z.string().min(12).max(256) }))
+    .mutation(async ({ ctx, input }) => {
+      const user = await prisma.user.findUnique({ where: { id: ctx.user.id } })
+      if (!user?.passwordHash || !(await verifyPassword(input.currentPassword, user.passwordHash)))
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Current password is incorrect' })
+      if (input.currentPassword === input.newPassword)
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Choose a different password' })
+      await prisma.user.update({ where: { id: user.id }, data: { passwordHash: await hashPassword(input.newPassword) } })
+      if (ctx.sessionToken) await prisma.session.deleteMany({ where: { userId: user.id, token: { not: ctx.sessionToken } } })
+      return { ok: true, signedOutOtherSessions: true }
+    }),
+
+  sessions: protectedProcedure.query(async ({ ctx }) => {
+    const sessions = await prisma.session.findMany({
+      where: { userId: ctx.user.id, expiresAt: { gt: new Date() } },
+      select: { id: true, userAgent: true, ipAddress: true, createdAt: true, token: true },
+      orderBy: { createdAt: 'desc' },
+    })
+    return sessions.map(({ token, ...session }) => ({ ...session, current: token === ctx.sessionToken }))
+  }),
+
+  revokeSession: protectedProcedure
+    .input(z.object({ sessionId: z.string().cuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const session = await prisma.session.findFirst({ where: { id: input.sessionId, userId: ctx.user.id } })
+      if (!session) throw new TRPCError({ code: 'NOT_FOUND', message: 'Session not found' })
+      await prisma.session.delete({ where: { id: session.id } })
+      return { ok: true, revokedCurrent: session.token === ctx.sessionToken }
+    }),
+
+  revokeOtherSessions: protectedProcedure.mutation(async ({ ctx }) => {
+    const result = await prisma.session.deleteMany({ where: { userId: ctx.user.id, token: { not: ctx.sessionToken ?? '' } } })
+    return { ok: true, count: result.count }
+  }),
+
   me: protectedProcedure
-    .query(({ ctx }) => ({
+    .query(async ({ ctx }) => ({
       id: ctx.user.id,
       email: ctx.user.email,
       name: ctx.user.name,
       role: ctx.user.role,
       orgId: ctx.user.orgId,
       org: ctx.user.org,
+      profile: await prisma.user.findUnique({ where: { id: ctx.user.id }, select: { phone: true, jobTitle: true, bio: true, timezone: true, language: true, profilePhoto: true } }),
     })),
 
   listUsers: adminProcedure

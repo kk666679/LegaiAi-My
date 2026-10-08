@@ -34,6 +34,7 @@ export const createContext = async (opts: CreateExpressContextOptions) => {
     prisma,
     traceId,
     user,
+    sessionToken: token ?? null,
     userId: user?.id ?? null,
     orgId: user?.orgId ?? null,
     ipAddress,
