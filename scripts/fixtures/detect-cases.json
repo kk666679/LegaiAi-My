@@ -1,0 +1,8 @@
+[
+  { "text": "Mahkamah telah memutuskan bahawa peruntukan seksyen ini adalah terpakai.", "expected": "ms" },
+  { "text": "The court held that the provision under this section applies.", "expected": "en" },
+  { "text": "Memandangkan plaintif tidak mematuhi perintah mahkamah, justeru tindakan sewajarnya.", "expected": "ms" },
+  { "text": "The plaintiff affirmed that the defendant shall comply with the court order.", "expected": "en" },
+  { "text": "Insufficient verified evidence.", "expected": "en" },
+  { "text": "", "expected": "en" }
+]
