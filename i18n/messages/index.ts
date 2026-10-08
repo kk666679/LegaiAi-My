@@ -67,6 +67,9 @@ const en = enAuth as unknown as Tree;
 const merge = (override: Tree) => deepMerge(en, override);
 const j = (v: unknown) => v as unknown as Tree;
 
+const EN_NS = [enCommon, enContracts, enDocuments, enMatters] as const;
+const NS_KEYS = ["common", "contracts", "documents", "matters"] as const;
+
 /**
  * Merge one locale's per-namespace files over English.
  * Each namespace file contributes its top-level key (e.g. contracts.json
@@ -75,14 +78,11 @@ const j = (v: unknown) => v as unknown as Tree;
  * translated; others ship English stubs that merge cleanly).
  */
 function buildLocale(auth: Tree, ns: Tree[]): Tree {
-  const out = merge(auth);
-  const keys = ["common", "contracts", "documents", "matters"] as const;
-  for (let i = 0; i < keys.length; i += 1) {
-    const key = keys[i] as (typeof keys)[number];
-    const base = (en[key] as Tree | undefined) ?? {};
+  const out = deepMerge(enAuth as unknown as Record<string, unknown>, auth);
+  for (let i = 0; i < NS_KEYS.length; i += 1) {
     const overlay = (ns[i] ?? {}) as Record<string, unknown>;
-    (out as Record<string, unknown>)[key] = deepMerge(
-      base as Record<string, unknown>,
+    (out as Record<string, unknown>)[NS_KEYS[i]!] = deepMerge(
+      EN_NS[i] as Record<string, unknown>,
       overlay,
     );
   }
