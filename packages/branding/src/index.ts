@@ -24,9 +24,9 @@ export function supportsUnicode(
   isTTY: boolean = Boolean(process.stdout?.isTTY)
 ): boolean {
   if (!isTTY) return false;
-  if (env.CI) return false;
-  if (env.TERM === 'dumb') return false;
-  if (process.platform === 'win32' && !env.WT_SESSION) return false;
+  if (env['CI']) return false;
+  if (env['TERM'] === 'dumb') return false;
+  if (process.platform === 'win32' && !env['WT_SESSION']) return false;
   return true;
 }
 
@@ -34,14 +34,14 @@ export function supportsWideBanner(
   env: NodeJS.ProcessEnv = process.env,
   columns: number = process.stdout?.columns ?? 0
 ): boolean {
-  if (env.CI) return false;
+  if (env['CI']) return false;
   return columns >= LAWMATE_BANNER_WIDTH + 2;
 }
 
 export function isBannerSuppressed(
   env: NodeJS.ProcessEnv = process.env
 ): boolean {
-  const v = env.LAWMATE_NO_BANNER;
+  const v = env['LAWMATE_NO_BANNER'];
   return Boolean(v && v !== '0' && v.toLowerCase() !== 'false');
 }
 
