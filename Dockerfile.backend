@@ -26,6 +26,10 @@ RUN npm ci --legacy-peer-deps --include=dev --ignore-scripts
 
 # ── 3. Run postinstall manually after source is available ───────────────────
 FROM deps AS build
+# The manifest stage creates /app/backend to install its workspace package.
+# In the source tree, backend is a symlink to packages/backend, so remove that
+# temporary directory before copying the repository tree into the image.
+RUN rm -rf ./backend
 COPY . .
 RUN node scripts/patch-ag-ui-core.mjs
 ARG DATABASE_URL=postgresql://placeholder:placeholder@localhost:5432/placeholder
