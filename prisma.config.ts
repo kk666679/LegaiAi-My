@@ -5,10 +5,13 @@ import { defineConfig } from 'prisma/config';
 config({ path: '.env.local', override: false });
 config({ path: '.env', override: false });
 
-// DATABASE_URL is only required for commands that touch the database
-// (migrate, db push, db pull, studio). `prisma generate` must work without it,
-// so we fall back to a clearly-fake connection string that is never dialed.
+// Keep Prisma CLI pointed at the same database as backend/src/db/index.ts.
+// `prisma generate` must work without a configured database, so the last
+// fallback is intentionally fake and is never dialed by generation.
 const DATABASE_URL =
+  process.env.ORM_DATABASE_URL ??
+  process.env.ORM_PRISMA_DATABASE_URL ??
+  process.env.ORM_POSTGRES_URL ??
   process.env.DATABASE_URL ??
   'postgresql://placeholder:placeholder@localhost:5432/placeholder';
 

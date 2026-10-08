@@ -45,19 +45,28 @@ model Organisation {
 }
 
 model User {
-  id            String        @id @default(cuid())
-  email         String        @unique
-  name          String?
-  passwordHash  String?
-  role          String        @default("viewer") // admin | lawyer | paralegal | viewer
-  orgId         String?
-  org           Organisation? @relation(fields: [orgId], references: [id], onDelete: SetNull)
-  emailVerified Boolean       @default(false)
-  lastLoginAt   DateTime?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id             String        @id @default(cuid())
+  email          String        @unique
+  name           String?
+  phone          String?
+  jobTitle       String?
+  bio            String?
+  timezone       String?      @default("Asia/Kuala_Lumpur")
+  language       String       @default("en")
+  profilePhoto   String?
+  passwordHash   String?
+  role           String        @default("viewer") // admin | lawyer | paralegal | viewer
+  orgId          String?
+  org            Organisation? @relation(fields: [orgId], references: [id], onDelete: SetNull)
+  emailVerified  Boolean       @default(false)
+  lastLoginAt    DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
-  sessions Session[]
+  sessions               Session[]
+  savedAuthorities       SavedAuthority[]
+  integrationConnections IntegrationConnection[]
+  integrationOAuthStates IntegrationOAuthState[]
 
   @@index([orgId])
   @@index([email])
@@ -1016,4 +1025,172 @@ model PlanPrice {
   @@unique([planId, countryCode, currency, billingInterval])
   @@index([planId])
   @@map("plan_prices")
+}
+
+// ── Unified Job Model (for all worker types) ─────────────────────────────────
+
+enum JobStatus {
+  QUEUED
+  RUNNING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+  RETRYING
+}
+
+enum JobType {
+  RETRIEVAL
+  ANALYSIS
+  DRAFTING
+  VALIDATION
+  AUDIT
+  ORCHESTRATOR
+  PRIVACY
+  DEBATE
+  MONITORING
+  INDEXING
+  TESTING
+  SANDBOX
+  AI_DEVELOPER
+}
+
+model Job {
+  id              String    @id @default(cuid())
+  orgId           String?
+  userId          String?
+  traceId         String?
+  jobType         JobType
+  status          JobStatus @default(QUEUED)
+  priority        Int       @default(10)
+  input           Json?
+  result          Json?
+  errorMessage    String?
+  errorCode       String?
+  progress        Json?     // { stage: string, percent: int, message: string }
+  attempts        Int       @default(0)
+  maxAttempts     Int       @default(3)
+  startedAt       DateTime?
+  completedAt     DateTime?
+  failedAt        DateTime?
+  queuedAt        DateTime  @default(now())
+  workerId        String?
+  idempotencyKey  String?   @unique
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([orgId])
+  @@index([userId])
+  @@index([traceId])
+  @@index([jobType])
+  @@index([status])
+  @@index([idempotencyKey])
+  @@map("jobs")
+}
+
+// ── Automations (workflows) ──────────────────────────────────────────────────
+
+model Automation {
+  id          String   @id @default(cuid())
+  orgId       String?
+  userId      String?
+  name        String
+  description String?
+  category    String?
+  status      String   @default("draft") // draft | active | paused | archived
+  definition  Json?    // { nodes: WorkflowNode[], edges: Edge[] }
+  templateId  String?
+  tags        Json?    // string[]
+  lastRunAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  runs     AutomationRun[]
+  versions AutomationVersion[]
+
+  @@index([orgId])
+  @@index([userId])
+  @@index([status])
+  @@map("automations")
+}
+
+model AutomationRun {
+  id           String      @id @default(cuid())
+  automationId String
+  automation   Automation  @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  orgId        String?
+  userId       String?
+  jobId        String? // linked Job row when dispatched to a queue
+  status       String      @default("queued") // queued | running | success | failed | cancelled
+  trigger      String      @default("manual") // manual | scheduled | webhook | api
+  input        Json?
+  output       Json?
+  errorMessage String?
+  startedAt    DateTime?
+  finishedAt   DateTime?
+  durationMs   Int?
+  nodeResults  Json? // [{ nodeId, status, message }]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([automationId])
+  @@index([orgId])
+  @@index([status])
+  @@index([jobId])
+  @@map("automation_runs")
+}
+
+model AutomationVersion {
+  id            String     @id @default(cuid())
+  automationId  String
+  automation    Automation @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  versionNumber Int
+  definition    Json?
+  summary       String?
+  authorName    String?
+  createdAt     DateTime   @default(now())
+
+  @@unique([automationId, versionNumber])
+  @@index([automationId])
+  @@map("automation_versions")
+}
+
+// ── Auth & Multi-Tenancy additions ───────────────────────────────────────────
+
+model SavedAuthority {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sourceId  String
+  authority Json
+  createdAt DateTime @default(now())
+  @@unique([userId, sourceId])
+  @@index([userId, createdAt])
+  @@map("saved_authorities")
+}
+
+model IntegrationConnection {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider    String
+  config      String
+  connectedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@unique([userId, provider])
+  @@index([userId])
+  @@map("integration_connections")
+}
+
+model IntegrationOAuthState {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider  String
+  stateHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+  @@index([userId, provider])
+  @@map("integration_oauth_states")
 }

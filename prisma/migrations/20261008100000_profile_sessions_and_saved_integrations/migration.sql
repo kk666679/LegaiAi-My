@@ -36,3 +36,18 @@ CREATE UNIQUE INDEX "integration_connections_userId_provider_key" ON "integratio
 CREATE INDEX "integration_connections_userId_idx" ON "integration_connections"("userId");
 ALTER TABLE "integration_connections" ADD CONSTRAINT "integration_connections_userId_fkey"
   FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+CREATE TABLE "integration_oauth_states" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "provider" TEXT NOT NULL,
+  "stateHash" TEXT NOT NULL,
+  "expiresAt" TIMESTAMP(3) NOT NULL,
+  "usedAt" TIMESTAMP(3),
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "integration_oauth_states_pkey" PRIMARY KEY ("id")
+);
+CREATE UNIQUE INDEX "integration_oauth_states_stateHash_key" ON "integration_oauth_states"("stateHash");
+CREATE INDEX "integration_oauth_states_userId_provider_idx" ON "integration_oauth_states"("userId", "provider");
+ALTER TABLE "integration_oauth_states" ADD CONSTRAINT "integration_oauth_states_userId_fkey"
+  FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;

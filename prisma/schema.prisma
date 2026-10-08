@@ -45,6 +45,7 @@ model User {
   sessions       Session[]
   savedAuthorities SavedAuthority[]
   integrationConnections IntegrationConnection[]
+  integrationOAuthStates IntegrationOAuthState[]
 
   @@index([orgId])
   @@index([email])
@@ -89,6 +90,19 @@ model IntegrationConnection {
   @@unique([userId, provider])
   @@index([userId])
   @@map("integration_connections")
+}
+
+model IntegrationOAuthState {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider  String
+  stateHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+  @@index([userId, provider])
+  @@map("integration_oauth_states")
 }
 
 model VectorDoc {
