@@ -8,7 +8,11 @@ import { trpcReact } from "@/clients";
 import { ThemeProvider } from "next-themes";
 import { getToken } from "@/lib/auth";
 import { AuthProvider } from "@/components/auth-provider";
-import { I18nProvider } from "@/lib/i18n/I18nProvider";
+import { TooltipProvider } from "@/components/ui/tooltip";
+// NOTE: no I18nProvider here — the single canonical provider
+// (@/i18n/providers/i18n-provider, cookie-backed) is mounted in
+// app/layout.tsx. Mounting the legacy lib/i18n provider here used to
+// create a nested split-brain locale (cookie vs localStorage).
 
 function TRPCProvider({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
@@ -48,7 +52,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           enableSystem
           disableTransitionOnChange
         >
-          <I18nProvider>{children}</I18nProvider>
+          <TooltipProvider>{children}</TooltipProvider>
         </ThemeProvider>
       </AuthProvider>
     </TRPCProvider>

@@ -17,6 +17,7 @@ import { billingRouter } from './billing';
 import { draftingRouter } from './drafting';
 import { sandboxRouter } from './sandbox';
 import { jobsRouter } from './jobs';
+import { automationsRouter } from './automations';
 import type { AnyRouter } from '@trpc/server';
 
 export const appRouter: AnyRouter = router({
@@ -37,6 +38,7 @@ export const appRouter: AnyRouter = router({
   drafting: draftingRouter,
   sandbox: sandboxRouter,
   jobs: jobsRouter,
+  automations: automationsRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -13,6 +13,9 @@ import { CacheStore } from './cache.js';
 import { createStack } from './observability/index.js';
 import * as skills from './skills/index.js';
 import { buildDefaultTools } from './mcp/tools/index.js';
+import { Translator, detect } from './i18n/index.js';
+
+const i18nTranslator = new Translator();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -253,13 +256,13 @@ function routeHandler(req, res, url) {
 
   if (method === 'POST' && pathname === '/api/i18n/detect') {
     return parseBody(req)
-      .then((body) => jsonResponse(res, 200, { lang: /[a-zA-Z]/.test((body && body.text) || '') && /[\u0600-\u06FF]/.test((body && body.text) || '') ? 'ms' : 'en' }))
+      .then((body) => jsonResponse(res, 200, { lang: detect((body && body.text) || '') }))
       .catch((err) => jsonResponse(res, 400, { error: { code: 'INVALID_INPUT', message: err.message } }));
   }
 
   if (method === 'POST' && pathname === '/api/i18n/translate') {
     return parseBody(req)
-      .then((body) => jsonResponse(res, 200, { text: (body && body.key === 'conclusion.heading' && body.lang === 'ms') ? 'Kesimpulan' : 'Conclusion' }))
+      .then((body) => jsonResponse(res, 200, { text: i18nTranslator.t((body && body.key) || '', (body && body.lang) || 'en') }))
       .catch((err) => jsonResponse(res, 400, { error: { code: 'INVALID_INPUT', message: err.message } }));
   }
 
