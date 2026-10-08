@@ -1,7 +1,7 @@
 {
   "name": "@lawmate/gateway",
   "version": "1.0.0",
-  "description": "LAWMATE AI API GATEWAY \u2014 Unified AI Infrastructure",
+  "description": "LAWMATE AI API GATEWAY — Unified AI Infrastructure",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -32,7 +32,13 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@lawmate/branding": "^1.0.0"
+    "@lawmate/branding": "^1.0.0",
+    "@lawmate/evidence": "^1.0.0",
+    "@lawmate/kg": "^1.0.0",
+    "@lawmate/memory": "^1.0.0",
+    "@lawmate/orchestrator": "^1.0.0",
+    "@lawmate/registry": "^1.0.0",
+    "@lawmate/safety": "^1.0.0"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",

@@ -27,5 +27,8 @@
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
     "access": "restricted"
+  },
+  "dependencies": {
+    "@lawmate/types": "^1.0.0"
   }
 }

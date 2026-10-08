@@ -1,7 +1,7 @@
 {
   "name": "@lawmate/cli",
   "version": "1.0.0",
-  "description": "LAWMATE CLI \u2014 Developer Command Line",
+  "description": "LAWMATE CLI — Developer Command Line",
   "type": "module",
   "bin": {
     "lawmate": "./bin/lawmate.js"
@@ -36,7 +36,21 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@lawmate/branding": "^1.0.0"
+    "@lawmate/branding": "^1.0.0",
+    "@lawmate/autobuild": "^1.0.0",
+    "@lawmate/comms": "^1.0.0",
+    "@lawmate/daemon": "^1.0.0",
+    "@lawmate/datasets": "^1.0.0",
+    "@lawmate/eval": "^1.0.0",
+    "@lawmate/evidence": "^1.0.0",
+    "@lawmate/fabric": "^1.0.0",
+    "@lawmate/gateway": "^1.0.0",
+    "@lawmate/kg": "^1.0.0",
+    "@lawmate/learning": "^1.0.0",
+    "@lawmate/memory": "^1.0.0",
+    "@lawmate/orchestrator": "^1.0.0",
+    "@lawmate/registry": "^1.0.0",
+    "@lawmate/safety": "^1.0.0"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
