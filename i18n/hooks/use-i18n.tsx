@@ -10,6 +10,8 @@ export interface I18nContextValue {
   messages: Record<string, unknown>;
   /** Translate a fully-qualified dotted key. */
   t: (key: string, vars?: Record<string, unknown>) => string;
+  /** True when a fully-qualified dotted key resolves to a string. */
+  exists: (key: string) => boolean;
   /** Fetch the raw value (object/array) at a dotted key. */
   raw: <T = unknown>(key: string) => T;
   formatDate: (v: string | number | Date) => string;

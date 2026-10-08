@@ -26,7 +26,7 @@ const CATALOG = Object.freeze({
     'conclusion.heading': 'Kesimpulan',
     'issue.heading': 'Isu',
     'rule.heading': 'Undang-undang',
-    'application.heading': 'Pentulahan',
+    'application.heading': 'Aplikasi',
     'citations.heading': 'Rujukan',
     'validation.heading': 'Pengesahan',
     'insufficient.evidence': 'Bukti terverifikasi yang mencukupi tidak tersedia.',

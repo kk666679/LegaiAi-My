@@ -1,13 +1,13 @@
 export const BRAND = {
-  name: "LAW MATE",
-  shortName: "Law Mate",
+  name: "LAWMATE",
+  shortName: "LawMate",
   tagline: "The Legal AI Operating Platform",
   description:
     "AI that works with your legal team — not just another chatbot.",
   country: "Malaysia",
-  website: "https://lawmate.ai",
-  supportEmail: "support@lawmate.ai",
-  legalName: "Law Mate Sdn. Bhd.",
+  website: "https://legai-my.vercel.app/",
+  supportEmail: "tuahkm@gmail.com",
+  legalName: "Kurnia Kadir",
 } as const;
 
 export interface PlanConfig {

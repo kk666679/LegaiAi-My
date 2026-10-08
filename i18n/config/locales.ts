@@ -127,6 +127,28 @@ export function toLocale(value: string | undefined | null): Locale {
 // Accept-Language detection
 //   "en-MY,en;q=0.9,ms;q=0.8"  →  "en"
 // ─────────────────────────────────────────────────────────────
+/**
+ * BCP-47 primary tags that map onto a different app locale code.
+ * Filipino (`fil`) is served by the Tagalog (`tl`) bundle.
+ */
+export const LANGUAGE_ALIASES: Record<string, Locale> = {
+  fil: "tl",
+};
+
+/** Map any BCP-47 tag (e.g. "fil", "fil-PH", "ms-MY") to an app locale. */
+export function codeFromIntl(tag: string | null | undefined): Locale | undefined {
+  if (!tag) return undefined;
+  const lower = tag.trim().toLowerCase();
+  if (!lower) return undefined;
+  const primary = lower.split("-")[0] ?? lower;
+  const aliased = LANGUAGE_ALIASES[primary] ?? LANGUAGE_ALIASES[lower] ?? primary;
+  if ((locales as readonly string[]).includes(aliased)) return aliased as Locale;
+  // Match by intlCode prefix (e.g. "ms-my" via ms-MY).
+  const byIntl = locales.find(
+    (l) => LOCALE_META[l].intlCode.toLowerCase() === lower,
+  );
+  return byIntl;
+}
 export function detectFromHeader(header: string | null | undefined): Locale {
   if (!header) return defaultLocale;
 
@@ -141,11 +163,19 @@ export function detectFromHeader(header: string | null | undefined): Locale {
     .sort((a, b) => b.quality - a.quality);
 
   for (const { lang } of parts) {
+    // BCP-47 → app-code aliases (header uses a different primary tag).
+    // "fil" (Filipino) is served by the "tl" (Tagalog) bundle.
+    const aliased = LANGUAGE_ALIASES[lang] ?? lang;
     // Exact match — "en" / "ms" / "th" / "vi" …
-    if (lang && (locales as readonly string[]).includes(lang)) return lang as Locale;
+    if (aliased && (locales as readonly string[]).includes(aliased))
+      return aliased as Locale;
     // Prefix match — "en-MY" → "en", "zh-Hans" → "zh"
-    const base = lang.split("-")[0];
-    if (base && (locales as readonly string[]).includes(base)) return base as Locale;
+    const base = aliased.split("-")[0];
+    if (base) {
+      const baseAliased = LANGUAGE_ALIASES[base] ?? base;
+      if ((locales as readonly string[]).includes(baseAliased))
+        return baseAliased as Locale;
+    }
   }
 
   return defaultLocale;

@@ -10,7 +10,7 @@ import { buildCapabilities } from './capabilities.js';
 import path from 'path';
 import fs from 'fs';
 
-import { createKG } from '../kg/index.js';
+import { createKG } from '../../.autoclaw/kg/index.js';
 
 const require = createRequire(import.meta.url);
 

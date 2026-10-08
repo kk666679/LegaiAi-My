@@ -126,19 +126,19 @@ export interface I18nProviderProps {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Namespace registry — mirrors `i18n/messages/en/*.json`
-// Adding a new namespace here keeps `useTranslation` type-safe.
+// Namespace registry — mirrors the top-level keys of
+// `i18n/messages/en/auth.json` (the single-file bundle per locale).
+// The bundle currently ships: login, logout, auth, topbar, common,
+// dashboard, sidebar.
 // ─────────────────────────────────────────────────────────────
 export type Namespace =
+  | "login"
+  | "logout"
+  | "auth"
+  | "topbar"
   | "common"
-  | "nav"
-  | "documents"
-  | "matters"
-  | "contracts"
-  | "automation"
-  | "hitl"
-  | "settings"
-  | "auth";
+  | "dashboard"
+  | "sidebar";
 
 // ─────────────────────────────────────────────────────────────
 // Locale metadata (re-export for convenience)

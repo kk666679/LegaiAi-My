@@ -62,6 +62,19 @@ export function I18nProvider({
     [messages],
   );
 
+  /** True when `key` resolves to a string in the active or fallback bundle. */
+  const exists = React.useCallback(
+    (key: string): boolean => {
+      const value = resolvePath(messages, key);
+      if (typeof value === "string") return true;
+      if (fallbackMessages) {
+        return typeof resolvePath(fallbackMessages, key) === "string";
+      }
+      return false;
+    },
+    [messages, fallbackMessages],
+  );
+
   const format = React.useMemo(
     () => createFormatters(localeMeta(locale).intlCode),
     [locale],
@@ -92,6 +105,7 @@ export function I18nProvider({
       messages,
       t,
       raw,
+      exists,
       formatDate: format.date,
       formatDateTime: format.dateTime,
       formatTime: format.time,
@@ -104,7 +118,7 @@ export function I18nProvider({
       format,
       setLocale,
     }),
-    [locale, messages, t, raw, format, plural, setLocale],
+    [locale, messages, t, raw, exists, format, plural, setLocale],
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;

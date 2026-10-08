@@ -6,6 +6,11 @@
   "author": "Kurnia Kadir",
   "main": "index.js",
   "scripts": {
+    "mcp":        "npm --prefix @kk666679/mcp start",
+    "mcp:stdio":  "MCP_TRANSPORT=stdio npm --prefix @kk666679/mcp start",
+    "mcp:http":   "MCP_TRANSPORT=http MCP_PORT=3003 npm --prefix @kk666679/mcp start",
+    "mcp:dev":    "MCP_TRANSPORT=stdio node --watch @kk666679/mcp/index.js",
+    "mcp:check":  "npm --prefix @kk666679/mcp run type-check",
     "i18n:eval": "tsx scripts/eval-detect.mjs",
     "i18n:eval:confusion": "tsx scripts/eval-detect.mjs --confusion",
     "i18n:eval:failures": "tsx scripts/eval-detect.mjs --failures",
