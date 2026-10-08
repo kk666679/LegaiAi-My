@@ -1,6 +1,7 @@
 "use client";
 // app/lawmate/research/_components/research-memo.tsx
 import * as React from "react";
+import Link from "next/link";
 import { Copy, Download, FileText, Save, Sparkles } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -46,10 +47,12 @@ export function ResearchMemoPage({ id }: { id: string }) {
           <FileText className="mx-auto size-6 text-muted-foreground" />
           <p className="mt-3 text-sm font-medium">No memo yet</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Generate a memo from the findings on this research session.
+            Review this session&apos;s findings before preparing a memo.
           </p>
-          <Button size="sm" className="mt-4 gap-1.5">
-            <Sparkles className="size-3.5" /> Generate memo
+          <Button asChild size="sm" className="mt-4 gap-1.5">
+            <Link href={`/lawmate/research/${encodeURIComponent(id)}/results`}>
+              <Sparkles className="size-3.5" /> Review findings
+            </Link>
           </Button>
         </Card>
       </div>
@@ -100,7 +103,7 @@ export function ResearchMemoPage({ id }: { id: string }) {
           <Button size="sm" variant="outline" className="gap-1.5" onClick={handleCopy}>
             <Copy className="size-3.5" /> Copy
           </Button>
-          <Button size="sm" variant="outline" className="gap-1.5" onClick={() => toast.success("Exported as PDF")}>
+          <Button size="sm" variant="outline" className="gap-1.5" onClick={() => window.print()}>
             <Download className="size-3.5" /> PDF
           </Button>
           <Button size="sm" className="gap-1.5" onClick={handleSave}>
@@ -131,7 +134,7 @@ export function ResearchMemoPage({ id }: { id: string }) {
             sources={memoSources}
             groupByType={false}
             heading="Generated artifact"
-            onExport={(artifact) => toast.success(`Exported ${artifact.title}`)}
+            onExport={() => window.print()}
           />
         )}
       </DashboardStateBoundary>

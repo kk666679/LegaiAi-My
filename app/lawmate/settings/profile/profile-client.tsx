@@ -35,6 +35,12 @@ export function ProfileSettings() {
   const [timezone, setTimezone] = React.useState("Asia/Kuala_Lumpur");
   const [language, setLanguage] = React.useState("en");
   const [saving, setSaving] = React.useState(false);
+  const [photoPreview, setPhotoPreview] = React.useState<string | null>(null);
+  const photoInputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => () => {
+    if (photoPreview) URL.revokeObjectURL(photoPreview);
+  }, [photoPreview]);
 
   const initials = name
     .split(" ")
@@ -44,11 +50,19 @@ export function ProfileSettings() {
     .toUpperCase();
 
   const onSave = () => {
-    setSaving(true);
-    setTimeout(() => {
-      setSaving(false);
-      toast.success("Profile updated");
-    }, 600);
+    setSaving(false);
+    toast.error("Profile changes are not persisted: the account service has no profile update endpoint.");
+  };
+
+  const onPhotoSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Choose an image file.");
+      return;
+    }
+    setPhotoPreview(URL.createObjectURL(file));
+    toast.info("Photo preview updated locally. Profile photo upload is not connected to account storage.");
   };
 
   return (
@@ -63,14 +77,19 @@ export function ProfileSettings() {
       >
         <div className="flex flex-wrap items-center gap-4">
           <Avatar className="size-16">
-            <AvatarImage src="" alt="" />
+            {photoPreview ? <AvatarImage src={photoPreview} alt="Profile photo preview" /> : null}
             <AvatarFallback className="text-lg">{initials}</AvatarFallback>
           </Avatar>
           <div className="flex flex-wrap gap-2">
-            <Button size="sm" variant="outline" className="gap-1.5">
+            <input ref={photoInputRef} type="file" accept="image/*" className="sr-only" onChange={onPhotoSelected} aria-label="Choose profile photo" />
+            <Button size="sm" variant="outline" className="gap-1.5" onClick={() => photoInputRef.current?.click()}>
               <Camera className="size-3.5" /> Upload
             </Button>
-            <Button size="sm" variant="ghost" className="gap-1.5 text-destructive hover:text-destructive">
+            <Button size="sm" variant="ghost" className="gap-1.5 text-destructive hover:text-destructive" onClick={() => {
+              setPhotoPreview(null);
+              if (photoInputRef.current) photoInputRef.current.value = "";
+              toast.info("Local photo preview removed.");
+            }}>
               <Trash2 className="size-3.5" /> Remove
             </Button>
           </div>
@@ -166,7 +185,14 @@ export function ProfileSettings() {
       <SettingsSection
         title="Contact"
         description="How teammates and clients can reach you."
-        action={<Button size="sm" variant="outline" className="gap-1.5"><Mail className="size-3.5" />Copy email</Button>}
+        action={<Button size="sm" variant="outline" className="gap-1.5" onClick={async () => {
+          try {
+            await navigator.clipboard.writeText(email);
+            toast.success("Email copied");
+          } catch {
+            toast.error("Could not copy email");
+          }
+        }}><Mail className="size-3.5" />Copy email</Button>}
       >
         <p className="text-sm text-muted-foreground">
           Your primary email is <span className="font-medium text-foreground">{email}</span>.

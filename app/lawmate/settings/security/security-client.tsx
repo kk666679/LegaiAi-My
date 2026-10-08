@@ -34,7 +34,6 @@ export function SecuritySettings() {
   const [current, setCurrent] = React.useState("");
   const [next, setNext] = React.useState("");
   const [confirm, setConfirm] = React.useState("");
-  const [saving, setSaving] = React.useState(false);
 
   const mismatch = next && confirm && next !== confirm;
   const weak = next.length > 0 && next.length < 12;
@@ -44,21 +43,14 @@ export function SecuritySettings() {
       toast.error("Fix password errors first");
       return;
     }
-    setSaving(true);
-    setTimeout(() => {
-      setSaving(false);
-      setCurrent("");
-      setNext("");
-      setConfirm("");
-      toast.success("Password updated");
-    }, 600);
+    toast.error("Password updates are not available: the account service has no password-change endpoint.");
   };
 
   return (
     <SettingsPage
       title="Security"
       description="Protect your account and review recent activity."
-      footer={{ onSave, saving, saveLabel: "Update password", disabled: !current || !next || !confirm }}
+      footer={{ onSave, saving: false, saveLabel: "Update password", disabled: !current || !next || !confirm }}
     >
       <SettingsSection
         title="Password"
@@ -129,7 +121,7 @@ export function SecuritySettings() {
         title="Active sessions"
         description="Devices currently signed in to your account."
         action={
-          <Button size="sm" variant="outline" className="gap-1.5" onClick={() => toast.success("Signed out of all other sessions")}>
+          <Button size="sm" variant="outline" className="gap-1.5" onClick={() => toast.error("Session revocation is not available: the account service does not expose session management.")}>
             <LogOut className="size-3.5" /> Sign out all other
           </Button>
         }
@@ -148,7 +140,7 @@ export function SecuritySettings() {
                 <p className="text-xs text-muted-foreground">{s.location} · {s.lastActive}</p>
               </div>
               {!s.current ? (
-                <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-destructive">
+                <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-destructive" onClick={() => toast.error("Session revocation is not available: the account service does not expose session management.")}>
                   Revoke
                 </Button>
               ) : null}

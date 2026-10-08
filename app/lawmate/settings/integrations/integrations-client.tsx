@@ -123,12 +123,12 @@ export function IntegrationsSettings() {
               <div className="mt-auto flex gap-2">
                 {i.connected ? (
                   <>
-                    <Button size="sm" variant="outline">Configure</Button>
+                    <Button size="sm" variant="outline" onClick={() => toast.info(`${i.name} configuration is not available yet.`)}>Configure</Button>
                     <Button
                       size="sm"
                       variant="ghost"
                       className="text-muted-foreground"
-                      onClick={() => toast.success(`Disconnected ${i.name}`)}
+                      onClick={() => toast.error(`${i.name} disconnection is not available because integration management is not connected to an account service.`)}
                     >
                       Disconnect
                     </Button>
@@ -137,7 +137,7 @@ export function IntegrationsSettings() {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => toast.success(`Connecting ${i.name}…`)}
+                    onClick={() => toast.error(`${i.name} connection is not available because OAuth setup is not configured.`)}
                   >
                     Connect
                   </Button>

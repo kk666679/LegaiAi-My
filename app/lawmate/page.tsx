@@ -870,7 +870,7 @@ export default function DashboardHomePage() {
                           className="size-8 shrink-0"
                           aria-label={`Analyse ${d.title}`}
                         >
-                          <Link href={`/lawmate/analysis?documentId=${d.id}`}>
+                          <Link href={`/lawmate/documents/${encodeURIComponent(d.id)}?tab=analysis`}>
                             <Sparkles className="size-4" />
                           </Link>
                         </Button>
@@ -1336,7 +1336,7 @@ function DocumentAnalysisCard({
         </p>
         {latest && (
           <Link
-            href={`/lawmate/analysis?documentId=${latest.id}`}
+            href={`/lawmate/documents/${encodeURIComponent(latest.id)}?tab=analysis`}
             className="flex items-center gap-3 rounded-md border bg-card/40 p-3 text-sm transition-colors hover:bg-accent/40"
           >
             <FileText className="size-4 text-muted-foreground" aria-hidden />

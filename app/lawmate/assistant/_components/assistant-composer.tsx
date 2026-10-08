@@ -5,6 +5,7 @@ import { ArrowUp, Paperclip, Square, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export interface AIAssistantComposerProps {
   value: string;
@@ -63,6 +64,7 @@ export function AIAssistantComposer({
                 variant="ghost"
                 className="size-7 text-muted-foreground"
                 aria-label="Attach file"
+                onClick={() => toast.info("File attachments are not available in this assistant yet.")}
               >
                 <Paperclip className="size-4" />
               </Button>
@@ -72,6 +74,7 @@ export function AIAssistantComposer({
                 variant="ghost"
                 className="size-7 text-muted-foreground"
                 aria-label="Improve prompt"
+                onClick={() => toast.info("Prompt improvement is not available yet.")}
               >
                 <Wand2 className="size-4" />
               </Button>

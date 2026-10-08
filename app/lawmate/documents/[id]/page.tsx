@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpcReact } from "@/clients";
 import { DashboardShell } from "@/components/lawmate/DashboardShell";
@@ -54,9 +54,24 @@ const TABS = [
 export default function DocumentDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const id = params.id as string;
-  const [activeTab, setActiveTab] = React.useState("preview");
+  const requestedTab = searchParams.get("tab");
+  const activeTab = TABS.some((tab) => tab.id === requestedTab)
+    ? requestedTab!
+    : "preview";
   const docMutations = useDocumentMutations();
+
+  const handleTabChange = (tab: string) => {
+    const nextParams = new URLSearchParams(searchParams.toString());
+    if (tab === "preview") nextParams.delete("tab");
+    else nextParams.set("tab", tab);
+    const query = nextParams.toString();
+    router.replace(
+      `/lawmate/documents/${encodeURIComponent(id)}${query ? `?${query}` : ""}`,
+      { scroll: false },
+    );
+  };
 
   const document = trpcReact.documents.getById.useQuery(id, { staleTime: 30_000 });
   const quality = trpcReact.drafting.quality.useQuery({ draftId: id }, { enabled: !!id, staleTime: 30_000 });
@@ -201,7 +216,7 @@ export default function DocumentDetailPage() {
           </Card>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid w-full grid-cols-4">
             {TABS.map(t => (
               <TabsTrigger key={t.id} value={t.id} className="gap-2">

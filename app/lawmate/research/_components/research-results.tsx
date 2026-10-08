@@ -123,7 +123,14 @@ export function ResearchResultsPage({ id }: { id: string }) {
                   size="sm"
                   variant="ghost"
                   className="gap-1.5"
-                  onClick={() => toast.success("Share link copied")}
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(window.location.href);
+                      toast.success("Share link copied");
+                    } catch {
+                      toast.error("Could not copy the share link");
+                    }
+                  }}
                 >
                   <Share2 className="size-3.5" />
                 </Button>
@@ -166,7 +173,7 @@ export function ResearchResultsPage({ id }: { id: string }) {
                       size="sm"
                       variant="ghost"
                       className="h-7 px-2 text-xs"
-                      onClick={() => toast.success("Saved authority")}
+                      onClick={() => toast.message("Save the research session to keep this authority with its results.")}
                     >
                       Save
                     </Button>
