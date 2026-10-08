@@ -1,21 +1,39 @@
 {
   "name": "@lawmate/cli",
   "version": "1.0.0",
-  "description": "LAWMATE CLI — Developer Command Line",
+  "description": "LAWMATE CLI \u2014 Developer Command Line",
   "type": "module",
   "bin": {
     "lawmate": "./bin/lawmate.js"
   },
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./*": {
+      "import": "./dist/*.js",
+      "types": "./dist/*.d.ts"
+    }
   },
-  "files": ["bin", "src", "README.md", "LICENSE"],
+  "files": [
+    "bin",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "type-check": "tsc --noEmit"
   },
-  "keywords": ["lawmate", "cli", "legal", "ai", "developer"],
+  "keywords": [
+    "lawmate",
+    "cli",
+    "legal",
+    "ai",
+    "developer"
+  ],
   "license": "MIT",
   "dependencies": {
     "@lawmate/branding": "^1.0.0"

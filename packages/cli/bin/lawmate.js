@@ -1,2 +1,10 @@
 #!/usr/bin/env node
-import('../src/main.ts').then((m) => process.exit(m.main(process.argv)));
+/**
+ * @lawmate/cli — LAWMATE CLI binary entry point.
+ *
+ * Usage: lawmate <command> [options]
+ */
+import { main } from '../dist/index.js';
+
+const exitCode = main(process.argv);
+process.exit(exitCode);
