@@ -30,12 +30,13 @@ export const kgRouter = router({
         data: input.data ?? {},
       });
       getContainer().audit.record({
-        traceId: `kg-add-${node.id}`,
+        category: 'knowledge-mutation',
+        correlationId: `kg-add-${node.id}`,
         actor: { id: 'system', type: 'system', name: 'kg' },
         action: 'kg.addNode',
         resource: node.id,
-        outcome: 'allow',
-        metadata: { type: node.type },
+        decision: 'ALLOW',
+        details: { type: node.type },
       });
       return node;
     }),
