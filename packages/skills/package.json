@@ -1,7 +1,7 @@
 {
-  "name": "@lawmate/adapter",
+  "name": "@lawmate/skills",
   "version": "1.0.0",
-  "description": "LAWMATE adapter contracts and runtime bindings",
+  "description": "LAWMATE reusable skill library",
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",

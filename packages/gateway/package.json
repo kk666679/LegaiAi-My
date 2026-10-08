@@ -1,19 +1,22 @@
 {
-  "name": "@lawmate/adapter",
+  "name": "@lawmate/gateway",
   "version": "1.0.0",
-  "description": "LAWMATE adapter contracts and runtime bindings",
+  "description": "LAWMATE AI API GATEWAY — Unified AI Infrastructure",
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./*": "./src/*.ts"
+    ".": "./src/index.ts"
   },
   "files": ["src", "README.md", "LICENSE"],
   "scripts": {
     "type-check": "tsc --noEmit"
   },
+  "keywords": ["lawmate", "gateway", "ai", "api", "infrastructure"],
   "license": "MIT",
+  "dependencies": {
+    "@lawmate/branding": "^1.0.0"
+  },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
     "access": "restricted"

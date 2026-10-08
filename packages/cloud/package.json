@@ -1,7 +1,7 @@
 {
-  "name": "@lawmate/adapter",
+  "name": "@lawmate/cloud",
   "version": "1.0.0",
-  "description": "LAWMATE adapter contracts and runtime bindings",
+  "description": "LAWMATE optional cloud relay",
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
