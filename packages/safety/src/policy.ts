@@ -1,135 +1,77 @@
-/**
- * @lawmate/safety — Policy engine.
- *
- * Every decision is explicit: ALLOW, DENY, REQUIRE_APPROVAL, REDACT, or ESCALATE.
- * Never trust agent-generated authorization decisions.
- */
-import { randomUUID } from 'node:crypto';
-import {
-  PolicyEvaluationRequest,
-  PolicyEvaluationResult,
-  PolicyRule,
-  Decision,
-  LawmateError,
-  ErrorCode,
-} from '@lawmate/types';
+export type Decision = 'ALLOW' | 'DENY' | 'REQUIRE_APPROVAL' | 'REDACT' | 'ESCALATE';
 
-export interface PolicyEngine {
-  evaluate(request: PolicyEvaluationRequest): PolicyEvaluationResult;
-  addRule(rule: PolicyRule): void;
-  removeRule(ruleId: string): void;
-  getRules(): PolicyRule[];
+export interface PolicyRule {
+  id: string;
+  name: string;
+  description?: string;
+  action: string;
+  subject: string;
+  resource: string;
+  conditions?: Record<string, unknown>;
+  decision: Decision;
+  priority: number;
+  enabled: boolean;
 }
 
-export class InMemoryPolicyEngine implements PolicyEngine {
-  private rules: PolicyRule[] = [];
+export interface EvaluationRequest {
+  actor: string;
+  subject?: string;
+  action: string;
+  resource: string;
+  context?: Record<string, unknown>;
+  capabilities?: string[];
+  dataClass?: string;
+  riskLevel?: string;
+}
 
-  evaluate(request: PolicyEvaluationRequest): PolicyEvaluationResult {
-    const matched: string[] = [];
-    let decision: Decision = 'ALLOW';
-    let requiresApproval = false;
-    const redactFields: string[] = [];
-    let escalateTo: string | undefined;
+export interface EvaluationResult {
+  decision: Decision;
+  matchedRules: string[];
+  reason?: string;
+  requiresApproval: boolean;
+}
 
-    // Sort by priority descending.
-    const sorted = [...this.rules].sort((a, b) => b.priority - a.priority);
+export class PolicyEngine {
+  private rules = new Map<string, PolicyRule>();
 
-    for (const rule of sorted) {
-      if (!rule.enabled) continue;
-      if (!this.matches(rule, request)) continue;
+  add(rule: PolicyRule): void { this.rules.set(rule.id, rule); }
+  remove(id: string): boolean { return this.rules.delete(id); }
 
-      matched.push(rule.id);
-
-      switch (rule.decision) {
-        case 'DENY':
-          decision = 'DENY';
-          break;
-        case 'REQUIRE_APPROVAL':
-          if (decision !== 'DENY') decision = 'REQUIRE_APPROVAL';
-          requiresApproval = true;
-          break;
-        case 'REDACT':
-          if (decision !== 'DENY') decision = 'REDACT';
-          if (rule.conditions?.redactFields) {
-            redactFields.push(...(rule.conditions.redactFields as string[]));
-          }
-          break;
-        case 'ESCALATE':
-          if (decision !== 'DENY') decision = 'ESCALATE';
-          escalateTo = rule.conditions?.escalateTo as string | undefined;
-          break;
-        case 'ALLOW':
-          if (decision === 'ALLOW') continue;
-          break;
-      }
-
-      if (decision === 'DENY') break;
-    }
-
-    return {
-      decision,
-      matchedRules: matched,
-      requiresApproval,
-      redactFields,
-      escalateTo,
-      reason: matched.length === 0 ? 'No matching policy; default ALLOW' : `Matched ${matched.length} rule(s)`,
-    };
-  }
-
-  addRule(rule: PolicyRule): void {
-    const existing = this.rules.findIndex((r) => r.id === rule.id);
-    if (existing >= 0) this.rules[existing] = rule;
-    else this.rules.push(rule);
-  }
-
-  removeRule(ruleId: string): void {
-    this.rules = this.rules.filter((r) => r.id !== ruleId);
-  }
-
-  getRules(): PolicyRule[] {
-    return [...this.rules];
-  }
-
-  private matches(rule: PolicyRule, request: PolicyEvaluationRequest): boolean {
-    if (rule.action !== '*' && rule.action !== request.action) return false;
-    if (rule.subject !== '*' && rule.subject !== request.subject) return false;
-    if (rule.resource !== '*' && rule.resource !== request.resource) return false;
-
-    const conditions = rule.conditions || {};
-    for (const [key, value] of Object.entries(conditions)) {
-      if (key === 'redactFields' || key === 'escalateTo') continue;
-      const requestValue = (request.context as Record<string, unknown>)[key];
-      if (requestValue !== value) return false;
+  private matches(rule: PolicyRule, req: EvaluationRequest): boolean {
+    if (!rule.enabled) return false;
+    if (rule.action !== '*' && rule.action !== req.action) return false;
+    const subject = req.subject ?? req.actor;
+    if (rule.subject !== '*' && rule.subject !== subject) return false;
+    if (rule.resource !== '*' && rule.resource !== req.resource) return false;
+    for (const [k, v] of Object.entries(rule.conditions ?? {})) {
+      if ((req.context ?? {})[k] !== v) return false;
     }
     return true;
   }
-}
 
-export function createPolicyEngine(): PolicyEngine {
-  return new InMemoryPolicyEngine();
-}
+  evaluate(req: EvaluationRequest): EvaluationResult {
+    const active = Array.from(this.rules.values())
+      .filter((r) => this.matches(r, req))
+      .sort((a, b) => b.priority - a.priority);
 
-/** Throw a policy-denied error. */
-export function policyDeniedError(message: string, requestId?: string): LawmateError {
-  return {
-    code: 'POLICY_DENIED',
-    message,
-    timestamp: new Date().toISOString(),
-    requestId,
-  };
-}
+    if (active.length === 0) {
+      return {
+        decision: 'ALLOW',
+        matchedRules: [],
+        requiresApproval: false,
+        reason: 'no matching rules (default allow)',
+      };
+    }
 
-export function assertAllowed(result: PolicyEvaluationResult, requestId?: string): void {
-  if (result.decision === 'DENY') {
-    throw policyDeniedError(result.reason || 'Policy denied', requestId);
+    const top = active[0]!;
+    return {
+      decision: top.decision,
+      matchedRules: active.map((r) => r.id),
+      reason: `matched rule: ${top.name}`,
+      requiresApproval: top.decision === 'REQUIRE_APPROVAL',
+    };
   }
-}
 
-export function assertApproval(result: PolicyEvaluationResult, requestId?: string): void {
-  if (result.decision === 'DENY') {
-    throw policyDeniedError(result.reason || 'Policy denied', requestId);
-  }
-  if (result.requiresApproval || result.decision === 'REQUIRE_APPROVAL') {
-    throw Object.assign(new Error('REQUIRE_APPROVAL'), { code: 'REQUIRE_APPROVAL' as ErrorCode, requestId });
-  }
+  list(): PolicyRule[] { return Array.from(this.rules.values()); }
+  clear(): void { this.rules.clear(); }
 }

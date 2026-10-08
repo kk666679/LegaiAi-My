@@ -1,8 +1,9 @@
 /**
- * @lawmate/safety — Public API.
+ * @lawmate/safety — Safety, policy, authorization, rate limiting.
  */
-export * from './policy';
-export * from './authorization';
-export * from './audit';
-export * from './validation';
-export * from './rate-limit';
+
+export * from './audit.js';
+export * from './authorization.js';
+export * from './policy.js';
+export * from './rate-limit.js';
+export * from './validation.js';
