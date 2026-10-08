@@ -119,7 +119,7 @@ const worker = new Worker('legal-orchestrator', async (job) => {
 
     throw new Error(`Unknown orchestrator action: ${action}`)
   } catch (err) {
-    const error = err as Error
+    const error = err
     const { retryable, code } = classifyError(error)
     log.error({ traceId, err: error.message, retryable, code }, 'Orchestrator job failed')
 

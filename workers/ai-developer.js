@@ -61,7 +61,7 @@ const worker = new Worker('ai-developer', async (job) => {
     log.info({ traceId, jobId }, 'AI Developer job completed')
     return output
   } catch (err) {
-    const error = err as Error
+    const error = err
     const { retryable, code } = classifyError(error)
     log.error({ traceId, err: error.message, retryable, code }, 'AI Developer job failed')
 

@@ -99,7 +99,7 @@ const worker = new BullWorker('legal-audit', async (job) => {
 
     throw new Error(`Unknown audit action: ${action}`)
   } catch (err) {
-    const error = err as Error
+    const error = err
     const { retryable, code } = classifyError(error)
     log.error({ traceId, err: error.message, retryable, code }, 'Audit job failed')
 

@@ -158,7 +158,7 @@ const worker = new Worker('legal-indexing', async (job) => {
 
         results.indexed++
       } catch (err) {
-        const error = err as Error
+        const error = err
         log.error({ traceId, err: error.message }, 'Chunk indexing error')
         results.errors.push({ docId: doc.id, error: error.message })
       }
@@ -177,7 +177,7 @@ const worker = new Worker('legal-indexing', async (job) => {
     log.info({ traceId, ...results }, 'Indexing complete')
     return output
   } catch (err) {
-    const error = err as Error
+    const error = err
     const { retryable, code } = classifyError(error)
     log.error({ traceId, err: error.message, retryable, code }, 'Indexing job failed')
 

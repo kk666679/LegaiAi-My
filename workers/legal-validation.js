@@ -166,7 +166,7 @@ const worker = new Worker('legal-validation', async (job) => {
     log.info({ traceId, count: results.length }, 'Validation complete')
     return output
   } catch (err) {
-    const error = err as Error
+    const error = err
     const { retryable, code } = classifyError(error)
     log.error({ traceId, err: error.message, retryable, code }, 'Validation job failed')
 

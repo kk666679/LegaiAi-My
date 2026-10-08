@@ -148,7 +148,7 @@ const worker = new Worker('legal-retrieval', async (job) => {
     log.info({ traceId, count: attributed.length }, 'Retrieval complete')
     return output
   } catch (err) {
-    const error = err as Error
+    const error = err
     const { retryable, code } = classifyError(error)
     log.error({ traceId, err: error.message, retryable, code }, 'Retrieval job failed')
 

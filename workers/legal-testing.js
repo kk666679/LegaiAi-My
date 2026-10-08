@@ -163,7 +163,7 @@ const worker = new Worker('legal-testing', async (job) => {
 
     throw new Error(`Unknown testing action: ${action}`)
   } catch (err) {
-    const error = err as Error
+    const error = err
     const { retryable, code } = classifyError(error)
     log.error({ traceId, err: error.message, retryable, code }, 'Testing job failed')
 

@@ -160,7 +160,7 @@ const worker = new Worker('legal-analysis', async (job) => {
     log.info({ traceId, confidence, rightsEngaged }, 'Analysis complete')
     return output
   } catch (err) {
-    const error = err as Error
+    const error = err
     const { retryable, code } = classifyError(error)
     log.error({ traceId, err: error.message, retryable, code }, 'Analysis job failed')
 

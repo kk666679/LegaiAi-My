@@ -132,7 +132,7 @@ const worker = new Worker('legal-monitoring', async (job) => {
 
     throw new Error(`Unknown monitoring action: ${action}`)
   } catch (err) {
-    const error = err as Error
+    const error = err
     const { retryable, code } = classifyError(error)
     log.error({ traceId, err: error.message, retryable, code }, 'Monitoring job failed')
 

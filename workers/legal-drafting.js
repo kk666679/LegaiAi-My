@@ -214,7 +214,7 @@ const worker = new Worker('legal-drafting', async (job) => {
     log.info({ traceId, draftId: draft.id }, 'Draft complete')
     return output
   } catch (err) {
-    const error = err as Error
+    const error = err
     const { retryable, code } = classifyError(error)
     log.error({ traceId, err: error.message, retryable, code }, 'Drafting job failed')
 

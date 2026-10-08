@@ -190,7 +190,7 @@ const worker = new Worker('legal-sandbox', async (job) => {
 
       return output
     } catch (err) {
-      const error = err as Error
+      const error = err
       const { retryable, code } = classifyError(error)
       log.error({ traceId: data.traceId, err: error.message, retryable, code }, 'sandbox job failed')
 

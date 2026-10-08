@@ -126,7 +126,7 @@ const worker = new Worker('legal-privacy', async (job) => {
 
     throw new Error(`Unknown privacy action: ${action}`)
   } catch (err) {
-    const error = err as Error
+    const error = err
     const { retryable, code } = classifyError(error)
     log.error({ traceId, err: error.message, retryable, code }, 'Privacy job failed')
 

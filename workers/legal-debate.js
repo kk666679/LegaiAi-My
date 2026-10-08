@@ -124,7 +124,7 @@ const worker = new Worker('legal-debate', async (job) => {
     log.info({ traceId, winner, scores }, 'Debate complete')
     return output
   } catch (err) {
-    const error = err as Error
+    const error = err
     const { retryable, code } = classifyError(error)
     log.error({ traceId, err: error.message, retryable, code }, 'Debate job failed')
 
