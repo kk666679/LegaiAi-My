@@ -1050,3 +1050,70 @@ model PlanPrice {
   @@map("plan_prices")
 }
 
+// ── Automations (workflows) ────────────────────────────────────────
+
+model Automation {
+  id          String   @id @default(cuid())
+  orgId       String?
+  userId      String?
+  name        String
+  description String?
+  category    String?
+  status      String   @default("draft") // draft | active | paused | archived
+  definition  Json?    // { nodes: WorkflowNode[], edges: Edge[] }
+  templateId  String?
+  tags        Json?    // string[]
+  lastRunAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  runs     AutomationRun[]
+  versions AutomationVersion[]
+
+  @@index([orgId])
+  @@index([userId])
+  @@index([status])
+  @@map("automations")
+}
+
+model AutomationRun {
+  id           String      @id @default(cuid())
+  automationId String
+  automation   Automation  @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  orgId        String?
+  userId       String?
+  jobId        String? // linked Job row when dispatched to a queue
+  status       String      @default("queued") // queued | running | success | failed | cancelled
+  trigger      String      @default("manual") // manual | scheduled | webhook | api
+  input        Json?
+  output       Json?
+  errorMessage String?
+  startedAt    DateTime?
+  finishedAt   DateTime?
+  durationMs   Int?
+  nodeResults  Json? // [{ nodeId, status, message }]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([automationId])
+  @@index([orgId])
+  @@index([status])
+  @@index([jobId])
+  @@map("automation_runs")
+}
+
+model AutomationVersion {
+  id            String     @id @default(cuid())
+  automationId  String
+  automation    Automation @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  versionNumber Int
+  definition    Json?
+  summary       String?
+  authorName    String?
+  createdAt     DateTime   @default(now())
+
+  @@unique([automationId, versionNumber])
+  @@index([automationId])
+  @@map("automation_versions")
+}
+
