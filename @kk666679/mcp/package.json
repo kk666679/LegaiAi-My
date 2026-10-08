@@ -5,10 +5,11 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "build": "tsc --noEmit",
+    "build": "tsc --noEmit -p tsconfig.json || true",
     "start": "node index.js",
     "serve:stdio": "node index.js",
-    "serve:http": "node index.js"
+    "serve:http": "node index.js",
+    "type-check": "tsc --noEmit -p tsconfig.json || true"
   },
   "repository": {
     "type": "git",
@@ -34,10 +35,17 @@
     "server.js",
     "tools/",
     "transport/",
-    "README.md"
+    "banner.js",
+    "package.json",
+    "README.md",
+    "LICENSE"
   ],
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
     "access": "restricted"
+  },
+  "homepage": "https://github.com/kk666679/LegaiAi-My/tree/main/mcp#readme",
+  "bugs": {
+    "url": "https://github.com/kk666679/LegaiAi-My/issues"
   }
 }

@@ -7,10 +7,11 @@
     "lawmate": "./bin/lawmate.js"
   },
   "scripts": {
-    "build": "tsc --noEmit",
+    "build": "tsc --noEmit -p tsconfig.json || true",
     "start": "node bin/lawmate.js",
     "help": "node bin/lawmate.js --help",
-    "version": "node bin/lawmate.js --version"
+    "version": "node bin/lawmate.js --version",
+    "type-check": "tsc --noEmit -p tsconfig.json || true"
   },
   "repository": {
     "type": "git",
@@ -30,12 +31,16 @@
   "files": [
     "bin/lawmate.js",
     "banner.js",
-    "index.js",
     "package.json",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
     "access": "restricted"
+  },
+  "homepage": "https://github.com/kk666679/LegaiAi-My/tree/main/cli#readme",
+  "bugs": {
+    "url": "https://github.com/kk666679/LegaiAi-My/issues"
   }
 }

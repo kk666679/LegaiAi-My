@@ -1,0 +1,19 @@
+{
+  "name": "tag-protection",
+  "target": "tag",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "include": ["refs/tags/v*", "refs/tags/ch*"],
+      "exclude": []
+    }
+  },
+  "rules": [
+    { "type": "deletion" },
+    { "type": "update" },
+    { "type": "non_fast_forward" },
+    { "type": "creation" },
+    { "type": "required_linear_history" }
+  ],
+  "bypass_actors": []
+}

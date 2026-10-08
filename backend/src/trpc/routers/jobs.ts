@@ -147,12 +147,12 @@ export const jobsRouter = router({
       const updated = await jobService.markCancelled(job.id)
 
       const queueName = JOB_TYPE_TO_QUEUE[job.jobType as JobType]
-      if (queueName && queues[queueName]) {
+      if (queueName && queues[queueName as keyof typeof queues as keyof typeof queues]) {
         try {
-          const bullJob = await queues[queueName].getJob(job.id)
+          const bullJob = await queues[queueName as keyof typeof queues as keyof typeof queues].getJob(job.id)
           if (bullJob) await bullJob.remove()
         } catch (err) {
-          log.warn({ err: (err as Error).message, jobId: job.id }, 'Failed to remove BullMQ job')
+          console.warn({ err: (err as Error).message, jobId: job.id }, 'Failed to remove BullMQ job')
         }
       }
 
@@ -185,7 +185,7 @@ export const jobsRouter = router({
       const updated = await jobService.retry(job.id)
 
       const queueName = JOB_TYPE_TO_QUEUE[job.jobType as JobType]
-      if (queueName && queues[queueName]) {
+      if (queueName && queues[queueName as keyof typeof queues as keyof typeof queues]) {
         const queueEntry = Object.entries(JOB_TYPE_TO_QUEUE).find(([_, q]) => q === queueName)
         const jobTypeName = Object.keys(JOB_TYPE_TO_QUEUE).find(k => JOB_TYPE_TO_QUEUE[k as JobType] === queueName)
       }

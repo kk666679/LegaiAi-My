@@ -1,3 +1,4 @@
+import { kgRouter } from "./kg.js";
 import { router } from '../trpc';
 import { vectorsRouter } from './vectors';
 import { embeddingsRouter } from './embeddings';

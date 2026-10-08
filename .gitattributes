@@ -1,19 +1,31 @@
+# Normalize all text files to LF in the repo
 * text=auto eol=lf
-*.sh text eol=lf
-*.yml text eol=lf
-*.yaml text eol=lf
-*.json text eol=lf
-*.ts text eol=lf
-*.tsx text eol=lf
-*.js text eol=lf
-*.mjs text eol=lf
-*.md text eol=lf
-Dockerfile* text eol=lf
-Makefile text eol=lf
-*.png binary
-*.jpg binary
-*.gif binary
-*.ico binary
-*.woff binary
+
+# Explicit source file types
+*.ts    text eol=lf
+*.tsx   text eol=lf
+*.js    text eol=lf
+*.mjs   text eol=lf
+*.cjs   text eol=lf
+*.json  text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.md    text eol=lf
+*.sh    text eol=lf
+
+# Windows-only files that should keep CRLF
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+
+# Binary files — never touch
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.pdf   binary
+*.woff  binary
 *.woff2 binary
-*.ttf binary
+
+# Lockfiles are often generated on Windows — don't touch to avoid churn
+package-lock.json  -text

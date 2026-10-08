@@ -41,12 +41,13 @@ jobs:
         with:
           node-version: '24'
           cache: npm
-          cache-dependency-path: backend/package-lock.json
       - name: Validate backend Docker image builds
         run: docker build -f Dockerfile.backend -t lawmate-backend .
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps --no-audit --no-fund
       - name: Prisma generate (schema wiring)
         working-directory: backend
-        run: npm ci && npx prisma generate
+        run: npx prisma generate
       - name: Backend test
         working-directory: backend
         run: npm test --if-present

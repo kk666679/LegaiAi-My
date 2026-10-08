@@ -1,0 +1,33 @@
+{
+  "name": "@lawmate/safety",
+  "version": "1.0.0",
+  "description": "Central safety, security, policy, and governance layer for LAWMATE",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint src --ext .ts",
+    "test": "node --test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lawmate/types": "^1.0.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "eslint": "^9.0.0"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "license": "MIT"
+}

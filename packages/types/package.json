@@ -1,0 +1,32 @@
+{
+  "name": "@lawmate/types",
+  "version": "1.0.0",
+  "description": "Shared type definitions and contracts for LAWMATE platform",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint src --ext .ts",
+    "test": "node --test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "eslint": "^9.0.0"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "license": "MIT"
+}

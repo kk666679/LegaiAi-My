@@ -400,7 +400,7 @@ export const agentsRouter: AnyRouter = router({
       // Also try to remove from BullMQ
       try {
         const queueName = JOB_TYPE_TO_QUEUE_ARRAY[job.jobType]
-        const queue = queueName && queues[queueName]
+        const queue = queueName && queues[queueName as keyof typeof queues]
         if (queue) {
           const bullJob = await queue.getJob(job.id)
           if (bullJob) await bullJob.remove()
@@ -429,7 +429,7 @@ export const agentsRouter: AnyRouter = router({
       // Re-dispatch to queue
       try {
         const queueName = JOB_TYPE_TO_QUEUE_ARRAY[job.jobType]
-        const queue = queueName && queues[queueName]
+        const queue = queueName && queues[queueName as keyof typeof queues]
         if (queue) {
           await queue.add('retry', { ...(job.input as any), traceId: job.traceId, jobId: job.id }, { jobId: job.id })
         }
@@ -494,6 +494,49 @@ export const agentsRouter: AnyRouter = router({
         timestamp: new Date().toISOString(),
       }
     }),
+
+  // ── Aggregated agent metrics from real tables ────────────────────────────
+  agentMetrics: protectedProcedure
+    .input(z.object({ sinceHours: z.number().min(1).max(720).default(24) }).optional())
+    .query(async ({ ctx, input }) => {
+      const since = new Date(Date.now() - (input?.sinceHours ?? 24) * 3600_000)
+      const orgId = ctx.orgId ?? undefined
+
+      const [governance, actions, audits] = await Promise.all([
+        prisma.aIGovernanceLog.groupBy({
+          by: ['aiModel'],
+          where: { orgId, createdAt: { gte: since } },
+          _sum: { costUsd: true, promptTokens: true, completionTokens: true },
+          _avg: { latencyMs: true },
+          _count: { _all: true },
+        }),
+        prisma.agentAction.groupBy({
+          by: ['agentName', 'status'],
+          where: { orgId, createdAt: { gte: since } },
+          _count: { _all: true },
+        }),
+        prisma.auditLog.groupBy({
+          by: ['agentName'],
+          where: { orgId, createdAt: { gte: since } },
+          _count: { _all: true },
+          _avg: { durationMs: true },
+        }),
+      ])
+
+      return {
+        since: since.toISOString(),
+        governance,
+        actions,
+        audits,
+      }
+    }),
+
+  hitlPending: permissionProcedure('view_audit_log').query(async ({ ctx }) =>
+    prisma.agentAction.count({
+      where: { orgId: ctx.orgId ?? undefined, status: 'pending' },
+    }),
+  ),
+
 })
 
 const JOB_TYPE_TO_QUEUE_ARRAY: Record<JobType, string> = {

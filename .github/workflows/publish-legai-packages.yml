@@ -1,0 +1,136 @@
+name: Publish LAWMATE Packages
+
+# Trigger on a version tag, or manually via the Actions UI.
+# Do not publish on every commit.
+on:
+  push:
+    tags:
+      - "v*"
+      - "cli-v*"
+      - "gateway-v*"
+      - "mcp-v*"
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type 'publish' to confirm"
+        required: true
+        default: ""
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    name: Publish to GitHub Packages
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    # Refuse accidental manual runs.
+    if: >
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.confirm == 'publish')
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          registry-url: https://npm.pkg.github.com
+          scope: "@lawmate"
+          cache: npm
+
+      - name: Configure npm for GitHub Packages
+        run: |
+          cat > .npmrc <<'NPMRC'
+          @lawmate:registry=https://npm.pkg.github.com
+          //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+          always-auth=true
+          NPMRC
+          echo "registry=https://registry.npmjs.org/" >> .npmrc
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci --no-audit --no-fund
+          elif [ -f cli/package-lock.json ]; then
+            (cd cli && npm ci --no-audit --no-fund)
+            ([ -f gateway/package-lock.json ] && cd gateway && npm ci --no-audit --no-fund) || true
+            ([ -f mcp/package-lock.json ] && cd mcp && npm ci --no-audit --no-fund) || true
+          else
+            for pkg in cli gateway mcp; do
+              if [ -f "$pkg/package.json" ]; then
+                echo "→ npm install (in $pkg/)"
+                (cd "$pkg" && npm install --no-audit --no-fund)
+              fi
+            done
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Type-check (if present)
+        run: |
+          for pkg in cli gateway mcp; do
+            if node -e "process.exit(require('./$pkg/package.json').scripts?.['type-check'] ? 0 : 1)" 2>/dev/null; then
+              echo "→ type-check ($pkg)"
+              (cd "$pkg" && npm run type-check)
+            fi
+          done
+
+      - name: Lint (if present)
+        run: |
+          for pkg in cli gateway mcp; do
+            if node -e "process.exit(require('./$pkg/package.json').scripts?.lint ? 0 : 1)" 2>/dev/null; then
+              echo "→ lint ($pkg)"
+              (cd "$pkg" && npm run lint)
+            fi
+          done
+
+      - name: Test (if present)
+        run: |
+          for pkg in cli gateway mcp; do
+            if node -e "process.exit(require('./$pkg/package.json').scripts?.test ? 0 : 1)" 2>/dev/null; then
+              echo "→ test ($pkg)"
+              (cd "$pkg" && npm test)
+            fi
+          done
+
+      - name: Verify @lawmate scope is authenticated
+        run: |
+          echo "→ whoami"
+          npm whoami --registry https://npm.pkg.github.com || {
+            echo "❌ npm whoami failed. GITHUB_TOKEN likely lacks packages:write."
+            exit 1
+          }
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build, validate, pack, scan
+        run: bash scripts/pack-all.sh
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish
+        run: bash scripts/publish-all.sh
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## LAWMATE Packages" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          for pkg in cli gateway mcp; do
+            if [ -f "$pkg/package.json" ]; then
+              NAME=$(node -p "require('./$pkg/package.json').name")
+              VERSION=$(node -p "require('./$pkg/package.json').version")
+              echo "- \`$NAME@$VERSION\`" >> $GITHUB_STEP_SUMMARY
+            fi
+          done

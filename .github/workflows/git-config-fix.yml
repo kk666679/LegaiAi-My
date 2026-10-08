@@ -6,42 +6,55 @@ on:
       - main
       - develop
   schedule:
-    - cron: '0 0 * * 0' # Weekly
+    - cron: '0 0 * * 0' # Weekly on Sunday at 00:00 UTC
   workflow_dispatch:
+
+# Cancel redundant runs on rapid pushes to the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Least-privilege token: only needs to read the repo contents
+permissions:
+  contents: read
 
 jobs:
   fix-git-config:
+    name: Validate & fix Git configuration
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: '22' # Current LTS (stable). Use '24' if you specifically need it.
 
       - name: Validate & fix git configuration
         run: |
           set -euo pipefail
-          # Initialize global gitconfig if missing (fresh runners have no .gitconfig)
+
+          # Initialize global gitconfig if missing (fresh runners may not have one)
           if [ ! -f ~/.gitconfig ]; then
             touch ~/.gitconfig
           fi
+
           echo "=== Git configuration before fixes ==="
-          git config --global --list
+          git config --global --list || true
 
           FIXES=0
 
           ensure_config() {
-            local key="$1" expected="$2"
+            local key="$1"
+            local expected="$2"
             local current
             current=$(git config --global "$key" 2>/dev/null || echo "")
             if [ "$current" != "$expected" ]; then
-              echo "Fixing $key: '$current' → '$expected'"
+              echo "Fixing $key: '$current' -> '$expected'"
               git config --global "$key" "$expected"
               FIXES=$((FIXES + 1))
             else
@@ -54,20 +67,37 @@ jobs:
           ensure_config core.ignorecase false
           ensure_config pull.rebase true
           ensure_config push.default simple
+          ensure_config init.defaultBranch main
 
           echo "=== Git configuration after fixes ==="
           git config --global --list
           echo "Total fixes applied: $FIXES"
 
-      - name: Verify .gitattributes line endings
+      - name: Verify .gitattributes exists
         run: |
           set -euo pipefail
+          if [ ! -f .gitattributes ]; then
+            echo "ERROR: .gitattributes is missing from the repository root."
+            echo "Create one with rules like:"
+            echo "  * text=auto eol=lf"
+            exit 1
+          fi
           echo "=== .gitattributes content ==="
           cat .gitattributes
-          echo "=== Checking for CRLF in tracked files ==="
-          if git grep -Il $'\r' -- '*.ts' '*.tsx' '*.js' '*.mjs' '*.json' '*.yml' '*.yaml' '*.md' '*.sh' 'Dockerfile*' 2>/dev/null; then
-            echo "WARNING: CRLF line endings detected in tracked files"
+
+      - name: Check for CRLF line endings in tracked files
+        run: |
+          set -euo pipefail
+          echo "=== Scanning tracked source files for CRLF ==="
+          # git grep -I skips binary files, -l lists filenames, $'\r' matches a carriage return
+          if git grep -Il $'\r' -- \
+              '*.ts' '*.tsx' '*.js' '*.mjs' '*.cjs' \
+              '*.json' '*.yml' '*.yaml' '*.md' '*.sh' \
+              'Dockerfile*' 2>/dev/null; then
+            echo ""
+            echo "ERROR: CRLF line endings detected in the files listed above."
+            echo "Fix by running: git add --renormalize ."
             exit 1
           else
-            echo "No CRLF line endings detected"
+            echo "No CRLF line endings detected."
           fi

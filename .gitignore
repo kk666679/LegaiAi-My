@@ -82,3 +82,7 @@ fly.toml
 .autoclaw/orchestrator/comms/loop-state.json
 .autoclaw/orchestrator/comms/_gc/last-run.json
 
+
+# npm pack output
+*.tgz
+**/*.tgz

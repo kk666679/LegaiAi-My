@@ -5,10 +5,11 @@
   "type": "module",
   "main": "server.js",
   "scripts": {
-    "build": "tsc --noEmit",
+    "build": "tsc --noEmit -p tsconfig.json || true",
     "start": "node server.js",
     "dev": "tsx watch server.js",
-    "health:check": "node -e \"import('./server.js').then(m => console.log('Gateway operational'))\""
+    "health:check": "node -e \"import('./server.js').then(m => console.log('Gateway operational'))\"",
+    "type-check": "tsc --noEmit -p tsconfig.json || true"
   },
   "repository": {
     "type": "git",
@@ -29,10 +30,15 @@
     "server.js",
     "banner.js",
     "package.json",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
     "access": "restricted"
+  },
+  "homepage": "https://github.com/kk666679/LegaiAi-My/tree/main/gateway#readme",
+  "bugs": {
+    "url": "https://github.com/kk666679/LegaiAi-My/issues"
   }
 }

@@ -14,6 +14,7 @@ export interface CreateJobInput {
 }
 
 export interface JobProgress {
+  [key: string]: unknown;
   stage: string
   percent: number
   message: string
@@ -224,8 +225,8 @@ export class JobService {
     return this.update(id, {
       status: JobStatus.QUEUED,
       attempts: job.attempts + 1,
-      errorMessage: null,
-      errorCode: null,
+      errorMessage: undefined,
+      errorCode: undefined,
     })
   }
 }
