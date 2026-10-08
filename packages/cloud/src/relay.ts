@@ -17,7 +17,7 @@ export class CloudRelay {
         headers: { 'content-type': 'application/json', 'x-lawmate-signature': signature },
         body: body || undefined,
         signal: controller.signal,
-      });
+      }) as Response;
       const parsed = (await res.json().catch(() => undefined)) as T | undefined;
       return { ok: res.ok, status: res.status, body: parsed };
     } catch (e) { return { ok: false, status: 0, error: (e as Error).message }; }
