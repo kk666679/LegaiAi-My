@@ -1,31 +1,18 @@
-# Dependencies
 node_modules
 **/node_modules
-
-# Build output
 .next
-out
-build
+.turbo
 dist
-**/dist
-*.tsbuildinfo
-next-env.d.ts
-
-# Local env
+build
+out
+.git
+.github
 .env
 .env.*
 !.env.example
-
-# Agent / internal state (must never ship)
-.autoclaw
-.openclaw
-.clinerules
-.kilo
-.kilocode
-
-# Misc
-.git
-.github
-*.md
+*.log
+*.tgz
+**/*.tgz
 coverage
 .DS_Store
+*.tsbuildinfo

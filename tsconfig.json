@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2023",
-    "lib": ["DOM", "DOM.Iterable", "ES2023"],
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ES2023"
+    ],
     "jsx": "react-jsx",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -44,37 +48,96 @@
     "incremental": true,
     "tsBuildInfoFile": ".tsbuildinfo",
     "paths": {
-      "@/*": ["./*"],
-      "@/backend/*": ["./backend/*"],
-      "@/components/*": ["./components/*"],
-      "@/components/ui/*": ["./components/ui/*"],
-      "@/components/ai/*": ["./components/ai/*"],
-      "@/components/ai-elements/*": ["./components/ai-elements/*"],
-      "@/lib/*": ["./lib/*"],
-      "@/lib/utils/*": ["./lib/utils/*"],
-      "@/hooks/*": ["./hooks/*"],
-      "@/hooks/use*": ["./hooks/use*.ts"],
-      "@/types/*": ["./types/*"],
-      "@/utils/*": ["./utils/*"],
-      "@/config/*": ["./config/*"],
-      "@/constants/*": ["./constants/*"],
-      "@/services/*": ["./services/*"],
-  "@/workers/*": ["./workers/*"],
-      "@/queues/*": ["./src/queues/*"],
-      "@/prisma/*": ["./prisma/*"],
-      "@/validators/*": ["./validators/*"],
-      "@/public/*": ["./public/*"],
-      "@ui": ["./components/ui/index.ts"],
-      "@ai": ["./components/ai/index.ts"],
-      "@ai-elements": ["./components/ai-elements/index.ts"],
-      "~/*": ["./*"],
-      "~backend/*": ["./backend/*"],
-      "~components/*": ["./components/*"]
+      "@/*": [
+        "./*"
+      ],
+      "@/backend/*": [
+        "./backend/*"
+      ],
+      "@/components/*": [
+        "./components/*"
+      ],
+      "@/components/ui/*": [
+        "./components/ui/*"
+      ],
+      "@/components/ai/*": [
+        "./components/ai/*"
+      ],
+      "@/components/ai-elements/*": [
+        "./components/ai-elements/*"
+      ],
+      "@/lib/*": [
+        "./lib/*"
+      ],
+      "@/lib/utils/*": [
+        "./lib/utils/*"
+      ],
+      "@/hooks/*": [
+        "./hooks/*"
+      ],
+      "@/hooks/use*": [
+        "./hooks/use*.ts"
+      ],
+      "@/types/*": [
+        "./types/*"
+      ],
+      "@/utils/*": [
+        "./utils/*"
+      ],
+      "@/config/*": [
+        "./config/*"
+      ],
+      "@/constants/*": [
+        "./constants/*"
+      ],
+      "@/services/*": [
+        "./services/*"
+      ],
+      "@/workers/*": [
+        "./workers/*"
+      ],
+      "@/queues/*": [
+        "./src/queues/*"
+      ],
+      "@/prisma/*": [
+        "./prisma/*"
+      ],
+      "@/validators/*": [
+        "./validators/*"
+      ],
+      "@/public/*": [
+        "./public/*"
+      ],
+      "@ui": [
+        "./components/ui/index.ts"
+      ],
+      "@ai": [
+        "./components/ai/index.ts"
+      ],
+      "@ai-elements": [
+        "./components/ai-elements/index.ts"
+      ],
+      "~/*": [
+        "./*"
+      ],
+      "~backend/*": [
+        "./backend/*"
+      ],
+      "~components/*": [
+        "./components/*"
+      ]
     },
-    "typeRoots": ["./node_modules/@types", "./types"],
+    "typeRoots": [
+      "./node_modules/@types",
+      "./types"
+    ],
     "plugins": [
-      { "name": "next" },
-      { "name": "@typescript-eslint/eslint-plugin" }
+      {
+        "name": "next"
+      },
+      {
+        "name": "@typescript-eslint/eslint-plugin"
+      }
     ]
   },
   "include": [
@@ -127,13 +190,18 @@
     ".env*",
     ".env.local",
     "!.env.example",
-    "backend/schemas"
+    "backend/schemas",
+    "packages/**"
   ],
   "watchOptions": {
     "watchFile": "useFsEvents",
     "watchDirectory": "useFsEvents",
     "fallbackPolling": "dynamicPriority",
     "synchronousWatchDirectory": true,
-    "excludeDirectories": ["**/node_modules", "**/.next", "**/.openclaw"]
+    "excludeDirectories": [
+      "**/node_modules",
+      "**/.next",
+      "**/.openclaw"
+    ]
   }
 }
