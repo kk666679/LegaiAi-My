@@ -12,10 +12,23 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { DocumentActionMenu } from "@/components/documents/actions/document-action-menu";
+import { useDocumentMutations } from "@/hooks/useDocuments";
+import { toast } from "sonner";
 import Link from "next/link";
 import { formatDate } from "@/lib/lawmate/utils";
 import { cn } from "@/lib/utils";
-import { FileText, FileText as FileTextIcon, History, Search, Sparkles, FileSignature } from "lucide-react";
+import {
+  FileText,
+  FileText as FileTextIcon,
+  History,
+  Search,
+  Sparkles,
+  FileSignature,
+  Edit3,
+  Star,
+  Users,
+} from "lucide-react";
 
 const DOC_STATUS = ["draft", "review", "approved", "archived"] as const;
 const STATUS_LABELS: Record<string, string> = {
@@ -43,6 +56,7 @@ export default function DocumentDetailPage() {
   const router = useRouter();
   const id = params.id as string;
   const [activeTab, setActiveTab] = React.useState("preview");
+  const docMutations = useDocumentMutations();
 
   const document = trpcReact.documents.getById.useQuery(id, { staleTime: 30_000 });
   const quality = trpcReact.drafting.quality.useQuery({ draftId: id }, { enabled: !!id, staleTime: 30_000 });
@@ -88,6 +102,39 @@ export default function DocumentDetailPage() {
 
   const doc = document.data;
 
+  const handleRename = (doc: { id: string; title?: string; name?: string }) => {
+    const newName = doc.title ?? doc.name ?? "";
+    if (!newName) return;
+    void (async () => {
+      try {
+        await docMutations.update(doc.id, { title: newName });
+        toast.success("Document renamed");
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Failed to rename document");
+      }
+    })();
+  };
+
+  const handleDelete = async () => {
+    try {
+      await docMutations.remove(id);
+      toast.success("Document deleted");
+      router.push("/lawmate/documents");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to delete document");
+    }
+  };
+
+  const handleArchive = async () => {
+    try {
+      await docMutations.archive(id);
+      toast.success("Document archived");
+      void document.refetch();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to archive document");
+    }
+  };
+
   return (
     <DashboardShell>
       <div className="space-y-6">
@@ -104,6 +151,17 @@ export default function DocumentDetailPage() {
           actions={
             <>
               <Button asChild variant="outline" size="sm"><Link href={`/lawmate/documents/${id}/studio`}>Open Studio</Link></Button>
+              <DocumentActionMenu
+                document={doc}
+                trigger={
+                  <Button variant="ghost" size="sm" className="gap-1.5">
+                    <Edit3 className="size-3.5" /> More
+                  </Button>
+                }
+                onRename={handleRename}
+                onArchive={handleArchive}
+                onDelete={handleDelete}
+              />
             </>
           }
         />
@@ -339,12 +397,4 @@ function StatCard({ label, value, icon: Icon }: { label: string; value: string; 
       </CardContent>
     </Card>
   );
-}
-
-function Star({ className }: { className?: string }) {
-  return <svg className={className} fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>;
-}
-
-function Users({ className }: { className?: string }) {
-  return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>;
 }

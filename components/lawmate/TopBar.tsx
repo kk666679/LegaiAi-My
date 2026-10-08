@@ -44,14 +44,14 @@ import {
 import { CommandPalette } from "@/components/lawmate/CommandPalette";
 import { useAuth } from "@/components/auth-provider";
 import { trpcReact } from "@/clients";
-import { useTranslation } from "@/lib/i18n/I18nProvider";
+import { useTranslation } from "@/i18n/hooks/use-translation";
+import { useI18n } from "@/i18n/hooks/use-i18n";
 import { AdminGate } from "@/components/shared/PermissionGate";
 import {
-  LOCALE_FLAGS,
-  LOCALE_LABELS,
-  LOCALE_COUNTRY,
+  LOCALE_META,
+  locales,
   type Locale,
-} from "@/lib/i18n/resources";
+} from "@/i18n/config/locales";
 
 function initials(name?: string | null, email?: string | null) {
   if (name) {
@@ -78,7 +78,8 @@ export function TopBar({ onMenu }: TopBarProps) {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [shortcutKey, setShortcutKey] = useState("Ctrl");
   const { setTheme, theme } = useTheme();
-  const { t, locale, setLocale, available } = useTranslation("sidebar");
+  const { t, tGlobal } = useTranslation("topbar");
+  const { locale, setLocale } = useI18n();
   const { user, logout } = useAuth();
   const router = useRouter();
 
@@ -141,7 +142,7 @@ export function TopBar({ onMenu }: TopBarProps) {
           size="icon"
           onClick={onMenu}
           className="md:hidden"
-          aria-label={t("openMenu")}
+          aria-label={tGlobal("sidebar.openMenu")}
         >
           <Menu className="size-4" aria-hidden />
         </Button>
@@ -150,13 +151,13 @@ export function TopBar({ onMenu }: TopBarProps) {
       <button
         onClick={() => setPaletteOpen(true)}
         className="flex flex-1 items-center gap-2 rounded-md border bg-muted/30 px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
-        aria-label="Open command palette and search"
+        aria-label={t("openCommandPalette")}
       >
         <Search className="size-4 shrink-0" />
         <span className="hidden sm:inline truncate">
-          Search documents, matters, sources…
+          {t("searchPlaceholder")}
         </span>
-        <span className="sm:hidden truncate">Search…</span>
+        <span className="sm:hidden truncate">{t("searchShort")}</span>
         <span className="ml-auto hidden gap-1 sm:inline-flex items-center">
           <Kbd>{shortcutKey}</Kbd>
           <Kbd>K</Kbd>
@@ -170,7 +171,7 @@ export function TopBar({ onMenu }: TopBarProps) {
         onClick={() => router.push("/lawmate/assistant")}
       >
         <Sparkles className="size-4" />
-        Ask LawMate
+        {t("askLawMate")}
       </Button>
 
       <DropdownMenu>
@@ -181,43 +182,43 @@ export function TopBar({ onMenu }: TopBarProps) {
             className="hidden gap-1.5 md:inline-flex"
           >
             <Plus className="size-4" />
-            <span className="hidden xl:inline">New</span>
+            <span className="hidden xl:inline">{t("new")}</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuLabel>Create new</DropdownMenuLabel>
+          <DropdownMenuLabel>{t("createNew")}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
             <Link href="/lawmate/documents/new" className="gap-2">
-              <Plus className="size-4" /> New document
+              <Plus className="size-4" /> {t("newDocument")}
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/lawmate/matters/new" className="gap-2">
-              <Plus className="size-4" /> New matter
+              <Plus className="size-4" /> {t("newMatter")}
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/lawmate/contracts/new" className="gap-2">
-              <Plus className="size-4" /> New contract
+              <Plus className="size-4" /> {t("newContract")}
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
             <Link href="/lawmate/documents/new" className="gap-2">
-              <Plus className="size-4" /> Upload document
+              <Plus className="size-4" /> {t("uploadDocument")}
             </Link>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Button variant="ghost" size="icon" aria-label="Notifications" asChild>
+      <Button variant="ghost" size="icon" aria-label={t("notifications")} asChild>
         <Link href="/lawmate/hitl" className="relative">
           <Bell className="size-4" />
           {unread > 0 && (
             <span
               className="absolute right-1.5 top-1.5 flex size-1.5 rounded-full bg-red-500"
-              aria-label={`${unread} unread alerts`}
+              aria-label={t("unreadAlerts", { count: unread })}
             >
               <span className="absolute inset-0 animate-ping rounded-full bg-red-500 opacity-75" />
             </span>
@@ -256,54 +257,54 @@ export function TopBar({ onMenu }: TopBarProps) {
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
             <Link href="/lawmate/settings/profile" className="gap-2">
-              <UserIcon className="size-4" /> Profile
+              <UserIcon className="size-4" /> {t("profile")}
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/lawmate/settings" className="gap-2">
-              <Settings className="size-4" /> Settings
+              <Settings className="size-4" /> {t("settings")}
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/lawmate/settings/byok" className="gap-2">
-              <Sparkles className="size-4" /> AI Settings
+              <Sparkles className="size-4" /> {t("aiSettings")}
             </Link>
           </DropdownMenuItem>
           <AdminGate>
             <DropdownMenuItem asChild>
               <Link href="/lawmate/settings/users" className="gap-2">
-                <Users className="size-4" /> Team &amp; users
+                <Users className="size-4" /> {t("teamAndUsers")}
               </Link>
             </DropdownMenuItem>
           </AdminGate>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
               <Languages className="size-4" />
-              <span className="ml-2">Language</span>
+              <span className="ml-2">{t("language")}</span>
               <span className="ml-auto text-xs text-muted-foreground">
-                {LOCALE_FLAGS[locale]} {LOCALE_LABELS[locale]}
+                {LOCALE_META[locale].flag} {LOCALE_META[locale].name}
               </span>
             </DropdownMenuSubTrigger>
             <DropdownMenuSubContent className="min-w-[16rem]">
               <DropdownMenuLabel className="text-xs text-muted-foreground">
-                Choose your language
+                {t("chooseLanguage")}
               </DropdownMenuLabel>
               <DropdownMenuRadioGroup
                 value={locale}
                 onValueChange={(v) => setLocale(v as Locale)}
               >
-                {available.map((code) => (
+                {locales.map((code) => (
                   <DropdownMenuRadioItem
                     key={code}
                     value={code}
                     className="gap-2"
                   >
                     <span className="text-base leading-none">
-                      {LOCALE_FLAGS[code]}
+                      {LOCALE_META[code].flag}
                     </span>
-                    <span className="flex-1">{LOCALE_LABELS[code]}</span>
+                    <span className="flex-1">{LOCALE_META[code].name}</span>
                     <span className="text-xs text-muted-foreground">
-                      {LOCALE_COUNTRY[code]}
+                      {LOCALE_META[code].englishName}
                     </span>
                     {code === locale && (
                       <Check className="size-4 text-primary" />
@@ -322,29 +323,29 @@ export function TopBar({ onMenu }: TopBarProps) {
               ) : (
                 <Monitor className="size-4" />
               )}
-              <span className="ml-2">Appearance</span>
+              <span className="ml-2">{t("appearance")}</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuSubContent>
               <DropdownMenuItem onClick={() => setTheme("light")}>
-                <Sun className="size-4" /> Light
+                <Sun className="size-4" /> {t("light")}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTheme("dark")}>
-                <Moon className="size-4" /> Dark
+                <Moon className="size-4" /> {t("dark")}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTheme("system")}>
-                <Monitor className="size-4" /> System
+                <Monitor className="size-4" /> {t("system")}
               </DropdownMenuItem>
             </DropdownMenuSubContent>
           </DropdownMenuSub>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
             <Link href="/resources/documentation" className="gap-2">
-              <Keyboard className="size-4" /> Keyboard shortcuts
+              <Keyboard className="size-4" /> {t("keyboardShortcuts")}
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/resources/documentation" className="gap-2">
-              <HelpCircle className="size-4" /> Help &amp; docs
+              <HelpCircle className="size-4" /> {t("helpAndDocs")}
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
@@ -355,7 +356,7 @@ export function TopBar({ onMenu }: TopBarProps) {
             }}
             className="text-red-500 focus:text-red-500"
           >
-            <LogOut className="size-4" /> Sign out
+            <LogOut className="size-4" /> {t("signOut")}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

@@ -21,7 +21,7 @@ const LINKS = [
   { href: "/lawmate/documents/templates", label: "Templates", icon: <BookTemplate className="size-4" /> },
   { href: "/lawmate/documents/studio", label: "Drafting Studio", icon: <Sparkles className="size-4" /> },
   { href: "/lawmate/documents/library", label: "Library", icon: <Library className="size-4" /> },
-  { href: "/lawmate/documents/contracts", label: "Contracts", icon: <FileSignature className="size-4" /> },
+  { href: "/lawmate/contracts", label: "Contracts", icon: <FileSignature className="size-4" /> },
   { href: "/lawmate/documents?status=archived", label: "Archived", icon: <Archive className="size-4" /> },
   { href: "/lawmate/documents/trash", label: "Trash", icon: <Trash2 className="size-4" /> },
 ];

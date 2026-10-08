@@ -1,4 +1,5 @@
 "use client";
+
 import * as React from "react";
 import { DraftingStudio } from "./drafting-studio";
 import { StudioOutline, type OutlineSection } from "./studio-outline";
@@ -8,6 +9,7 @@ import { StudioAIPanel, type StudioAIAction, type StudioAIMessage } from "./stud
 
 export interface StudioLayoutProps {
   title: string;
+  onTitleChange?: (title: string) => void;
   status?: string;
   templates?: StudioTemplate[];
   templateId?: string;
@@ -31,19 +33,67 @@ export interface StudioLayoutProps {
   onRedo?: () => void;
   canUndo?: boolean;
   canRedo?: boolean;
+  saving?: boolean;
+  lastSaved?: string | null;
+  saveError?: string | null;
+  docType?: string;
+  onDocTypeChange?: (docType: string) => void;
+  docTypeLabel?: string;
 }
 
 export function StudioLayout(props: StudioLayoutProps) {
   return (
     <DraftingStudio
       toolbar={
-        <StudioToolbar title={props.title} status={props.status} templates={props.templates} templateId={props.templateId}
-          onTemplateChange={props.onTemplateChange} onSave={props.onSave} onExport={props.onExport} onShare={props.onShare}
-          onUndo={props.onUndo} onRedo={props.onRedo} canUndo={props.canUndo} canRedo={props.canRedo} />
+        <StudioToolbar
+          title={props.title}
+          onTitleChange={props.onTitleChange}
+          status={props.status}
+          templates={props.templates}
+          templateId={props.templateId}
+          onTemplateChange={props.onTemplateChange}
+          onSave={props.onSave}
+          onExport={props.onExport}
+          onShare={props.onShare}
+          onUndo={props.onUndo}
+          onRedo={props.onRedo}
+          canUndo={props.canUndo}
+          canRedo={props.canRedo}
+          saving={props.saving}
+          lastSaved={props.lastSaved}
+          saveError={props.saveError}
+          docType={props.docType}
+          onDocTypeChange={props.onDocTypeChange}
+          docTypeLabel={props.docTypeLabel}
+        />
       }
-      outline={<StudioOutline sections={props.sections} activeId={props.activeSectionId} onSelect={props.onSectionSelect} onAdd={props.onSectionAdd} onReorder={props.onSectionReorder} />}
-      editor={<StudioEditor value={props.body} onChange={props.onBodyChange} title={props.title} subtitle={props.templates?.find((t) => t.id === props.templateId)?.label} status={props.status ?? "Draft"} />}
-      aiPanel={<StudioAIPanel messages={props.messages} running={props.running} actions={props.aiActions} onAction={props.onAIAction} composerSlot={props.composerSlot} />}
+      outline={
+        <StudioOutline
+          sections={props.sections}
+          activeId={props.activeSectionId}
+          onSelect={props.onSectionSelect}
+          onAdd={props.onSectionAdd}
+          onReorder={props.onSectionReorder}
+        />
+      }
+      editor={
+        <StudioEditor
+          value={props.body}
+          onChange={props.onBodyChange}
+          title={props.title}
+          subtitle={props.templates?.find((t) => t.id === props.templateId)?.label ?? props.docTypeLabel}
+          status={props.status ?? "Draft"}
+        />
+      }
+      aiPanel={
+        <StudioAIPanel
+          messages={props.messages}
+          running={props.running}
+          actions={props.aiActions}
+          onAction={props.onAIAction}
+          composerSlot={props.composerSlot}
+        />
+      }
     />
   );
 }

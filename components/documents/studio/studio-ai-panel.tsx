@@ -2,10 +2,20 @@
 
 import { Button } from "@/components/ui/button";
 
+/**
+ * Flexible message shape. Components may pass either the component-layer
+ * shape (role: "user" | "ai") or the persisted shape (role: "assistant" |
+ * "user"). The panel renders whichever fields are present.
+ */
 export interface StudioAIMessage {
   id: string;
-  role: "assistant" | "user";
-  content: string;
+  role: string;
+  content?: string;
+  text?: React.ReactNode;
+  author?: string;
+  initials?: string;
+  chips?: string[];
+  time?: string;
 }
 
 export interface StudioAIAction {
@@ -33,7 +43,11 @@ export function StudioAIPanel({
         {messages.map((message) => (
           <div key={message.id} className="rounded-md bg-muted/50 p-3 text-sm">
             <p className="mb-1 text-xs font-medium capitalize text-muted-foreground">{message.role}</p>
-            <p className="whitespace-pre-wrap">{message.content}</p>
+            {typeof message.content === "string" ? (
+              <p className="whitespace-pre-wrap">{message.content}</p>
+            ) : message.text != null ? (
+              <div className="whitespace-pre-wrap">{message.text}</div>
+            ) : null}
           </div>
         ))}
         {running && <p className="text-xs text-muted-foreground">{running}</p>}

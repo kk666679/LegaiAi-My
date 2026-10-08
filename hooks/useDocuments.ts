@@ -177,6 +177,23 @@ export interface CreateDocumentInput {
   createdBy?: string;
 }
 
+export interface UpdateDocumentInput {
+  title?: string;
+  content?: string;
+  docType?: DocumentType;
+  status?: DocumentStatus;
+  clientId?: string | null;
+  caseNumber?: string | null;
+  court?: DocumentCourt | null;
+  jurisdiction?: string | null;
+  tags?: string[];
+  parties?: Record<string, string> | null;
+  fileUrl?: string | null;
+  fileSize?: number | null;
+  mimeType?: string | null;
+  updatedBy?: string;
+}
+
 /** Mutations backing the row / bulk action menus. */
 export function useDocumentMutations(onDone?: () => void) {
   const queryClient = useQueryClient();
@@ -194,6 +211,7 @@ export function useDocumentMutations(onDone?: () => void) {
   });
   const approve = trpcReact.documents.approve.useMutation({ onSuccess: settle });
   const create = trpcReact.documents.create.useMutation({ onSuccess: settle });
+  const update = trpcReact.documents.update.useMutation({ onSuccess: settle });
 
   return {
     archive: (id: string) => archive.mutateAsync({ id }),
@@ -204,7 +222,8 @@ export function useDocumentMutations(onDone?: () => void) {
       submitForReview.mutateAsync({ id, ...(reviewerId ? { reviewerId } : {}) }),
     approve: (id: string, reviewerId: string) => approve.mutateAsync({ id, reviewerId }),
     create: (input: CreateDocumentInput) => create.mutateAsync(input),
-    isPending: archive.isPending || remove.isPending || duplicate.isPending,
+    update: (id: string, input: UpdateDocumentInput) => update.mutateAsync({ id, ...input }),
+    isPending: archive.isPending || remove.isPending || duplicate.isPending || update.isPending,
   };
 }
 

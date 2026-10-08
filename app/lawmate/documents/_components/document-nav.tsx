@@ -6,12 +6,6 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const TABS = (id: string) => [
   { href: `/lawmate/documents/${id}/preview`,     label: "Preview" },
-  { href: `/lawmate/documents/${id}/analysis`,    label: "Analysis" },
-  { href: `/lawmate/documents/${id}/versions`,    label: "Versions" },
-  { href: `/lawmate/documents/${id}/comparison`,  label: "Comparison" },
-  { href: `/lawmate/documents/${id}/comments`,    label: "Comments" },
-  { href: `/lawmate/documents/${id}/activity`,    label: "Activity" },
-  { href: `/lawmate/documents/${id}/permissions`, label: "Permissions" },
   { href: `/lawmate/documents/${id}/studio`,      label: "Studio" },
 ];
 

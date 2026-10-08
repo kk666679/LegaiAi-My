@@ -30,22 +30,33 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import type { DocumentPermission, LegalDocument } from "../types";
+import type { DocumentPermission } from "../types";
+
+/**
+ * Accepts either the component-layer LegalDocument (`.name`) or the
+ * persisted Prisma shape returned by the tRPC documents router (`.title`).
+ */
+type ActionMenuDocument = {
+  id: string;
+  name?: string;
+  title?: string;
+  status?: string;
+};
 
 export interface DocumentActionMenuProps {
-  document: LegalDocument;
+  document: ActionMenuDocument;
   trigger: React.ReactNode;
   permissions?: DocumentPermission[];
-  onOpen?: (doc: LegalDocument) => void;
-  onRename?: (doc: LegalDocument) => void;
-  onMove?: (doc: LegalDocument) => void;
-  onDuplicate?: (doc: LegalDocument) => void;
-  onDownload?: (doc: LegalDocument) => void;
-  onShare?: (doc: LegalDocument) => void;
-  onAnalyse?: (doc: LegalDocument) => void;
-  onCompare?: (doc: LegalDocument) => void;
-  onArchive?: (doc: LegalDocument) => void;
-  onDelete?: (doc: LegalDocument) => void;
+  onOpen?: (doc: ActionMenuDocument) => void;
+  onRename?: (doc: ActionMenuDocument) => void;
+  onMove?: (doc: ActionMenuDocument) => void;
+  onDuplicate?: (doc: ActionMenuDocument) => void;
+  onDownload?: (doc: ActionMenuDocument) => void;
+  onShare?: (doc: ActionMenuDocument) => void;
+  onAnalyse?: (doc: ActionMenuDocument) => void;
+  onCompare?: (doc: ActionMenuDocument) => void;
+  onArchive?: (doc: ActionMenuDocument) => void;
+  onDelete?: (doc: ActionMenuDocument) => void;
 }
 
 export function DocumentActionMenu({
@@ -65,6 +76,7 @@ export function DocumentActionMenu({
 }: DocumentActionMenuProps) {
   const [confirmDelete, setConfirmDelete] = React.useState(false);
   const allow = (p: DocumentPermission) => permissions.includes(p);
+  const label = doc.title ?? doc.name ?? "Document";
 
   return (
     <>
@@ -134,7 +146,7 @@ export function DocumentActionMenu({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete document?</AlertDialogTitle>
             <AlertDialogDescription>
-              "{doc.name}" will be permanently deleted. This action cannot be undone.
+              "{label}" will be permanently deleted. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
