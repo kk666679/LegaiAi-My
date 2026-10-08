@@ -9,7 +9,15 @@ import { KnowledgeGraph } from '@lawmate/kg';
 import { VectorIndex } from '@lawmate/vector';
 import { MemoryStore } from '@lawmate/memory';
 import { EvidenceChain } from '@lawmate/evidence';
-import { PolicyEngine, AuditLog, Authorizer, RateLimiter } from '@lawmate/safety';
+import {
+  PolicyEngine,
+  type AuditRecorder,
+  type CapabilityChecker,
+  type RateLimiter,
+  createAuditRecorder,
+  createCapabilityChecker,
+  createRateLimiter,
+} from '@lawmate/safety';
 import { RegistryCatalog } from '@lawmate/registry';
 import { SkillRegistry } from '@lawmate/skills';
 import { ToolRegistry } from '@lawmate/tools';
@@ -21,8 +29,8 @@ export interface LawmateContainer {
   memory: MemoryStore;
   evidence: EvidenceChain;
   policy: PolicyEngine;
-  audit: AuditLog;
-  authz: Authorizer;
+  audit: AuditRecorder;
+  authz: CapabilityChecker;
   rateLimiter: RateLimiter;
   registry: RegistryCatalog;
   skills: SkillRegistry;
@@ -40,9 +48,9 @@ export function getContainer(): LawmateContainer {
       memory: new MemoryStore(),
       evidence: new EvidenceChain(),
       policy: new PolicyEngine(),
-      audit: new AuditLog(true),
-      authz: new Authorizer(),
-      rateLimiter: new RateLimiter(),
+      audit: createAuditRecorder(),
+      authz: createCapabilityChecker(),
+      rateLimiter: createRateLimiter(),
       registry: new RegistryCatalog(),
       skills: new SkillRegistry(),
       tools: new ToolRegistry(),

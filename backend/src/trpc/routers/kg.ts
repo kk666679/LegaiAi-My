@@ -31,7 +31,7 @@ export const kgRouter = router({
       });
       getContainer().audit.record({
         traceId: `kg-add-${node.id}`,
-        actor: 'system',
+        actor: { id: 'system', type: 'system', name: 'kg' },
         action: 'kg.addNode',
         resource: node.id,
         outcome: 'allow',
@@ -129,7 +129,7 @@ export const kgRouter = router({
   auditList: protectedProcedure
     .input(z.object({ limit: z.number().int().min(1).max(500).default(50) }).optional())
     .query(({ input }) => {
-      return getContainer().audit.list().slice(-(input?.limit ?? 50));
+      return getContainer().audit.getRecent(input?.limit ?? 50);
     }),
 });
 

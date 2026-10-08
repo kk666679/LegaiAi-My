@@ -125,9 +125,10 @@ export function DraftForm({ initialData = {}, onSubmit, onCitationsChange }: Dra
 
   const handleFormSubmit = form.handleSubmit((data: FormData) => {
     onSubmit({
+      title: `${data.docType} — ${data.parties.plaintiff} v ${data.parties.defendant}`,
       ...data,
       citations,
-    } as DraftRequest);
+    } as unknown as DraftRequest);
   });
 
   return (

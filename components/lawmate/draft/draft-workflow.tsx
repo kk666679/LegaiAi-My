@@ -77,8 +77,8 @@ export function DraftWorkflow({ currentStep, validationResult, jobId }: DraftWor
                   <div className="mt-2 text-xs">
                     <div className={validationResult.hasOverruled ? "text-red-600" : "text-green-600"}>
                       {validationResult.hasOverruled 
-                        ? `⚠️ ${validationResult.summary.overruled} overruled citation(s)`
-                        : `✅ ${validationResult.summary.valid} valid citation(s)`
+                        ? `⚠️ ${validationResult.summary?.overruled ?? 0} overruled citation(s)`
+                        : `✅ ${validationResult.summary?.valid ?? 0} valid citation(s)`
                       }
                     </div>
                   </div>

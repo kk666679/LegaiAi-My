@@ -44,7 +44,7 @@ export function AgentSwarm() {
             }}
             className="flex flex-col items-center gap-3"
           >
-            <AIOrb label={agent} />
+            <AIOrb />
 
             <p className="text-sm font-medium text-slate-300">
               {agent}

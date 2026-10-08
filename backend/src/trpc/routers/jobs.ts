@@ -72,7 +72,7 @@ export const jobsRouter = router({
         traceId: input.traceId ?? ctx.traceId,
         jobType: input.jobType as JobType,
         priority: input.priority,
-        input: input.input,
+        input: input.input ? JSON.parse(JSON.stringify(input.input)) : undefined,
         maxAttempts: input.maxAttempts,
         idempotencyKey: input.idempotencyKey,
       })

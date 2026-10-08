@@ -85,7 +85,7 @@ export class JobService {
     }
 
     if (input.progress) {
-      data.progress = input.progress
+      data.progress = input.progress as unknown as Prisma.InputJsonValue
     }
 
     if (input.result !== undefined) {

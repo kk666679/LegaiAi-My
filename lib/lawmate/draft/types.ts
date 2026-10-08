@@ -21,6 +21,8 @@ export interface ValidationResult {
   citations: Citation[];
   issues: Array<{ severity: 'error' | 'warning' | 'info'; message: string; path?: string }>;
   score: number;
+  hasOverruled?: boolean;
+  summary?: { total: number; valid: number; overruled: number; warning: number };
 }
 
 export interface DraftDocument {
@@ -41,6 +43,8 @@ export interface DraftRequest {
   facts?: string;
   instructions?: string;
   templateId?: string;
+  tone?: 'neutral' | 'adversarial' | 'persuasive';
+  format?: 'markdown' | 'docx' | 'pdf';
 }
 
 export interface DraftFormState {

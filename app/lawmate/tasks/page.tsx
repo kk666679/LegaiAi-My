@@ -41,7 +41,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { CheckCircle2, Database, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { CheckCircle2, Database, Edit3 as Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { useLocalTasks } from "@/hooks/useLocalTasks";
 import {
   TASK_ASSIGNEES,

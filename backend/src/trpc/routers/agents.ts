@@ -371,7 +371,8 @@ export const agentsRouter: AnyRouter = router({
       let lastUpdate = JSON.stringify(job.progress)
       yield job.progress ?? { stage: job.status.toLowerCase(), percent: 0, message: job.status, timestamp: new Date().toISOString() }
 
-      const interval = setInterval(async () => {
+      while (true) {
+        await new Promise((r) => setTimeout(r, 1000))
         const current = await prisma.job.findUnique({ where: { id: input.jobId } })
         if (!current) return
         const update = JSON.stringify(current.progress)
@@ -379,9 +380,8 @@ export const agentsRouter: AnyRouter = router({
           lastUpdate = update
           yield current.progress ?? { stage: current.status.toLowerCase(), percent: 0, message: current.status, timestamp: new Date().toISOString() }
         }
-      }, 1000)
-
-      return () => clearInterval(interval)
+        if (['COMPLETED','FAILED','CANCELLED'].includes(current.status)) return
+      }
         }),
 
   cancelJob: permissionProcedure('run_agents')
