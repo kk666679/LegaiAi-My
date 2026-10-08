@@ -86,3 +86,4 @@ fly.toml
 # npm pack output
 *.tgz
 **/*.tgz
+dist/

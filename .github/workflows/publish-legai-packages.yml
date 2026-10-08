@@ -112,13 +112,8 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build, validate, pack, scan
-        run: bash scripts/pack-all.sh
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Publish
-        run: bash scripts/publish-all.sh
+      - name: Publish workspace packages
+        run: npm publish --workspaces --access restricted
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
