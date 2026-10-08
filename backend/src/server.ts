@@ -47,21 +47,9 @@ const helmetMw: express.RequestHandler = loadHelmet()
 
 // ESM modules have no bare `require`; keep one available for the optional
 // helmet lookup below (and any other guarded dynamic CJS loads).
-// [dedup-removed] const require_ = createRequire(import.meta.url)
 
 // Helmet is required in production (backend/package.json) but may be absent in
 // the workspace-root dev sandbox. Fall back to a no-op so the dev server boots.
-function loadHelmet(): express.RequestHandler {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const m = require_('helmet')
-    const fn = (m.default ?? m) as (opts?: { contentSecurityPolicy?: boolean }) => express.RequestHandler
-    return fn({ contentSecurityPolicy: false })
-  } catch {
-    return (_req, _res, next) => next()
-  }
-}
-// [dedup-removed] const helmetMw: express.RequestHandler = loadHelmet()
 
 const app = express()
 const PORT = parseInt(process.env.PORT || '3001')
@@ -655,7 +643,13 @@ const server = app.listen(PORT, async () => {
   // Check if Redis is available
   try {
     const redis = await import('redis');
-    const redisClient = redis.createClient({ // host removed: process.env.REDIS_HOST || 'localhost', port: parseInt(process.env.REDIS_PORT || '6379') });
+    const redisClient = redis.createClient({
+      url: process.env.REDIS_URL,
+      socket: {
+        host: process.env.REDIS_HOST || 'localhost',
+        port: parseInt(process.env.REDIS_PORT || '6379', 10),
+      },
+    });
     await redisClient.ping();
     process.stdout.write('Queue: connected\n');
     await redisClient.quit();

@@ -13,8 +13,15 @@
  * All values are constants — no Math.random, no faker.
  */
 import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 
-const prisma = new PrismaClient();
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  console.error('[seed-agents] DATABASE_URL is not set');
+  process.exit(1);
+}
+const adapter = new PrismaPg({ connectionString });
+const prisma = new PrismaClient({ adapter });
 
 /** Catalogue matching AGENT_DEFS in use-agents.ts. */
 const AGENTS = [
